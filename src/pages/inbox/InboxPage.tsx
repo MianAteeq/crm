@@ -16,7 +16,7 @@ export default function InboxPage() {
   } = useInbox();
 
   return (
-    <div className="h-[calc(100vh-80px)] -m-10 overflow-hidden flex bg-bg-surface border border-border rounded-none lg:rounded-[3rem] shadow-2xl">
+    <div className="h-[calc(100vh-80px)] -m-6 overflow-hidden flex bg-white border border-slate-200 rounded-xl shadow-sm">
       {/* List Panel */}
       <div className="w-full md:w-[350px] lg:w-[400px] shrink-0 h-full">
         <ConversationList 
@@ -51,12 +51,12 @@ export default function InboxPage() {
             </div>
           </motion.div>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-center p-20 bg-bg-surface2/30">
-             <div className="w-32 h-32 rounded-[3rem] bg-bg-surface3 border border-border flex items-center justify-center text-text-muted mb-8 shadow-inner">
-                <MessageCircle size={64} />
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-20 bg-slate-50/50">
+             <div className="w-20 h-20 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 mb-6 shadow-sm">
+                <MessageCircle size={32} />
              </div>
-             <h2 className="text-3xl font-black text-white uppercase tracking-tighter">No Conversation Selected</h2>
-             <p className="text-text-muted mt-4 font-medium max-w-[320px] leading-relaxed">
+             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">No Conversation Selected</h2>
+             <p className="text-slate-500 mt-2 font-medium max-w-[320px] leading-relaxed text-sm">
                 Connect with your customers in real-time. Pick a conversation from the left to start chatting.
              </p>
           </div>

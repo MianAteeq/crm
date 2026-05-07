@@ -1,170 +1,161 @@
-import React from 'react';
+import { 
+  MessageSquare, 
+  Layout, 
+  Users, 
+  BarChart3, 
+  Zap, 
+  ShieldCheck, 
+  Layers
+} from 'lucide-react';
 import { motion } from 'motion/react';
-import { Shield, Zap, TrendingUp, Users, MessageSquare, Layout, Activity, Rocket } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import { cn } from '../../lib/utils';
+
+export function Hero() {
+  return (
+    <section className="relative pt-48 pb-32 px-6 overflow-hidden">
+      <div className="max-w-7xl mx-auto text-center relative z-10">
+        <motion.div
+           initial={{ opacity: 0, scale: 0.95 }}
+           animate={{ opacity: 1, scale: 1 }}
+           className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-full mb-10"
+        >
+           <span className="w-2 h-2 rounded-full bg-brand animate-pulse" />
+           <span className="text-xs font-bold text-slate-600 tracking-tight">API v2.4 Platform Now Live</span>
+        </motion.div>
+        
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-6xl md:text-8xl font-black text-slate-900 tracking-tight mb-8 leading-[0.9] lowercase"
+        >
+          Scale your reach.<br />
+          Automate <span className="text-brand italic">meaningfully.</span>
+        </motion.h1>
+
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="max-w-2xl mx-auto text-slate-500 font-medium text-lg md:text-xl mb-12 leading-relaxed"
+        >
+          The next-generation WhatsApp marketing engine for high-performance teams. 
+          Unify your inbox, launch massive campaigns, and build deep customer relationships at scale.
+        </motion.p>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+        >
+          <NavLink
+            to="/register"
+            className="w-full sm:w-auto px-10 py-5 bg-slate-900 text-white font-bold rounded-2xl transition-all hover:bg-slate-800 active:scale-95 shadow-lg shadow-slate-200 text-sm"
+          >
+            Start Campaign Free
+          </NavLink>
+          <button className="w-full sm:w-auto px-10 py-5 bg-white border border-slate-200 text-slate-600 font-bold rounded-2xl transition-all hover:bg-slate-50 active:scale-95 text-sm">
+            Book a Demo
+          </button>
+        </motion.div>
+      </div>
+
+      {/* Decorative Blob */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] -z-10 pointer-events-none opacity-40">
+         <div className="absolute top-[-100px] left-[-200px] w-96 h-96 bg-brand/20 rounded-full blur-[120px]" />
+         <div className="absolute top-[100px] right-[-200px] w-96 h-96 bg-blue-100 rounded-full blur-[120px]" />
+      </div>
+    </section>
+  );
+}
 
 const features = [
-  { icon: MessageSquare, title: "Smart Inbox", desc: "One powerful interface for all your customer conversations with multi-agent support." },
-  { icon: Layout, title: "Campaign Builder", desc: "Create and schedule high-engagement WhatsApp campaigns with visual builder." },
-  { icon: Shield, title: "Meta API Secure", desc: "Fully compliant with WhatsApp Cloud API rules. Secure and enterprise-grade." },
-  { icon: Zap, title: "Instant Automation", desc: "Automate replies, sequences, and workflow triggers without a single line of code." },
-  { icon: Users, title: "Team Collaboration", desc: "Assign conversations, add internal notes, and track team performance metrics." },
-  { icon: Activity, title: "Real-time Analytics", desc: "Detailed insights into delivery, open rates, and conversion metrics." }
+  { icon: MessageSquare, title: 'Unified Inbox', desc: 'Manage all your customer conversations in one powerful enterprise-grade interface. Seamlessly across teams.' },
+  { icon: Layout, title: 'Smart Templates', desc: 'Build complex interactive message templates with our drag-and-drop visual builder. High converting components.' },
+  { icon: Users, title: 'CRM Integration', desc: 'Sync your existing customer data from Salesforce, HubSpot, or Shopify instantly. Keep your source of truth.' },
+  { icon: BarChart3, title: 'Deep Analytics', desc: 'Track reach, delivery rates, and conversion metrics with pixel-perfect accuracy. Real-time reporting engine.' },
+  { icon: Zap, title: 'Automation', desc: 'Build zero-code automation flows that handle everything from support to sales. Reduce your operational load.' },
+  { icon: ShieldCheck, title: 'Meta Verified', desc: 'Built on the official Meta Graph API ensuring 100% compliance and stability for your brand assets.' },
 ];
 
-const pricing = [
-  { name: "Starter", price: "$29", desc: "Perfect for small businesses", features: ["1,000 Contacts", "Standard API", "Single Agent", "Basic Templates"] },
-  { name: "Pro", price: "$99", desc: "Most popular for growth", features: ["10,000 Contacts", "Priority API", "Unlimited Agents", "Dynamic Variables", "API Access"], recommended: true },
-  { name: "Enterprise", price: "Custom", desc: "For large scale operations", features: ["Unlimited Contacts", "Dedicated Support", "Custom Integration", "SLA Guarantee", "White Label"] }
-];
-
-export const Hero = () => (
-  <section className="pt-40 pb-20 px-6 relative overflow-hidden">
-    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-brand/5 blur-[120px] rounded-full -z-10" />
-    
-    <div className="max-w-7xl mx-auto text-center">
-      <motion.div 
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="inline-flex items-center gap-2 px-6 py-2 bg-brand/10 border border-brand/20 rounded-full text-[10px] font-black text-brand uppercase tracking-[0.2em] mb-10"
-      >
-        <Rocket size={14} /> WhatsApp Cloud API v18.0 Powered
-      </motion.div>
-
-      <motion.h1 
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter leading-[0.9] mb-10"
-      >
-        Automate your <br />
-        <span className="text-brand">WhatsApp Scale</span>
-      </motion.h1>
-
-      <motion.p 
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="text-xl md:text-2xl font-medium text-text-muted max-w-2xl mx-auto mb-16 uppercase tracking-tight"
-      >
-        Send targeted campaigns, manage customer inquiries, and automate your entire sales funnel on the world's most popular messaging app.
-      </motion.p>
-
-      <motion.div 
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="flex flex-col md:flex-row items-center justify-center gap-6"
-      >
-        <Link to="/signup" className="w-full md:w-auto px-12 py-6 bg-brand text-black text-xs font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all shadow-[0_20px_50px_rgba(40,_255,_191,_0.3)]">
-          Get Started For Free
-        </Link>
-        <button className="w-full md:w-auto px-12 py-6 bg-bg-surface3 border border-border text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:border-brand/40 transition-all">
-          Book a 1:1 Demo
-        </button>
-      </motion.div>
-
-      {/* Dashboard Preview */}
-      <motion.div 
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 1 }}
-        className="mt-32 relative mx-auto max-w-5xl group"
-      >
-        <div className="absolute -inset-1 bg-gradient-to-r from-brand/50 to-blue-500/50 rounded-[3rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000" />
-        <div className="relative bg-bg-surface border border-white/10 rounded-[2.5rem] p-4 shadow-2xl overflow-hidden aspect-video">
-           <div className="w-full h-full bg-black/40 rounded-2xl border border-white/5 flex items-center justify-center">
-              <div className="text-center opacity-40 group-hover:opacity-80 transition-opacity">
-                 <Activity size={80} className="text-brand mx-auto mb-4 animate-pulse" />
-                 <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white">Live Dashboard Preview</p>
-              </div>
-           </div>
+export function Features() {
+  return (
+    <section id="features" className="py-32 px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-24">
+           <span className="text-[10px] font-bold text-brand uppercase tracking-[0.3em] bg-brand/5 px-4 py-1.5 rounded-full border border-brand/10">Capabilities</span>
+           <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mt-6 leading-tight">Built for the high-end <br className="hidden md:block"/> marketing era</h2>
         </div>
-      </motion.div>
-    </div>
-  </section>
-);
 
-export const Features = () => (
-  <section id="features" className="py-40 px-6 bg-black/20">
-    <div className="max-w-7xl mx-auto">
-      <div className="text-center mb-24">
-        <h2 className="text-4xl font-black text-white uppercase tracking-tighter mb-4 leading-none">Built for Scale</h2>
-        <p className="text-text-muted text-[10px] font-black uppercase tracking-[0.3em]">Advanced Features • Seamless Integration</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {features.map((f, i) => (
-          <motion.div 
-            key={f.title}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.1 }}
-            className="p-10 bg-bg-surface border border-border rounded-[2.5rem] hover:border-brand/40 transition-all group"
-          >
-            <div className="w-16 h-16 bg-bg-surface3 border border-border rounded-2xl flex items-center justify-center text-text-muted group-hover:text-brand group-hover:border-brand/20 transition-all mb-8">
-              <f.icon size={32} />
-            </div>
-            <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-4">{f.title}</h3>
-            <p className="text-text-muted text-sm font-medium leading-relaxed uppercase tracking-tight">{f.desc}</p>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  </section>
-);
-
-export const Pricing = () => (
-  <section id="pricing" className="py-40 px-6">
-    <div className="max-w-7xl mx-auto">
-      <div className="text-center mb-24">
-        <h2 className="text-4xl font-black text-white uppercase tracking-tighter mb-4 leading-none">Simple, Transparent Pricing</h2>
-        <p className="text-text-muted text-[10px] font-black uppercase tracking-[0.3em]">No hidden fees • Cancel anytime</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-        {pricing.map((p, i) => (
-          <motion.div 
-            key={p.name}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.1 }}
-            className={`p-12 rounded-[3rem] border flex flex-col relative ${
-              p.recommended 
-                ? 'bg-brand/5 border-brand shadow-[0_0_50px_rgba(40,_255,_191,_0.05)] pt-20' 
-                : 'bg-bg-surface border-border'
-            }`}
-          >
-            {p.recommended && (
-              <div className="absolute top-8 left-1/2 -translate-x-1/2 px-6 py-2 bg-brand text-black text-[9px] font-black uppercase tracking-widest rounded-full">
-                Most Popular
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {features.map((f, i) => (
+            <motion.div
+              key={f.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="p-10 bg-white border border-slate-100 rounded-[2.5rem] shadow-sm hover:shadow-xl hover:shadow-slate-100 transition-all group"
+            >
+              <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-brand group-hover:bg-brand/5 group-hover:border-brand/20 transition-all mb-8">
+                <f.icon size={26} strokeWidth={2} />
               </div>
-            )}
-            <h3 className="text-[12px] font-black text-text-muted uppercase tracking-[0.3em] mb-4">{p.name}</h3>
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-5xl font-black text-white tracking-tighter">{p.price}</span>
-              {p.name !== 'Enterprise' && <span className="text-text-muted font-bold uppercase tracking-tight text-sm">/month</span>}
-            </div>
-            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-10">{p.desc}</p>
-            
-            <div className="space-y-4 mb-12 flex-1">
-              {p.features.map(f => (
-                <div key={f} className="flex items-center gap-3 text-[11px] font-bold text-white/80 uppercase">
-                  <TrendingUp size={14} className="text-brand" /> {f}
-                </div>
-              ))}
-            </div>
-
-            <Link to="/signup" className={`w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center transition-all ${
-              p.recommended ? 'bg-brand text-black hover:brightness-110' : 'bg-bg-surface3 text-white border border-border hover:border-brand/40'
-            }`}>
-              {p.name === 'Enterprise' ? 'Contact Sales' : 'Get Started'}
-            </Link>
-          </motion.div>
-        ))}
+              <h3 className="text-xl font-bold text-slate-900 mb-4">{f.title}</h3>
+              <p className="text-slate-500 font-medium text-sm leading-relaxed">{f.desc}</p>
+            </motion.div>
+          ))}
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+}
+
+export function Pricing() {
+  return (
+    <section id="pricing" className="py-32 px-6">
+       <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+             <h2 className="text-4xl font-bold text-slate-900 tracking-tight mb-4">Scalable Pricing</h2>
+             <p className="text-slate-500 font-medium">Simple plans for high-growth automated teams.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+             {[
+               { name: 'Starter', price: '$0', features: ['1,000 Contacts', 'Basic Analytics', 'Standard Support', '5 Automation Flows'], highlighted: false },
+               { name: 'Professional', price: '$49', features: ['10,000 Contacts', 'Advanced Flows', 'Priority 24/7 Support', 'CRM Integration'], highlighted: true },
+               { name: 'Enterprise', price: 'Custom', features: ['Unlimited Contacts', 'Meta Verification', 'Dedicated Manager', 'API Access'], highlighted: false }
+             ].map((plan) => (
+               <div key={plan.name} className={cn(
+                 "p-12 rounded-[3.5rem] border flex flex-col transition-all",
+                 plan.highlighted ? "bg-slate-900 text-white border-slate-900 shadow-2xl scale-105 z-10" : "bg-white border-slate-200 text-slate-900"
+               )}>
+                  <h3 className={cn("text-xs font-bold uppercase tracking-[0.3em] mb-4", plan.highlighted ? "text-brand" : "text-slate-400")}>{plan.name}</h3>
+                  <div className="flex items-baseline gap-2 mb-10">
+                     <span className="text-5xl font-black tracking-tight">{plan.price}</span>
+                     {plan.price !== 'Custom' && <span className={cn("text-xs font-medium uppercase", plan.highlighted ? "text-slate-400" : "text-slate-400")}>/mo</span>}
+                  </div>
+                  <ul className="space-y-4 mb-12 flex-1">
+                     {plan.features.map(f => (
+                       <li key={f} className="flex items-center gap-3 text-sm font-medium opacity-80">
+                          <div className={cn("w-1.5 h-1.5 rounded-full", plan.highlighted ? "bg-brand" : "bg-slate-900")} />
+                          {f}
+                       </li>
+                     ))}
+                  </ul>
+                  <button className={cn(
+                    "w-full py-5 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95",
+                    plan.highlighted 
+                      ? "bg-brand text-black hover:bg-white hover:text-black" 
+                      : "bg-slate-900 text-white hover:bg-slate-800"
+                  )}>
+                    Get Started
+                  </button>
+               </div>
+             ))}
+          </div>
+       </div>
+    </section>
+  );
+}

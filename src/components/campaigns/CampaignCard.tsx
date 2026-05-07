@@ -16,55 +16,55 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, onClick }) => {
 
   return (
     <motion.div 
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -2 }}
       onClick={() => onClick(campaign)}
-      className="bg-bg-surface border border-border rounded-[2.5rem] p-8 cursor-pointer hover:border-brand/30 transition-all group"
+      className="bg-white border border-slate-200 rounded-xl p-6 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all group flex flex-col"
     >
-      <div className="flex items-start justify-between mb-8">
-        <div className="w-14 h-14 rounded-2xl bg-brand/5 border border-brand/10 flex items-center justify-center text-brand">
-          {campaign.type === 'Broadcast' ? <Send size={24} /> : <Calendar size={24} />}
+      <div className="flex items-start justify-between mb-6">
+        <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-slate-900 group-hover:bg-slate-100 transition-colors">
+          {campaign.type === 'Broadcast' ? <Send size={20} /> : <Calendar size={20} />}
         </div>
         <StatusBadge status={campaign.status} />
       </div>
 
-      <div className="space-y-1 mb-8">
-        <h3 className="text-xl font-black text-white uppercase tracking-tight group-hover:text-brand transition-colors">
+      <div className="space-y-1 mb-6">
+        <h3 className="text-lg font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">
           {campaign.name}
         </h3>
-        <p className="text-[10px] text-text-muted font-black uppercase tracking-widest">
-          {campaign.type} • Created {new Date(campaign.createdAt).toLocaleDateString()}
+        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+          {campaign.type} • {new Date(campaign.createdAt).toLocaleDateString()}
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-8">
-        <div className="p-4 bg-bg-surface3 rounded-2xl border border-border">
-          <div className="flex items-center gap-2 text-text-muted mb-1">
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+          <div className="flex items-center gap-1.5 text-slate-400 mb-1">
             <Users size={12} />
-            <span className="text-[9px] font-black uppercase tracking-widest">Audience</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest">Audience</span>
           </div>
-          <p className="text-lg font-black text-white">{campaign.audienceSize.toLocaleString()}</p>
+          <p className="text-base font-bold text-slate-900">{campaign.audienceSize.toLocaleString()}</p>
         </div>
-        <div className="p-4 bg-bg-surface3 rounded-2xl border border-border">
-          <div className="flex items-center gap-2 text-text-muted mb-1">
+        <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+          <div className="flex items-center gap-1.5 text-slate-400 mb-1">
             <CheckCircle2 size={12} />
-            <span className="text-[9px] font-black uppercase tracking-widest">Delivery</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest">Success</span>
           </div>
-          <p className="text-lg font-black text-white">{deliveryRate}%</p>
+          <p className="text-base font-bold text-slate-900">{deliveryRate}%</p>
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-6 border-t border-border mt-auto">
-        <div className="flex -space-x-2">
+      <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+        <div className="flex -space-x-1.5">
           {[1, 2, 3].map(i => (
-            <div key={i} className="w-6 h-6 rounded-full border-2 border-bg-surface bg-bg-surface3" />
+            <div key={i} className="w-5 h-5 rounded-full border-2 border-white bg-slate-100" />
           ))}
-          <div className="w-6 h-6 rounded-full border-2 border-bg-surface bg-brand flex items-center justify-center text-[8px] font-black text-white">
+          <div className="w-5 h-5 rounded-full border-2 border-white bg-slate-900 flex items-center justify-center text-[8px] font-bold text-white">
             +
           </div>
         </div>
-        <div className="flex items-center gap-2 text-brand group-hover:translate-x-1 transition-transform">
-          <span className="text-[10px] font-black uppercase tracking-widest">Analytics</span>
-          <ArrowRight size={14} />
+        <div className="flex items-center gap-1.5 text-blue-600 group-hover:translate-x-1 transition-transform">
+          <span className="text-[10px] font-bold uppercase tracking-wider">Details</span>
+          <ArrowRight size={12} />
         </div>
       </div>
     </motion.div>

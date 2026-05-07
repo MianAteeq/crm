@@ -8,69 +8,66 @@ interface ApiLogsViewerProps {
 
 export default function ApiLogsViewer({ logs }: ApiLogsViewerProps) {
   return (
-    <div className="p-8 bg-black/40 border border-border rounded-[2.5rem] space-y-6">
+    <div className="p-8 bg-white border border-slate-100 rounded-3xl space-y-8 shadow-sm">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-bg-surface3 text-text-muted rounded-xl">
-             <Terminal size={20} />
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center border border-slate-100">
+             <Terminal size={18} />
           </div>
           <div>
-             <h3 className="text-[11px] font-black text-white uppercase tracking-[0.2em]">API Request Logs</h3>
-             <p className="text-[9px] font-medium text-text-muted uppercase">Real-time communication debug</p>
+             <h3 className="text-base font-bold text-slate-900 tracking-tight">System Logs</h3>
+             <p className="text-xs font-medium text-slate-400">Real-time API communication events</p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-           <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[8px] font-black text-emerald-500/80 uppercase tracking-widest">Listening</span>
-           </div>
+        <div className="flex items-center gap-2.5 px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100">
+           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+           <span className="text-[10px] font-black uppercase tracking-widest">Listening</span>
         </div>
       </div>
 
-      <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+      <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
         {logs.length === 0 ? (
-          <div className="py-12 text-center opacity-30">
-             <Shield size={40} className="mx-auto mb-4 text-text-muted" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-text-muted">No API events captured yet</p>
+          <div className="py-20 text-center opacity-40">
+             <Shield size={48} className="mx-auto mb-6 text-slate-200" />
+             <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">No active events logged</p>
           </div>
         ) : (
           logs.map((log) => (
-            <div key={log.id} className="p-4 bg-bg-surface3/50 border border-border/50 rounded-xl hover:border-brand/20 transition-all group">
-               <div className="flex items-start justify-between mb-3">
+            <div key={log.id} className="p-6 bg-slate-50 border border-slate-100 rounded-2xl hover:border-slate-300 transition-all group">
+               <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                     <span className={`px-2 py-0.5 rounded text-[8px] font-black ${log.method === 'POST' ? 'bg-brand text-black' : 'bg-blue-500 text-white'}`}>
+                     <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${log.method === 'POST' ? 'bg-slate-900 text-white' : 'bg-blue-600 text-white'}`}>
                         {log.method}
                      </span>
-                     <span className="text-[10px] font-mono text-white/80">{log.endpoint}</span>
+                     <span className="text-[11px] font-mono font-bold text-slate-600">{log.endpoint}</span>
                   </div>
-                  <span className={`text-[9px] font-black uppercase tracking-widest ${log.status === 200 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                     HTTP {log.status}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className={`text-[11px] font-black ${log.status >= 200 && log.status < 300 ? 'text-emerald-600' : 'text-red-600'}`}>
+                       STATUS {log.status}
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-400">
+                       {new Date(log.timestamp).toLocaleTimeString([], { hour12: false })}
+                    </span>
+                  </div>
                </div>
                
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                     <div className="flex items-center gap-1.5 text-[8px] font-black text-text-muted uppercase tracking-widest">
-                        <ArrowUpRight size={10} /> Request Payload
+               <div className="grid grid-cols-1 gap-6">
+                  <div className="space-y-2">
+                     <div className="flex items-center gap-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                        <ArrowUpRight size={12} className="text-slate-300" /> Payload
                      </div>
-                     <pre className="p-3 bg-black/40 rounded-lg text-[9px] font-mono text-white/60 overflow-x-auto">
+                     <pre className="p-4 bg-white border border-slate-100 rounded-xl text-[10px] font-mono text-slate-500 overflow-x-auto shadow-inner">
                         {JSON.stringify(log.request, null, 2)}
                      </pre>
                   </div>
-                  <div className="space-y-1.5">
-                     <div className="flex items-center gap-1.5 text-[8px] font-black text-text-muted uppercase tracking-widest">
-                        <ArrowDownLeft size={10} /> Meta Response
+                  <div className="space-y-2">
+                     <div className="flex items-center gap-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                        <ArrowDownLeft size={12} className="text-slate-300" /> Server Data
                      </div>
-                     <pre className="p-3 bg-black/40 rounded-lg text-[9px] font-mono text-emerald-500/60 overflow-x-auto">
+                     <pre className="p-4 bg-white border border-slate-100 rounded-xl text-[10px] font-mono text-slate-500 overflow-x-auto shadow-inner">
                         {JSON.stringify(log.response, null, 2)}
                      </pre>
                   </div>
-               </div>
-
-               <div className="mt-3 pt-3 border-t border-white/5 flex justify-end">
-                  <span className="text-[8px] font-black text-text-muted uppercase tracking-tighter">
-                     {new Date(log.timestamp).toLocaleTimeString()}
-                  </span>
                </div>
             </div>
           ))

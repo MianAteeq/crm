@@ -33,19 +33,18 @@ export default function CampaignsPage() {
   ];
 
   return (
-    <div className="space-y-10 min-h-screen pb-20">
+    <div className="space-y-8 min-h-screen pb-20">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-           <h1 className="text-4xl font-black text-white uppercase tracking-tighter">Campaigns</h1>
-           <p className="text-text-muted mt-2 font-medium tracking-wide">Orchestrate and analyze your WhatsApp outreach</p>
+           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Campaigns</h1>
+           <p className="text-slate-500 mt-1 font-medium text-sm">Orchestrate and analyze your WhatsApp outreach campaigns</p>
         </div>
         <button 
           onClick={() => navigate('/campaigns/create')}
-          className="bg-brand hover:brightness-110 text-black px-8 py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] transition-all flex items-center gap-3 shadow-[0_10px_40px_rgba(var(--brand-rgb),0.2)] active:scale-95 group relative overflow-hidden"
+          className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm active:scale-95 group"
         >
-          <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
-          <Plus size={18} strokeWidth={3} />
+          <Plus size={18} strokeWidth={2} />
           Create Campaign
         </button>
       </div>
@@ -53,56 +52,54 @@ export default function CampaignsPage() {
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {stats.map((stat, i) => (
-          <div key={i} className="p-8 bg-bg-surface border border-border rounded-[2.5rem] flex items-center justify-between group hover:border-brand/30 transition-all">
+          <div key={i} className="p-6 bg-white border border-slate-200 rounded-xl flex items-center justify-between shadow-sm group hover:border-slate-300 transition-all">
              <div>
-                <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] mb-1">{stat.label}</p>
-                <div className="flex items-baseline gap-3">
-                   <h3 className="text-3xl font-black text-white tracking-tighter">{stat.value}</h3>
-                   <span className={`text-[10px] font-black uppercase tracking-widest ${stat.trend === 'up' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                <div className="flex items-baseline gap-2">
+                   <h3 className="text-2xl font-bold text-slate-900 tracking-tight">{stat.value}</h3>
+                   <span className={`text-[10px] font-bold ${stat.trend === 'up' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'} px-2 py-0.5 rounded-full`}>
                       {stat.change}
                    </span>
                 </div>
              </div>
-             <div className="w-14 h-14 rounded-2xl bg-bg-surface3 border border-border flex items-center justify-center text-text-muted group-hover:text-brand transition-colors">
-                <stat.icon size={28} />
+             <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-slate-900 transition-colors">
+                <stat.icon size={20} />
              </div>
           </div>
         ))}
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col lg:flex-row gap-6 p-6 bg-bg-surface border border-border rounded-[2.5rem] shadow-xl">
+      <div className="flex flex-col lg:flex-row gap-4 p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
         <div className="relative group flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-brand transition-colors" size={16} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 transition-colors" size={16} />
           <input 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search campaigns..."
-            className="w-full bg-bg-surface3 border border-border rounded-2xl p-4 pl-12 text-sm font-bold text-white focus:outline-none focus:border-brand/40 transition-all"
+            className="w-full bg-slate-50 border border-slate-100 rounded-lg py-2.5 pl-10 pr-4 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-100 transition-all"
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-4">
-           <div className="flex items-center gap-2 bg-bg-surface3 border border-border rounded-2xl p-2">
+        <div className="flex flex-wrap items-center gap-3">
+           <div className="flex items-center gap-1 bg-slate-50 border border-slate-100 rounded-lg p-1">
               {(['grid', 'table'] as const).map(mode => (
                 <button
                   key={mode}
                   onClick={() => setViewMode(mode)}
-                  className={`p-2.5 rounded-xl transition-all ${
-                    viewMode === mode ? 'bg-bg-surface border border-border text-brand' : 'text-text-muted hover:text-white'
+                  className={`p-2 rounded-md transition-all ${
+                    viewMode === mode ? 'bg-white border border-slate-200 text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'
                   }`}
                 >
-                  {mode === 'grid' ? <LayoutGrid size={18} /> : <List size={18} />}
+                  {mode === 'grid' ? <LayoutGrid size={16} /> : <List size={16} />}
                 </button>
               ))}
            </div>
 
-           <div className="h-10 w-px bg-border mx-2 hidden lg:block" />
-
            <select 
              value={statusFilter}
              onChange={(e) => setStatusFilter(e.target.value)}
-             className="bg-bg-surface3 border border-border rounded-2xl px-5 py-4 text-[10px] font-black text-text-muted uppercase tracking-widest focus:outline-none focus:border-brand/40 transition-all appearance-none pr-10 relative cursor-pointer hover:border-brand/30"
+             className="bg-white border border-slate-200 rounded-lg px-4 py-2 text-xs font-bold text-slate-600 hover:border-slate-300 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-100"
            >
               <option value="all">All Status</option>
               <option value="draft">Draft</option>
@@ -114,16 +111,12 @@ export default function CampaignsPage() {
            <select 
              value={typeFilter}
              onChange={(e) => setTypeFilter(e.target.value)}
-             className="bg-bg-surface3 border border-border rounded-2xl px-5 py-4 text-[10px] font-black text-text-muted uppercase tracking-widest focus:outline-none focus:border-brand/40 transition-all appearance-none pr-10 relative cursor-pointer hover:border-brand/30"
+             className="bg-white border border-slate-200 rounded-lg px-4 py-2 text-xs font-bold text-slate-600 hover:border-slate-300 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-100"
            >
               <option value="all">All Types</option>
               <option value="broadcast">Broadcast</option>
               <option value="automation">Automation</option>
            </select>
-
-           <button className="flex items-center gap-3 px-6 py-4 bg-bg-surface border border-border rounded-2xl text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-white transition-all">
-              Latest <ChevronDown size={14} />
-           </button>
         </div>
       </div>
 
@@ -162,11 +155,11 @@ export default function CampaignsPage() {
 
       {filteredCampaigns.length === 0 && (
         <div className="py-20 flex flex-col items-center text-center">
-           <div className="w-24 h-24 rounded-[2rem] bg-bg-surface3 border border-border flex items-center justify-center text-text-muted mb-8">
-              <Send size={40} />
+           <div className="w-20 h-20 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 mb-6 shadow-sm">
+              <Send size={32} />
            </div>
-           <h3 className="text-2xl font-black text-white uppercase tracking-tight">No Campaigns Found</h3>
-           <p className="text-text-muted mt-2 font-medium max-w-[320px]">
+           <h3 className="text-xl font-bold text-slate-900 tracking-tight">No Campaigns Found</h3>
+           <p className="text-slate-500 mt-2 font-medium max-w-[320px] text-sm leading-relaxed">
               Try adjusting your search filters or create your first campaign to get started.
            </p>
         </div>

@@ -24,9 +24,9 @@ export default function ExportDropdown({ onExport }: ExportDropdownProps) {
     <div className="relative" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 bg-bg-surface/50 border border-border rounded-2xl py-3 px-5 text-[10px] font-black uppercase tracking-widest hover:bg-bg-surface transition-all"
+        className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm"
       >
-        <Download size={14} className="text-brand" />
+        <Download size={14} />
         <span>Export</span>
         <ChevronDown size={14} className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
@@ -37,26 +37,30 @@ export default function ExportDropdown({ onExport }: ExportDropdownProps) {
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute right-0 mt-2 w-48 bg-bg-surface border border-border rounded-2xl shadow-2xl z-50 overflow-hidden backdrop-blur-xl"
+            className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden"
           >
             <div className="p-2 space-y-1">
                <button 
                 onClick={() => { onExport('csv'); setIsOpen(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-white hover:bg-white/[0.05] rounded-xl transition-all"
+                className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all"
                >
-                  <FileText size={16} className="text-blue-500" />
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500">
+                     <FileText size={16} />
+                  </div>
                   <span>Export as CSV</span>
                </button>
                <button 
                 onClick={() => { onExport('excel'); setIsOpen(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-white hover:bg-white/[0.05] rounded-xl transition-all"
+                className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all"
                >
-                  <FileSpreadsheet size={16} className="text-emerald-500" />
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500">
+                     <FileSpreadsheet size={16} />
+                  </div>
                   <span>Export as Excel</span>
                </button>
             </div>
-            <div className="p-3 bg-bg-surface2/50 border-t border-border">
-               <p className="text-[8px] text-text-muted font-bold uppercase tracking-widest text-center italic">Includes custom fields & tags</p>
+            <div className="p-3 bg-slate-50 border-t border-slate-100">
+               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center">Includes custom fields</p>
             </div>
           </motion.div>
         )}

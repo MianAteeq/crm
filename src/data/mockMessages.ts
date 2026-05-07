@@ -7,7 +7,7 @@ export const mockConversations: Conversation[] = [
       id: 'c1',
       name: 'Muhammad Ahmad',
       phone: '+92 300 1234567',
-      status: 'Active',
+      status: 'active',
       tags: ['Premium', 'Loyalty'],
       lastSeen: '2024-05-03T09:00:00Z'
     },
@@ -27,7 +27,7 @@ export const mockConversations: Conversation[] = [
       id: 'c2',
       name: 'Zainab Bibi',
       phone: '+92 312 9876543',
-      status: 'Active',
+      status: 'active',
       tags: ['New Lead'],
       lastSeen: '2024-05-03T07:15:00Z'
     },
@@ -45,7 +45,7 @@ export const mockConversations: Conversation[] = [
       id: 'c3',
       name: 'Ali Khan',
       phone: '+92 321 4567890',
-      status: 'Active',
+      status: 'active',
       tags: ['Urgent'],
       lastSeen: '2024-05-02T22:00:00Z'
     },

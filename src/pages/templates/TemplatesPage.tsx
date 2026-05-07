@@ -50,28 +50,28 @@ export default function TemplatesPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-4">
            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-brand/10 rounded-2xl border border-brand/20">
-                 <Library size={24} className="text-brand" />
+              <div className="p-2.5 bg-slate-900 rounded-2xl shadow-lg shadow-slate-900/10">
+                 <Library size={24} className="text-white" />
               </div>
-              <h1 className="text-3xl font-black text-white uppercase tracking-tight">Message Templates</h1>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Templates</h1>
            </div>
            
-           <div className="flex p-1 bg-bg-surface border border-border rounded-2xl w-fit">
+           <div className="flex p-1 bg-slate-50 border border-slate-200 rounded-xl w-fit">
               <button 
                 onClick={() => setActiveTab('my')}
                 className={cn(
-                  "px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2",
-                  activeTab === 'my' ? "bg-bg-surface3 text-white shadow-xl border border-border" : "text-text-muted hover:text-white"
+                  "px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2",
+                  activeTab === 'my' ? "bg-white text-slate-900 shadow-sm border border-slate-100" : "text-slate-400 hover:text-slate-600"
                 )}
               >
                 <UserCircle size={14} />
-                My Blueprints
+                My Templates
               </button>
               <button 
                 onClick={() => setActiveTab('system')}
                 className={cn(
-                  "px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2",
-                  activeTab === 'system' ? "bg-bg-surface3 text-white shadow-xl border border-border" : "text-text-muted hover:text-white"
+                  "px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2",
+                  activeTab === 'system' ? "bg-white text-slate-900 shadow-sm border border-slate-100" : "text-slate-400 hover:text-slate-600"
                 )}
               >
                 <SparklesIcon />
@@ -83,7 +83,7 @@ export default function TemplatesPage() {
         <div className="flex items-center gap-4">
            <button 
             onClick={() => setIsSyncModalOpen(true)}
-            className="flex items-center gap-3 px-6 py-4 bg-bg-surface border border-border rounded-[2rem] text-[10px] font-black uppercase tracking-[0.2em] text-text-muted hover:text-white hover:border-brand/40 transition-all active:scale-95 group"
+            className="flex items-center gap-3 px-6 py-4 bg-white border border-slate-200 rounded-xl text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-900 hover:border-slate-900 transition-all active:scale-95 group shadow-sm"
            >
             <RefreshCcw size={16} className="group-hover:rotate-180 transition-transform duration-500" />
             Sync from Meta
@@ -91,11 +91,10 @@ export default function TemplatesPage() {
 
            <button 
             onClick={() => navigate('/templates/create')}
-            className="bg-brand hover:bg-brand-dark text-black px-8 py-4 rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] transition-all flex items-center gap-3 shadow-[0_0_50px_var(--color-brand-glow)] active:scale-95 group overflow-hidden relative"
+            className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-4 rounded-xl font-bold uppercase tracking-widest text-[11px] transition-all flex items-center gap-3 shadow-lg shadow-slate-900/10 active:scale-95 group"
            >
-            <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
-            <Plus size={18} strokeWidth={3} />
-            Forge Template
+            <Plus size={18} strokeWidth={2} />
+            Create Template
            </button>
         </div>
       </div>
@@ -126,18 +125,18 @@ export default function TemplatesPage() {
                   ))}
                 </div>
               ) : (
-                <div className="bg-bg-surface border border-border rounded-[2.5rem] overflow-hidden shadow-2xl">
+                <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
                   <TemplateTable templates={filteredTemplates} onSelect={setSelectedTemplate} />
                 </div>
               )
             ) : (
-              <div className="h-[40vh] flex flex-col items-center justify-center space-y-6 text-center bg-bg-surface/30 border border-dashed border-border rounded-[3rem]">
-                 <div className="w-20 h-20 bg-bg-surface rounded-[2rem] border border-border flex items-center justify-center text-text-muted group">
-                    <Library size={32} className="group-hover:scale-110 transition-transform" />
+              <div className="py-32 flex flex-col items-center justify-center space-y-6 text-center bg-slate-50/50 border border-slate-200 rounded-3xl">
+                 <div className="w-20 h-20 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-center text-slate-300 group">
+                    <Library size={32} className="group-hover:scale-110 group-hover:text-slate-900 transition-all" />
                  </div>
-                 <div className="space-y-1">
-                    <p className="text-sm font-black text-white uppercase tracking-widest">No matching blueprints found</p>
-                    <p className="text-[11px] text-text-muted font-medium uppercase tracking-wider">Try adjusting your filters or forging a new template</p>
+                 <div className="space-y-2">
+                    <p className="text-xl font-bold text-slate-900 tracking-tight">No Templates Found</p>
+                    <p className="text-sm text-slate-500 font-medium max-w-xs">Try adjusting your filters or create a new template to get started.</p>
                  </div>
               </div>
             )}
@@ -150,13 +149,13 @@ export default function TemplatesPage() {
             exit={{ opacity: 0, y: -20 }}
             className="space-y-10"
           >
-             <div className="p-6 bg-brand/5 border border-brand/10 rounded-[2rem] flex items-start gap-4">
-                <div className="p-2 bg-brand/20 rounded-xl text-brand">
+             <div className="p-8 bg-blue-50 border border-blue-100 rounded-2xl flex items-start gap-4">
+                <div className="p-3 bg-white rounded-xl text-blue-600 shadow-sm">
                    <Info size={20} />
                 </div>
-                <div className="space-y-1">
-                   <h4 className="text-xs font-black text-brand uppercase tracking-widest">About Meta System Library</h4>
-                   <p className="text-[11px] text-brand/80 font-medium leading-relaxed max-w-3xl">
+                <div className="space-y-2">
+                   <h4 className="text-[10px] font-bold text-blue-900 uppercase tracking-widest">About Meta System Library</h4>
+                   <p className="text-xs text-blue-800 font-medium leading-relaxed max-w-4xl">
                      Accelerate your workflow with pre-approved blueprints. These templates adhere strictly to Meta's Business Messaging Policies and are designed for maximum engagement. Selecting a template will pre-fill the Forge Workspace.
                    </p>
                 </div>

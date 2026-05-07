@@ -40,14 +40,34 @@ export interface CampaignRecipient {
   timestamp: string;
 }
 
+export interface Tag {
+  id: string;
+  name: string;
+  color?: string;
+}
+
 export interface Contact {
   id: string;
   name: string;
   phone: string;
+  email?: string;
+  company?: string;
+  job_title?: string;
+  address?: string;
+  birthday?: string;
+  website?: string;
+  notes?: string;
   avatar?: string;
-  status: 'Active' | 'Unsubscribed' | 'Archived';
-  tags: string[];
+  status: 'active' | 'unsubscribed' | 'archived' | 'lead' | 'customer';
+  tags: string[]; // These will be tag IDs
   lastSeen: string;
+  lastContacted?: string; // UI specific
+  totalCampaigns?: number; // UI specific
+  campaigns?: any[]; // UI specific
+  createdAt?: string;
+  created_at?: string;
+  addedDate?: string; // UI specific
+  updatedAt?: string;
 }
 
 export interface User {
@@ -59,14 +79,28 @@ export interface User {
   onboardingStep: number;
 }
 
+export interface WhatsAppSettings {
+  access_token: string;
+  phone_number_id: string;
+  business_account_id: string;
+  status: 'connected' | 'disconnected' | 'pending' | 'error';
+  business_name?: string;
+  phone_number?: string;
+  webhook_status?: 'active' | 'inactive';
+  last_synced?: string;
+}
+
 export interface WhatsAppConfig {
-  status: 'connected' | 'disconnected';
+  status: 'connected' | 'disconnected' | 'pending' | 'error';
   phoneNumberId: string;
   businessAccountId: string;
   accessToken: string;
   webhookUrl: string;
   verifyToken: string;
   lastSync: string;
+  businessName?: string;
+  phoneNumber?: string;
+  webhookStatus?: 'active' | 'inactive';
 }
 
 export interface ApiLog {

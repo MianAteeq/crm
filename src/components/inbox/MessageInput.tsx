@@ -54,18 +54,18 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
   };
 
   return (
-    <div className="p-6 bg-bg-surface border-t border-border relative">
+    <div className="p-6 bg-white border-t border-slate-200 relative">
       <AnimatePresence>
         {showTemplates && (
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="absolute bottom-full left-6 right-6 mb-4 p-6 bg-bg-surface border border-border rounded-[2rem] shadow-2xl z-20"
+            className="absolute bottom-full left-6 right-6 mb-4 p-6 bg-white border border-slate-200 rounded-2xl shadow-2xl z-20"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-[10px] font-black text-brand uppercase tracking-[0.2em]">WhatsApp Templates</h3>
-              <button onClick={() => setShowTemplates(false)} className="text-text-muted hover:text-white">
+              <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">WhatsApp Templates</h3>
+              <button onClick={() => setShowTemplates(false)} className="text-slate-400 hover:text-slate-900 transition-colors">
                 <X size={16} />
               </button>
             </div>
@@ -74,10 +74,10 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
                  <button
                    key={t.id}
                    onClick={() => handleSendTemplate(t.id)}
-                   className="p-4 bg-bg-surface3 border border-border rounded-xl text-left hover:border-brand/40 transition-all group"
+                   className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-left hover:border-slate-900 transition-all group"
                  >
-                   <p className="text-[9px] font-black text-brand uppercase tracking-widest mb-1">{t.category}</p>
-                   <p className="text-[11px] font-bold text-white uppercase truncate">{t.displayName}</p>
+                   <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 group-hover:text-slate-600 transition-colors">{t.category}</p>
+                   <p className="text-[11px] font-bold text-slate-900 uppercase truncate">{t.displayName}</p>
                  </button>
                ))}
             </div>
@@ -91,10 +91,10 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
             exit={{ opacity: 0, scale: 0.95 }}
             className="absolute bottom-full left-6 mb-4 z-20"
           >
-            <div className="relative shadow-2xl rounded-2xl overflow-hidden border border-border">
+            <div className="relative shadow-2xl rounded-2xl overflow-hidden border border-slate-200">
               <EmojiPicker 
                 onEmojiClick={onEmojiClick}
-                theme={Theme.DARK}
+                theme={Theme.LIGHT}
                 width={300}
                 height={400}
                 lazyLoadEmojis={true}
@@ -113,7 +113,7 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
               setShowTemplates(false);
             }}
             className={`p-3 rounded-xl transition-all ${
-              showEmojiPicker ? 'bg-brand text-black' : 'text-text-muted hover:text-white hover:bg-bg-surface3'
+              showEmojiPicker ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'
             }`}
             title="Add Emoji"
           >
@@ -128,7 +128,7 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
           <button 
              type="button" 
              onClick={() => fileInputRef.current?.click()}
-             className="p-3 text-text-muted hover:text-white hover:bg-bg-surface3 rounded-xl transition-all"
+             className="p-3 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all"
              title="Attach File"
           >
             <Paperclip size={20} />
@@ -140,7 +140,7 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
                setShowEmojiPicker(false);
              }}
              className={`p-3 rounded-xl transition-all ${
-               showTemplates ? 'bg-brand text-black' : 'text-text-muted hover:text-white hover:bg-bg-surface3'
+               showTemplates ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'
              }`}
              title="Use Template"
           >
@@ -155,7 +155,7 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="w-full bg-bg-surface3 border border-border rounded-2xl p-4 text-sm font-medium text-white focus:outline-none focus:border-brand/40 transition-all resize-none max-h-40 overflow-y-auto"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 transition-all resize-none max-h-40 overflow-y-auto shadow-inner"
             style={{ minHeight: '52px' }}
           />
         </div>
@@ -163,16 +163,16 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
         <button 
           type="submit"
           disabled={!text.trim() || disabled}
-          className="p-4 bg-brand text-black rounded-2xl hover:brightness-110 disabled:opacity-50 disabled:grayscale transition-all shadow-lg shadow-brand/20 mb-1"
+          className="p-4 bg-slate-900 text-white rounded-xl hover:bg-slate-800 disabled:opacity-50 disabled:grayscale transition-all shadow-lg shadow-slate-900/10 mb-1"
         >
-          <Send size={20} strokeWidth={3} />
+          <Send size={20} strokeWidth={2.5} />
         </button>
       </form>
       
-      <div className="mt-4 flex items-center justify-between text-[8px] font-black text-text-muted uppercase tracking-widest px-1">
+      <div className="mt-4 flex items-center justify-between text-[8px] font-bold text-slate-400 uppercase tracking-widest px-1">
          <span>Shift + Enter for new line</span>
-         <span className="flex items-center gap-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> WhatsApp Connected
+         <span className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> WhatsApp Status: Connected
          </span>
       </div>
     </div>

@@ -10,73 +10,68 @@ interface CampaignTableProps {
 
 export default function CampaignTable({ campaigns, onView }: CampaignTableProps) {
   return (
-    <div className="bg-bg-surface border border-border rounded-[2.5rem] overflow-hidden">
+    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="border-b border-border bg-bg-surface2/30">
-            <th className="px-8 py-6 text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Campaign Name</th>
-            <th className="px-8 py-6 text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Type</th>
-            <th className="px-8 py-6 text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Audience</th>
-            <th className="px-8 py-6 text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Analytics (S/D/R)</th>
-            <th className="px-8 py-6 text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Status</th>
-            <th className="px-8 py-6 text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Actions</th>
+          <tr className="border-b border-slate-100 bg-slate-50/50">
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Campaign Name</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Type</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Audience</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Analytics</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-border/50">
+        <tbody className="divide-y divide-slate-100">
           {campaigns.map((campaign) => (
             <tr 
               key={campaign.id} 
-              className="hover:bg-bg-surface2/50 transition-colors group cursor-pointer"
+              className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
               onClick={() => onView(campaign)}
             >
-              <td className="px-8 py-6">
+              <td className="px-6 py-4">
                 <div className="flex flex-col">
-                  <span className="text-sm font-black text-white uppercase tracking-tight group-hover:text-brand transition-colors">
+                  <span className="text-sm font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">
                     {campaign.name}
                   </span>
-                  <span className="text-[10px] text-text-muted font-bold mt-1">
-                    Scheduled: {campaign.scheduledAt ? new Date(campaign.scheduledAt).toLocaleString() : 'Not set'}
+                  <span className="text-[10px] text-slate-400 font-medium mt-0.5">
+                    {campaign.scheduledAt ? new Date(campaign.scheduledAt).toLocaleString() : 'Not scheduled'}
                   </span>
                 </div>
               </td>
-              <td className="px-8 py-6">
-                <span className="px-3 py-1 rounded-lg bg-bg-surface3 border border-border text-[9px] font-black text-text-muted uppercase tracking-widest">
+              <td className="px-6 py-4">
+                <span className="px-2 py-1 rounded-md bg-slate-100 border border-slate-200 text-[10px] font-bold text-slate-600">
                   {campaign.type}
                 </span>
               </td>
-              <td className="px-8 py-6">
-                <span className="text-sm font-black text-white">{campaign.audienceSize.toLocaleString()}</span>
+              <td className="px-6 py-4">
+                <span className="text-sm font-bold text-slate-900">{campaign.audienceSize.toLocaleString()}</span>
               </td>
-              <td className="px-8 py-6">
-                <div className="flex items-center gap-3">
+              <td className="px-6 py-4">
+                <div className="flex items-center gap-4">
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-white tracking-tight">{campaign.sent}</span>
-                    <span className="text-[9px] text-text-muted uppercase font-black tracking-tighter">Sent</span>
+                    <span className="text-xs font-bold text-slate-900">{campaign.sent}</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase">Sent</span>
                   </div>
-                  <div className="w-px h-6 bg-border" />
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-white tracking-tight">{campaign.delivered}</span>
-                    <span className="text-[9px] text-text-muted uppercase font-black tracking-tighter">Deliv.</span>
+                    <span className="text-xs font-bold text-slate-900">{campaign.delivered}</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase">Deliv.</span>
                   </div>
-                  <div className="w-px h-6 bg-border" />
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-white tracking-tight">{campaign.read}</span>
-                    <span className="text-[9px] text-text-muted uppercase font-black tracking-tighter">Read</span>
+                    <span className="text-xs font-bold text-slate-900">{campaign.read}</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase">Read</span>
                   </div>
                 </div>
               </td>
-              <td className="px-8 py-6">
+              <td className="px-6 py-4">
                 <StatusBadge status={campaign.status} />
               </td>
-              <td className="px-8 py-6">
-                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                  <button className="p-3 rounded-xl bg-bg-surface3 border border-border text-text-muted hover:text-white transition-all">
+              <td className="px-6 py-4">
+                <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
+                  <button className="p-2 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
                     <Eye size={16} />
                   </button>
-                  <button className="p-3 rounded-xl bg-bg-surface3 border border-border text-text-muted hover:text-white transition-all">
-                    <Copy size={16} />
-                  </button>
-                  <button className="p-3 rounded-xl bg-bg-surface3 border border-border text-text-muted hover:text-rose-500 hover:border-rose-500/30 transition-all">
+                  <button className="p-2 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all">
                     <Trash2 size={16} />
                   </button>
                 </div>

@@ -29,12 +29,12 @@ export default function TemplateSelector({ value, onChange }: TemplateSelectorPr
     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
       <div className="space-y-6">
         <div className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-brand transition-colors" size={16} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" size={16} />
           <input 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search approved templates..."
-            className="w-full bg-bg-surface3 border border-border rounded-2xl p-4 pl-12 text-sm font-bold text-white focus:outline-none focus:border-brand/40 transition-all shadow-inner"
+            className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none focus:border-slate-900 transition-all shadow-inner"
           />
         </div>
 
@@ -43,26 +43,26 @@ export default function TemplateSelector({ value, onChange }: TemplateSelectorPr
             <button
               key={t.id}
               onClick={() => handleSelect(t)}
-              className={`w-full p-4 rounded-3xl border flex items-center justify-between transition-all ${
+              className={`w-full p-4 rounded-2xl border flex items-center justify-between transition-all ${
                 value === t.id 
-                  ? 'bg-brand/5 border-brand shadow-[0_0_20px_rgba(var(--brand-rgb),0.05)]' 
-                  : 'bg-bg-surface border-border hover:border-brand/30'
+                  ? 'bg-slate-900 border-slate-900 text-white shadow-lg shadow-slate-900/10' 
+                  : 'bg-white border-slate-200 text-slate-900 hover:border-slate-400'
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                  value === t.id ? 'bg-brand text-white' : 'bg-bg-surface3 text-text-muted'
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
+                  value === t.id ? 'bg-white/10 text-white' : 'bg-slate-50 text-slate-400'
                 }`}>
                   <Layout size={20} />
                 </div>
                 <div className="text-left">
-                  <p className="text-[10px] font-black text-brand uppercase tracking-widest leading-none mb-1">{t.category}</p>
-                  <p className="text-sm font-black text-white uppercase tracking-tight">{t.displayName}</p>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest leading-none mb-1 transition-all ${value === t.id ? 'text-slate-400' : 'text-slate-400'}`}>{t.category}</p>
+                  <p className={`text-sm font-bold tracking-tight uppercase ${value === t.id ? 'text-white' : 'text-slate-900'}`}>{t.displayName}</p>
                 </div>
               </div>
               {value === t.id && (
-                <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-brand">
-                  <CheckCircle2 size={20} />
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
+                  <CheckCircle2 size={18} />
                 </div>
               )}
             </button>
@@ -72,10 +72,10 @@ export default function TemplateSelector({ value, onChange }: TemplateSelectorPr
 
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h4 className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Template Preview</h4>
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Template Preview</h4>
           {selectedTemplate && (
-            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-              Official Approval
+            <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 shadow-sm">
+              Approved
             </span>
           )}
         </div>
@@ -87,30 +87,30 @@ export default function TemplateSelector({ value, onChange }: TemplateSelectorPr
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="bg-bg-surface2 border border-border rounded-[2.5rem] p-8 min-h-[400px] shadow-2xl relative overflow-hidden"
+              className="bg-white border border-slate-200 rounded-[2rem] p-8 min-h-[400px] shadow-xl relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 p-8 opacity-5">
+              <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
                  <Layout size={120} />
               </div>
 
               <div className="relative z-10 space-y-6">
                 <div className="space-y-2">
-                   <p className="text-[10px] font-black text-text-muted uppercase tracking-widest">Header</p>
+                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Header</p>
                    {selectedTemplate.header.type === 'text' && (
-                     <p className="text-lg font-black text-white">{selectedTemplate.header.text}</p>
+                     <p className="text-xl font-bold text-slate-900">{selectedTemplate.header.text}</p>
                    )}
                    {selectedTemplate.header.type === 'image' && (
-                     <div className="aspect-video w-full rounded-2xl bg-bg-surface3 border border-border overflow-hidden">
+                     <div className="aspect-video w-full rounded-2xl bg-slate-50 border border-slate-200 overflow-hidden shadow-inner">
                        <img src={selectedTemplate.header.mediaUrl} alt="Header" className="w-full h-full object-cover" />
                      </div>
                    )}
-                   {selectedTemplate.header.type === 'none' && <p className="text-xs text-text-muted italic">No header</p>}
+                   {selectedTemplate.header.type === 'none' && <p className="text-xs text-slate-400 italic">No header</p>}
                 </div>
 
                 <div className="space-y-2">
-                   <p className="text-[10px] font-black text-text-muted uppercase tracking-widest">Body Message</p>
-                   <div className="p-6 bg-bg-surface3 border border-border rounded-2xl">
-                     <p className="text-sm font-medium text-white leading-relaxed whitespace-pre-wrap">
+                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Body Message</p>
+                   <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-inner">
+                     <p className="text-sm font-medium text-slate-700 leading-relaxed whitespace-pre-wrap">
                         {selectedTemplate.body.text}
                      </p>
                    </div>
@@ -118,22 +118,22 @@ export default function TemplateSelector({ value, onChange }: TemplateSelectorPr
 
                 {selectedTemplate.footer && (
                   <div className="space-y-2">
-                    <p className="text-[10px] font-black text-text-muted uppercase tracking-widest">Footer</p>
-                    <p className="text-xs text-text-muted font-medium italic">{selectedTemplate.footer.text}</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Footer</p>
+                    <p className="text-xs text-slate-400 font-medium italic">{selectedTemplate.footer.text}</p>
                   </div>
                 )}
 
                 {selectedTemplate.buttons.type !== 'none' && (
                   <div className="space-y-4 pt-4">
-                    <p className="text-[10px] font-black text-text-muted uppercase tracking-widest">Action Buttons</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Action Buttons</p>
                     <div className="grid grid-cols-2 gap-3">
                       {selectedTemplate.buttons.cta?.map((btn, i) => (
-                        <div key={i} className="p-3 bg-brand/10 border border-brand/20 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black text-brand uppercase tracking-widest">
-                          <Eye size={14} /> {btn.label}
+                        <div key={i} className="p-3 bg-slate-900 border border-slate-900 rounded-xl flex items-center justify-center gap-2 text-[10px] font-bold text-white uppercase tracking-widest shadow-sm">
+                          <Eye size={14} strokeWidth={2.5} /> {btn.label}
                         </div>
                       ))}
                       {selectedTemplate.buttons.quickReplies?.map((btn, i) => (
-                        <div key={i} className="p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-[10px] font-black text-white uppercase tracking-widest opacity-60">
+                        <div key={i} className="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-[10px] font-bold text-slate-600 uppercase tracking-widest shadow-sm">
                           {btn.text}
                         </div>
                       ))}
@@ -143,12 +143,12 @@ export default function TemplateSelector({ value, onChange }: TemplateSelectorPr
               </div>
             </motion.div>
           ) : (
-            <div className="bg-bg-surface2/30 border border-dashed border-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center text-center h-[400px]">
-              <div className="w-20 h-20 rounded-3xl bg-bg-surface3 flex items-center justify-center text-text-muted mb-6">
+            <div className="bg-slate-50 border border-dashed border-slate-200 rounded-[2rem] p-12 flex flex-col items-center justify-center text-center h-[400px]">
+              <div className="w-20 h-20 rounded-3xl bg-white border border-slate-100 flex items-center justify-center text-slate-300 mb-6 shadow-sm">
                 <Layout size={40} />
               </div>
-              <h3 className="text-lg font-black text-white uppercase tracking-tight">No Template Selected</h3>
-              <p className="text-[11px] text-text-muted mt-2 font-medium max-w-[240px]">
+              <h3 className="text-lg font-bold text-slate-900 tracking-tight">No Template Selected</h3>
+              <p className="text-[11px] text-slate-400 mt-2 font-medium max-w-[240px]">
                 Browse your approved WhatsApp templates and select one to start crafting your campaign.
               </p>
             </div>

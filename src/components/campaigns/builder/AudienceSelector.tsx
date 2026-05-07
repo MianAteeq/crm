@@ -24,22 +24,22 @@ export default function AudienceSelector({ value, onChange }: AudienceSelectorPr
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => onChange({ type: opt.id as any })}
-            className={`p-8 rounded-[2.5rem] border text-left transition-all relative overflow-hidden ${
+            className={`p-8 rounded-2xl border text-left transition-all relative overflow-hidden shadow-sm ${
               value.type === opt.id 
-                ? 'bg-brand/5 border-brand shadow-[0_0_40px_rgba(var(--brand-rgb),0.1)]' 
-                : 'bg-bg-surface3 border-border hover:border-brand/30'
+                ? 'bg-slate-900 border-slate-900 text-white shadow-lg shadow-slate-900/10' 
+                : 'bg-white border-slate-200 text-slate-900 hover:border-slate-400'
             }`}
           >
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${
-              value.type === opt.id ? 'bg-brand text-white' : 'bg-bg-surface border border-border text-text-muted'
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all ${
+              value.type === opt.id ? 'bg-white/10 text-white' : 'bg-slate-50 border border-slate-100 text-slate-400'
             }`}>
               <opt.icon size={28} />
             </div>
-            <h3 className="text-lg font-black text-white uppercase tracking-tight mb-2">{opt.label}</h3>
-            <p className="text-[11px] text-text-muted font-medium leading-relaxed">{opt.description}</p>
+            <h3 className={`text-lg font-bold tracking-tight mb-2 ${value.type === opt.id ? 'text-white' : 'text-slate-900'}`}>{opt.label}</h3>
+            <p className={`text-[11px] font-medium leading-relaxed ${value.type === opt.id ? 'text-slate-400' : 'text-slate-500'}`}>{opt.description}</p>
             
             {value.type === opt.id && (
-              <div className="absolute top-6 right-6 text-brand">
+              <div className="absolute top-6 right-6 text-white">
                 <CheckCircle2 size={24} />
               </div>
             )}
@@ -51,11 +51,11 @@ export default function AudienceSelector({ value, onChange }: AudienceSelectorPr
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-8 bg-bg-surface border border-border rounded-[2.5rem] space-y-6"
+          className="p-8 bg-white border border-slate-200 rounded-2xl space-y-6 shadow-sm"
         >
           <div className="flex items-center justify-between">
-            <h4 className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Select Target Segment</h4>
-            <span className="text-[10px] font-black text-brand uppercase tracking-widest">
+            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Select Target Segment</h4>
+            <span className="text-[10px] font-bold text-slate-900 uppercase tracking-widest">
               {mockSegments.length} Available
             </span>
           </div>
@@ -66,12 +66,12 @@ export default function AudienceSelector({ value, onChange }: AudienceSelectorPr
                 onClick={() => onChange({ ...value, segmentId: segment.id })}
                 className={`p-4 rounded-xl border text-left transition-all ${
                   value.segmentId === segment.id 
-                    ? 'bg-brand border-brand text-white' 
-                    : 'bg-bg-surface3 border-border text-text-muted hover:border-brand/30 hover:text-white'
+                    ? 'bg-slate-900 border-slate-900 text-white' 
+                    : 'bg-slate-50 border-slate-200 text-slate-400 hover:border-slate-400 hover:text-slate-900'
                 }`}
               >
-                <p className="text-[9px] font-black uppercase tracking-widest leading-tight">{segment.name}</p>
-                <p className={`text-[10px] font-bold mt-1 ${value.segmentId === segment.id ? 'text-white/70' : 'text-text-muted'}`}>
+                <p className="text-[9px] font-bold uppercase tracking-widest leading-tight">{segment.name}</p>
+                <p className={`text-[10px] font-bold mt-1 ${value.segmentId === segment.id ? 'text-slate-400' : 'text-slate-500'}`}>
                   {segment.count} Leads
                 </p>
               </button>
@@ -80,18 +80,18 @@ export default function AudienceSelector({ value, onChange }: AudienceSelectorPr
         </motion.div>
       )}
 
-      <div className="p-10 bg-brand/5 border border-brand/20 rounded-[2.5rem] flex items-center justify-between">
+      <div className="p-10 bg-slate-100 border border-slate-200 rounded-2xl flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-6">
-          <div className="w-16 h-16 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center text-brand">
+          <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-900 shadow-sm">
             <Users size={32} />
           </div>
           <div>
-            <p className="text-[10px] font-black text-brand uppercase tracking-widest">Audience Preview</p>
-            <h3 className="text-3xl font-black text-white tracking-tighter mt-1">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Audience Preview</p>
+            <h3 className="text-3xl font-bold text-slate-900 tracking-tight mt-1">
               {value.type === 'segment' && value.segmentId 
                 ? mockSegments.find(s => s.id === value.segmentId)?.count.toLocaleString()
                 : value.type === 'all' ? '5,840' : '0'}
-              <span className="text-sm text-text-muted ml-2 uppercase tracking-widest">Contacts Selected</span>
+              <span className="text-sm text-slate-400 ml-2 uppercase font-bold tracking-widest leading-none">Contacts Selected</span>
             </h3>
           </div>
         </div>
