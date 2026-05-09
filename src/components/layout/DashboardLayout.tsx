@@ -2,6 +2,7 @@ import { ReactNode, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
+  Layout as LayoutIcon,
   MessageSquare, 
   Send, 
   Users, 
@@ -26,7 +27,7 @@ const menuItems = [
   { group: 'Engagement', items: [
     { icon: Send, label: 'Campaigns', path: '/campaigns' },
     { icon: MessageSquare, label: 'Inbox', path: '/inbox' },
-    { icon: FileText, label: 'Templates', path: '/templates' },
+    { icon: LayoutIcon, label: 'Templates', path: '/templates' },
   ]},
   { group: 'Audience', items: [
     { icon: Users, label: 'Contacts', path: '/contacts' },

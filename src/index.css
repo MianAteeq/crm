@@ -5,66 +5,69 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", sans-serif;
-  --font-serif: "Georgia", serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   
   --color-brand: #25D366;
   --color-brand-dark: #128C7E;
   --color-brand-glow: rgba(37,211,102,0.1);
   
-  --color-bg-base: #F8FAFC;
+  --color-bg-base: #F9FAFB;
   --color-bg-surface: #FFFFFF;
-  --color-bg-surface2: #F1F5F9;
-  --color-bg-surface3: #E2E8F0;
+  --color-bg-subtle: #F3F4F6;
+  --color-bg-muted: #F9FAFB;
   
   --color-text-primary: #111827;
-  --color-text-muted: #6B7280;
-  
-  --color-info: #3b82f6;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
+  --color-text-secondary: #4B5563;
+  --color-text-muted: #9CA3AF;
   
   --color-border: #E5E7EB;
-  --border-glass: rgba(255, 255, 255, 0.5);
+  --color-border-subtle: #F3F4F6;
+  
+  --shadow-premium: 0 1px 2px 0 rgb(0 0 0 / 0.05), 0 4px 6px -1px rgb(0 0 0 / 0.02);
+  --shadow-subtle: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-floating: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 @layer base {
   body {
-    @apply bg-bg-base text-text-primary font-sans antialiased;
+    @apply bg-bg-base text-text-primary font-sans antialiased selection:bg-brand/10 selection:text-brand-dark;
   }
 }
 
-/* Phone Input Customization */
-.PhoneInput {
-  @apply flex items-center bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus-within:bg-white focus-within:border-slate-900 focus-within:ring-4 focus-within:ring-slate-900/5 transition-all;
-}
-
-.PhoneInputInput {
-  @apply flex-1 bg-transparent border-none p-0 ml-3 text-sm font-bold text-slate-900 focus:ring-0 outline-none;
-}
-
-.PhoneInputCountry {
-  @apply flex items-center mr-0;
-}
-
-.PhoneInputCountrySelect {
-  @apply opacity-0 absolute w-full h-full cursor-pointer;
-}
-
-.PhoneInputCountryIcon {
-  @apply w-6 h-auto rounded-sm shadow-sm;
-}
-
-.PhoneInput.phone-input-error {
-  @apply border-red-500 bg-red-50/30;
-}
-
 .glass-card {
-  @apply bg-bg-surface border border-border rounded-3xl;
+  @apply bg-bg-surface border border-border shadow-premium rounded-2xl;
+}
+
+.input-base {
+  @apply w-full bg-white border border-border rounded-xl px-4 py-2.5 text-sm font-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 transition-all;
+}
+
+.label-base {
+  @apply block text-[11px] font-bold text-text-muted uppercase tracking-wider mb-1.5;
+}
+
+.btn-premium-primary {
+  @apply relative px-5 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-2 overflow-hidden shadow-sm bg-slate-900 text-white hover:bg-slate-800 hover:shadow-md disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.btn-premium-secondary {
+  @apply relative px-5 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-2 overflow-hidden shadow-sm bg-white text-slate-700 border border-border hover:bg-slate-50 hover:shadow-md disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.whatsapp-bubble {
+  @apply relative px-3 py-2 rounded-xl shadow-sm text-sm leading-snug;
+}
+
+.whatsapp-bubble-in {
+  @apply bg-white text-[#111b21] rounded-tl-none;
+}
+
+.whatsapp-bubble-out {
+  @apply bg-[#dcf8c6] text-[#111b21] rounded-tr-none;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -72,34 +75,5 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
-}
-
-.btn-primary {
-  @apply bg-black hover:bg-slate-800 text-white text-[12px] font-bold py-2.5 px-6 rounded-xl transition-all active:scale-95 shadow-sm;
-}
-
-.btn-secondary {
-  @apply bg-white hover:bg-slate-50 text-slate-700 text-[12px] font-bold py-2.5 px-6 rounded-xl border border-slate-200 transition-all active:scale-95 shadow-sm;
-}
-
-.nav-link-active {
-  @apply bg-slate-100 text-black border-none shadow-none font-semibold;
-}
-
-/* Scrollbar Customization */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-200 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-300;
+  @apply bg-slate-200 rounded-full hover:bg-slate-300;
 }

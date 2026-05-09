@@ -25,7 +25,7 @@ export default function LandingPage() {
                  {[
                    { step: '01', title: 'Connect API', desc: 'Plug in your Meta WhatsApp Cloud token.' },
                    { step: '02', title: 'Load Contacts', desc: 'Sync from CRM or upload CSV files.' },
-                   { step: '03', title: 'Pick Template', desc: 'Use verified templates for scale.' },
+                   { step: '03', title: 'Write Content', desc: 'Compose your outreach message.' },
                    { step: '04', title: 'Launch', desc: 'Watch your engagement skyrocket.' }
                  ].map((s) => (
                    <div key={s.step} className="text-center group">

@@ -3,6 +3,7 @@ import { MoreHorizontal, Users, Send, CheckCircle2, AlertCircle, Calendar, Arrow
 import { Campaign } from '../../types';
 import StatusBadge from './StatusBadge';
 import { motion } from 'motion/react';
+import { formatSafeDate } from '../../lib/utils';
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -32,7 +33,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, onClick }) => {
           {campaign.name}
         </h3>
         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-          {campaign.type} • {new Date(campaign.createdAt).toLocaleDateString()}
+          {campaign.type} • {formatSafeDate(campaign.createdAt)}
         </p>
       </div>
 

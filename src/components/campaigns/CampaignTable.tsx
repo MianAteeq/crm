@@ -2,13 +2,14 @@ import React from 'react';
 import { MoreHorizontal, Eye, Copy, Trash2, Pause, Play } from 'lucide-react';
 import { Campaign } from '../../types';
 import StatusBadge from './StatusBadge';
+import { formatSafeDateTime } from '../../lib/utils';
 
 interface CampaignTableProps {
   campaigns: Campaign[];
   onView: (campaign: Campaign) => void;
 }
 
-export default function CampaignTable({ campaigns, onView }: CampaignTableProps) {
+export default function CampaignTable({ campaigns = [], onView }: CampaignTableProps) {
   return (
     <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
       <table className="w-full text-left border-collapse">
@@ -23,7 +24,7 @@ export default function CampaignTable({ campaigns, onView }: CampaignTableProps)
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
-          {campaigns.map((campaign) => (
+          {(campaigns || []).map((campaign) => (
             <tr 
               key={campaign.id} 
               className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
@@ -35,7 +36,7 @@ export default function CampaignTable({ campaigns, onView }: CampaignTableProps)
                     {campaign.name}
                   </span>
                   <span className="text-[10px] text-slate-400 font-medium mt-0.5">
-                    {campaign.scheduledAt ? new Date(campaign.scheduledAt).toLocaleString() : 'Not scheduled'}
+                    {campaign.scheduledAt ? formatSafeDateTime(campaign.scheduledAt) : 'Not scheduled'}
                   </span>
                 </div>
               </td>

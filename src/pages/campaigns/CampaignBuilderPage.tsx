@@ -6,12 +6,10 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import AudienceSelector from '../../components/campaigns/builder/AudienceSelector';
-import TemplateSelector from '../../components/campaigns/builder/TemplateSelector';
-import VariableMapper from '../../components/campaigns/builder/VariableMapper';
 import SchedulePicker from '../../components/campaigns/builder/SchedulePicker';
 import ComplianceChecklist from '../../components/campaigns/builder/ComplianceChecklist';
 
-type Step = 1 | 2 | 3 | 4 | 5 | 6;
+type Step = 1 | 2 | 3 | 4 | 5;
 
 export default function CampaignBuilderPage() {
   const navigate = useNavigate();
@@ -23,8 +21,7 @@ export default function CampaignBuilderPage() {
     type: 'Broadcast' as 'Broadcast' | 'Automation',
     description: '',
     audience: { type: 'all' as any, segmentId: '' },
-    templateId: '',
-    variableMapping: {} as Record<string, string>,
+    message: '',
     scheduleMethod: 'now' as 'now' | 'scheduled',
     scheduledDate: '',
     scheduledTime: '',
@@ -33,14 +30,13 @@ export default function CampaignBuilderPage() {
   const steps = [
     { id: 1, label: 'Setup', icon: Settings },
     { id: 2, label: 'Audience', icon: Users },
-    { id: 3, label: 'Template', icon: Layout },
-    { id: 4, label: 'Mapping', icon: Database },
-    { id: 5, label: 'Schedule', icon: Calendar },
-    { id: 6, label: 'Confirm', icon: Rocket },
+    { id: 3, label: 'Message', icon: Layout },
+    { id: 4, label: 'Schedule', icon: Calendar },
+    { id: 5, label: 'Confirm', icon: Rocket },
   ];
 
   const handleNext = () => {
-    if (currentStep < 6) setCurrentStep((prev) => (prev + 1) as Step);
+    if (currentStep < 5) setCurrentStep((prev) => (prev + 1) as Step);
   };
 
   const handleBack = () => {
@@ -104,10 +100,20 @@ export default function CampaignBuilderPage() {
       case 2:
         return <AudienceSelector value={campaignData.audience} onChange={(a) => setCampaignData({ ...campaignData, audience: a })} />;
       case 3:
-        return <TemplateSelector value={campaignData.templateId} onChange={(t) => setCampaignData({ ...campaignData, templateId: t })} />;
+        return (
+          <div className="space-y-6">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+              Compose Message
+            </label>
+            <textarea 
+              value={campaignData.message}
+              onChange={(e) => setCampaignData({ ...campaignData, message: e.target.value })}
+              placeholder="Type your WhatsApp message here..."
+              className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm font-bold text-slate-900 focus:outline-none focus:border-slate-900 transition-all h-64 resize-none shadow-inner"
+            />
+          </div>
+        );
       case 4:
-        return <VariableMapper templateId={campaignData.templateId} mapping={campaignData.variableMapping} onChange={(m) => setCampaignData({ ...campaignData, variableMapping: m })} />;
-      case 5:
         return (
           <SchedulePicker 
             method={campaignData.scheduleMethod}
@@ -118,7 +124,7 @@ export default function CampaignBuilderPage() {
             onTimeChange={(t) => setCampaignData({ ...campaignData, scheduledTime: t })}
           />
         );
-      case 6:
+      case 5:
         return (
           <div className="space-y-10">
             <div className="p-10 bg-emerald-50 border border-emerald-100 rounded-[2.5rem] flex flex-col items-center text-center">
@@ -207,7 +213,7 @@ export default function CampaignBuilderPage() {
 
       <div className="max-w-6xl mx-auto px-6">
          <div className="mb-12">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Step {currentStep} of 6</p>
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Step {currentStep} of 5</p>
             <h2 className="text-4xl font-bold text-slate-900 tracking-tight mt-2">{steps[currentStep-1].label}</h2>
          </div>
 
@@ -234,7 +240,7 @@ export default function CampaignBuilderPage() {
                onClick={handleNext}
                className="bg-slate-900 hover:bg-slate-800 text-white px-10 py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-2.5 shadow-lg shadow-slate-900/10 active:scale-95 group relative overflow-hidden"
             >
-               {currentStep === 6 ? 'Confirm & Launch' : 'Continue'}
+               {currentStep === 5 ? 'Confirm & Launch' : 'Continue'}
                <ChevronRight size={16} strokeWidth={2.5} />
             </button>
          </div>

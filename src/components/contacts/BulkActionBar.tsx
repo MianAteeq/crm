@@ -60,7 +60,7 @@ export default function BulkActionBar({ selectedCount, onClear, onDelete, onAddT
                       >
                          <p className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50 mb-1">Select Tag to Apply</p>
                          <div className="max-h-48 overflow-y-auto custom-scrollbar p-1">
-                            {availableTags.map(tag => (
+                            {(availableTags || []).map(tag => (
                                <button 
                                 key={tag.id}
                                 onClick={() => { onAddTag(tag.id); setShowTags(false); }}

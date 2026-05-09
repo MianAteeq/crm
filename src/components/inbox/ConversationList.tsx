@@ -1,7 +1,8 @@
 import React from 'react';
-import { Search, Filter, Mail, Star, Users, CheckCircle2 } from 'lucide-react';
+import { Search, Filter, Mail, Star, Users, Wifi, WifiOff } from 'lucide-react';
 import { Conversation } from '../../types';
 import ConversationItem from './ConversationItem';
+import { useRealtime } from '../../hooks/useRealtime';
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -13,18 +14,42 @@ export default function ConversationList({ conversations, activeId, onSelect }: 
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState<'all' | 'unread' | 'assigned'>('all');
 
-  const filtered = conversations.filter(c => {
+  const { isConnected, error: realtimeError } = useRealtime({
+    channel: 'chat.1', // Background connection check
+    event: 'ping',
+    enabled: true,
+    onEvent: () => {}
+  });
+
+  const safeConversations = Array.isArray(conversations) ? conversations : [];
+  const filtered = safeConversations.filter(c => {
     const matchesSearch = c.contact.name.toLowerCase().includes(search.toLowerCase()) || 
                          c.contact.phone.includes(search);
     const matchesFilter = filter === 'all' || (filter === 'unread' && c.unreadCount > 0);
     return matchesSearch && matchesFilter;
   });
 
+  const getStatusColor = () => {
+    if (realtimeError) return 'bg-amber-50 text-amber-600 border border-amber-100';
+    return isConnected ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100';
+  };
+
+  const getStatusLabel = () => {
+    if (realtimeError) return 'Auth Err';
+    return isConnected ? 'Live' : 'Offline';
+  };
+
   return (
     <div className="flex flex-col h-full bg-white border-r border-slate-100">
       {/* Search & Filter Header */}
       <div className="p-4 space-y-4 border-b border-slate-100">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Messages</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">Messages</h2>
+          <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors ${getStatusColor()}`} title={realtimeError || undefined}>
+            {isConnected ? <Wifi size={10} strokeWidth={3} /> : <WifiOff size={10} strokeWidth={3} />}
+            {getStatusLabel()}
+          </div>
+        </div>
         
         <div className="relative group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand transition-colors" size={14} />
@@ -40,7 +65,6 @@ export default function ConversationList({ conversations, activeId, onSelect }: 
           {[
             { id: 'all', label: 'All', icon: Mail },
             { id: 'unread', label: 'Unread', icon: Star },
-            { id: 'assigned', label: 'Assigned', icon: CheckCircle2 },
           ].map(f => (
             <button
               key={f.id}

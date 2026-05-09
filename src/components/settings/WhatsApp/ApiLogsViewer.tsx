@@ -1,6 +1,7 @@
 import React from 'react';
 import { Terminal, Shield, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { ApiLog } from '../../../types';
+import { formatSafeTime } from '../../../lib/utils';
 
 interface ApiLogsViewerProps {
   logs: ApiLog[];
@@ -26,7 +27,7 @@ export default function ApiLogsViewer({ logs }: ApiLogsViewerProps) {
       </div>
 
       <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-        {logs.length === 0 ? (
+        {(!logs || logs.length === 0) ? (
           <div className="py-20 text-center opacity-40">
              <Shield size={48} className="mx-auto mb-6 text-slate-200" />
              <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">No active events logged</p>
@@ -46,7 +47,7 @@ export default function ApiLogsViewer({ logs }: ApiLogsViewerProps) {
                        STATUS {log.status}
                     </span>
                     <span className="text-[10px] font-bold text-slate-400">
-                       {new Date(log.timestamp).toLocaleTimeString([], { hour12: false })}
+                       {formatSafeTime(log.timestamp, { hour12: false })}
                     </span>
                   </div>
                </div>

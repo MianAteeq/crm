@@ -50,7 +50,7 @@ export default function ContactSidebar({ conversation }: ContactSidebarProps) {
             </button>
          </div>
          <div className="flex flex-wrap gap-2">
-            {contact.tags.map(tag => (
+            {(contact.tags || []).map(tag => (
               <span key={tag} className="px-3 py-1.5 bg-slate-100 border border-slate-100 text-slate-600 text-[9px] font-bold uppercase tracking-widest rounded-lg">
                 {tag}
               </span>
@@ -81,13 +81,15 @@ export default function ContactSidebar({ conversation }: ContactSidebarProps) {
                   <p className="text-sm font-bold text-slate-900 leading-none">Pakistan (GMT+5)</p>
                </div>
             </div>
-            <div className="flex items-start gap-4">
+             <div className="flex items-start gap-4">
                <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 shrink-0 border border-slate-100">
                   <History size={14} />
                </div>
                <div>
                   <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">First Seen</p>
-                  <p className="text-sm font-bold text-slate-900 leading-none">Oct 12, 2023</p>
+                  <p className="text-sm font-bold text-slate-900 leading-none">
+                    {contact.created_at ? new Date(contact.created_at).toLocaleDateString() : 'N/A'}
+                  </p>
                </div>
             </div>
          </div>

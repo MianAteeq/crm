@@ -34,7 +34,7 @@ export const mockConversations: Conversation[] = [
     isOnline: false,
     unreadCount: 0,
     messages: [
-      { id: 'm5', sender: 'user', type: 'template', content: 'Hi Zainab! Thanks for joining us. Check out our new collection.', timestamp: '2024-05-03T07:00:00Z', status: 'read' },
+      { id: 'm5', sender: 'user', type: 'text', content: 'Hi Zainab! Thanks for joining us. Check out our new collection.', timestamp: '2024-05-03T07:00:00Z', status: 'read' },
       { id: 'm6', sender: 'contact', type: 'text', content: 'Thank you! The collection looks great.', timestamp: '2024-05-03T07:10:00Z', status: 'read' }
     ],
     lastMessage: { id: 'm6', sender: 'contact', type: 'text', content: 'Thank you! The collection looks great.', timestamp: '2024-05-03T07:10:00Z', status: 'read' }

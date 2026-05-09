@@ -17,8 +17,7 @@ export interface Campaign {
   failed: number;
   status: 'Draft' | 'Scheduled' | 'Running' | 'Completed' | 'Failed';
   scheduledAt: string;
-  templateId: string;
-  variableMapping: Record<string, string>;
+  messageContent: string;
   createdAt: string;
 }
 
@@ -60,12 +59,13 @@ export interface Contact {
   avatar?: string;
   status: 'active' | 'unsubscribed' | 'archived' | 'lead' | 'customer';
   tags: string[]; // These will be tag IDs
-  lastSeen: string;
+  lastSeen?: string;
   lastContacted?: string; // UI specific
   totalCampaigns?: number; // UI specific
   campaigns?: any[]; // UI specific
   createdAt?: string;
   created_at?: string;
+  last_message?: string;
   addedDate?: string; // UI specific
   updatedAt?: string;
 }
@@ -77,6 +77,7 @@ export interface User {
   businessName?: string;
   avatar?: string;
   onboardingStep: number;
+  tenantId?: string;
 }
 
 export interface WhatsAppSettings {
@@ -116,17 +117,18 @@ export interface ApiLog {
 export interface Message {
   id: string;
   sender: 'user' | 'contact';
-  type: 'text' | 'template' | 'image' | 'file';
+  type: 'text' | 'image' | 'video' | 'audio' | 'file';
   content: string;
   timestamp: string;
   status: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
-  templateId?: string;
+  mediaUrl?: string;
+  fileName?: string;
 }
 
 export interface Conversation {
   id: string;
   contact: Contact;
-  messages: Message[];
+  messages?: Message[];
   unreadCount: number;
   lastMessage: Message;
   isOnline: boolean;

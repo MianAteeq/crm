@@ -5,7 +5,8 @@ import {
   BarChart3, 
   Zap, 
   ShieldCheck, 
-  Layers
+  Layers,
+  Send
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { NavLink } from 'react-router-dom';
@@ -73,7 +74,7 @@ export function Hero() {
 
 const features = [
   { icon: MessageSquare, title: 'Unified Inbox', desc: 'Manage all your customer conversations in one powerful enterprise-grade interface. Seamlessly across teams.' },
-  { icon: Layout, title: 'Smart Templates', desc: 'Build complex interactive message templates with our drag-and-drop visual builder. High converting components.' },
+  { icon: Send, title: 'Mass Broadcast', desc: 'Launch massive campaigns to thousands of contacts with a single click. High delivery rates guaranteed.' },
   { icon: Users, title: 'CRM Integration', desc: 'Sync your existing customer data from Salesforce, HubSpot, or Shopify instantly. Keep your source of truth.' },
   { icon: BarChart3, title: 'Deep Analytics', desc: 'Track reach, delivery rates, and conversion metrics with pixel-perfect accuracy. Real-time reporting engine.' },
   { icon: Zap, title: 'Automation', desc: 'Build zero-code automation flows that handle everything from support to sales. Reduce your operational load.' },

@@ -8,8 +8,8 @@ import CampaignDetailPage from './pages/campaigns/CampaignDetailPage';
 import InboxPage from './pages/inbox/InboxPage';
 import Contacts from './pages/Contacts';
 import ContactEditorPage from './pages/contacts/ContactEditorPage';
-import TemplatesPage from './pages/templates/TemplatesPage';
-import CreateTemplatePage from './pages/templates/CreateTemplatePage';
+import TemplatesPage from './pages/whatsapp/TemplatesPage';
+import TemplateBuilderPage from './pages/whatsapp/TemplateBuilderPage';
 import WhatsAppSettingsPage from './pages/settings/WhatsAppSettingsPage';
 
 // Auth Pages
@@ -49,7 +49,7 @@ export default function App() {
           <Route path="contacts/add" element={<ContactEditorPage />} />
           <Route path="contacts/edit/:id" element={<ContactEditorPage />} />
           <Route path="templates" element={<TemplatesPage />} />
-          <Route path="templates/create" element={<CreateTemplatePage />} />
+          <Route path="templates/builder" element={<TemplateBuilderPage />} />
           <Route path="settings/whatsapp" element={<WhatsAppSettingsPage />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>

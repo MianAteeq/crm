@@ -68,11 +68,19 @@ export default function Contacts() {
     }
   };
 
-  // Fetch Data on mount
+  // Fetch Tags and Initial Data on mount
   useEffect(() => {
     fetchTags();
-    fetchData();
   }, []);
+
+  // Live Search & Filter updates
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchData();
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, selectedTag, selectedStatus, lastTouchpoint]);
 
   const displayTags = useMemo(() => {
     if (Array.isArray(tags) && tags.length > 0) return tags;

@@ -1,14 +1,15 @@
 import React, { useEffect, useRef } from 'react';
-import { MoreVertical, User, Phone, Tag, Trash2, Archive, CheckCircle2 } from 'lucide-react';
+import { User } from 'lucide-react';
 import { Conversation, Message } from '../../types';
 import MessageBubble from './MessageBubble';
 import MessageInput from './MessageInput';
 import TypingIndicator from './TypingIndicator';
 import { motion, AnimatePresence } from 'motion/react';
+import { formatSafeTime, formatDynamicDate, formatDateDivider } from '../../lib/utils';
 
 interface ChatWindowProps {
   conversation: Conversation;
-  onSendMessage: (content: string, type?: Message['type']) => void;
+  onSendMessage: (content: string, type: any, file?: File) => void;
   isTyping?: boolean;
 }
 
@@ -20,6 +21,19 @@ export default function ChatWindow({ conversation, onSendMessage, isTyping }: Ch
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [conversation.messages, isTyping]);
+
+  // Group messages by date
+  const groupedMessages = (conversation.messages || []).reduce((acc: { [key: string]: Message[] }, msg) => {
+    if (!msg) return acc;
+    const dateKey = formatDateDivider(msg.timestamp);
+    if (!acc[dateKey]) {
+      acc[dateKey] = [];
+    }
+    acc[dateKey].push(msg);
+    return acc;
+  }, {});
+
+  const dateKeys = Object.keys(groupedMessages);
 
   return (
     <div className="flex flex-col h-full bg-slate-50 relative overflow-hidden">
@@ -42,19 +56,14 @@ export default function ChatWindow({ conversation, onSendMessage, isTyping }: Ch
               <h3 className="text-sm font-bold text-slate-900 tracking-tight leading-none mb-1">{conversation.contact.name}</h3>
               <div className="flex items-center gap-2">
                  <span className={`text-[10px] font-bold ${conversation.isOnline ? 'text-green-500' : 'text-slate-400'}`}>
-                    {conversation.isOnline ? 'Online now' : `Last seen ${new Date(conversation.contact.lastSeen).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                    {conversation.isOnline ? 'Online now' : `Last seen ${formatDynamicDate(conversation.contact.lastSeen)}`}
                  </span>
               </div>
            </div>
         </div>
 
         <div className="flex items-center gap-2">
-           <button className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-bold text-slate-500 hover:text-slate-900 transition-all">
-              <Tag size={12} /> Add Tag
-           </button>
-           <button className="p-2 text-slate-400 hover:text-slate-900 transition-all">
-              <MoreVertical size={18} />
-           </button>
+           {/* Actions removed as requested */}
         </div>
       </div>
 
@@ -63,22 +72,27 @@ export default function ChatWindow({ conversation, onSendMessage, isTyping }: Ch
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-6 space-y-2 custom-scrollbar bg-white shadow-inner"
       >
-        <div className="flex justify-center mb-8">
-           <span className="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-              Today, May 3rd
-           </span>
-        </div>
-
-        {conversation.messages.map((msg, i) => {
-          const prevMsg = conversation.messages[i-1];
-          const isNewGroup = !prevMsg || prevMsg.sender !== msg.sender;
-          
-          return (
-            <div key={msg.id} className={isNewGroup ? 'pt-4' : 'pt-1'}>
-               <MessageBubble message={msg} />
+        {dateKeys.map((dateKey) => (
+          <React.Fragment key={dateKey}>
+            <div className="flex justify-center my-8">
+               <span className="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  {dateKey}
+               </span>
             </div>
-          );
-        })}
+
+            {groupedMessages[dateKey].map((msg, i) => {
+              const messages = groupedMessages[dateKey];
+              const prevMsg = messages[i-1];
+              const isNewGroup = !prevMsg || prevMsg.sender !== msg.sender;
+              
+              return (
+                <div key={msg.id} className={isNewGroup ? 'pt-4' : 'pt-1'}>
+                   <MessageBubble message={msg} />
+                </div>
+              );
+            })}
+          </React.Fragment>
+        ))}
 
         <AnimatePresence>
           {isTyping && (

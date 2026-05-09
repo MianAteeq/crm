@@ -6,6 +6,7 @@ import {
   Send, Target, AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { formatSafeDate, formatSafeTime } from '../../lib/utils';
 import { mockCampaigns, mockRecipients, mockLogs } from '../../data/mockCampaigns';
 import CampaignAnalytics from '../../components/campaigns/details/CampaignAnalytics';
 import RecipientTable from '../../components/campaigns/details/RecipientTable';
@@ -49,7 +50,7 @@ export default function CampaignDetailPage() {
               </div>
               <div className="flex items-center gap-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                  <span className="flex items-center gap-2"><Send size={14} className="text-slate-900" /> {campaign.type}</span>
-                 <span className="flex items-center gap-2"><Calendar size={14} className="text-slate-900" /> Created {new Date(campaign.createdAt).toLocaleDateString()}</span>
+                 <span className="flex items-center gap-2"><Calendar size={14} className="text-slate-900" /> Created {formatSafeDate(campaign.createdAt)}</span>
                  <span className="flex items-center gap-2"><Target size={14} className="text-slate-900" /> {campaign.audienceSize.toLocaleString()} Audience</span>
               </div>
            </div>
@@ -87,9 +88,9 @@ export default function CampaignDetailPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
              <div className="lg:col-span-2 space-y-8">
                 <div className="p-10 bg-white border border-slate-200 rounded-3xl space-y-8 shadow-sm">
-                   <h3 className="text-xl font-bold text-slate-900 tracking-tight">Description</h3>
+                   <h3 className="text-xl font-bold text-slate-900 tracking-tight">Message Content</h3>
                    <p className="text-sm text-slate-600 font-medium leading-relaxed italic">
-                      "This campaign was designed to target our high-value segments for the upcoming Eid holidays. The primary goal is conversion through special discount incentives."
+                      "{campaign.messageContent || campaign.description}"
                    </p>
                 </div>
 
@@ -162,7 +163,7 @@ export default function CampaignDetailPage() {
             <div className="p-8 space-y-4 max-h-[600px] overflow-y-auto font-mono custom-scrollbar">
                {campaignLogs.map((log) => (
                  <div key={log.id} className="flex gap-6 py-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 px-4 transition-colors rounded-lg">
-                    <span className="text-[10px] text-slate-400 shrink-0 w-32 font-medium">[{new Date(log.timestamp).toLocaleTimeString()}]</span>
+                    <span className="text-[10px] text-slate-400 shrink-0 w-32 font-medium">[{formatSafeTime(log.timestamp)}]</span>
                     <span className={`text-[10px] font-bold uppercase tracking-widest shrink-0 w-20 
                       ${log.level === 'info' ? 'text-blue-600' : log.level === 'warning' ? 'text-amber-600' : 'text-rose-600'}`}>
                        {log.level}

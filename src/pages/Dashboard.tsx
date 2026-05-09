@@ -13,7 +13,6 @@ import { motion } from 'motion/react';
 import { cn } from '@/src/lib/utils';
 import { mockCampaigns } from '../data/mockCampaigns';
 import { contacts } from '../data/contactsMock';
-import { templates } from '../data/templates';
 import { mockConversations } from '../data/mockMessages';
 
 export default function Dashboard() {
@@ -21,11 +20,10 @@ export default function Dashboard() {
   const totalCampaigns = mockCampaigns.length;
   
   // Calculate total messages (Direct messages + Campaign messages)
-  const directMessagesCount = mockConversations.reduce((acc, conv) => acc + conv.messages.length, 0);
+  const directMessagesCount = (mockConversations || []).reduce((acc, conv) => acc + (conv.messages || []).length, 0);
   const campaignMessagesCount = mockCampaigns.reduce((acc, camp) => acc + camp.sent, 0);
   const totalMessages = directMessagesCount + campaignMessagesCount;
   
-  const totalTemplates = templates.length;
   const totalContacts = contacts.length;
 
   // Monthly stats (simulated based on historical data)
@@ -38,7 +36,6 @@ export default function Dashboard() {
   const stats = [
     { label: 'Total Campaigns', value: totalCampaigns.toString(), change: '+2 new', trend: 'up', icon: Layout },
     { label: 'Total Messages', value: totalMessages.toLocaleString(), change: '+12.5%', trend: 'up', icon: MessageSquare },
-    { label: 'Cloud Templates', value: totalTemplates.toString(), change: 'Ready', trend: 'up', icon: Layout },
     { label: 'Global Contacts', value: totalContacts.toLocaleString(), change: '+24', trend: 'up', icon: Users },
   ];
 

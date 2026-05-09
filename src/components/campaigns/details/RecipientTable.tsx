@@ -1,12 +1,13 @@
 import React from 'react';
 import { CampaignRecipient } from '../../../types';
 import { Search, Filter, Download, User, Smartphone, Clock, AlertCircle, CheckCircle2, Eye, Send } from 'lucide-react';
+import { formatSafeDateTime } from '../../../lib/utils';
 
 interface RecipientTableProps {
   recipients: CampaignRecipient[];
 }
 
-export default function RecipientTable({ recipients }: RecipientTableProps) {
+export default function RecipientTable({ recipients = [] }: RecipientTableProps) {
   const getStatusIcon = (status: CampaignRecipient['status']) => {
     switch (status) {
       case 'read': return <Eye size={14} className="text-violet-500" />;
@@ -47,7 +48,7 @@ export default function RecipientTable({ recipients }: RecipientTableProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            {recipients.map((r) => (
+            {(recipients || []).map((r) => (
               <tr key={r.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-8 py-6">
                   <div className="flex items-center gap-4">
@@ -75,7 +76,7 @@ export default function RecipientTable({ recipients }: RecipientTableProps) {
                 <td className="px-8 py-6">
                   <div className="flex items-center gap-3 text-slate-400">
                      <Clock size={14} />
-                     <span className="text-[10px] font-bold uppercase tracking-widest">{new Date(r.timestamp).toLocaleString()}</span>
+                     <span className="text-[10px] font-bold uppercase tracking-widest">{formatSafeDateTime(r.timestamp)}</span>
                   </div>
                 </td>
                 <td className="px-8 py-6">

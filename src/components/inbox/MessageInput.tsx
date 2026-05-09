@@ -1,23 +1,32 @@
 import React, { useState, useRef } from 'react';
-import { Smile, Paperclip, Send, Layout, X, Image as ImageIcon, FileText } from 'lucide-react';
+import { Smile, Paperclip, Send, X, Image as ImageIcon, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { templates as mockTemplates } from '../../data/templates';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 
 interface MessageInputProps {
-  onSend: (content: string, type: 'text' | 'template' | 'image' | 'file') => void;
+  onSend: (content: string, type: 'text' | 'image' | 'file', file?: File) => void;
   disabled?: boolean;
 }
 
 export default function MessageInput({ onSend, disabled }: MessageInputProps) {
   const [text, setText] = useState('');
-  const [showTemplates, setShowTemplates] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!text.trim() || disabled) return;
+    if (disabled) return;
+
+    if (selectedFile) {
+      const type = selectedFile.type.startsWith('image/') ? 'image' : 'file';
+      onSend(text || selectedFile.name, type, selectedFile);
+      setSelectedFile(null);
+      setText('');
+      return;
+    }
+
+    if (!text.trim()) return;
     onSend(text, 'text');
     setText('');
   };
@@ -29,14 +38,6 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
     }
   };
 
-  const handleSendTemplate = (templateId: string) => {
-    const template = mockTemplates.find(t => t.id === templateId);
-    if (template) {
-      onSend(template.body.text, 'template');
-    }
-    setShowTemplates(false);
-  };
-
   const onEmojiClick = (emojiData: any) => {
     setText(prev => prev + emojiData.emoji);
     setShowEmojiPicker(false);
@@ -45,45 +46,46 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    const type = file.type.startsWith('image/') ? 'image' : 'file';
-    onSend(file.name, type);
-    
-    // Reset input
+    setSelectedFile(file);
     if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const removeSelectedFile = () => {
+    setSelectedFile(null);
   };
 
   return (
     <div className="p-6 bg-white border-t border-slate-200 relative">
       <AnimatePresence>
-        {showTemplates && (
-          <motion.div 
+        {selectedFile && (
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="absolute bottom-full left-6 right-6 mb-4 p-6 bg-white border border-slate-200 rounded-2xl shadow-2xl z-20"
+            className="absolute bottom-full left-6 right-6 mb-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl shadow-xl z-20 flex items-center gap-4"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">WhatsApp Templates</h3>
-              <button onClick={() => setShowTemplates(false)} className="text-slate-400 hover:text-slate-900 transition-colors">
-                <X size={16} />
-              </button>
+            <div className="w-16 h-16 rounded-xl bg-white border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+              {selectedFile.type.startsWith('image/') ? (
+                <img src={URL.createObjectURL(selectedFile)} alt="Preview" className="w-full h-full object-cover" />
+              ) : (
+                <FileText className="text-slate-400" size={24} />
+              )}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-               {mockTemplates.filter(t => t.status === 'approved').map(t => (
-                 <button
-                   key={t.id}
-                   onClick={() => handleSendTemplate(t.id)}
-                   className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-left hover:border-slate-900 transition-all group"
-                 >
-                   <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 group-hover:text-slate-600 transition-colors">{t.category}</p>
-                   <p className="text-[11px] font-bold text-slate-900 uppercase truncate">{t.displayName}</p>
-                 </button>
-               ))}
+            <div className="flex-1 min-w-0">
+               <p className="text-[11px] font-bold text-slate-900 truncate">{selectedFile.name}</p>
+               <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                 {(selectedFile.size / 1024 / 1024).toFixed(2)} MB • {selectedFile.type || 'Unknown Type'}
+               </p>
             </div>
+            <button 
+              type="button"
+              onClick={removeSelectedFile}
+              className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+            >
+              <X size={20} />
+            </button>
           </motion.div>
         )}
-
         {showEmojiPicker && (
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
@@ -110,7 +112,6 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
             type="button" 
             onClick={() => {
               setShowEmojiPicker(!showEmojiPicker);
-              setShowTemplates(false);
             }}
             className={`p-3 rounded-xl transition-all ${
               showEmojiPicker ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'
@@ -133,19 +134,6 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
           >
             <Paperclip size={20} />
           </button>
-          <button 
-             type="button" 
-             onClick={() => {
-               setShowTemplates(!showTemplates);
-               setShowEmojiPicker(false);
-             }}
-             className={`p-3 rounded-xl transition-all ${
-               showTemplates ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'
-             }`}
-             title="Use Template"
-          >
-            <Layout size={20} />
-          </button>
         </div>
 
         <div className="flex-1 relative">
@@ -162,7 +150,7 @@ export default function MessageInput({ onSend, disabled }: MessageInputProps) {
 
         <button 
           type="submit"
-          disabled={!text.trim() || disabled}
+          disabled={(!text.trim() && !selectedFile) || disabled}
           className="p-4 bg-slate-900 text-white rounded-xl hover:bg-slate-800 disabled:opacity-50 disabled:grayscale transition-all shadow-lg shadow-slate-900/10 mb-1"
         >
           <Send size={20} strokeWidth={2.5} />

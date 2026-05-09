@@ -3,6 +3,7 @@ import { X, Phone, Mail, MessageSquare, Edit3, Trash2, Calendar, Globe, Clock, C
 import { Contact, Tag as TagType } from '../../types';
 import TagBadge from './TagBadge';
 import { motion, AnimatePresence } from 'motion/react';
+import { formatSafeDate } from '../../lib/utils';
 
 interface ContactDrawerProps {
   contact: Contact | null;
@@ -140,7 +141,7 @@ export default function ContactDrawer({ contact, isOpen, onClose, onEdit, onDele
                           </div>
                           <div>
                              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 leading-none">Contact Lifecycle</p>
-                             <p className="text-sm font-bold text-white mt-1.5 tracking-tight">Joined on {new Date(contact.createdAt || contact.addedDate || '').toLocaleDateString()}</p>
+                             <p className="text-sm font-bold text-white mt-1.5 tracking-tight">Joined on {formatSafeDate(contact.createdAt || contact.addedDate || contact.created_at)}</p>
                           </div>
                        </div>
                     </div>

@@ -13,8 +13,8 @@ interface ContactTableProps {
   onView: (contact: Contact) => void;
 }
 
-export default function ContactTable({ contacts, availableTags, selectedIds, onSelect, onSelectAll, onView }: ContactTableProps) {
-  const allSelected = contacts.length > 0 && selectedIds.length === contacts.length;
+export default function ContactTable({ contacts = [], availableTags = [], selectedIds, onSelect, onSelectAll, onView }: ContactTableProps) {
+  const allSelected = (contacts || []).length > 0 && selectedIds.length === (contacts || []).length;
 
   return (
     <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
@@ -32,15 +32,17 @@ export default function ContactTable({ contacts, availableTags, selectedIds, onS
                   {allSelected && <div className="w-1.5 h-1.5 bg-white rounded-sm" />}
                 </button>
               </th>
-              <th className="p-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest w-[45%]">Contact Info</th>
-              <th className="p-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center w-[25%]">Tags</th>
-              <th className="p-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center w-[15%]">Status</th>
+              <th className="p-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest w-[30%]">Contact Info</th>
+              <th className="p-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center w-[20%]">Last Message</th>
+              <th className="p-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center w-[15%]">Tags</th>
+              <th className="p-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center w-[10%]">Joined</th>
+              <th className="p-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center w-[10%]">Status</th>
               <th className="p-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-right w-[10%]"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
             <AnimatePresence mode="popLayout">
-              {contacts.length === 0 ? (
+              {(!contacts || contacts.length === 0) ? (
                 <tr>
                    <td colSpan={5} className="p-20 text-center">
                       <div className="flex flex-col items-center gap-4">
@@ -99,6 +101,13 @@ export default function ContactTable({ contacts, availableTags, selectedIds, onS
                       </div>
                     </td>
                     <td className="p-4">
+                       <div className="flex flex-col justify-center max-w-[150px] mx-auto overflow-hidden">
+                          <p className="text-[11px] text-slate-500 truncate font-medium italic">
+                            {contact.last_message || "No messages yet"}
+                          </p>
+                       </div>
+                    </td>
+                    <td className="p-4">
                        <div className="flex flex-wrap justify-center gap-1 max-w-[180px] mx-auto">
                           {(contact.tags || []).slice(0, 2).map((tag, idx) => (
                             <TagBadge key={typeof tag === 'object' ? (tag as any).id || idx : tag} tag={tag} availableTags={availableTags} />
@@ -107,6 +116,11 @@ export default function ContactTable({ contacts, availableTags, selectedIds, onS
                             <span className="text-[9px] font-bold text-slate-400 px-1">+ {contact.tags.length - 2}</span>
                           )}
                        </div>
+                    </td>
+                    <td className="p-4 text-center">
+                       <span className="text-[10px] font-bold text-slate-500 uppercase">
+                          {contact.created_at ? new Date(contact.created_at).toLocaleDateString() : 'N/A'}
+                       </span>
                     </td>
                     <td className="p-4">
                        <div className="flex justify-center">

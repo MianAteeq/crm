@@ -1,104 +1,218 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Conversation, Message } from '../../types';
-import { mockConversations } from '../../data/mockMessages';
+import { crmApi } from '../../services/crmApi';
+import { AuthService } from '../../services/authService';
+import { useRealtime } from '../useRealtime';
 
 export function useInbox() {
-  const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(mockConversations[0]?.id || null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
-  const activeConversation = conversations.find(c => c.id === activeConversationId);
+  const fetchConversations = useCallback(async (silent = false) => {
+    if (!silent) setIsLoading(true);
+    try {
+      const data = await crmApi.getConversations();
+      setConversations(data);
+    } catch (error) {
+      console.error('Failed to fetch conversations:', error);
+    } finally {
+      if (!silent) setIsLoading(false);
+    }
+  }, []);
 
-  const sendMessage = useCallback((content: string, type: Message['type'] = 'text') => {
-    if (!activeConversationId) return;
+  const fetchMessages = useCallback(async (id: string, silent = false) => {
+    try {
+      const data = await crmApi.getConversationMessages(id);
+      setMessages(data);
+      
+      // Mark as read locally or via API if needed
+      setConversations(prev => prev.map(c => 
+        c.id === id ? { ...c, unreadCount: 0 } : c
+      ));
+    } catch (error) {
+      console.error('Failed to fetch messages:', error);
+    }
+  }, []);
 
-    const newMessage: Message = {
-      id: `m_${Date.now()}`,
-      sender: 'user',
-      type,
-      content,
-      timestamp: new Date().toISOString(),
-      status: 'sending'
-    };
-
-    setConversations(prev => prev.map(c => {
-      if (c.id === activeConversationId) {
-        return {
-          ...c,
-          messages: [...c.messages, newMessage],
-          lastMessage: newMessage
-        };
+  // Realtime Integration for Laravel Reverb
+  // Backend: Channel('tenant.' . $tenantId)
+  // Event: .message.received
+  const tenantId = AuthService.getTenantId() || '1';
+  
+  useRealtime({
+    channel: `tenant.${tenantId}`,
+    event: '.message.received', // Dot prefix for explicit event name
+    isPrivate: false,           // Backend uses Channel, not PrivateChannel
+    enabled: true,
+    onEvent: (data) => {
+      console.log('[Realtime] 📥 Incoming Broadcast Payload:', data);
+      
+      const messageData = data.message || data.payload || data;
+      if (!messageData) {
+        console.warn('[Realtime] No message data found in payload');
+        return;
       }
-      return c;
-    }));
+      
+      // Robust ID extraction
+      const incomingConvIdRaw = messageData.conversation_id || messageData.chat_id || data.conversation_id || data.chat_id;
+      const incomingConvId = incomingConvIdRaw ? String(incomingConvIdRaw) : null;
+      
+      console.log(`[Realtime] 📲 Event: message.received, Incoming ID: ${incomingConvId}, Active ID: ${activeConversationId}`);
 
-    // Simulate status updates
-    setTimeout(() => {
-      updateMessageStatus(activeConversationId, newMessage.id, 'sent');
-      setTimeout(() => {
-        updateMessageStatus(activeConversationId, newMessage.id, 'delivered');
+      // 1. Always re-fetch conversations (keeps counts and ordering synced)
+      fetchConversations(true);
+
+      // 2. Refresh messages if it's a match, OR as a fallback if we have an active chat
+      // Some payloads might not include the conversation/chat ID explicitly
+      if (activeConversationId && (!incomingConvId || String(incomingConvId) === String(activeConversationId))) {
+        console.log('[Realtime] 🎯 Refreshing messages for active conversation...');
+        // Small delay to ensure DB transaction is finished on server
         setTimeout(() => {
-          updateMessageStatus(activeConversationId, newMessage.id, 'read');
-          
-          // Simulate reply after reading
-          simulateReply(activeConversationId);
-        }, 1500);
-      }, 1000);
-    }, 500);
-  }, [activeConversationId]);
-
-  const updateMessageStatus = (convId: string, msgId: string, status: Message['status']) => {
-    setConversations(prev => prev.map(c => {
-      if (c.id === convId) {
-        return {
-          ...c,
-          messages: c.messages.map(m => m.id === msgId ? { ...m, status } : m),
-          lastMessage: c.lastMessage.id === msgId ? { ...c.lastMessage, status } : c.lastMessage
-        };
+          fetchMessages(activeConversationId, true);
+        }, 500);
       }
-      return c;
-    }));
-  };
-
-  const simulateReply = (convId: string) => {
-    setIsTyping(true);
-    setTimeout(() => {
-      setIsTyping(false);
-      const reply: Message = {
-        id: `r_${Date.now()}`,
-        sender: 'contact',
-        type: 'text',
-        content: 'Thanks for the quick response! I will check and get back to you.',
-        timestamp: new Date().toISOString(),
-        status: 'read'
+      
+      // 3. Optimistic local updates for immediate UI feedback
+      const isFromMe = messageData.from_me === true || messageData.direction === 'outbound' || messageData.user_id === 10;
+      
+      const newMessage: Message = {
+        id: String(messageData.id || `rt_${Date.now()}`),
+        sender: isFromMe ? 'user' : 'contact',
+        type: messageData.type || 'text',
+        content: messageData.body || messageData.message || messageData.content || 'New message',
+        timestamp: messageData.created_at || new Date().toISOString(),
+        status: 'read',
+        mediaUrl: messageData.media_url || messageData.url,
+        fileName: messageData.file_name || messageData.filename
       };
 
+      // Update messages list if active (extra safety check)
+      if (incomingConvId && String(incomingConvId) === String(activeConversationId)) {
+        setMessages(prev => {
+          if (prev.some(m => String(m.id) === String(newMessage.id))) return prev;
+          return [...prev, newMessage];
+        });
+      }
+
+      // Update conversations list summary
+      setConversations(prev => {
+        const targetId = incomingConvId || activeConversationId;
+        if (!targetId) return prev;
+        
+        const index = prev.findIndex(c => String(c.id) === String(targetId));
+        if (index === -1) return prev;
+
+        const newConversations = [...prev];
+        const updatedConv = {
+          ...newConversations[index],
+          lastMessage: newMessage,
+          unreadCount: (activeConversationId !== targetId && !isFromMe) 
+            ? (newConversations[index].unreadCount + 1) 
+            : newConversations[index].unreadCount
+        };
+
+        newConversations.splice(index, 1);
+        return [updatedConv, ...newConversations];
+      });
+    }
+  });
+
+  useEffect(() => {
+    fetchConversations();
+  }, [fetchConversations]);
+
+  useEffect(() => {
+    if (activeConversationId) {
+      setMessages([]); // Clear messages immediately when switching
+      fetchMessages(activeConversationId);
+    } else {
+      setMessages([]);
+    }
+  }, [activeConversationId, fetchMessages]);
+
+  const safeConversations = Array.isArray(conversations) ? conversations : [];
+  const activeConversation = safeConversations.find(c => String(c.id) === String(activeConversationId));
+  
+  // Create a combined active conversation with fetched messages
+  const activeConversationWithMessages = activeConversation ? {
+    ...activeConversation,
+    messages: messages
+  } : null;
+
+  const sendMessage = useCallback(async (content: string, type: 'text' | 'image' | 'file' = 'text', file?: File) => {
+    if (!activeConversationId) return;
+
+    // Optimistic update
+    const tempMessage: Message = {
+      id: `temp_${Date.now()}`,
+      sender: 'user',
+      type: type,
+      content,
+      timestamp: new Date().toISOString(),
+      status: 'sending',
+      mediaUrl: file ? URL.createObjectURL(file) : undefined,
+      fileName: file?.name
+    };
+
+    setMessages(prev => [...prev, tempMessage]);
+
+    try {
+      let sentMessage: Message;
+      if (file) {
+        sentMessage = await crmApi.sendMedia(activeConversationId, file);
+      } else {
+        sentMessage = await crmApi.sendMessage(activeConversationId, content);
+      }
+      
+      // Update with real message from server
+      setMessages(prev => prev.map(m => m.id === tempMessage.id ? sentMessage : m));
+      
+      // Update conversation last message
       setConversations(prev => prev.map(c => {
-        if (c.id === convId) {
+        if (c.id === activeConversationId) {
           return {
             ...c,
-            messages: [...c.messages, reply],
-            lastMessage: reply,
-            unreadCount: activeConversationId === convId ? 0 : c.unreadCount + 1
+            lastMessage: sentMessage
           };
         }
         return c;
       }));
-    }, 3000);
-  };
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      setMessages(prev => prev.map(m => 
+        m.id === tempMessage.id ? { ...m, status: 'failed' } : m
+      ));
+    }
+  }, [activeConversationId]);
 
   const selectConversation = (id: string) => {
     setActiveConversationId(id);
-    setConversations(prev => prev.map(c => 
-      c.id === id ? { ...c, unreadCount: 0 } : c
-    ));
+    
+    // Mark as read if there are unread messages
+    const conv = conversations.find(c => c.id === id);
+    if (conv && conv.unreadCount > 0) {
+      crmApi.markAsRead(id).catch(err => {
+        console.warn('Failed to mark as read:', err);
+      });
+      
+      // Update locally immediately
+      setConversations(prev => prev.map(c => 
+        c.id === id ? { ...c, unreadCount: 0 } : c
+      ));
+    }
   };
 
   return {
-    conversations,
-    activeConversation,
+    conversations: safeConversations,
+    activeConversation: activeConversationWithMessages,
     selectConversation,
     sendMessage,
-    isTyping
+    isTyping,
+    isLoading,
+    refreshManual: fetchConversations
   };
 }

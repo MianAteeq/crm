@@ -21,17 +21,31 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true });
     try {
       const response = await AuthService.login(email, password);
+      
+      // Fallback for tenant_id if not present in user object but present in root
+      const tenantIdValue = response.user.tenant_id || response.tenant_id || '1';
+      
       const user: User = {
         id: response.user.id,
         email: response.user.email,
         name: response.user.name,
         businessName: response.user.businessName || 'throbtech Enterprise',
         onboardingStep: 4, // Assume completed for real users
+        tenantId: String(tenantIdValue)
       };
       
       AuthService.setToken(response.token);
+      AuthService.setTenantId(tenantIdValue);
       set({ user, isAuthenticated: true, isLoading: false });
       localStorage.setItem('auth_session', JSON.stringify(user));
+      
+      // Refresh the WebSocket connection with the new token
+      try {
+        const { refreshEcho } = await import('../lib/echo');
+        refreshEcho();
+      } catch (e) {
+        console.warn('Realtime refresh deferred', e);
+      }
     } catch (error) {
       set({ isLoading: false });
       throw error;

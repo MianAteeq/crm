@@ -2,6 +2,7 @@ import React from 'react';
 import { Conversation } from '../../types';
 import { User, CheckCheck, Clock } from 'lucide-react';
 import MessageStatusIcon from './MessageStatusIcon';
+import { formatSafeTime, formatDynamicDate } from '../../lib/utils';
 
 interface ConversationItemProps {
   conversation: Conversation;
@@ -11,6 +12,30 @@ interface ConversationItemProps {
 
 const ConversationItem: React.FC<ConversationItemProps> = ({ conversation, isActive, onClick }) => {
   const lastMsg = conversation.lastMessage;
+  
+  if (!lastMsg) {
+    return (
+      <div 
+        onClick={onClick}
+        className={`p-4 flex items-center gap-3 cursor-pointer transition-all relative ${
+          isActive 
+            ? 'bg-slate-50 border-r-2 border-slate-900' 
+            : 'hover:bg-slate-50/50'
+        }`}
+      >
+        <div className="relative shrink-0">
+          <div className={`w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 overflow-hidden ${isActive ? 'border-slate-300' : ''}`}>
+             <User size={18} />
+          </div>
+        </div>
+        <div className="flex-1 min-w-0">
+           <h4 className="text-xs font-bold truncate text-slate-900">{conversation.contact.name}</h4>
+           <p className="text-[11px] font-medium text-slate-400">No messages yet</p>
+        </div>
+      </div>
+    );
+  }
+
   const isIncoming = lastMsg.sender === 'contact';
   
   return (
@@ -41,7 +66,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({ conversation, isAct
             {conversation.contact.name}
           </h4>
           <span className="text-[10px] font-medium text-slate-400">
-            {new Date(lastMsg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {formatDynamicDate(lastMsg.timestamp)}
           </span>
         </div>
         
@@ -49,7 +74,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({ conversation, isAct
           <div className="flex items-center gap-1.5 min-w-0">
             {!isIncoming && <MessageStatusIcon status={lastMsg.status} size={10} />}
             <p className="text-[11px] font-medium text-slate-500 truncate">
-              {lastMsg.type === 'template' ? 'Template Message' : lastMsg.content}
+              {lastMsg.content}
             </p>
           </div>
           {conversation.unreadCount > 0 && (

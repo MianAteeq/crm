@@ -5,8 +5,7 @@ import { motion } from 'motion/react';
 interface ComplianceChecklistProps {
   campaignData: {
     name: string;
-    templateId: string;
-    variableMapping: Record<string, string>;
+    message: string;
   };
 }
 
@@ -14,16 +13,16 @@ export default function ComplianceChecklist({ campaignData }: ComplianceChecklis
   // Mock validation logic for the demo
   const checks = [
     {
-      id: 'name-convention',
-      label: 'Template name follows convention',
-      description: 'Must contain only lowercase letters, numbers, and underscores.',
-      isValid: /^[a-z0-9_]+$/.test(campaignData.templateId || 'campaign_template_default'),
+      id: 'content-length',
+      label: 'Message length optimized',
+      description: 'Ensures the message is within the recommended WhatsApp character limits.',
+      isValid: (campaignData.message || '').length > 0 && (campaignData.message || '').length < 4096,
     },
     {
-      id: 'sample-values',
-      label: 'Body has sample values',
-      description: 'All variables in the template must have mapping or samples.',
-      isValid: Object.keys(campaignData.variableMapping).length > 0 || true, // Simplified for mock
+      id: 'policy-check',
+      label: 'Policy Integrity Verification',
+      description: 'Checks for restricted keywords according to WhatsApp Business policies.',
+      isValid: true, // Simplified for mock
     },
     {
       id: 'media-check',

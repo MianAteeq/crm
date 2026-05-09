@@ -3,6 +3,7 @@ import { Phone, Mail, MoreVertical, Zap, Clock, ShieldCheck, ShieldAlert, Ban } 
 import { Contact, Tag as TagType } from '../../types';
 import TagBadge from './TagBadge';
 import { motion } from 'motion/react';
+import { formatSafeDate } from '../../lib/utils';
 
 interface ContactCardProps {
   key?: React.Key;
@@ -52,15 +53,22 @@ export default function ContactCard({ contact, availableTags, selected, onSelect
             <TagBadge key={typeof tag === 'object' ? (tag as any).id || idx : tag} tag={tag} availableTags={availableTags} />
           ))}
           {(contact.tags || []).length > 3 && (
-             <span className="text-[10px] font-bold text-slate-400 uppercase">+ {contact.tags.length - 3}</span>
+             <span className="text-[10px] font-bold text-slate-400 uppercase">+ {(contact.tags || []).length - 3}</span>
           )}
+        </div>
+
+        <div className="w-full space-y-1">
+           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-left">Last Message</p>
+           <p className="text-[11px] text-slate-600 font-medium line-clamp-2 text-left italic bg-slate-50 p-2 rounded-lg border border-slate-100">
+             {contact.last_message || "No messages yet"}
+           </p>
         </div>
 
         <div className="w-full pt-4 border-t border-slate-100 grid grid-cols-2 gap-4">
            <div className="text-center">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Created At</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Joined</p>
               <div className="flex items-center justify-center gap-1 mt-2 text-[10px] font-bold text-slate-900 uppercase">
-                 {contact.created_at ? new Date(contact.created_at).toLocaleDateString() : 'N/A'}
+                 {formatSafeDate(contact.created_at || contact.createdAt)}
               </div>
            </div>
            <div className="text-center">

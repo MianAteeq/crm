@@ -12,13 +12,23 @@ export default function InboxPage() {
     activeConversation, 
     selectConversation, 
     sendMessage, 
-    isTyping 
+    isTyping,
+    isLoading 
   } = useInbox();
 
   return (
-    <div className="h-[calc(100vh-80px)] -m-6 overflow-hidden flex bg-white border border-slate-200 rounded-xl shadow-sm">
+    <div className="h-[calc(100vh-80px)] -m-6 overflow-hidden flex bg-white border border-slate-200 rounded-xl shadow-sm relative">
+      {isLoading && conversations.length === 0 && (
+        <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-sm flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin" />
+            <p className="text-sm font-bold text-slate-900 uppercase tracking-widest">Loading Chats...</p>
+          </div>
+        </div>
+      )}
+      
       {/* List Panel */}
-      <div className="w-full md:w-[350px] lg:w-[400px] shrink-0 h-full">
+      <div className="w-full md:w-[350px] lg:w-[400px] shrink-0 h-full border-r border-slate-100">
         <ConversationList 
           conversations={conversations} 
           activeId={activeConversation?.id} 

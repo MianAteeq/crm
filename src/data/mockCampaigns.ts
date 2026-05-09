@@ -12,8 +12,7 @@ export const mockCampaigns: Campaign[] = [
     failed: 5,
     status: 'Completed',
     scheduledAt: '2024-06-15T09:00:00Z',
-    templateId: '1',
-    variableMapping: { '1': 'name' },
+    messageContent: 'Eid Mubarak to you and your family! Wishing you a blessed holiday filled with joy and prosperity.',
     createdAt: '2024-06-10T14:30:00Z'
   },
   {
@@ -27,8 +26,7 @@ export const mockCampaigns: Campaign[] = [
     failed: 0,
     status: 'Scheduled',
     scheduledAt: '2024-12-01T10:00:00Z',
-    templateId: '1',
-    variableMapping: { '1': 'name' },
+    messageContent: 'Our Winter Collection is here! Shop the latest styles and keep warm this season.',
     createdAt: '2024-11-20T11:00:00Z'
   },
   {
@@ -42,8 +40,7 @@ export const mockCampaigns: Campaign[] = [
     failed: 2,
     status: 'Running',
     scheduledAt: '2024-05-01T00:00:00Z',
-    templateId: '2',
-    variableMapping: { '1': 'name', '2': 'date', '3': 'time' },
+    messageContent: 'Reminder: Your appointment is scheduled for tomorrow. We look forward to seeing you!',
     createdAt: '2024-04-25T15:00:00Z'
   },
   {
@@ -57,8 +54,7 @@ export const mockCampaigns: Campaign[] = [
     failed: 0,
     status: 'Draft',
     scheduledAt: '',
-    templateId: '1',
-    variableMapping: {},
+    messageContent: 'Flash sale starts now! Get up to 50% off on all items for the next 24 hours.',
     createdAt: '2024-05-03T08:00:00Z'
   }
 ];
