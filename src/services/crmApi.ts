@@ -1,7 +1,7 @@
 import { Contact, Tag, WhatsAppSettings, Conversation, Message } from '../types';
 import { AuthService } from './authService';
 
-const BASE_URL = '/api/proxy';
+const BASE_URL = 'https://crm.throbtech.com/api';
 
 // Mock Data
 const MOCK_TAGS: Tag[] = [
@@ -78,13 +78,15 @@ class CrmApiService {
     // For now, always return mock data if available, or try real request but fallback
     const url = `${BASE_URL}${endpoint}`;
     const token = AuthService.getToken();
-
+    const tenantId = AuthService.getTenantId();
     const isFormData = options.body instanceof FormData;
 
     const headers: HeadersInit = {
       ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
       ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      ...(tenantId ? { 'X-Tenant-Id': tenantId } : {}),
       ...options.headers,
     };
 
@@ -95,6 +97,20 @@ class CrmApiService {
 
     try {
       const response = await fetch(url, config);
+      
+      if (response.status === 401) {
+        console.error(`[CRM API] Unauthorized request (401) to ${endpoint}. Token exists: ${!!token}`);
+        if (token) {
+          AuthService.removeToken();
+          // Only redirect if we are not already on the login/home page
+          if (window.location.pathname !== '/' && !window.location.pathname.startsWith('/auth')) {
+            console.warn('[CRM API] Redirecting to login due to 401');
+            window.location.href = '/';
+          }
+        }
+        throw new Error('Unauthenticated');
+      }
+
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {

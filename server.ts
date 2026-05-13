@@ -13,33 +13,36 @@ async function startServer() {
   });
 
   // Proxy for CRM API
-  const CRM_DOMAIN = 'https://crm.throbtech.com';
+  const CRM_DOMAIN = process.env.VITE_CRM_API_URL || 'https://crm.throbtech.com';
   const CRM_API_URL = `${CRM_DOMAIN}/api`;
 
   app.use("/api/proxy", express.raw({ type: '*/*', limit: '50mb' }));
   app.all("/api/proxy/*", async (req, res) => {
     try {
+      // Extract the endpoint relative to /api/proxy/
       let endpoint = req.params[0] || '';
       if (!endpoint && req.path.startsWith('/api/proxy/')) {
         endpoint = req.path.substring('/api/proxy/'.length);
       }
       
-      const CRM_DOMAIN = 'https://crm.throbtech.com';
-      const CRM_API_URL = `${CRM_DOMAIN}/api`;
-
-      // Remove leading slash if any
-      endpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+      // Clean leading and trailing slashes from endpoint
+      endpoint = endpoint.replace(/^\/+|\/+$/g, '');
       
-      // Laravel broadcasting auth is typically at the root domain, not under /api
-      let url = `${CRM_API_URL}/${endpoint}`;
-      if (endpoint === 'broadcasting/auth' || endpoint.startsWith('broadcasting/auth/')) {
-        url = `${CRM_DOMAIN}/broadcasting/auth`;
-      }
+      const rawUrl = (process.env.VITE_CRM_API_URL || 'https://crm.throbtech.com').replace(/\/$/, '');
+      
+      // Determine the target base domain (strip /api if present in config)
+      const TARGET_CRM_DOMAIN = rawUrl.endsWith('/api') ? rawUrl.slice(0, -4) : rawUrl;
+
+      // The proxy is now a simple passthrough. 
+      // The frontend should call /api/proxy/api/foo for CRM API endpoints
+      // or /api/proxy/broadcasting/auth for Laravel Echo.
+      const url = `${TARGET_CRM_DOMAIN}/${endpoint}`;
       
       const filteredHeaders: Record<string, string> = {
-        'Accept': 'application/json', // Force JSON response
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
       };
-      const skipHeaders = ['host', 'connection', 'content-length'];
+      const skipHeaders = ['host', 'connection', 'content-length', 'accept-encoding', 'accept', 'x-requested-with'];
       
       Object.keys(req.headers).forEach(key => {
         if (!skipHeaders.includes(key.toLowerCase())) {
@@ -50,17 +53,22 @@ async function startServer() {
         }
       });
 
-      console.log(`[PROXY] ${req.method} ${url}`);
-
-      // Special logging for broadcasting auth
-      if (endpoint.includes('broadcasting/auth')) {
-        console.log('[BROADCAST REQUEST] auth endpoint hit');
-        console.log('[BROADCAST REQUEST] Auth Header:', req.headers['authorization'] ? 'Present' : 'MISSING');
-        try {
-          const bodyStr = Buffer.from(req.body).toString('utf8');
-          console.log('[BROADCAST REQUEST] Payload:', bodyStr);
-        } catch (e) {}
+      const authHeader = req.headers['authorization'];
+      if (authHeader) {
+        const tokenValue = Array.isArray(authHeader) ? authHeader[0] : authHeader;
+        if (tokenValue.toLowerCase().includes('mock_')) {
+          console.warn(`[PROXY WARNING] Request to real CRM ${url} using a MOCK token! This will likely fail with 401.`);
+        }
+        console.log(`[PROXY] Authorization header present: ${tokenValue.substring(0, 20)}...`);
+        filteredHeaders['Authorization'] = tokenValue;
+      } else {
+        console.warn(`[PROXY] No Authorization header found for ${url}`);
       }
+
+      console.log(`[PROXY] Forwarding Request: ${req.method} ${url}`);
+      console.log(`[PROXY] Filtered Headers: ${JSON.stringify(Object.keys(filteredHeaders))}`);
+
+      const hostHeader = new URL(TARGET_CRM_DOMAIN).host;
 
       const response = await axios({
         method: req.method,
@@ -68,7 +76,7 @@ async function startServer() {
         data: (['GET', 'HEAD'].includes(req.method.toUpperCase()) || !req.body || req.body.length === 0) ? undefined : req.body,
         headers: {
           ...filteredHeaders,
-          'Host': 'crm.throbtech.com',
+          'Host': hostHeader,
           'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0 WhatsAppCRM/1.0',
         },
         maxContentLength: Infinity,

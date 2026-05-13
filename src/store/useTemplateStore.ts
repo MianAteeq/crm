@@ -9,6 +9,7 @@ interface TemplateStore {
   setHeaderType: (type: HeaderType) => void;
   setHeaderText: (text: string) => void;
   setHeaderMedia: (url: string, fileName?: string) => void;
+  setHeaderMediaHandle: (handle: string) => void;
   setHeaderFileName: (fileName: string) => void;
   setBodyText: (text: string) => void;
   setFooterText: (text: string) => void;
@@ -16,6 +17,7 @@ interface TemplateStore {
   addButton: (button: Omit<TemplateButton, 'id'>) => void;
   updateButton: (id: string, updates: Partial<TemplateButton>) => void;
   removeButton: (id: string) => void;
+  setTemplate: (template: WhatsAppTemplate) => void;
   resetTemplate: () => void;
 }
 
@@ -54,7 +56,7 @@ export const useTemplateStore = create<TemplateStore>((set) => ({
   setHeaderType: (type) => set((state) => ({
     currentTemplate: { 
       ...state.currentTemplate, 
-      header: { ...state.currentTemplate.header, type, text: '', mediaUrl: '' } 
+      header: { ...state.currentTemplate.header, type, text: '', mediaUrl: '', mediaHandle: '' } 
     }
   })),
 
@@ -69,6 +71,13 @@ export const useTemplateStore = create<TemplateStore>((set) => ({
     currentTemplate: { 
       ...state.currentTemplate, 
       header: { ...state.currentTemplate.header, mediaUrl: url, fileName: fileName || state.currentTemplate.header.fileName } 
+    }
+  })),
+
+  setHeaderMediaHandle: (handle) => set((state) => ({
+    currentTemplate: { 
+      ...state.currentTemplate, 
+      header: { ...state.currentTemplate.header, mediaHandle: handle } 
     }
   })),
 
@@ -110,6 +119,8 @@ export const useTemplateStore = create<TemplateStore>((set) => ({
       buttons: [...state.currentTemplate.buttons, { ...button, id: Math.random().toString(36).substr(2, 9) }] 
     }
   })),
+
+  setTemplate: (template) => set({ currentTemplate: template }),
 
   updateButton: (id, updates) => set((state) => ({
     currentTemplate: { 

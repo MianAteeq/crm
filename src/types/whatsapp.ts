@@ -20,6 +20,7 @@ export interface WhatsAppTemplate {
     type: HeaderType;
     text?: string;
     mediaUrl?: string;
+    mediaHandle?: string;
     fileName?: string;
   };
   body: {

@@ -1,5 +1,5 @@
 
-const BASE_URL = '/api/proxy';
+const BASE_URL = 'https://crm.throbtech.com/api';
 
 export interface LoginResponse {
   token: string;
@@ -21,25 +21,21 @@ export class AuthService {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
         },
         body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
-        throw new Error('Fallback to mock');
+        const errorBody = await response.text().catch(() => 'No error body');
+        console.error(`[AUTH] Login failed with status ${response.status}: ${errorBody}`);
+        throw new Error(`Login failed: ${response.status}`);
       }
 
       return await response.json();
     } catch (error) {
-      console.warn('[AUTH] Login failed, using mock response');
-      return {
-        token: 'mock_jwt_token',
-        user: {
-          id: 'user_1',
-          email: email || 'user@example.com',
-          name: email ? email.split('@')[0] : 'Demo User'
-        }
-      };
+      console.error('[AUTH] Login error:', error);
+      throw error;
     }
   }
 

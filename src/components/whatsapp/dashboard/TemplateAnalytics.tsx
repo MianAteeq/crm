@@ -27,7 +27,6 @@ const data = [
 
 const stats = [
   { label: 'Delivered', value: '124,302', change: '+12.5%', trend: 'up', icon: Send, color: 'emerald' },
-  { label: 'Read Rate', value: '84.2%', change: '+5.2%', trend: 'up', icon: CheckCircle, color: 'blue' },
   { label: 'Click Rate', value: '24.1%', change: '-2.1%', trend: 'down', icon: MousePointer2, color: 'purple' },
   { label: 'Replies', value: '1,204', change: '+3.1%', trend: 'up', icon: MessageSquare, color: 'amber' },
 ];
@@ -105,10 +104,6 @@ export default function TemplateAnalytics() {
               <h3 className="text-lg font-black text-slate-900 tracking-tight uppercase tracking-widest text-xs">Engagement Trends</h3>
               <div className="flex items-center gap-4">
                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-500" />
-                    <span className="text-[10px] font-black text-slate-400 uppercase">Opened</span>
-                 </div>
-                 <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-slate-200" />
                     <span className="text-[10px] font-black text-slate-400 uppercase">Sent</span>
                  </div>
@@ -131,7 +126,6 @@ export default function TemplateAnalytics() {
                   }} 
                 />
                 <Bar dataKey="sent" fill="#e2e8f0" radius={[4, 4, 0, 0]} barSize={12} />
-                <Bar dataKey="opened" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={12} />
               </BarChart>
             </ResponsiveContainer>
           </div>

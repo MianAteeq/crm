@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useTemplateStore } from '../../../store/useTemplateStore';
 import { HeaderType, ButtonType, TemplateCategory } from '../../../types/whatsapp';
+import { whatsappApi } from '../../../services/whatsappApi';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../../lib/utils';
 import { GoogleGenAI } from "@google/genai";
@@ -39,6 +40,7 @@ export default function TemplateEditor() {
     setHeaderType, 
     setHeaderText,
     setHeaderMedia,
+    setHeaderMediaHandle,
     setHeaderFileName,
     setBodyText,
     setFooterText,
@@ -76,7 +78,6 @@ export default function TemplateEditor() {
     { id: 'NONE', label: 'None', icon: Hash },
     { id: 'TEXT', label: 'Text', icon: Type },
     { id: 'IMAGE', label: 'Image', icon: ImageIcon },
-    { id: 'VIDEO', label: 'Video', icon: Video },
     { id: 'DOCUMENT', label: 'Doc', icon: FileText },
   ];
 
@@ -149,6 +150,7 @@ export default function TemplateEditor() {
   const commonEmojis = ['😊', '👋', '🎉', '💡', '⚠️', '✅', '🚀', '🎁', '📅', '💬'];
   const [showEmojiPicker, setShowEmojiPicker] = React.useState(false);
   const [uploadError, setUploadError] = React.useState<string | null>(null);
+  const [isUploading, setIsUploading] = React.useState(false);
   const [isRewriting, setIsRewriting] = React.useState(false);
   const [showAIOptions, setShowAIOptions] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -195,7 +197,6 @@ export default function TemplateEditor() {
   const validateFile = (file: File) => {
     const type = currentTemplate.header.type;
     const maxSize = type === 'IMAGE' ? 5 * 1024 * 1024 : 
-                    type === 'VIDEO' ? 16 * 1024 * 1024 : 
                     100 * 1024 * 1024; // Document
 
     if (file.size > maxSize) {
@@ -203,13 +204,12 @@ export default function TemplateEditor() {
     }
 
     if (type === 'IMAGE' && !file.type.startsWith('image/')) return 'Invalid image file';
-    if (type === 'VIDEO' && !file.type.startsWith('video/')) return 'Invalid video file';
     if (type === 'DOCUMENT' && file.type !== 'application/pdf') return 'Only PDF documents are supported';
 
     return null;
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -220,13 +220,43 @@ export default function TemplateEditor() {
     }
 
     setUploadError(null);
-    // Create a local URL for preview purposes
-    const objectUrl = URL.createObjectURL(file);
-    
-    if (currentTemplate.header.type === 'DOCUMENT') {
-      setHeaderMedia(objectUrl, file.name);
-    } else {
-      setHeaderMedia(objectUrl);
+    setIsUploading(true);
+
+    try {
+      // 1. Upload to server to get media_handle
+      const response = await whatsappApi.uploadMedia(file);
+      console.log('TemplateEditor: Media upload response processing:', response);
+      
+      // Prioritize header_handle as requested by the user, then fallback to others
+      const media_handle = 
+        response.header_handle ||
+        response.media_handle || 
+        (response as any).id ||
+        (response as any).response?.h || // From user sample JSON
+        (response as any).data?.media_handle || 
+        (response as any).data?.id ||
+        (response as any).data || 
+        (typeof response === 'string' ? response : null);
+      
+      if (!media_handle || typeof media_handle !== 'string') {
+         console.error('Failed to find media_handle in response:', response);
+         throw new Error('Server did not return a valid media handle. Please check your file and try again.');
+      }
+      
+      setHeaderMediaHandle(media_handle);
+
+      // 2. Create local URL for preview
+      const objectUrl = URL.createObjectURL(file);
+      if (currentTemplate.header.type === 'DOCUMENT') {
+        setHeaderMedia(objectUrl, file.name);
+      } else {
+        setHeaderMedia(objectUrl);
+      }
+    } catch (err: any) {
+      console.error('Media upload failed:', err);
+      setUploadError(err.message || 'Failed to upload media. Please try again.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -350,7 +380,7 @@ export default function TemplateEditor() {
           </div>
         )}
 
-        {['IMAGE', 'VIDEO', 'DOCUMENT'].includes(currentTemplate.header.type) && (
+        {['IMAGE', 'DOCUMENT'].includes(currentTemplate.header.type) && (
           <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
             {currentTemplate.header.type === 'DOCUMENT' && (
               <div className="space-y-1.5">
@@ -378,9 +408,6 @@ export default function TemplateEditor() {
                     {currentTemplate.header.type === 'IMAGE' && (
                       <img src={currentTemplate.header.mediaUrl} alt="Preview" className="w-full h-full object-cover" />
                     )}
-                    {currentTemplate.header.type === 'VIDEO' && (
-                      <video src={currentTemplate.header.mediaUrl} className="w-full h-full object-cover" />
-                    )}
                     {currentTemplate.header.type === 'DOCUMENT' && (
                       <FileIcon size={24} className="text-blue-500" />
                     )}
@@ -394,7 +421,7 @@ export default function TemplateEditor() {
                     </p>
                   </div>
                   <button 
-                    onClick={() => setHeaderMedia('')}
+                    onClick={() => { setHeaderMedia(''); setHeaderMediaHandle(''); }}
                     className="p-2 text-text-muted hover:text-danger hover:bg-danger/5 rounded-lg transition-all"
                     title="Remove media"
                   >
@@ -421,7 +448,6 @@ export default function TemplateEditor() {
                   className="hidden"
                   accept={
                     currentTemplate.header.type === 'IMAGE' ? "image/*" :
-                    currentTemplate.header.type === 'VIDEO' ? "video/*" :
                     ".pdf"
                   }
                   onChange={handleFileChange}
@@ -430,26 +456,32 @@ export default function TemplateEditor() {
                   "w-12 h-12 rounded-full flex items-center justify-center transition-transform group-hover:scale-110",
                   uploadError ? "bg-danger/10 text-danger" : "bg-blue-50 text-blue-500"
                 )}>
-                  {currentTemplate.header.type === 'IMAGE' && <ImageIcon size={24} />}
-                  {currentTemplate.header.type === 'VIDEO' && <Video size={24} />}
-                  {currentTemplate.header.type === 'DOCUMENT' && <FileText size={24} />}
+                  {isUploading ? (
+                    <Loader2 size={24} className="animate-spin text-blue-500" />
+                  ) : (
+                    <>
+                      {currentTemplate.header.type === 'IMAGE' && <ImageIcon size={24} />}
+                      {currentTemplate.header.type === 'DOCUMENT' && <FileText size={24} />}
+                    </>
+                  )}
                 </div>
                 <div>
                   <p className="text-sm font-bold text-slate-800">
-                    {uploadError ? "Invalid file" : "Click to upload or drag and drop"}
+                    {isUploading ? "Uploading media..." : (uploadError ? "Invalid file" : "Click to upload or drag and drop")}
                   </p>
                   <p className={cn(
                     "text-xs mt-1",
                     uploadError ? "text-danger font-medium" : "text-text-muted"
                   )}>
-                    {uploadError || (
-                      currentTemplate.header.type === 'IMAGE' ? 'JPG, PNG or WEBP (Max 5MB)' : 
-                      currentTemplate.header.type === 'VIDEO' ? 'MP4 or MKV (Max 16MB)' : 
-                      'PDF (Max 100MB)'
+                    {isUploading ? "Please wait while we process your file" : (
+                      uploadError || (
+                        currentTemplate.header.type === 'IMAGE' ? 'JPG, PNG or WEBP (Max 5MB)' : 
+                        'PDF (Max 100MB)'
+                      )
                     )}
                   </p>
                 </div>
-                {!uploadError && (
+                {!uploadError && !isUploading && (
                   <button 
                     onClick={(e) => { e.stopPropagation(); triggerFileUpload(); }}
                     className="btn-premium-secondary py-2 px-6 text-[11px] uppercase tracking-widest shadow-sm"
