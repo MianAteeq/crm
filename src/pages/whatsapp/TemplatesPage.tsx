@@ -23,13 +23,14 @@ import {
   Calendar,
   User,
   Edit2,
-  Copy,
   Trash2 as Trash,
-  FileText
+  FileText,
+  Send
 } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import TemplateAnalytics from '../../components/whatsapp/dashboard/TemplateAnalytics';
 import WhatsAppPreview from '../../components/whatsapp/preview/WhatsAppPreview';
+import SendTemplateModal from '../../components/whatsapp/modals/SendTemplateModal';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../lib/utils';
 import { WhatsAppTemplate } from '../../types/whatsapp';
@@ -74,14 +75,59 @@ const mockTemplates: WhatsAppTemplate[] = [
 export default function TemplatesPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlQuery = searchParams.get('search') || '';
+
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [activeTab, setActiveTab] = useState<'all' | 'analytics' | 'categories' | 'rules'>('all');
   const [isSyncing, setIsSyncing] = useState(false);
   const [templates, setTemplates] = useState<WhatsAppTemplate[]>([]);
+  const [searchQuery, setSearchQuery] = useState(urlQuery);
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [selectedTemplateForPreview, setSelectedTemplateForPreview] = useState<WhatsAppTemplate | null>(null);
+  const [templateToDelete, setTemplateToDelete] = useState<WhatsAppTemplate | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [templatePerformance, setTemplatePerformance] = useState<any>(null);
+  const [isLoadingPerformance, setIsLoadingPerformance] = useState(false);
+  const [templateToSend, setTemplateToSend] = useState<WhatsAppTemplate | null>(null);
+
+  useEffect(() => {
+    if (selectedTemplateForPreview && selectedTemplateForPreview.status === 'APPROVED') {
+      const fetchTemplateStats = async () => {
+        setIsLoadingPerformance(true);
+        try {
+          const stats = await whatsappApi.fetchPerformanceInsights(30, selectedTemplateForPreview.id);
+          setTemplatePerformance(stats);
+        } catch (e) {
+          console.error('Failed to fetch template stats', e);
+          setTemplatePerformance(null);
+        } finally {
+          setIsLoadingPerformance(false);
+        }
+      };
+      fetchTemplateStats();
+    } else {
+      setTemplatePerformance(null);
+    }
+  }, [selectedTemplateForPreview]);
+
+  useEffect(() => {
+    if (!templateToDelete) {
+      setDeleteError(null);
+    }
+  }, [templateToDelete]);
+
+  useEffect(() => {
+    const query = searchParams.get('search') || '';
+    if (query !== searchQuery) {
+      setSearchQuery(query);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (location.state?.message) {
@@ -159,47 +205,84 @@ export default function TemplatesPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this template? This action cannot be undone.')) {
-      return;
-    }
+  const handleDelete = async () => {
+    if (!templateToDelete) return;
 
+    setIsDeleting(true);
+    setDeleteError(null);
     try {
-      await whatsappApi.deleteTemplate(id);
-      setTemplates(prev => prev.filter(t => t.id !== id));
+      await whatsappApi.deleteTemplate(templateToDelete.id);
+      setTemplates(prev => prev.filter(t => t.id !== templateToDelete.id));
+      setSuccessMessage('Template deleted successfully');
+      setTemplateToDelete(null);
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Delete failed:', err);
-      alert('Failed to delete template. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete template';
+      setDeleteError(errorMessage);
+      setError(errorMessage);
+      // We don't clear the error automatically here so the user can see why it failed in the modal
+    } finally {
+      setIsDeleting(false);
     }
   };
+
+  const filteredTemplates = templates.filter(template => {
+    const matchesSearch = template.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         template.body.text.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === 'ALL' || template.status === statusFilter;
+    const matchesCategory = categoryFilter === 'ALL' || template.category === categoryFilter;
+    
+    return matchesSearch && matchesStatus && matchesCategory;
+  });
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
-      <header className="shrink-0 bg-white border-b border-slate-200 px-10 py-10 relative">
+      <header className="shrink-0 pt-12 pb-16 relative">
         <AnimatePresence>
           {successMessage && (
+            <motion.div 
+              initial={{ opacity: 0, y: -20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.9 }}
+              className="fixed top-8 left-1/2 -translate-x-1/2 z-[100] bg-slate-900 text-white rounded-2xl px-6 py-4 shadow-2xl flex items-center gap-4 border border-white/10 backdrop-blur-xl"
+            >
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
+                 <CheckCircle size={18} />
+              </div>
+              <span className="text-[11px] font-black uppercase tracking-[0.1em]">{successMessage}</span>
+              <button onClick={() => setSuccessMessage(null)} className="ml-4 opacity-50 hover:opacity-100 transition-opacity">
+                <X size={16} />
+              </button>
+            </motion.div>
+          )}
+          {error && (
             <motion.div 
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-emerald-500 text-white rounded-full px-6 py-2 shadow-lg flex items-center gap-2 border border-emerald-400"
+              className="fixed top-8 left-1/2 -translate-x-1/2 z-[100] bg-red-500 text-white rounded-2xl px-6 py-4 shadow-2xl flex items-center gap-4 border border-white/10 backdrop-blur-xl"
             >
-              <CheckCircle size={16} />
-              <span className="text-xs font-bold uppercase tracking-wider">{successMessage}</span>
+              <AlertCircle size={18} />
+              <span className="text-[11px] font-black uppercase tracking-[0.1em]">{error}</span>
               <button 
-                onClick={() => setSuccessMessage(null)}
-                className="ml-2 hover:bg-emerald-600 rounded-full p-0.5"
+                onClick={() => setError(null)}
+                className="ml-2 hover:bg-red-600 rounded-full p-0.5"
               >
                 <X size={14} />
               </button>
             </motion.div>
           )}
         </AnimatePresence>
-        <div className="max-w-[1600px] mx-auto flex items-end justify-between">
+
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-20 px-8">
           <div>
-            <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2">WhatsApp Templates</h1>
-            <p className="text-sm font-bold text-slate-400 uppercase tracking-[0.3em]">Marketing & Automation Control</p>
+            <div className="flex items-center gap-2 mb-4">
+               <span className="px-3 py-1 bg-indigo-500/10 text-indigo-500 text-[10px] font-black uppercase tracking-[0.2em] rounded-full border border-indigo-500/20">Resource Management</span>
+            </div>
+            <h1 className="text-6xl font-black text-slate-950 tracking-tighter leading-none mb-4">Template Lab</h1>
+            <p className="text-sm font-bold text-slate-400 uppercase tracking-[0.3em]">Configure Strategic Messaging Assets</p>
           </div>
           
           <div className="flex items-center gap-4">
@@ -207,42 +290,42 @@ export default function TemplatesPage() {
                onClick={handleSync}
                disabled={isSyncing}
                className={cn(
-                 "flex items-center gap-3 px-6 py-5 bg-white border border-slate-200 rounded-3xl font-black uppercase tracking-widest text-[10px] text-slate-600 hover:text-slate-900 transition-all shadow-sm active:scale-95",
+                 "flex items-center gap-4 px-8 py-5 bg-white border border-slate-200 rounded-[2rem] font-black uppercase tracking-widest text-[10px] text-slate-600 hover:text-slate-900 transition-all shadow-premium hover:shadow-floating active:scale-95",
                  isSyncing && "opacity-50 cursor-not-allowed"
                )}
              >
-               <RefreshCw size={14} className={cn("text-blue-500", isSyncing && "animate-spin")} />
-               {isSyncing ? 'Syncing...' : 'Sync from Meta'}
+               <RefreshCw size={16} className={cn("text-indigo-500", isSyncing && "animate-spin")} />
+               {isSyncing ? 'Synchronizing Cluster...' : 'Sync from Meta'}
              </button>
              <button 
                onClick={() => navigate('/templates/builder')}
-               className="bg-slate-900 hover:bg-slate-800 text-white px-10 py-5 rounded-3xl font-black uppercase tracking-widest text-xs transition-all flex items-center gap-4 shadow-2xl shadow-slate-900/20 active:scale-95 group"
+               className="bg-slate-950 hover:bg-slate-900 text-white px-10 py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs transition-all flex items-center gap-4 shadow-2xl shadow-slate-900/20 active:scale-95 group"
              >
                <Plus size={20} strokeWidth={3} className="group-hover:rotate-90 transition-transform" />
-               Create Template
+               Architect Template
              </button>
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="max-w-[1600px] mx-auto mt-12 flex items-center gap-12">
+        {/* Tab Orbit */}
+        <div className="flex items-center gap-12 border-b border-slate-100 px-8">
            {[
-             { id: 'all', label: 'All Templates' },
-             { id: 'analytics', label: 'Performance Insight' },
-             { id: 'categories', label: 'By Category' },
-             { id: 'rules', label: 'Policy Center' },
+             { id: 'all', label: 'All Modules' },
+             { id: 'analytics', label: 'Performance' },
+             { id: 'categories', label: 'Categories' },
+             { id: 'rules', label: 'Compliance' },
            ].map(tab => (
              <button 
                key={tab.id}
                onClick={() => setActiveTab(tab.id as any)}
                className={cn(
-                 "relative py-2 text-sm font-black uppercase tracking-widest transition-all",
-                 activeTab === tab.id ? "text-slate-900" : "text-slate-400 hover:text-slate-600"
+                 "relative py-6 text-[10px] font-black uppercase tracking-[0.25em] transition-all",
+                 activeTab === tab.id ? "text-slate-950" : "text-slate-400 hover:text-slate-600"
                )}
              >
                {tab.label}
                {activeTab === tab.id && (
-                 <motion.div layoutId="activeTab" className="absolute -bottom-2 left-0 right-0 h-1 bg-slate-900 rounded-full" />
+                 <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-1 bg-slate-950 rounded-full" />
                )}
              </button>
            ))}
@@ -250,7 +333,7 @@ export default function TemplatesPage() {
       </header>
 
       {/* Main Content Area */}
-       <main className="flex-1 max-w-[1600px] mx-auto w-full px-10 py-12">
+      <main className="flex-1 overflow-y-auto bg-slate-50/50 relative custom-scrollbar pb-32">
         <AnimatePresence mode="wait">
           {activeTab === 'analytics' ? (
             <motion.div 
@@ -258,22 +341,23 @@ export default function TemplatesPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
+              className="px-8"
             >
                <TemplateAnalytics />
             </motion.div>
           ) : activeTab === 'categories' ? (
             <motion.div 
-              key="categories"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex items-center justify-center min-h-[400px] flex-col gap-4 text-center"
+               key="categories"
+               initial={{ opacity: 0, y: 10 }}
+               animate={{ opacity: 1, y: 0 }}
+               exit={{ opacity: 0, y: -10 }}
+               className="px-8 flex items-center justify-center min-h-[400px] flex-col gap-4 text-center"
             >
-               <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-3xl flex items-center justify-center">
-                  <Filter size={32} />
+               <div className="w-20 h-20 bg-indigo-50 text-indigo-500 rounded-[2.5rem] flex items-center justify-center mb-4">
+                  <Tag size={32} strokeWidth={2.5} />
                </div>
-               <h3 className="text-xl font-black text-slate-900">Categories View coming soon</h3>
-               <p className="text-slate-500 max-w-sm">We are refining the category management interface to provide better insights into your message types.</p>
+               <h3 className="text-2xl font-black text-slate-950 tracking-tighter uppercase">Category Clustering</h3>
+               <p className="text-slate-400 font-medium max-w-sm text-sm">Organize your messaging architecture by strategic purpose and compliance classification.</p>
             </motion.div>
           ) : activeTab === 'rules' ? (
             <motion.div 
@@ -281,13 +365,15 @@ export default function TemplatesPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="flex items-center justify-center min-h-[400px] flex-col gap-4 text-center"
+              className="px-8 flex items-center justify-center min-h-[400px] flex-col gap-6 text-center"
             >
-               <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-3xl flex items-center justify-center">
-                  <AlertCircle size={32} />
+               <div className="w-20 h-20 bg-rose-50 text-rose-500 rounded-[2.5rem] flex items-center justify-center mb-4">
+                  <AlertCircle size={32} strokeWidth={2.5} />
                </div>
-               <h3 className="text-xl font-black text-slate-900">Policy Center coming soon</h3>
-               <p className="text-slate-500 max-w-sm">Stay compliant with Meta's business policies using our automated rule checker and transparency logs.</p>
+               <div>
+                  <h3 className="text-2xl font-black text-slate-950 tracking-tighter uppercase">Compliance Shield</h3>
+                  <p className="text-slate-400 font-medium max-w-sm mt-4 text-sm leading-relaxed">Automated policy validation and Meta Business Suite integrity checks are pending synchronization.</p>
+               </div>
             </motion.div>
           ) : (
             <motion.div 
@@ -295,41 +381,64 @@ export default function TemplatesPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="space-y-8"
+              className="space-y-12"
             >
                {/* Controls Bar */}
-               <div className="flex items-center justify-between">
-                  <div className="flex gap-4">
-                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mt-12 px-8">
+                  <div className="flex flex-col sm:flex-row gap-6 flex-1">
+                     <div className="relative flex-1 max-w-md group">
+                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-all" size={20} strokeWidth={2.5} />
                         <input 
                           type="text" 
-                          placeholder="Search templates..."
-                          className="pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl w-80 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all" 
+                          placeholder="Search intelligence cache..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="w-full pl-16 pr-6 py-5 bg-white border border-slate-200 rounded-[2rem] text-[11px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:border-slate-400 focus:ring-4 focus:ring-slate-900/5 shadow-premium transition-all placeholder:text-slate-300" 
                         />
                      </div>
-                     <button className="flex items-center gap-3 px-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-all">
-                        <Filter size={18} />
-                        Filter
-                     </button>
+                     <div className="flex gap-4">
+                        <select 
+                          value={statusFilter}
+                          onChange={(e) => setStatusFilter(e.target.value)}
+                          className="px-8 py-5 bg-white border border-slate-200 rounded-[2rem] text-[10px] font-black uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-4 focus:ring-slate-900/5 transition-all shadow-premium cursor-pointer"
+                        >
+                          <option value="ALL">Global Status</option>
+                          <option value="APPROVED">Approved</option>
+                          <option value="PENDING">Syncing</option>
+                          <option value="REJECTED">Offline</option>
+                        </select>
+                        <select 
+                          value={categoryFilter}
+                          onChange={(e) => setCategoryFilter(e.target.value)}
+                          className="px-8 py-5 bg-white border border-slate-200 rounded-[2rem] text-[10px] font-black uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-4 focus:ring-slate-900/5 transition-all shadow-premium cursor-pointer"
+                        >
+                          <option value="ALL">Strategy Class</option>
+                          <option value="MARKETING">Growth</option>
+                          <option value="UTILITY">Operational</option>
+                          <option value="AUTHENTICATION">Security</option>
+                        </select>
+                     </div>
                   </div>
 
-                  <div className="flex bg-white p-1.5 rounded-2xl border border-slate-200">
+                  <div className="flex bg-white p-2 rounded-[1.5rem] border border-slate-200 shadow-premium">
                      <button 
+                       type="button"
                        onClick={() => setView('list')}
-                       className={cn("p-2 rounded-xl transition-all", view === 'list' ? "bg-slate-900 text-white shadow-lg" : "text-slate-400 hover:text-slate-600")}
-                     ><List size={18} /></button>
+                       className={cn("w-12 h-12 rounded-xl transition-all flex items-center justify-center", view === 'list' ? "bg-slate-950 text-white shadow-lg" : "text-slate-400 hover:text-slate-600")}
+                     ><List size={20} /></button>
                      <button 
+                       type="button"
                        onClick={() => setView('grid')}
-                       className={cn("p-2 rounded-xl transition-all", view === 'grid' ? "bg-slate-900 text-white shadow-lg" : "text-slate-400 hover:text-slate-600")}
-                     ><Grid size={18} /></button>
+                       className={cn("w-12 h-12 rounded-xl transition-all flex items-center justify-center", view === 'grid' ? "bg-slate-950 text-white shadow-lg" : "text-slate-400 hover:text-slate-600")}
+                     ><Grid size={20} /></button>
                   </div>
                </div>
 
+               <div className="px-8 pb-32">
                {isLoading ? (
-                 <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-                    <Loader2 className="w-12 h-12 text-slate-200 animate-spin" />
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Loading templates...</p>
+                 <div className="flex flex-col items-center justify-center min-h-[400px] gap-6">
+                    <Loader2 className="w-16 h-16 text-slate-200 animate-spin" strokeWidth={2.5}/>
+                    <p className="text-slate-400 font-black uppercase tracking-[0.4em] text-[10px] animate-pulse">Accessing Intelligence Layer...</p>
                  </div>
                ) : error ? (
                  <div className="flex flex-col items-center justify-center min-h-[400px] gap-6 text-center">
@@ -347,37 +456,50 @@ export default function TemplatesPage() {
                       Retry Connection
                     </button>
                  </div>
-               ) : templates.length === 0 ? (
+               ) : filteredTemplates.length === 0 ? (
                  <div className="flex flex-col items-center justify-center min-h-[400px] gap-6 text-center">
                     <div className="w-20 h-20 bg-slate-100 text-slate-300 rounded-[2.5rem] flex items-center justify-center">
                        <MessageSquare size={40} />
                     </div>
                     <div>
-                       <h3 className="text-xl font-black text-slate-900">No templates found</h3>
-                       <p className="text-slate-500 max-w-sm mt-2">Sync from Meta or create a new template to get started.</p>
+                       <h3 className="text-xl font-black text-slate-900">No matching templates</h3>
+                       <p className="text-slate-500 max-w-sm mt-2">Adjust your filters or search query to find what you're looking for.</p>
                     </div>
-                    <button 
-                       onClick={() => navigate('/templates/builder')}
-                       className="px-10 py-5 bg-slate-900 text-white rounded-3xl font-black uppercase tracking-widest text-xs shadow-xl shadow-slate-900/20 active:scale-95 transition-all"
-                    >
-                       Create New Template
-                    </button>
+                    {(searchQuery !== '' || statusFilter !== 'ALL' || categoryFilter !== 'ALL') ? (
+                      <button 
+                        onClick={() => {
+                          setSearchQuery('');
+                          setStatusFilter('ALL');
+                          setCategoryFilter('ALL');
+                        }}
+                        className="px-8 py-3 bg-slate-100 text-slate-600 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-200 transition-all font-mono"
+                      >
+                        Clear Filters
+                      </button>
+                    ) : (
+                      <button 
+                         onClick={() => navigate('/templates/builder')}
+                         className="px-10 py-5 bg-slate-900 text-white rounded-3xl font-black uppercase tracking-widest text-xs shadow-xl shadow-slate-900/20 active:scale-95 transition-all"
+                      >
+                         Create New Template
+                      </button>
+                    )}
                  </div>
                ) : view === 'list' ? (
                  /* Table / List View */
-                 <div className="bg-white rounded-[3rem] border border-slate-200 overflow-hidden shadow-xl shadow-slate-200/20">
-                    <table className="w-full text-left">
+                 <div className="bg-white rounded-[3.5rem] border border-slate-200 overflow-hidden shadow-premium">
+                    <table className="w-full text-left font-sans">
                       <thead>
-                        <tr className="border-b border-slate-100">
-                          <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Template Identity</th>
-                          <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Category</th>
-                          <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
-                          <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Last Updated</th>
-                          <th className="px-10 py-6 text-right"></th>
+                        <tr className="border-b border-slate-50">
+                           <th className="px-12 py-8 text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Identity Core</th>
+                           <th className="px-8 py-8 text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Strategy Class</th>
+                           <th className="px-8 py-8 text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Integrity Status</th>
+                           <th className="px-8 py-8 text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Sync Timestamp</th>
+                           <th className="px-12 py-8 text-right"></th>
                         </tr>
                       </thead>
                       <tbody>
-                        {templates.map((template, i) => (
+                        {filteredTemplates.map((template, i) => (
                           <tr key={template.id} className="hover:bg-slate-50 transition-colors group">
                             <td className="px-10 py-6">
                                <div className="flex items-center gap-4">
@@ -419,19 +541,44 @@ export default function TemplatesPage() {
                                <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-1">{formatUpdateTime(template.updatedAt)}</p>
                             </td>
                             <td className="px-10 py-6 text-right">
-                               <div className="flex items-center justify-end gap-3">
+                               <div className="flex items-center justify-end gap-3 relative z-10">
                                   <button 
-                                    onClick={() => setSelectedTemplateForPreview(template)}
-                                    className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 bg-slate-50/50 rounded-xl transition-all shadow-sm border border-transparent hover:border-blue-100 group/btn"
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedTemplateForPreview(template);
+                                    }}
+                                    className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 bg-slate-50/50 rounded-xl transition-all shadow-sm border border-transparent hover:border-blue-100 group/btn cursor-pointer"
                                     title="View Preview"
                                   >
                                     <Eye size={18} className="transition-transform group-hover/btn:scale-110" />
                                   </button>
                                   <button 
-                                    onClick={() => navigate(`/templates/builder?id=${template.id}`)}
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setTemplateToSend(template);
+                                    }}
+                                    disabled={template.status !== 'APPROVED'}
+                                    className={cn(
+                                      "w-10 h-10 flex items-center justify-center rounded-xl transition-all shadow-sm border border-transparent group/btn cursor-pointer",
+                                      template.status !== 'APPROVED' 
+                                        ? "text-slate-200 bg-slate-50 cursor-not-allowed" 
+                                        : "text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 bg-slate-50/50 hover:border-emerald-100"
+                                    )}
+                                    title={template.status !== 'APPROVED' ? "Only approved templates can be sent" : "Send Template"}
+                                  >
+                                    <Send size={18} className="transition-transform group-hover/btn:scale-110" />
+                                  </button>
+                                  <button 
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate(`/templates/builder?id=${template.id}`);
+                                    }}
                                     disabled={template.status === 'PENDING'}
                                     className={cn(
-                                      "w-10 h-10 flex items-center justify-center rounded-xl transition-all shadow-sm border border-transparent group/btn",
+                                      "w-10 h-10 flex items-center justify-center rounded-xl transition-all shadow-sm border border-transparent group/btn cursor-pointer",
                                       template.status === 'PENDING' 
                                         ? "text-slate-200 bg-slate-50 cursor-not-allowed" 
                                         : "text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 bg-slate-50/50 hover:border-emerald-100"
@@ -441,8 +588,12 @@ export default function TemplatesPage() {
                                     <Edit2 size={18} className="transition-transform group-hover/btn:scale-110" />
                                   </button>
                                   <button 
-                                    onClick={() => handleDelete(template.id)}
-                                    className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 bg-slate-50/50 rounded-xl transition-all shadow-sm border border-transparent hover:border-red-100 group/btn"
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setTemplateToDelete(template);
+                                    }}
+                                    className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 bg-slate-50/50 rounded-xl transition-all shadow-sm border border-transparent hover:border-red-100 group/btn cursor-pointer"
                                     title="Delete Template"
                                   >
                                     <Trash size={18} className="transition-transform group-hover/btn:scale-110" />
@@ -457,13 +608,13 @@ export default function TemplatesPage() {
                ) : (
                  /* Grid View */
                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                   {templates.map((template, i) => (
+                   {filteredTemplates.map((template, i) => (
                      <motion.div 
                        key={template.id}
                        initial={{ opacity: 0, scale: 0.95 }}
                        animate={{ opacity: 1, scale: 1 }}
                        transition={{ delay: i * 0.05 }}
-                       className="group bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 transition-all"
+                       className="group bg-white rounded-[3.5rem] border border-slate-200 p-10 shadow-premium hover:shadow-floating transition-all duration-500 cursor-pointer overflow-hidden relative"
                      >
                         <div className="flex items-start justify-between mb-8">
                            <div className={cn(
@@ -510,26 +661,43 @@ export default function TemplatesPage() {
                                 <span className="text-sm font-black text-slate-900">{formatUpdateDate(template.updatedAt)}</span>
                               </div>
                            </div>
-                           <div className="flex gap-2">
+                           <div className="flex gap-2 relative z-10">
                               <button 
+                                type="button"
                                 onClick={() => setSelectedTemplateForPreview(template)}
-                                className="w-10 h-10 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-100 transition-all group/btn"
+                                className="w-10 h-10 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-100 transition-all group/btn cursor-pointer"
                                 title="View Preview"
                               >
                                 <Eye size={18} className="transition-transform group-hover/btn:scale-110" />
                               </button>
                               <button 
-                                onClick={() => handleDelete(template.id)}
-                                className="w-10 h-10 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 hover:border-red-100 transition-all group/btn"
+                                type="button"
+                                onClick={() => setTemplateToSend(template)}
+                                disabled={template.status !== 'APPROVED'}
+                                className={cn(
+                                  "w-10 h-10 border border-slate-200 rounded-xl flex items-center justify-center transition-all group/btn cursor-pointer",
+                                  template.status !== 'APPROVED' 
+                                    ? "text-slate-200 bg-slate-50 cursor-not-allowed" 
+                                    : "text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-100"
+                                )}
+                                title={template.status !== 'APPROVED' ? "Only approved templates can be sent" : "Send Template"}
+                              >
+                                <Send size={18} className="transition-transform group-hover/btn:scale-110" />
+                              </button>
+                              <button 
+                                type="button"
+                                onClick={() => setTemplateToDelete(template)}
+                                className="w-10 h-10 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 hover:border-red-100 transition-all group/btn cursor-pointer"
                                 title="Delete"
                               >
                                 <Trash size={18} className="transition-transform group-hover/btn:scale-110" />
                               </button>
                               <button 
+                                type="button"
                                 onClick={() => navigate(`/templates/builder?id=${template.id}`)}
                                 disabled={template.status === 'PENDING'}
                                 className={cn(
-                                  "w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-lg active:scale-95 group/btn",
+                                  "w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-lg active:scale-95 group/btn cursor-pointer",
                                   template.status === 'PENDING'
                                     ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
                                     : "bg-slate-900 text-white hover:bg-slate-800"
@@ -544,6 +712,7 @@ export default function TemplatesPage() {
                    ))}
                  </div>
                )}
+               </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -644,39 +813,75 @@ export default function TemplatesPage() {
                           </p>
                         </div>
                       </div>
-                      
+
+                      {selectedTemplateForPreview.status === 'APPROVED' && (
+                        <div className="p-5 bg-slate-50 border border-slate-100 rounded-[2rem] space-y-4">
+                          <div className="flex items-center justify-between">
+                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Performance (30D)</span>
+                             <div className={cn(
+                               "px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border",
+                               templatePerformance?.hero_insight?.quality_score === 'Needs Improvement' ? "bg-rose-50 text-rose-600 border-rose-100" : "bg-emerald-50 text-emerald-600 border-emerald-100"
+                             )}>
+                               {isLoadingPerformance ? 'Loading...' : (templatePerformance?.hero_insight?.quality_score || 'Optimal')}
+                             </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                             <div>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Open Rate</p>
+                                <p className="text-lg font-black text-slate-900 leading-none">
+                                  {isLoadingPerformance ? '...' : (templatePerformance?.stats?.read_rate ? `${templatePerformance.stats.read_rate}%` : '0%')}
+                                </p>
+                             </div>
+                             <div>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Delivered</p>
+                                <p className="text-lg font-black text-slate-900 leading-none">
+                                  {isLoadingPerformance ? '...' : (templatePerformance?.stats?.total_delivered?.toLocaleString() || '0')}
+                                </p>
+                             </div>
+                          </div>
+                        </div>
+                      )}
 
                     </div>
                   </div>
 
                   {/* Sidebar Actions */}
-                  <div className="mt-auto pt-10 grid grid-cols-2 gap-3 shrink-0">
+                  <div className="mt-auto pt-10 flex flex-col gap-3 shrink-0">
+                    <button 
+                      onClick={() => setTemplateToSend(selectedTemplateForPreview)}
+                      disabled={selectedTemplateForPreview.status !== 'APPROVED'}
+                      className={cn(
+                        "flex items-center justify-center gap-2 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95",
+                        selectedTemplateForPreview.status !== 'APPROVED'
+                          ? "bg-slate-50 text-slate-300 border border-slate-100 cursor-not-allowed"
+                          : "bg-emerald-500 text-white shadow-xl shadow-emerald-500/20 hover:bg-emerald-600"
+                      )}
+                    >
+                      <Send size={16} />
+                      Send to Contact
+                    </button>
                     <button 
                       onClick={() => navigate(`/templates/builder?id=${selectedTemplateForPreview.id}`)}
                       disabled={selectedTemplateForPreview.status === 'PENDING'}
                       className={cn(
-                        "flex items-center justify-center gap-2 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95",
+                        "flex items-center justify-center gap-2 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95",
                         selectedTemplateForPreview.status === 'PENDING'
                           ? "bg-slate-50 text-slate-300 border border-slate-100 cursor-not-allowed"
-                          : "bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-400"
+                          : "bg-slate-900 text-white shadow-xl shadow-slate-900/10 hover:bg-slate-800"
                       )}
                       title={selectedTemplateForPreview.status === 'PENDING' ? "Cannot edit pending template" : "Edit"}
                     >
-                      <Edit2 size={14} />
-                      Edit
-                    </button>
-                    <button className="flex items-center justify-center gap-2 py-3.5 bg-white border border-slate-200 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-600 hover:text-slate-900 hover:border-slate-400 transition-all active:scale-95">
-                      <Copy size={14} />
-                      Clone
+                      <Edit2 size={16} />
+                      Edit Template
                     </button>
                     <button 
+                      type="button"
                       onClick={() => {
-                        handleDelete(selectedTemplateForPreview.id);
-                        setSelectedTemplateForPreview(null);
+                        setTemplateToDelete(selectedTemplateForPreview);
                       }}
-                      className="col-span-2 flex items-center justify-center gap-2 py-3.5 bg-red-50 text-red-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-100 transition-all active:scale-95"
+                      className="flex items-center justify-center gap-2 py-4 bg-red-50 text-red-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-100 transition-all active:scale-95 cursor-pointer"
                     >
-                      <Trash size={14} />
+                      <Trash size={16} />
                       Delete Template
                     </button>
                   </div>
@@ -719,6 +924,80 @@ export default function TemplatesPage() {
                        Close Preview
                      </button>
                   </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {templateToSend && (
+            <SendTemplateModal 
+              template={templateToSend}
+              onClose={() => setTemplateToSend(null)}
+              onSuccess={() => {
+                setSuccessMessage(`Template "${templateToSend.name}" sent successfully`);
+                setTimeout(() => setSuccessMessage(null), 5000);
+              }}
+            />
+          )}
+        </AnimatePresence>
+        
+        {/* Delete Confirmation Modal */}
+        <AnimatePresence>
+          {templateToDelete && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="bg-white rounded-[32px] p-8 max-w-md w-full shadow-2xl border border-slate-100"
+              >
+                <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-6">
+                  <Trash size={32} />
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 mb-2">Delete Template?</h3>
+                <p className="text-slate-500 mb-8 font-medium leading-relaxed">
+                  Are you sure you want to delete <span className="text-slate-900 font-bold">"{templateToDelete.name}"</span>? 
+                  This action is permanent and cannot be undone via Meta.
+                </p>
+
+                {deleteError && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="mb-8 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3"
+                  >
+                    <AlertCircle size={18} className="text-red-500 shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-xs font-black text-red-600 uppercase tracking-widest mb-1">Status Error</p>
+                      <p className="text-sm font-medium text-red-900 leading-tight">{deleteError}</p>
+                    </div>
+                  </motion.div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  <button 
+                    type="button"
+                    onClick={() => setTemplateToDelete(null)}
+                    disabled={isDeleting}
+                    className="py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-400 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="py-4 bg-red-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-red-500/20 hover:bg-red-600 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isDeleting ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <Trash size={14} />
+                    )}
+                    Confirm Delete
+                  </button>
                 </div>
               </motion.div>
             </div>

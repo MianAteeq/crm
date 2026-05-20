@@ -1,80 +1,102 @@
 import React from 'react';
-import { MoreHorizontal, Eye, Copy, Trash2, Pause, Play } from 'lucide-react';
+import { MoreHorizontal, Eye, Copy, Trash2, Pause, Play, ChevronRight, Zap, Target } from 'lucide-react';
 import { Campaign } from '../../types';
 import StatusBadge from './StatusBadge';
 import { formatSafeDateTime } from '../../lib/utils';
+import { cn } from '../../lib/utils';
 
 interface CampaignTableProps {
   campaigns: Campaign[];
   onView: (campaign: Campaign) => void;
+  onDelete?: (campaign: Campaign) => void;
 }
 
-export default function CampaignTable({ campaigns = [], onView }: CampaignTableProps) {
+export default function CampaignTable({ campaigns = [], onView, onDelete }: CampaignTableProps) {
   return (
-    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+    <div className="bg-white border border-slate-200/60 rounded-[2rem] overflow-hidden shadow-premium">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="border-b border-slate-100 bg-slate-50/50">
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Campaign Name</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Type</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Audience</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Analytics</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
+          <tr className="border-b border-slate-100 bg-slate-50/30">
+            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Campaign</th>
+            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Type</th>
+            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Reach</th>
+            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Performance</th>
+            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
+            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className="divide-y divide-slate-100/50">
           {(campaigns || []).map((campaign) => (
             <tr 
               key={campaign.id} 
-              className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
+              className="hover:bg-slate-50/50 transition-all group cursor-pointer"
               onClick={() => onView(campaign)}
             >
-              <td className="px-6 py-4">
-                <div className="flex flex-col">
-                  <span className="text-sm font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">
-                    {campaign.name}
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-medium mt-0.5">
-                    {campaign.scheduledAt ? formatSafeDateTime(campaign.scheduledAt) : 'Not scheduled'}
-                  </span>
+              <td className="px-8 py-6">
+                <div className="flex items-center gap-4">
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-300",
+                    campaign.type === 'Broadcast' ? "bg-indigo-50 border-indigo-100 text-indigo-500" : "bg-purple-50 border-purple-100 text-purple-500"
+                  )}>
+                    {campaign.type === 'Broadcast' ? <Zap size={18} /> : <Target size={18} />}
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-bold text-slate-900 tracking-tight truncate group-hover:text-brand transition-colors">
+                      {campaign.name}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                      {campaign.scheduledAt ? formatSafeDateTime(campaign.scheduledAt) : 'Immediate Delivery'}
+                    </span>
+                  </div>
                 </div>
               </td>
-              <td className="px-6 py-4">
-                <span className="px-2 py-1 rounded-md bg-slate-100 border border-slate-200 text-[10px] font-bold text-slate-600">
+              <td className="px-8 py-6">
+                <span className="px-3 py-1 rounded-lg bg-slate-50 border border-slate-200/50 text-[10px] font-black text-slate-500 uppercase tracking-widest">
                   {campaign.type}
                 </span>
               </td>
-              <td className="px-6 py-4">
-                <span className="text-sm font-bold text-slate-900">{campaign.audienceSize.toLocaleString()}</span>
+              <td className="px-8 py-6 text-center">
+                <span className="text-sm font-black text-slate-900 tracking-tight italic">{campaign.audienceSize.toLocaleString()}</span>
               </td>
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-4">
+              <td className="px-8 py-6">
+                <div className="flex items-center gap-6">
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-slate-900">{campaign.sent}</span>
-                    <span className="text-[9px] text-slate-400 font-bold uppercase">Sent</span>
+                    <span className="text-xs font-black text-slate-900">{campaign.delivered}</span>
+                    <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest">Deliv.</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-slate-900">{campaign.delivered}</span>
-                    <span className="text-[9px] text-slate-400 font-bold uppercase">Deliv.</span>
+                    <span className="text-xs font-black text-slate-900">{campaign.read}</span>
+                    <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest">Read</span>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-xs font-bold text-slate-900">{campaign.read}</span>
-                    <span className="text-[9px] text-slate-400 font-bold uppercase">Read</span>
+                  <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-brand rounded-full" 
+                      style={{ width: `${Math.min(100, (campaign.read / (campaign.delivered || 1)) * 100)}%` }} 
+                    />
                   </div>
                 </div>
               </td>
-              <td className="px-6 py-4">
+              <td className="px-8 py-6">
                 <StatusBadge status={campaign.status} />
               </td>
-              <td className="px-6 py-4">
-                <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
-                  <button className="p-2 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
+              <td className="px-8 py-6">
+                <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
+                  <button 
+                    onClick={() => onView(campaign)}
+                    className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all pointer-events-auto"
+                    title="View Campaign Details"
+                  >
                     <Eye size={16} />
                   </button>
-                  <button className="p-2 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all">
-                    <Trash2 size={16} />
-                  </button>
+                  {onDelete && (
+                    <button 
+                      onClick={() => onDelete(campaign)}
+                      className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 border border-transparent hover:border-red-100 transition-all"
+                      title="Delete Campaign"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
                 </div>
               </td>
             </tr>

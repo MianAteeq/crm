@@ -1,7 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   User, Phone, MapPin, Tag, Plus, Edit2, 
-  ExternalLink, MessageSquare, History, Terminal 
+  ExternalLink, History 
 } from 'lucide-react';
 import { Conversation } from '../../types';
 
@@ -11,18 +12,22 @@ interface ContactSidebarProps {
 
 export default function ContactSidebar({ conversation }: ContactSidebarProps) {
   const { contact } = conversation;
+  const navigate = useNavigate();
   
   return (
     <div className="w-[340px] flex flex-col h-full bg-white border-l border-slate-200 overflow-y-auto custom-scrollbar shadow-sm">
       {/* Contact Profile */}
       <div className="p-8 text-center border-b border-slate-50">
-         <div className="w-24 h-24 rounded-3xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 mx-auto mb-6 relative group overflow-hidden shadow-inner">
+         <div 
+           onClick={() => navigate(`/contacts/edit/${contact.id}`)}
+           className="w-24 h-24 rounded-3xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 mx-auto mb-6 relative group overflow-hidden shadow-inner cursor-pointer"
+         >
             {contact.avatar ? (
               <img src={contact.avatar} alt={contact.name} className="w-full h-full object-cover" />
             ) : (
               <User size={48} />
             )}
-            <div className="absolute inset-0 bg-slate-900/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+            <div className="absolute inset-0 bg-slate-900/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                <Edit2 size={24} className="text-white" />
             </div>
          </div>
@@ -30,7 +35,10 @@ export default function ContactSidebar({ conversation }: ContactSidebarProps) {
          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{contact.phone}</p>
          
          <div className="flex items-center justify-center gap-2 mt-6">
-            <button className="flex-1 px-4 py-3 bg-slate-900 text-white rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-slate-900/10 hover:bg-slate-800 transition-all flex items-center justify-center gap-2">
+            <button 
+              onClick={() => navigate(`/contacts/edit/${contact.id}`)}
+              className="flex-1 px-4 py-3 bg-slate-900 text-white rounded-xl text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-slate-900/10 hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
+            >
                <Edit2 size={12} /> Edit Profile
             </button>
             <button className="p-3 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-slate-900 hover:border-slate-900 transition-all">
@@ -95,26 +103,6 @@ export default function ContactSidebar({ conversation }: ContactSidebarProps) {
          </div>
       </div>
 
-      {/* CRM Actions */}
-      <div className="p-8 space-y-4">
-         <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Quick CRM Actions</h4>
-         <button className="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl text-left hover:border-slate-300 transition-all group">
-            <div className="flex items-center gap-3">
-               <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-400 group-hover:text-slate-900 transition-colors shadow-sm">
-                  <Terminal size={14} />
-               </div>
-               <span className="text-[10px] font-bold text-slate-900 uppercase tracking-widest">Assign Agent</span>
-            </div>
-         </button>
-         <button className="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl text-left hover:border-slate-300 transition-all group">
-            <div className="flex items-center gap-3">
-               <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-400 group-hover:text-slate-900 transition-colors shadow-sm">
-                  <MessageSquare size={14} />
-               </div>
-               <span className="text-[10px] font-bold text-slate-900 uppercase tracking-widest">Send Campaign</span>
-            </div>
-         </button>
-      </div>
-    </div>
+     </div>
   );
 }

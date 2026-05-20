@@ -1,7 +1,17 @@
 import { Contact, Tag, WhatsAppSettings, Conversation, Message } from '../types';
 import { AuthService } from './authService';
 
-const BASE_URL = 'https://crm.throbtech.com/api';
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined' && 
+      (window.location.hostname.endsWith('run.app') || 
+       window.location.hostname.includes('localhost') || 
+       window.location.hostname.includes('127.0.0.1'))) {
+    return '/api';
+  }
+  return 'https://crm.throbtech.com/api';
+};
+
+const BASE_URL = getBaseUrl();
 
 // Mock Data
 const MOCK_TAGS: Tag[] = [
@@ -84,7 +94,6 @@ class CrmApiService {
     const headers: HeadersInit = {
       ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       'Accept': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
       ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       ...(tenantId ? { 'X-Tenant-Id': tenantId } : {}),
       ...options.headers,
@@ -303,7 +312,7 @@ class CrmApiService {
         conversationsArray = data.data;
       }
       
-      if (conversationsArray.length === 0) return MOCK_CONVERSATIONS;
+      if (conversationsArray.length === 0) return [];
 
       return conversationsArray.map(c => {
         const rawConv = c as any;
@@ -352,7 +361,7 @@ class CrmApiService {
         };
       });
     } catch (error) {
-      return MOCK_CONVERSATIONS;
+      return [];
     }
   }
 
@@ -518,6 +527,55 @@ class CrmApiService {
       console.warn(`[CRM API] markAsRead failed for ${conversationId}`, error);
       return { message: 'Marked as read (Mock)', success: true };
     }
+  }
+
+  // Campaigns API
+  async createCampaign(payload: any): Promise<any> {
+    return this.request<any>('/campaigns', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async getCampaignStats(): Promise<any> {
+    return this.request<any>('/campaigns/dashboard', {
+      method: 'GET',
+    });
+  }
+
+  async getDashboardInsights(): Promise<any> {
+    return this.request<any>('/dashboard/insights', {
+      method: 'GET',
+    });
+  }
+
+  async getCampaignsList(params?: { search?: string; type?: string; status?: string }): Promise<any> {
+    let query = '';
+    if (params) {
+      const searchParams = new URLSearchParams();
+      if (params.search) searchParams.append('search', params.search);
+      if (params.type) searchParams.append('type', params.type);
+      if (params.status) searchParams.append('status', params.status);
+      const queryStr = searchParams.toString();
+      if (queryStr) {
+        query = `?${queryStr}`;
+      }
+    }
+    return this.request<any>(`/campaign/list${query}`, {
+      method: 'GET',
+    });
+  }
+
+  async getCampaign(id: string | number): Promise<any> {
+    return this.request<any>(`/campaigns/${id}`, {
+      method: 'GET',
+    });
+  }
+
+  async deleteCampaign(id: string | number): Promise<any> {
+    return this.request<any>(`/campaigns/${id}`, {
+      method: 'DELETE',
+    });
   }
 }
 

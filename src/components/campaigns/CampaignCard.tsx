@@ -1,71 +1,122 @@
 import React from 'react';
-import { MoreHorizontal, Users, Send, CheckCircle2, AlertCircle, Calendar, ArrowRight } from 'lucide-react';
+import { MoreHorizontal, Users, Send, CheckCircle2, AlertCircle, Calendar, ArrowRight, Zap, Target, TrendingUp, Trash2 } from 'lucide-react';
 import { Campaign } from '../../types';
 import StatusBadge from './StatusBadge';
 import { motion } from 'motion/react';
 import { formatSafeDate } from '../../lib/utils';
+import { cn } from '../../lib/utils';
 
 interface CampaignCardProps {
   campaign: Campaign;
   onClick: (campaign: Campaign) => void;
+  onDelete?: (e: React.MouseEvent, campaign: Campaign) => void;
 }
 
-const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, onClick }) => {
+const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, onClick, onDelete }) => {
   const deliveryRate = campaign.audienceSize > 0 
     ? Math.round((campaign.delivered / campaign.audienceSize) * 100) 
     : 0;
 
   return (
     <motion.div 
-      whileHover={{ y: -2 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -8, transition: { duration: 0.3 } }}
       onClick={() => onClick(campaign)}
-      className="bg-white border border-slate-200 rounded-xl p-6 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all group flex flex-col"
+      className="group relative bg-white border border-slate-200/60 rounded-[2rem] p-8 cursor-pointer shadow-premium transition-all duration-500 hover:shadow-floating hover:border-brand/20 flex flex-col overflow-hidden"
     >
-      <div className="flex items-start justify-between mb-6">
-        <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-slate-900 group-hover:bg-slate-100 transition-colors">
-          {campaign.type === 'Broadcast' ? <Send size={20} /> : <Calendar size={20} />}
+      {/* Background Gradient Glow */}
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-brand/5 blur-[80px] rounded-full group-hover:bg-brand/10 transition-colors duration-500" />
+      
+      <div className="flex items-start justify-between mb-8 relative z-10">
+        <div className={cn(
+          "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-sm border",
+          campaign.type === 'Broadcast' 
+            ? "bg-indigo-50 border-indigo-100 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white" 
+            : "bg-purple-50 border-purple-100 text-purple-600 group-hover:bg-purple-600 group-hover:text-white"
+        )}>
+          {campaign.type === 'Broadcast' ? <Zap size={24} /> : <Target size={24} />}
         </div>
-        <StatusBadge status={campaign.status} />
+        <div className="flex items-center gap-2">
+          <StatusBadge status={campaign.status} />
+          {onDelete && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(e, campaign);
+              }}
+              className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 hover:border-red-100 transition-all shadow-sm"
+              title="Delete Campaign"
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="space-y-1 mb-6">
-        <h3 className="text-lg font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">
+      <div className="space-y-2 mb-8 relative z-10">
+        <h3 className="text-xl font-bold text-slate-900 tracking-tight group-hover:text-brand transition-colors duration-300">
           {campaign.name}
         </h3>
-        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-          {campaign.type} • {formatSafeDate(campaign.createdAt)}
-        </p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-          <div className="flex items-center gap-1.5 text-slate-400 mb-1">
-            <Users size={12} />
-            <span className="text-[9px] font-bold uppercase tracking-widest">Audience</span>
-          </div>
-          <p className="text-base font-bold text-slate-900">{campaign.audienceSize.toLocaleString()}</p>
-        </div>
-        <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-          <div className="flex items-center gap-1.5 text-slate-400 mb-1">
-            <CheckCircle2 size={12} />
-            <span className="text-[9px] font-bold uppercase tracking-widest">Success</span>
-          </div>
-          <p className="text-base font-bold text-slate-900">{deliveryRate}%</p>
+        <div className="flex items-center gap-2">
+           <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+             {campaign.type}
+           </span>
+           <div className="w-1 h-1 rounded-full bg-slate-300" />
+           <span className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">
+             {formatSafeDate(campaign.createdAt)}
+           </span>
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
-        <div className="flex -space-x-1.5">
+      <div className="grid grid-cols-2 gap-4 mb-8 relative z-10">
+        <div className="p-4 bg-slate-50/50 rounded-2xl border border-slate-100/50 group-hover:bg-white group-hover:border-slate-200 transition-all duration-300">
+          <div className="flex items-center gap-2 text-slate-400 mb-2">
+            <Users size={12} className="group-hover:text-brand transition-colors" />
+            <span className="text-[9px] font-black uppercase tracking-widest leading-none">Audience</span>
+          </div>
+          <p className="text-xl font-black text-slate-900 tracking-tight leading-none">{campaign.audienceSize.toLocaleString()}</p>
+        </div>
+        <div className="p-4 bg-slate-50/50 rounded-2xl border border-slate-100/50 group-hover:bg-white group-hover:border-slate-200 transition-all duration-300">
+          <div className="flex items-center gap-2 text-slate-400 mb-2">
+            <TrendingUp size={12} className="group-hover:text-emerald-500 transition-colors" />
+            <span className="text-[9px] font-black uppercase tracking-widest leading-none">Read Rate</span>
+          </div>
+          <p className="text-xl font-black text-slate-900 tracking-tight leading-none">{deliveryRate}%</p>
+        </div>
+      </div>
+
+      {/* Progress Bar (Subtle) */}
+      <div className="mb-8 space-y-2">
+        <div className="flex items-center justify-between text-[9px] font-black text-slate-400 uppercase tracking-widest">
+           <span>Delivery Progress</span>
+           <span className="text-slate-900">{deliveryRate}%</span>
+        </div>
+        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+           <motion.div 
+             initial={{ width: 0 }}
+             animate={{ width: `${deliveryRate}%` }}
+             transition={{ duration: 1.5, ease: "easeOut" }}
+             className={cn(
+               "h-full rounded-full transition-all duration-500",
+               deliveryRate > 80 ? "bg-emerald-500" : "bg-brand"
+             )}
+           />
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between pt-6 border-t border-slate-100/60 mt-auto relative z-10">
+        <div className="flex -space-x-2">
           {[1, 2, 3].map(i => (
-            <div key={i} className="w-5 h-5 rounded-full border-2 border-white bg-slate-100" />
+            <div key={i} className="w-6 h-6 rounded-full border-2 border-white bg-slate-100 shadow-sm" />
           ))}
-          <div className="w-5 h-5 rounded-full border-2 border-white bg-slate-900 flex items-center justify-center text-[8px] font-bold text-white">
+          <div className="w-6 h-6 rounded-full border-2 border-white bg-slate-900 flex items-center justify-center text-[8px] font-bold text-white shadow-sm">
             +
           </div>
         </div>
-        <div className="flex items-center gap-1.5 text-blue-600 group-hover:translate-x-1 transition-transform">
-          <span className="text-[10px] font-bold uppercase tracking-wider">Details</span>
-          <ArrowRight size={12} />
+        <div className="flex items-center gap-2 text-brand font-black group-hover:translate-x-2 transition-transform duration-300">
+          <span className="text-[10px] uppercase tracking-widest">View Analytics</span>
+          <ArrowRight size={14} />
         </div>
       </div>
     </motion.div>

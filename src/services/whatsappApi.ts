@@ -1,7 +1,17 @@
 import { WhatsAppTemplate } from '../types/whatsapp';
 import { AuthService } from './authService';
 
-const BASE_URL = 'https://crm.throbtech.com/api';
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined' && 
+      (window.location.hostname.endsWith('run.app') || 
+       window.location.hostname.includes('localhost') || 
+       window.location.hostname.includes('127.0.0.1'))) {
+    return '/api';
+  }
+  return 'https://crm.throbtech.com/api';
+};
+
+const BASE_URL = getBaseUrl();
 
 /**
  * Gets the standard headers for WhatsApp API requests.
@@ -11,7 +21,6 @@ const getHeaders = () => {
   const tenantId = AuthService.getTenantId();
   const headers: Record<string, string> = {
     'Accept': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest',
   };
   
   if (token) {
@@ -31,10 +40,13 @@ class WhatsAppApiService {
    */
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${BASE_URL}${endpoint}`;
+    const isFormData = options.body instanceof FormData;
+
     const response = await fetch(url, {
       ...options,
       headers: {
         ...getHeaders(),
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...options.headers,
       },
     });
@@ -57,7 +69,12 @@ class WhatsAppApiService {
       throw new Error(errorData.message || `API error: ${response.status}`);
     }
 
-    return await response.json();
+    const text = await response.text();
+    try {
+      return text ? JSON.parse(text) : {} as T;
+    } catch (e) {
+      return {} as T;
+    }
   }
 
   /**
@@ -82,34 +99,40 @@ class WhatsAppApiService {
       
       // Map CRM components-based structure to our internal WhatsAppTemplate type
       return rawTemplates.map((item: any) => {
-        // If it already matches our format, return it
-        if (item.body && item.header) return item;
-        
-        // Otherwise, transform from CRM components format
+        // Transform and normalize structure
         const components = item.components || [];
-        const header = components.find((c: any) => c.type === 'HEADER');
-        const body = components.find((c: any) => c.type === 'BODY');
-        const footer = components.find((c: any) => c.type === 'FOOTER');
-        const buttonsComp = components.find((c: any) => c.type === 'BUTTONS');
+        const header = components.find((c: any) => c.type?.toUpperCase() === 'HEADER') || item.header;
+        const body = components.find((c: any) => c.type?.toUpperCase() === 'BODY') || item.body;
+        const footer = components.find((c: any) => c.type?.toUpperCase() === 'FOOTER') || item.footer;
+        const buttonsComp = components.find((c: any) => c.type?.toUpperCase() === 'BUTTONS') || { buttons: item.buttons };
+
+        // Use internal ID if available, as requested ("delete pass not template_id pass id")
+        const id = (item.id || item.template_id || Math.random()).toString();
 
         return {
-          id: item.id?.toString() || item.template_id || Math.random().toString(),
+          id,
           name: item.name || '',
           category: item.category || 'MARKETING',
           language: item.language || 'en',
           status: item.status || 'PENDING',
           updatedAt: item.updated_at || item.created_at || new Date().toISOString(),
           header: {
-            type: (header?.format || 'NONE') as any,
+            type: (header?.format || header?.type || 'NONE').toUpperCase() as any,
             text: header?.text,
+            variables: header?.example?.header_text || header?.variables || [],
+            mediaHandle: header?.example?.header_handle?.[0] || item.media_handle || item.header_handle,
+            mediaUrl: item.media_url || item.header_url || (header?.example?.header_handle?.[0]?.startsWith('http') ? header.example.header_handle[0] : undefined),
+            fileName: header?.example?.header_handle?.[0]?.split('/').pop() || 'document.pdf',
+            mediaPath: item.media_path || item.header_path,
+            mediaType: item.media_type || (header?.format || header?.type || 'NONE').toUpperCase()
           },
           body: {
             text: body?.text || '',
-            variables: [], 
+            variables: body?.variables || (body?.example?.body_text?.[0]) || [], 
           },
           footer: footer ? { text: footer.text } : undefined,
           buttons: (buttonsComp?.buttons || []).map((b: any, idx: number) => ({
-            id: `b-${idx}`,
+            id: b.id || `b-${idx}`,
             type: b.type === 'PHONE_NUMBER' ? 'CALL' : (b.type === 'URL' ? 'URL' : 'QUICK_REPLY'),
             text: b.text,
             url: b.url,
@@ -134,6 +157,7 @@ class WhatsAppApiService {
    * Deletes a template from the CRM.
    */
   async deleteTemplate(id: string): Promise<{ success: boolean; message?: string }> {
+    console.log(`[WhatsApp API] Deleting template with ID: ${id}`);
     return this.request(`/whatsapp/templates/${id}`, { method: 'DELETE' });
   }
 
@@ -143,7 +167,16 @@ class WhatsAppApiService {
   async createTemplate(templateData: any): Promise<WhatsAppTemplate> {
     return this.request('/whatsapp/templates/create', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(templateData),
+    });
+  }
+
+  /**
+   * Updates an existing template in the CRM.
+   */
+  async updateTemplate(id: string, templateData: any): Promise<WhatsAppTemplate> {
+    return this.request(`/whatsapp/templates/${id}`, {
+      method: 'PUT',
       body: JSON.stringify(templateData),
     });
   }
@@ -151,7 +184,15 @@ class WhatsAppApiService {
   /**
    * Uploads media to the CRM for use in templates.
    */
-  async uploadMedia(file: File): Promise<{ media_handle?: string; header_handle?: string; id?: string; success?: boolean }> {
+  async uploadMedia(file: File): Promise<{ 
+    media_handle?: string; 
+    header_handle?: string; 
+    id?: string; 
+    success?: boolean;
+    media_path?: string;
+    media_type?: string;
+    media_url?: string;
+  }> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('file_name', file.name);
@@ -161,6 +202,32 @@ class WhatsAppApiService {
     return this.request('/whatsapp/templates/upload-media', {
       method: 'POST',
       body: formData,
+    });
+  }
+
+  /**
+   * Fetches performance insights for WhatsApp templates.
+   */
+  async fetchPerformanceInsights(days: number = 7, templateId?: string): Promise<any> {
+    let url = `/whatsapp/performance-insights?days=${days}`;
+    if (templateId) {
+      url += `&template_id=${templateId}`;
+    }
+    return this.request(url);
+  }
+
+  /**
+   * Sends a WhatsApp template to a specific phone number.
+   */
+  async sendTemplate(templateId: string, phone: string, components: any[] = [], parameters: string[] = []): Promise<any> {
+    return this.request('/whatsapp/templates/send', {
+      method: 'POST',
+      body: JSON.stringify({
+        template_id: templateId,
+        phone,
+        components,
+        parameters
+      }),
     });
   }
 }

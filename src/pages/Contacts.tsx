@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { UserPlus, Upload, LayoutGrid, List, Users, Loader2, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import { contacts as mockContacts, Contact, Tag } from '../data/contactsMock';
@@ -14,12 +14,15 @@ import { crmApi } from '../services/crmApi';
 
 export default function Contacts() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlQuery = searchParams.get('search') || '';
+
   // State
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [tags, setTags] = useState<Tag[]>([]);
   const [isTagsLoading, setIsTagsLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(urlQuery);
   const [selectedTag, setSelectedTag] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [lastTouchpoint, setLastTouchpoint] = useState('');
@@ -72,6 +75,14 @@ export default function Contacts() {
   useEffect(() => {
     fetchTags();
   }, []);
+
+  // Sync state with URL search parameters
+  useEffect(() => {
+    const query = searchParams.get('search') || '';
+    if (query !== searchQuery) {
+      setSearchQuery(query);
+    }
+  }, [searchParams]);
 
   // Live Search & Filter updates
   useEffect(() => {
@@ -154,7 +165,7 @@ export default function Contacts() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       {/* Page Header */}
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="flex items-center gap-4">

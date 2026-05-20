@@ -104,7 +104,11 @@ export default function ChatWindow({ conversation, onSendMessage, isTyping }: Ch
       </div>
 
       {/* Input */}
-      <MessageInput onSend={onSendMessage} />
+      <MessageInput 
+        onSend={onSendMessage} 
+        recipientPhone={conversation.contact.phone}
+        recipientName={conversation.contact.name}
+      />
     </div>
   );
 }

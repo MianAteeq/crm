@@ -19,9 +19,12 @@ export interface WhatsAppTemplate {
   header: {
     type: HeaderType;
     text?: string;
+    variables?: string[];
     mediaUrl?: string;
     mediaHandle?: string;
     fileName?: string;
+    mediaPath?: string;
+    mediaType?: string;
   };
   body: {
     text: string;

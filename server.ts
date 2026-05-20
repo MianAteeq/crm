@@ -12,17 +12,29 @@ async function startServer() {
     res.json({ status: "ok" });
   });
 
-  // Proxy for CRM API
+  // Proxy for CRM API (supports both /api/proxy/* and /api/* to avoid CORS)
   const CRM_DOMAIN = process.env.VITE_CRM_API_URL || 'https://crm.throbtech.com';
   const CRM_API_URL = `${CRM_DOMAIN}/api`;
 
-  app.use("/api/proxy", express.raw({ type: '*/*', limit: '50mb' }));
-  app.all("/api/proxy/*", async (req, res) => {
+  app.use(["/api/proxy", "/api"], (req, res, next) => {
+    if (req.path === '/api/health' || req.path === '/health') {
+      return next();
+    }
+    express.raw({ type: '*/*', limit: '50mb' })(req, res, next);
+  });
+
+  app.all(["/api/proxy/*", "/api/*"], async (req, res, next) => {
+    if (req.path === '/api/health' || req.path === '/health') {
+      return next();
+    }
+
     try {
-      // Extract the endpoint relative to /api/proxy/
-      let endpoint = req.params[0] || '';
-      if (!endpoint && req.path.startsWith('/api/proxy/')) {
+      // Extract the endpoint relative to /api/proxy/ or /api/
+      let endpoint = '';
+      if (req.path.startsWith('/api/proxy/')) {
         endpoint = req.path.substring('/api/proxy/'.length);
+      } else if (req.path.startsWith('/api/')) {
+        endpoint = req.path.substring('/api/'.length);
       }
       
       // Clean leading and trailing slashes from endpoint
@@ -33,10 +45,15 @@ async function startServer() {
       // Determine the target base domain (strip /api if present in config)
       const TARGET_CRM_DOMAIN = rawUrl.endsWith('/api') ? rawUrl.slice(0, -4) : rawUrl;
 
-      // The proxy is now a simple passthrough. 
-      // The frontend should call /api/proxy/api/foo for CRM API endpoints
-      // or /api/proxy/broadcasting/auth for Laravel Echo.
-      const url = `${TARGET_CRM_DOMAIN}/${endpoint}`;
+      // Smart routing:
+      // If the endpoint is already prefixed with 'api/' or 'broadcasting/', we route directly.
+      // Otherwise, we assume it's a standard CRM API endpoint and prepend 'api/'.
+      let url = '';
+      if (endpoint.startsWith('api/') || endpoint.startsWith('broadcasting/')) {
+        url = `${TARGET_CRM_DOMAIN}/${endpoint}`;
+      } else {
+        url = `${TARGET_CRM_DOMAIN}/api/${endpoint}`;
+      }
       
       const filteredHeaders: Record<string, string> = {
         'Accept': 'application/json',

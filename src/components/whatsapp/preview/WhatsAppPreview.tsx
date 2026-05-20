@@ -33,15 +33,33 @@ export default function WhatsAppPreview({ template }: WhatsAppPreviewProps) {
             {header.type !== 'NONE' && (
               <div className="mb-3 -mx-2.5 -mt-1 rounded-xl overflow-hidden border border-black/5 bg-slate-50">
                 {header.type === 'TEXT' && header.text && (
-                  <div className="p-3.5 font-bold text-[16px] text-slate-900 leading-tight bg-slate-50/50">{header.text}</div>
+                  <div className="p-3.5 font-bold text-[16px] text-slate-900 leading-tight bg-slate-50/50">
+                    {header.text.split(/(\{\{1\}\})/).map((part, i) => {
+                      if (part === '{{1}}') {
+                        return (
+                          <span key={i} className="text-[#00a884] font-bold">
+                            {header.variables?.[0] || part}
+                          </span>
+                        );
+                      }
+                      return part;
+                    })}
+                  </div>
                 )}
                 {header.type === 'IMAGE' && (
-                  <div className="aspect-[16/9] w-full flex items-center justify-center relative">
-                    <img 
-                      src={header.mediaUrl || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&fit=crop"} 
-                      alt="Media" 
-                      className="w-full h-full object-cover" 
-                    />
+                  <div className="aspect-[16/9] w-full flex items-center justify-center relative bg-slate-100">
+                    {header.mediaUrl ? (
+                      <img 
+                        src={header.mediaUrl} 
+                        alt="Media" 
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
+                        <ExternalLink size={32} strokeWidth={1.5} />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Image Header</span>
+                      </div>
+                    )}
                   </div>
                 )}
                 {header.type === 'DOCUMENT' && (
@@ -50,8 +68,12 @@ export default function WhatsAppPreview({ template }: WhatsAppPreviewProps) {
                       <FileText size={26} />
                     </div>
                     <div className="flex-1 overflow-hidden">
-                      <p className="text-sm font-bold truncate text-slate-900 leading-tight">{header.fileName || 'catalog_spring.pdf'}</p>
-                      <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mt-1">1.4 MB • PDF</p>
+                      <p className="text-sm font-bold truncate text-slate-900 leading-tight">
+                        {header.fileName || header.mediaHandle?.split('/').pop() || 'catalog_spring.pdf'}
+                      </p>
+                      <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mt-1">
+                        PDF Document
+                      </p>
                     </div>
                   </div>
                 )}
@@ -61,7 +83,18 @@ export default function WhatsAppPreview({ template }: WhatsAppPreviewProps) {
             {/* Body Content */}
             <div className="space-y-1 relative pr-2 pb-1">
                <p className="text-[17px] leading-[1.45] text-slate-800 whitespace-pre-wrap break-words font-normal">
-                  {body.text || "Preview your message body here..."}
+                  {body.text ? body.text.split(/(\{\{\d+\}\})/).map((part, i) => {
+                    const match = part.match(/\{\{(\d+)\}\}/);
+                    if (match) {
+                      const index = parseInt(match[1]) - 1;
+                      return (
+                        <span key={i} className="text-[#00a884] font-bold">
+                          {body.variables[index] || part}
+                        </span>
+                      );
+                    }
+                    return part;
+                  }) : "Preview your message body here..."}
                </p>
                {footer?.text && (
                  <p className="text-[13px] text-slate-400 mt-2 pt-2 border-t border-black/5 leading-snug">

@@ -8,9 +8,10 @@ interface TemplateStore {
   setLanguage: (language: string) => void;
   setHeaderType: (type: HeaderType) => void;
   setHeaderText: (text: string) => void;
-  setHeaderMedia: (url: string, fileName?: string) => void;
+  setHeaderMedia: (url: string, fileName?: string, mediaPath?: string, mediaType?: string) => void;
   setHeaderMediaHandle: (handle: string) => void;
   setHeaderFileName: (fileName: string) => void;
+  setHeaderVariable: (index: number, value: string) => void;
   setBodyText: (text: string) => void;
   setFooterText: (text: string) => void;
   setBodyVariable: (index: number, value: string) => void;
@@ -28,6 +29,7 @@ const initialTemplate: WhatsAppTemplate = {
   language: 'en_US',
   header: {
     type: 'NONE',
+    variables: [],
   },
   body: {
     text: '',
@@ -56,7 +58,7 @@ export const useTemplateStore = create<TemplateStore>((set) => ({
   setHeaderType: (type) => set((state) => ({
     currentTemplate: { 
       ...state.currentTemplate, 
-      header: { ...state.currentTemplate.header, type, text: '', mediaUrl: '', mediaHandle: '' } 
+      header: { ...state.currentTemplate.header, type, text: '', mediaUrl: '', mediaHandle: '', mediaPath: '', mediaType: '' } 
     }
   })),
 
@@ -67,10 +69,16 @@ export const useTemplateStore = create<TemplateStore>((set) => ({
     }
   })),
 
-  setHeaderMedia: (url, fileName) => set((state) => ({
+  setHeaderMedia: (url, fileName, mediaPath, mediaType) => set((state) => ({
     currentTemplate: { 
       ...state.currentTemplate, 
-      header: { ...state.currentTemplate.header, mediaUrl: url, fileName: fileName || state.currentTemplate.header.fileName } 
+      header: { 
+        ...state.currentTemplate.header, 
+        mediaUrl: url, 
+        fileName: fileName || state.currentTemplate.header.fileName,
+        mediaPath: mediaPath || state.currentTemplate.header.mediaPath,
+        mediaType: mediaType || state.currentTemplate.header.mediaType
+      } 
     }
   })),
 
@@ -87,6 +95,17 @@ export const useTemplateStore = create<TemplateStore>((set) => ({
       header: { ...state.currentTemplate.header, fileName } 
     }
   })),
+  
+  setHeaderVariable: (index, value) => set((state) => {
+    const variables = [...(state.currentTemplate.header.variables || [])];
+    variables[index] = value;
+    return {
+      currentTemplate: {
+        ...state.currentTemplate,
+        header: { ...state.currentTemplate.header, variables }
+      }
+    };
+  }),
 
   setBodyText: (text) => set((state) => ({
     currentTemplate: { 

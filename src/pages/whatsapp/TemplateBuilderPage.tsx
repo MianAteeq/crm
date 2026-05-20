@@ -75,18 +75,52 @@ export default function TemplateBuilderPage() {
   };
 
   const handlePublish = async () => {
-    if (!currentTemplate.name) {
-      setError('Please provide a template name.');
+    // 1. Basic Template Info
+    if (!currentTemplate.name || currentTemplate.name.trim().length < 3) {
+      setError('Template name is required and should be at least 3 characters.');
       return;
     }
 
-    if (!currentTemplate.body.text) {
+    if (!/^[a-z0-9_]+$/.test(currentTemplate.name)) {
+      setError('Template name can only contain lowercase letters, numbers, and underscores.');
+      return;
+    }
+
+    if (!currentTemplate.category) {
+      setError('Please select a template category.');
+      return;
+    }
+
+    if (!currentTemplate.language) {
+      setError('Please select a template language.');
+      return;
+    }
+
+    // 2. Header Validation
+    if (currentTemplate.header.type === 'TEXT') {
+      if (!currentTemplate.header.text || currentTemplate.header.text.trim().length === 0) {
+        setError('Please provide text for the header.');
+        return;
+      }
+      if (currentTemplate.header.text.length > 60) {
+        setError('Header text must be 60 characters or less.');
+        return;
+      }
+    } else if (['IMAGE', 'DOCUMENT'].includes(currentTemplate.header.type)) {
+      if (!currentTemplate.header.mediaHandle) {
+        setError(`Please upload a ${currentTemplate.header.type.toLowerCase()} for the header.`);
+        return;
+      }
+    }
+
+    // 3. Body Validation
+    if (!currentTemplate.body.text || currentTemplate.body.text.trim().length === 0) {
       setError('Please provide message body text.');
       return;
     }
 
-    if (['IMAGE', 'VIDEO', 'DOCUMENT'].includes(currentTemplate.header.type) && !currentTemplate.header.mediaHandle) {
-      setError(`Please upload a ${currentTemplate.header.type.toLowerCase()} for the header.`);
+    if (currentTemplate.body.text.length > 1024) {
+      setError('Message body cannot exceed 1024 characters.');
       return;
     }
 
@@ -94,9 +128,49 @@ export default function TemplateBuilderPage() {
     const varIndices = Array.from(new Set(varMatches.map(m => parseInt(m.match(/\d+/)?.[0] || '1') - 1)));
     
     for (const index of varIndices) {
-      if (currentTemplate.body.variables[index] === undefined || currentTemplate.body.variables[index] === '') {
-        setError(`Please provide a sample value for variable {{${index + 1}}}.`);
+      if (currentTemplate.body.variables[index] === undefined || currentTemplate.body.variables[index].trim() === '') {
+        setError(` Please provide a sample value for variable {{${index + 1}}}. This is required for WhatsApp approval.`);
         return;
+      }
+    }
+
+    // 4. Footer Validation
+    if (currentTemplate.footer?.text && currentTemplate.footer.text.length > 60) {
+      setError('Footer text must be 60 characters or less.');
+      return;
+    }
+
+    // 5. Buttons Validation
+    if (currentTemplate.buttons.length > 0) {
+      for (const btn of currentTemplate.buttons) {
+        if (!btn.text || btn.text.trim().length === 0) {
+          setError('Each button must have a label.');
+          return;
+        }
+        if (btn.text.length > 25) {
+          setError(`Button label "${btn.text}" is too long (max 25 chars).`);
+          return;
+        }
+        
+        if (btn.type === 'URL') {
+          if (!btn.url || btn.url.trim().length < 5) {
+            setError(`Please provide a valid URL for button "${btn.text}".`);
+            return;
+          }
+          if (!btn.url.startsWith('http')) {
+            setError(`URL for button "${btn.text}" must start with http:// or https://`);
+            return;
+          }
+        } else if (btn.type === 'CALL') {
+          if (!btn.phoneNumber || btn.phoneNumber.trim().length < 5) {
+            setError(`Please provide a valid phone number for button "${btn.text}".`);
+            return;
+          }
+           if (!/^\+?[0-9]+$/.test(btn.phoneNumber.replace(/\s/g, ''))) {
+            setError(`Phone number for button "${btn.text}" should only contain numbers and optionally start with +.`);
+            return;
+          }
+        }
       }
     }
 
@@ -116,6 +190,11 @@ export default function TemplateBuilderPage() {
 
         if (currentTemplate.header.type === 'TEXT') {
           header.text = currentTemplate.header.text;
+          if (currentTemplate.header.text.includes('{{1}}') && currentTemplate.header.variables?.[0]) {
+            header.example = {
+              header_text: [currentTemplate.header.variables[0]]
+            };
+          }
         } else {
           // Media header
           header.example = {
@@ -171,16 +250,32 @@ export default function TemplateBuilderPage() {
         components: components,
         // Fallback fields for simpler backends
         body: currentTemplate.body.text,
-        media_handle: currentTemplate.header.mediaHandle
+        media_handle: currentTemplate.header.mediaHandle,
+        media_path: currentTemplate.header.mediaPath,
+        media_type: currentTemplate.header.mediaType,
+        media_url: currentTemplate.header.mediaUrl
       };
 
       console.log('Publishing template to backend:', apiPayload);
-      const result = await whatsappApi.createTemplate(apiPayload);
-      console.log('Template creation success:', result);
+      
+      let result;
+      if (templateId && templateId !== 'new') {
+        result = await whatsappApi.updateTemplate(templateId, apiPayload);
+        console.log('Template update success:', result);
+      } else {
+        result = await whatsappApi.createTemplate(apiPayload);
+        console.log('Template creation success:', result);
+      }
       
       // Success
       resetTemplate();
-      navigate('/templates', { state: { message: 'Template created successfully!' } });
+      navigate('/templates', { 
+        state: { 
+          message: templateId && templateId !== 'new' 
+            ? 'Template updated successfully!' 
+            : 'Template created successfully!' 
+        } 
+      });
     } catch (err: any) {
       console.error('Publish failed details:', err);
       setError(err.message || 'Failed to publish template. Please check the information and try again.');
@@ -189,47 +284,65 @@ export default function TemplateBuilderPage() {
     }
   };
 
+  const isEditing = templateId && templateId !== 'new';
+
   return (
     <div className="flex flex-col h-screen bg-bg-base overflow-hidden">
       {/* SaaS Top Header */}
-      <div className="px-6 py-4 z-50 bg-bg-base shrink-0">
-        <header className="h-16 border border-slate-200 bg-white rounded-2xl flex items-center justify-between px-6 shadow-sm">
+      <div className="px-6 py-4 z-50 bg-[#fcfcfd] shrink-0">
+        <header className="h-16 border border-slate-200/90 bg-white rounded-2xl flex items-center justify-between px-6 shadow-premium">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => { resetTemplate(); navigate('/templates'); }}
-              className="flex items-center gap-2 px-3 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all font-medium text-sm"
+              className="flex items-center gap-2 px-3.5 py-2 text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all font-black text-xs uppercase tracking-widest cursor-pointer"
             >
-              <ChevronLeft size={18} />
-              <span>Templates</span>
+              <ChevronLeft size={16} className="stroke-[2.5px]" />
+              <span>Back</span>
             </button>
             <div className="h-4 w-px bg-slate-200" />
             <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <h1 className="text-[15px] font-bold text-slate-900 leading-none">
-                  {currentTemplate.name || 'Untitled Template'}
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-sm font-black text-slate-950 leading-none tracking-tight font-display">
+                  {currentTemplate.name || (isEditing ? 'Loading Template...' : 'New Template')}
                 </h1>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100 uppercase tracking-wider">Draft</span>
+                <span className={cn(
+                  "px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border",
+                  isEditing 
+                    ? "bg-amber-500/10 text-amber-700 border-amber-200/60" 
+                    : "bg-indigo-500/10 text-indigo-700 border-indigo-200/60"
+                )}>
+                  {isEditing ? 'Editing' : 'Draft'}
+                </span>
               </div>
-              <p className="text-[11px] text-slate-400 font-medium mt-0.5">Last edited Feb 24, 2024</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">
+                {isEditing ? `Template ID: ${templateId}` : 'WhatsApp Native Form Format'}
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={handleSave}
-              disabled={isSaving || isPublishing}
-              className="flex items-center gap-2 px-4 h-9 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all border border-slate-200 disabled:opacity-50"
-            >
-              {isSaving ? <CheckCircle2 size={16} className="text-emerald-500" /> : <Save size={16} />}
-              {isSaving ? 'Saved' : 'Save as Draft'}
-            </button>
+          <div className="flex items-center gap-3">
+            {!isEditing && (
+              <button 
+                onClick={handleSave}
+                disabled={isSaving || isPublishing}
+                className="relative px-5 h-10 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-[0.98] border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isSaving ? <CheckCircle2 size={14} className="text-emerald-500 stroke-[3px]" /> : <Save size={14} className="stroke-[2.5px]" />}
+                {isSaving ? 'Saved' : 'Save as Draft'}
+              </button>
+            )}
             <button 
               onClick={handlePublish}
               disabled={isPublishing || isSaving}
-              className="flex items-center gap-2 px-5 h-9 text-xs font-bold bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-all shadow-sm shadow-blue-200 disabled:opacity-50"
+              className={cn(
+                "relative px-6 h-10 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-[0.98] text-white flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50",
+                isEditing
+                  ? "bg-slate-900 hover:bg-slate-800 shadow-slate-900/10"
+                  : "bg-gradient-to-r from-indigo-600 to-indigo-700 hover:shadow-lg hover:shadow-indigo-500/20"
+              )}
             >
-              {isPublishing ? <Loader2 size={16} className="animate-spin" /> : <Rocket size={16} />}
-              {isPublishing ? 'Publishing...' : 'Publish Template'}
+              {isPublishing ? <Loader2 size={14} className="animate-spin text-white" /> : (isEditing ? <CheckCircle2 size={14} className="stroke-[3px]" /> : <Rocket size={14} className="stroke-[2.5px]" />)}
+              {isPublishing ? 'Updating...' : (isEditing ? 'Update Template' : 'Publish Template')}
             </button>
           </div>
         </header>
@@ -259,7 +372,9 @@ export default function TemplateBuilderPage() {
 
               <div className="flex items-center gap-2 mb-8 animate-in fade-in slide-in-from-left-4">
                  <div className="w-1.5 h-6 bg-slate-900 rounded-full" />
-                 <h2 className="text-xl font-bold tracking-tight">Template Builder</h2>
+                 <h2 className="text-xl font-bold tracking-tight">
+                   {isEditing ? 'Edit Template' : 'Template Builder'}
+                 </h2>
               </div>
               <TemplateEditor />
            </div>

@@ -1,5 +1,15 @@
 
-const BASE_URL = 'https://crm.throbtech.com/api';
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined' && 
+      (window.location.hostname.endsWith('run.app') || 
+       window.location.hostname.includes('localhost') || 
+       window.location.hostname.includes('127.0.0.1'))) {
+    return '/api';
+  }
+  return 'https://crm.throbtech.com/api';
+};
+
+const BASE_URL = getBaseUrl();
 
 export interface LoginResponse {
   token: string;
@@ -21,7 +31,6 @@ export class AuthService {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
         },
         body: JSON.stringify({ email, password }),
       });

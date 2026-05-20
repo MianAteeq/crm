@@ -101,7 +101,7 @@ export default function ContactEditorPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-8">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -163,6 +163,7 @@ export default function ContactEditorPage() {
                     value={formData.phone}
                     onChange={(val) => setFormData({ ...formData, phone: val || '' })}
                     className={errors.phone ? 'phone-input-error' : ''}
+                    placeholder="Enter phone number"
                   />
                   {errors.phone && <p className="text-[10px] text-red-500 font-bold ml-1">{errors.phone}</p>}
                 </div>
