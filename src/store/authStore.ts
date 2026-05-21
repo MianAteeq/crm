@@ -10,6 +10,7 @@ interface AuthState {
   signup: (email: string, name: string) => Promise<void>;
   logout: () => void;
   updateOnboarding: (step: number, data?: Partial<User>) => void;
+  updateProfile: (data: Partial<User>) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -75,6 +76,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   updateOnboarding: (step: number, data?: Partial<User>) => {
     set((state) => {
       const updatedUser = state.user ? { ...state.user, ...data, onboardingStep: step } : null;
+      if (updatedUser) {
+        localStorage.setItem('auth_session', JSON.stringify(updatedUser));
+      }
+      return { user: updatedUser };
+    });
+  },
+
+  updateProfile: (data: Partial<User>) => {
+    set((state) => {
+      const updatedUser = state.user ? { ...state.user, ...data } : null;
       if (updatedUser) {
         localStorage.setItem('auth_session', JSON.stringify(updatedUser));
       }

@@ -137,20 +137,10 @@ export default function Dashboard() {
       value: (dashboardMode === 'live' 
         ? (heroCards.network_reach !== undefined ? heroCards.network_reach : totalContacts)
         : 1248).toLocaleString(), 
-      change: dashboardMode === 'live' ? 'Live Contacts' : '+12.5%', 
+      change: '', 
       icon: Users, 
       color: 'text-indigo-500', 
       bg: 'bg-indigo-500/5' 
-    },
-    { 
-      label: 'Transmission Volume', 
-      value: (dashboardMode === 'live' 
-        ? (heroCards.transmission_volume !== undefined ? heroCards.transmission_volume : totalSentMessages)
-        : 24850).toLocaleString(), 
-      change: dashboardMode === 'live' ? (statsFromApi.delivery_rate !== undefined ? `${statsFromApi.delivery_rate}% Del` : 'Live Delivery') : '+8.2%', 
-      icon: Activity, 
-      color: 'text-emerald-500', 
-      bg: 'bg-emerald-500/5' 
     },
     { 
       label: 'Strategic Ops', 
@@ -362,7 +352,7 @@ export default function Dashboard() {
       </div>
 
       {/* Main Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {stats.map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -378,10 +368,12 @@ export default function Dashboard() {
                 <stat.icon size={24} strokeWidth={2.5} />
               </div>
               <div className="flex flex-col items-end">
-                <div className="flex items-center gap-1 text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
-                  <ArrowUpRight size={10} />
-                  {stat.change}
-                </div>
+                {stat.change && (
+                  <div className="flex items-center gap-1 text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+                    <ArrowUpRight size={10} />
+                    {stat.change}
+                  </div>
+                )}
               </div>
             </div>
             
