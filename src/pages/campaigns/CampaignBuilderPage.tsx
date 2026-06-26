@@ -35,20 +35,87 @@ export default function CampaignBuilderPage() {
     scheduledTime: '',
   });
 
+  const [contacts, setContacts] = useState<any[]>([]);
+  const [performanceInsights, setPerformanceInsights] = useState<any>(null);
+
   useEffect(() => {
-    const loadTemplates = async () => {
+    const loadData = async () => {
       setIsLoadingTemplates(true);
       try {
-        const data = await whatsappApi.fetchTemplates();
-        setTemplates(data);
+        const [templatesData, contactsData, insightsData] = await Promise.all([
+          whatsappApi.fetchTemplates(),
+          crmApi.getContacts(),
+          whatsappApi.fetchPerformanceInsights(30).catch(err => {
+            console.warn('Failed to load performance insights:', err);
+            return null;
+          })
+        ]);
+        setTemplates(templatesData || []);
+        setContacts(contactsData || []);
+        setPerformanceInsights(insightsData || null);
       } catch (error) {
-        console.error('Failed to load templates:', error);
+        console.error('Failed to load builder reference data:', error);
       } finally {
         setIsLoadingTemplates(false);
       }
     };
-    loadTemplates();
+    loadData();
   }, []);
+
+  const getEstimatedReach = () => {
+    if (campaignData.audience.type === 'manual') {
+      return (campaignData.audience.contactIds || []).length;
+    }
+    if (campaignData.audience.type === 'segment') {
+      const selectedTagIds = campaignData.audience.tagIds || [];
+      if (selectedTagIds.length === 0) return 0;
+      return contacts.filter(contact => {
+        const contactTagIds = contact.tags?.map((t: any) => Number(t)) || [];
+        return contactTagIds.some((id: number) => selectedTagIds.includes(id));
+      }).length;
+    }
+    // Default or All Contacts
+    return contacts.length > 0 ? contacts.length : 12450;
+  };
+
+  const getStats = () => {
+    let deliveryRate = 98;
+    let readRate = 68;
+
+    if (campaignData.template && performanceInsights?.top_templates) {
+      const templateStats = performanceInsights.top_templates.find((t: any) => 
+        String(t.template_name).toLowerCase() === String(campaignData.template?.name).toLowerCase()
+      );
+      if (templateStats) {
+        deliveryRate = templateStats.delivery_rate ?? 98;
+        readRate = templateStats.read_rate ?? 68;
+      } else if (performanceInsights.stats) {
+        deliveryRate = performanceInsights.stats.delivery_rate ?? 98;
+        readRate = performanceInsights.stats.read_rate ?? 68;
+      }
+    } else if (performanceInsights?.stats) {
+      deliveryRate = performanceInsights.stats.delivery_rate ?? 98;
+      readRate = performanceInsights.stats.read_rate ?? 68;
+    }
+
+    const clickRate = Math.round(readRate * 0.35);
+
+    const deliveryLabel = deliveryRate >= 90 ? 'High Efficiency' : (deliveryRate >= 70 ? 'Normal' : 'Needs Optimization');
+    const readLabel = readRate >= 70 ? 'Excellent' : (readRate >= 40 ? 'Average' : 'Low Engagement');
+    const clickLabel = clickRate >= 20 ? 'Good' : 'Needs Improvement';
+
+    return {
+      deliveryRate,
+      readRate,
+      clickRate,
+      deliveryLabel,
+      readLabel,
+      clickLabel
+    };
+  };
+
+  const currentStats = getStats();
+  const estimatedReach = getEstimatedReach();
 
   const handleLaunch = async () => {
     if (!campaignData.name || !campaignData.template) {
@@ -468,7 +535,7 @@ export default function CampaignBuilderPage() {
               </div>
               <div className="space-y-1">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Estimated Reach</p>
-                 <h4 className="text-2xl font-black text-slate-900">12,450</h4>
+                 <h4 className="text-2xl font-black text-slate-900">{estimatedReach.toLocaleString()}</h4>
                  <p className="text-[10px] font-bold text-slate-400 uppercase">Recipients</p>
               </div>
            </div>
@@ -479,8 +546,11 @@ export default function CampaignBuilderPage() {
               </div>
               <div className="space-y-1">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Delivery Rate</p>
-                 <h4 className="text-2xl font-black text-slate-900">98%</h4>
-                 <p className="text-[10px] font-bold text-emerald-500 uppercase">High Efficiency</p>
+                 <h4 className="text-2xl font-black text-slate-900">{currentStats.deliveryRate}%</h4>
+                 <p className={cn(
+                   "text-[10px] font-bold uppercase",
+                   currentStats.deliveryRate >= 70 ? "text-emerald-500" : "text-amber-500"
+                 )}>{currentStats.deliveryLabel}</p>
               </div>
            </div>
 
@@ -490,8 +560,11 @@ export default function CampaignBuilderPage() {
               </div>
               <div className="space-y-1">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Read Rate</p>
-                 <h4 className="text-2xl font-black text-slate-900">68%</h4>
-                 <p className="text-[10px] font-bold text-slate-400 uppercase">Average</p>
+                 <h4 className="text-2xl font-black text-slate-900">{currentStats.readRate}%</h4>
+                 <p className={cn(
+                   "text-[10px] font-bold uppercase",
+                   currentStats.readRate >= 40 ? "text-slate-400" : "text-amber-500"
+                 )}>{currentStats.readLabel}</p>
               </div>
            </div>
 
@@ -501,8 +574,11 @@ export default function CampaignBuilderPage() {
               </div>
               <div className="space-y-1">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Click Rate</p>
-                 <h4 className="text-2xl font-black text-slate-900">24%</h4>
-                 <p className="text-[10px] font-bold text-emerald-500 uppercase">Good</p>
+                 <h4 className="text-2xl font-black text-slate-900">{currentStats.clickRate}%</h4>
+                 <p className={cn(
+                   "text-[10px] font-bold uppercase",
+                   currentStats.clickRate >= 20 ? "text-emerald-500" : "text-amber-500"
+                 )}>{currentStats.clickLabel}</p>
               </div>
            </div>
         </div>

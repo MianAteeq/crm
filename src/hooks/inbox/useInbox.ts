@@ -1,16 +1,58 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Conversation, Message } from '../../types';
 import { crmApi } from '../../services/crmApi';
 import { AuthService } from '../../services/authService';
 import { useRealtime } from '../useRealtime';
 
 export function useInbox() {
+  const [searchParams] = useSearchParams();
+  const selectParam = searchParams.get('select') || searchParams.get('id');
+
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
+
+  const safeConversations = Array.isArray(conversations) ? conversations : [];
+  const activeConversation = safeConversations.find(c => String(c.id) === String(activeConversationId));
+  const isAutoReplyEnabled = activeConversation?.is_auto_reply_active !== false;
+
+  const toggleAutoReply = useCallback(async () => {
+    if (!activeConversationId) return;
+
+    const conv = conversations.find(c => String(c.id) === String(activeConversationId));
+    if (!conv) return;
+
+    const nextState = !conv.is_auto_reply_active;
+
+    // Optimistically update
+    setConversations(prev => prev.map(c => 
+      String(c.id) === String(activeConversationId) ? { ...c, is_auto_reply_active: nextState } : c
+    ));
+
+    try {
+      await crmApi.toggleConversationAutoReply(activeConversationId, nextState);
+    } catch (err) {
+      console.error('Failed to toggle auto reply:', err);
+      // Revert on error
+      setConversations(prev => prev.map(c => 
+        String(c.id) === String(activeConversationId) ? { ...c, is_auto_reply_active: !nextState } : c
+      ));
+    }
+  }, [activeConversationId, conversations]);
+
+  // Deep-linking: Automatically select conversation if query parameter matches
+  useEffect(() => {
+    if (selectParam && conversations.length > 0) {
+      const exists = conversations.some(c => String(c.id) === String(selectParam));
+      if (exists) {
+        setActiveConversationId(String(selectParam));
+      }
+    }
+  }, [selectParam, conversations]);
 
   const fetchConversations = useCallback(async (silent = false) => {
     if (!silent) setIsLoading(true);
@@ -134,9 +176,6 @@ export function useInbox() {
     }
   }, [activeConversationId, fetchMessages]);
 
-  const safeConversations = Array.isArray(conversations) ? conversations : [];
-  const activeConversation = safeConversations.find(c => String(c.id) === String(activeConversationId));
-  
   // Create a combined active conversation with fetched messages
   const activeConversationWithMessages = activeConversation ? {
     ...activeConversation,
@@ -181,17 +220,36 @@ export function useInbox() {
         }
         return c;
       }));
+
+      // Trigger automatic reply simulation if enabled
+      if (isAutoReplyEnabled && type === 'text') {
+        const conversationIdToReply = activeConversationId;
+        setTimeout(async () => {
+          setIsTyping(true);
+          try {
+            // Typing effect duration
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            await crmApi.simulateIncomingMessage(conversationIdToReply, content);
+          } catch (err) {
+            console.error('Failed to get simulated incoming response:', err);
+          } finally {
+            setIsTyping(false);
+          }
+        }, 800);
+      }
+
     } catch (error) {
       console.error('Failed to send message:', error);
       setMessages(prev => prev.map(m => 
         m.id === tempMessage.id ? { ...m, status: 'failed' } : m
       ));
     }
-  }, [activeConversationId]);
+  }, [activeConversationId, isAutoReplyEnabled]);
 
-  const selectConversation = (id: string) => {
+  const selectConversation = (id: string | null) => {
     setActiveConversationId(id);
-    
+    if (!id) return;
+
     // Mark as read if there are unread messages
     const conv = conversations.find(c => c.id === id);
     if (conv && conv.unreadCount > 0) {
@@ -213,6 +271,8 @@ export function useInbox() {
     sendMessage,
     isTyping,
     isLoading,
+    isAutoReplyEnabled,
+    toggleAutoReply,
     refreshManual: fetchConversations
   };
 }

@@ -1,19 +1,17 @@
-import { ReactNode, useState, useEffect, useRef } from 'react';
+import { ReactNode, useState, useEffect, useRef, ChangeEvent } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
+import {
+  LayoutDashboard,
   Layout as LayoutIcon,
-  MessageSquare, 
-  Send, 
-  Users, 
-  Settings, 
-  LogOut, 
-  FileText,
-  Zap,
+  MessageSquare,
+  Send,
+  Users,
+  Settings,
+  LogOut,
+  Radio,
   Menu,
   X,
   Smartphone,
-  Search,
   Bell,
   ChevronDown,
   Sparkles,
@@ -23,7 +21,10 @@ import {
   ChevronLeft,
   Plus,
   Compass,
-  CornerDownLeft,
+  BarChart3,
+  FileText,
+  Plug,
+  Calendar,
   MousePointerClick,
   User as UserIcon,
   Mail,
@@ -31,15 +32,13 @@ import {
   Copy,
   CheckCircle2,
   Lock,
-  Activity,
-  Cpu,
-  Terminal,
-  HelpCircle,
-  Shield,
-  Workflow
+  Zap,
+  ShieldCheck,
+  Cpu
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { useAuthStore } from '../../store/authStore';
+import { useBrandingStore } from '../../store/brandingStore';
 import { motion, AnimatePresence } from 'motion/react';
 import { crmApi } from '../../services/crmApi';
 import { whatsappApi } from '../../services/whatsappApi';
@@ -47,19 +46,18 @@ import { Contact, Campaign } from '../../types';
 import { WhatsAppTemplate } from '../../types/whatsapp';
 
 const menuItems = [
-  { group: 'Intelligence', items: [
-    { icon: LayoutDashboard, label: 'Insights', path: '/dashboard' },
+  { group: 'Main', items: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: MessageSquare, label: 'Conversations', path: '/inbox' },
+    { icon: Users, label: 'Contacts', path: '/contacts' },
   ]},
   { group: 'Engagement', items: [
     { icon: Send, label: 'Campaigns', path: '/campaigns' },
-    { icon: MessageSquare, label: 'Inbox', path: '/inbox' },
     { icon: LayoutIcon, label: 'Templates', path: '/templates' },
+    { icon: Smartphone, label: 'WhatsApp Numbers', path: '/whatsapp/connect' },
   ]},
-  { group: 'Network', items: [
-    { icon: Users, label: 'Contacts', path: '/contacts' },
-  ]},
-  { group: 'Systems', items: [
-    { icon: Smartphone, label: 'Integrations', path: '/settings/whatsapp' },
+  { group: 'System', items: [
+    { icon: Settings, label: 'Settings', path: '/settings/whatsapp' },
   ]}
 ];
 
@@ -72,6 +70,11 @@ const GRADIENTS = {
   charcoal: "from-slate-700 to-zinc-900 shadow-slate-500/10 bg-gradient-to-br text-white",
 };
 
+const isImageAvatar = (avatarStr?: string) => {
+  if (!avatarStr) return false;
+  return avatarStr.startsWith('http') || avatarStr.startsWith('/') || avatarStr.startsWith('data:');
+};
+
 export function Sidebar({ 
   isCollapsed = false, 
   setIsCollapsed = () => {} 
@@ -81,6 +84,7 @@ export function Sidebar({
 }) {
   const navigate = useNavigate();
   const { logout, user, updateProfile } = useAuthStore();
+  const { websiteName, websiteLogo } = useBrandingStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Profile modal state
@@ -93,6 +97,18 @@ export function Sidebar({
   const [showStatus, setShowStatus] = useState<'success' | 'error' | null>(null);
   const [isCopied, setIsCopied] = useState(false);
 
+  // Profile image upload state
+  const [tempAvatar, setTempAvatar] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+
+  // Password fields state
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
   // AI Co-pilot State
   const [aiStep, setAiStep] = useState<'idle' | 'simulating' | 'done'>('idle');
   const [aiLogs, setAiLogs] = useState<string[]>([]);
@@ -103,31 +119,106 @@ export function Sidebar({
       setName(user.name || '');
       setEmail(user.email || '');
       setBusinessName(user.businessName || '');
-      setSelectedGradient((user.avatar as keyof typeof GRADIENTS) || 'royal');
+      if (isImageAvatar(user.avatar)) {
+        setTempAvatar(user.avatar);
+      } else {
+        setTempAvatar(null);
+        setSelectedGradient((user.avatar as keyof typeof GRADIENTS) || 'royal');
+      }
     }
   }, [user, isProfileModalOpen]);
+
+  const handleAvatarUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const localUrl = URL.createObjectURL(file);
+    setTempAvatar(localUrl);
+    setAvatarFile(file);
+  };
 
   const handleSaveProfile = async (e: any) => {
     e.preventDefault();
     if (!name.trim()) return;
     setIsSaving(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      updateProfile({
+      let finalAvatar = user?.avatar;
+
+      // 1. Upload photo if selected
+      if (avatarFile) {
+        const uploadRes = await crmApi.uploadAvatar(avatarFile);
+        if (uploadRes.success) {
+          finalAvatar = uploadRes.avatar;
+          setAvatarFile(null);
+        }
+      } else if (tempAvatar === null) {
+        // If avatar photo was removed
+        finalAvatar = selectedGradient;
+      }
+
+      // 2. Save profile info on backend
+      const res = await crmApi.updateProfile({
         name: name.trim(),
-        businessName: businessName.trim(),
-        avatar: selectedGradient,
+        business_name: businessName.trim(),
+        avatar: finalAvatar
       });
-      setShowStatus('success');
-      setTimeout(() => {
-        setShowStatus(null);
-        setIsProfileModalOpen(false);
-      }, 1200);
-    } catch (err) {
+
+      if (res.success) {
+        updateProfile({
+          name: res.user.name,
+          businessName: res.user.tenant?.name || businessName.trim(),
+          avatar: res.user.avatar,
+        });
+        setShowStatus('success');
+        setTimeout(() => {
+          setShowStatus(null);
+          setIsProfileModalOpen(false);
+        }, 1200);
+      } else {
+        throw new Error(res.message || 'Profile update failed');
+      }
+    } catch (err: any) {
+      console.error(err);
       setShowStatus('error');
-      setTimeout(() => setShowStatus(null), 2000);
+      setTimeout(() => setShowStatus(null), 2500);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSavePassword = async () => {
+    if (newPassword.length < 6) {
+      setPasswordError('New password must be at least 6 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('New passwords do not match.');
+      return;
+    }
+
+    setIsChangingPassword(true);
+    setPasswordError(null);
+    try {
+      const res = await crmApi.changePassword({
+        current_password: currentPassword,
+        new_password: newPassword,
+        new_password_confirmation: confirmPassword
+      });
+
+      if (res.success) {
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setShowPasswordFields(false);
+        setShowStatus('success');
+        setTimeout(() => setShowStatus(null), 2000);
+      } else {
+        throw new Error(res.message || 'Password update failed');
+      }
+    } catch (err: any) {
+      console.error(err);
+      setPasswordError(err.message || 'Incorrect current password or update failed.');
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -164,8 +255,8 @@ export function Sidebar({
   return (
     <>
       {/* Mobile Toggle */}
-      <button 
-        className="lg:hidden fixed top-6 right-6 z-[60] w-12 h-12 bg-[#090d16] text-white rounded-2xl shadow-floating flex items-center justify-center transition-all active:scale-95 border border-white/10"
+      <button
+        className="lg:hidden fixed top-6 right-6 z-[60] w-11 h-11 bg-white text-slate-700 rounded-xl shadow-lg flex items-center justify-center transition-all active:scale-95 border border-slate-200"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         <AnimatePresence mode="wait">
@@ -181,159 +272,187 @@ export function Sidebar({
       </button>
 
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 bg-gradient-to-b from-[#040814] via-[#090f23] to-[#01030a] transform transition-all duration-300 ease-in-out lg:translate-x-0 border-r border-[#1e293b]/50 shadow-[4px_0_30px_rgba(0,0,0,0.7)] flex flex-col justify-between overflow-visible",
+        "fixed inset-y-0 left-0 z-50 bg-white transform transition-all duration-300 ease-in-out lg:translate-x-0 border-r border-slate-200 flex flex-col overflow-visible",
         isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
         isCollapsed ? "w-20" : "w-72"
       )}>
-        {/* Glowing atmospheric auroras */}
-        <div className="absolute top-0 left-0 w-72 h-72 bg-indigo-500/5 blur-[80px] rounded-full -translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-        <div className="absolute bottom-10 right-0 w-56 h-56 bg-violet-600/5 blur-[70px] rounded-full translate-x-1/3 pointer-events-none" />
-
         {/* Collapsible Trigger for Desktop */}
-        <button 
+        <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden lg:flex absolute right-[-14px] top-12 z-50 w-7 h-7 bg-[#090f23] hover:bg-[#121b36] border border-[#2e3e60]/70 rounded-full text-indigo-400 hover:text-white items-center justify-center cursor-pointer transition-all hover:scale-110 active:scale-95 shadow-[0_0_12px_rgba(99,102,241,0.25)]"
+          className="hidden lg:flex absolute right-[-12px] top-9 z-50 w-6 h-6 bg-white hover:bg-slate-50 border border-slate-200 rounded-full text-slate-400 hover:text-slate-700 items-center justify-center cursor-pointer transition-all hover:scale-110 active:scale-95 shadow-sm"
         >
           <ChevronLeft size={12} className={cn("transition-transform duration-300", isCollapsed && "rotate-180")} />
         </button>
 
-        <div className="flex flex-col h-full relative z-10">
-          
-          {/* 1. Logo Section */}
-          <div className={cn("relative transition-all duration-300", isCollapsed ? "p-4 flex justify-center" : "p-8")}>
-            <div className={cn("flex items-center gap-3.5 group cursor-pointer", isCollapsed ? "justify-center" : "")} onClick={() => navigate('/dashboard')}>
-              <div className="relative w-11 h-11 bg-gradient-to-br from-[#121b36] to-[#040814] border border-[#2e3e60] text-indigo-400 rounded-xl flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:border-indigo-500 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.35)] shadow-inner shrink-0">
-                <Cpu size={20} className="text-indigo-400 group-hover:text-white transition-colors" />
-                <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-slate-950 animate-ping" />
-                <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-slate-950" />
-              </div>
-              {!isCollapsed && (
-                <div className="flex flex-col select-none">
-                  <span className="text-lg font-black text-white tracking-widest block leading-none flex items-center gap-1.5 font-display">
-                    THROB <span className="text-[9px] bg-indigo-500/10 border border-indigo-500/25 px-1.5 py-0.5 rounded text-indigo-400 font-bold uppercase tracking-widest font-sans">OS</span>
-                  </span>
-                  <span className="text-[8px] font-bold text-slate-500 uppercase tracking-[0.28em] mt-1.5 block opacity-85">Strategic Intelligence</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* 2. Workspace switcher style user card */}
-          <div className={cn("px-4 mb-6 relative select-none", isCollapsed ? "flex justify-center" : "")}>
-            <div 
-              onClick={() => setIsProfileModalOpen(true)}
-              className={cn(
-                "bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 hover:border-indigo-500/25 flex items-center cursor-pointer group transition-all duration-300 rounded-2xl shadow-xl",
-                isCollapsed ? "p-2 justify-center w-12 h-12" : "p-3.5 gap-3.5 w-full"
-              )}
-            >
-              <div className={cn(
-                "rounded-xl flex items-center justify-center font-black transition-all duration-300 shrink-0 shadow-md relative group-hover:scale-105",
-                isCollapsed ? "w-8 h-8 text-[11px]" : "w-10 h-10 text-xs",
-                GRADIENTS[selectedGradient]
-              )}>
-                {name ? name.substring(0, 1).toUpperCase() : 'A'}
-                <span className="absolute bottom-[-1px] right-[-1px] w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-[#090f23]" />
-              </div>
-              {!isCollapsed && (
-                <div className="flex-1 min-w-0 text-left">
-                  <p className="text-[10px] font-black text-white truncate leading-none uppercase tracking-wider">{businessName || 'Workspace OS'}</p>
-                  <p className="text-[8px] text-indigo-400 font-bold mt-1 uppercase tracking-widest flex items-center gap-1">
-                    <span className="w-1 h-1 bg-indigo-400 rounded-full animate-pulse" />
-                    Secure Core Node
-                  </p>
-                </div>
-              )}
-              {!isCollapsed && <ChevronDown size={11} className="text-slate-500 group-hover:text-white transition-colors duration-300 mr-0.5 shrink-0" />}
-            </div>
-          </div>
-
-          {/* 3 & 4. Navigation & Active indicators */}
-          <div className="flex-1 px-1 overflow-y-auto custom-scrollbar relative">
-            <div className="space-y-6 pb-6">
-              {menuItems.map((group) => (
-                <div key={group.group} className="space-y-1">
-                  {!isCollapsed ? (
-                    <div className="flex items-center justify-between px-6 mb-2 mt-4 select-none">
-                      <span className="text-[8.5px] font-bold text-slate-500 uppercase tracking-[0.25em] leading-none">{group.group}</span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-800" />
-                    </div>
-                  ) : (
-                    <div className="w-full h-px bg-white/[0.03] my-4" />
-                  )}
-                  <nav className="space-y-1">
-                    {group.items.map((item) => (
-                      <NavLink
-                        key={item.label}
-                        to={item.path}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className={({ isActive }) => cn(
-                          "flex items-center rounded-xl text-[10px] font-semibold uppercase tracking-widest transition-all duration-200 group relative cursor-pointer",
-                          isCollapsed ? "p-3.5 justify-center mx-2.5" : "px-5 py-3.5 gap-4 mx-3",
-                          isActive 
-                            ? "bg-gradient-to-r from-indigo-500/10 to-violet-500/5 text-white border border-indigo-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_0_12px_rgba(99,102,241,0.06)] font-bold" 
-                            : "text-slate-400 hover:text-white hover:bg-white/[0.02] border border-transparent"
-                        )}
-                      >
-                        {({ isActive }) => (
-                          <>
-                            {/* Animated Left glowing bar on active */}
-                            {isActive && (
-                              <div className="absolute left-0 top-2 bottom-2 w-1 rounded-r bg-indigo-500 shadow-[0_0_8px_#6366f1] z-20" />
-                            )}
-                            
-                            <item.icon size={16} strokeWidth={isActive ? 2.5 : 2} className={cn("relative z-10 transition-all duration-200 shrink-0", isActive ? "text-indigo-400 scale-105" : "text-slate-500 group-hover:text-indigo-400 group-hover:scale-105")} />
-                            
-                            {!isCollapsed && (
-                              <span className="relative z-10 flex-1">{item.label}</span>
-                            )}
-
-                            {/* Hover Tooltips for Collapsed state */}
-                            {isCollapsed && (
-                              <div className="absolute left-[78px] top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1.5 translate-x-[-10px] transition-all duration-250 bg-[#060a16] border border-indigo-500/20 text-white rounded-lg px-3 py-1.5 whitespace-nowrap text-[8px] font-black uppercase tracking-wider shadow-floating z-[70] flex items-center gap-2">
-                                <span>{item.label}</span>
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </NavLink>
-                    ))}
-                  </nav>
-                </div>
-              ))}
-
-
-
-            </div>
-          </div>
-
-          {/* 5 & 6. Hover interactions & Bottom logout/action area */}
-          <div className="border-t border-white/[0.04] bg-[#020510]/50 sticky bottom-0 z-20">
-            {!isCollapsed ? (
-              <div className="p-4">
-                <button 
-                  onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-3 py-3 bg-[#111827]/40 hover:bg-rose-500/[0.06] text-slate-400 hover:text-rose-400 rounded-xl text-[8.5px] font-black uppercase tracking-widest transition-all duration-250 border border-white/5 hover:border-rose-500/20 cursor-pointer shadow-sm"
-                >
-                   <LogOut size={12} className="shrink-0" />
-                   Sign Out Protocol
-                </button>
-              </div>
+        {/* 1. Logo Section */}
+        <div className={cn("transition-all duration-300", isCollapsed ? "p-4 flex justify-center" : "px-6 pt-7 pb-5")}>
+          <div className={cn("flex items-center gap-3 cursor-pointer", isCollapsed ? "justify-center" : "")} onClick={() => navigate('/dashboard')}>
+            {websiteLogo ? (
+              <img src={websiteLogo} alt="Logo" className="w-10 h-10 object-contain rounded-xl shrink-0" />
             ) : (
-              <div className="p-4 flex flex-col items-center">
-                <button 
-                  onClick={handleLogout}
-                  className="w-10 h-10 flex items-center justify-center bg-[#111827]/40 hover:bg-rose-500/[0.06] text-slate-400 hover:text-rose-400 rounded-xl border border-white/5 hover:border-rose-500/20 cursor-pointer shadow-sm group relative"
-                >
-                   <LogOut size={12} />
-                   <div className="absolute left-[58px] top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1.5 translate-x-[-10px] transition-all duration-250 bg-[#060a16] border border-[#2e3e60]/20 text-rose-450 text-rose-400 rounded-lg px-3 py-1.5 whitespace-nowrap text-[8px] font-black uppercase tracking-wider shadow-floating z-[70]">
-                     Sign Out Protocol
-                   </div>
-                </button>
+              <div className="w-10 h-10 bg-gradient-to-br from-[#6D4AFF] to-[#8B5CF6] text-white rounded-xl flex items-center justify-center shadow-sm shadow-[#6D4AFF]/30 shrink-0">
+                <Cpu size={20} />
+              </div>
+            )}
+            {!isCollapsed && (
+              <div className="flex flex-col select-none max-w-[150px]">
+                <span className="text-lg font-bold text-slate-900 tracking-tight leading-none truncate">{websiteName}</span>
+                <span className="text-xs font-medium text-slate-400 mt-1">WhatsApp CRM</span>
               </div>
             )}
           </div>
+        </div>
 
+        {/* 2. User / workspace card */}
+        <div className={cn("px-4 mb-3 select-none", isCollapsed ? "flex justify-center" : "")}>
+          <div
+            onClick={() => setIsProfileModalOpen(true)}
+            className={cn(
+              "bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center cursor-pointer group transition-all duration-200 rounded-xl",
+              isCollapsed ? "p-2 justify-center w-12 h-12" : "p-2.5 gap-3 w-full"
+            )}
+          >
+            <div className={cn(
+              "rounded-lg flex items-center justify-center font-bold transition-all duration-200 shrink-0 relative overflow-hidden",
+              isCollapsed ? "w-8 h-8 text-sm" : "w-9 h-9 text-sm",
+              isImageAvatar(user?.avatar) ? "bg-slate-100" : GRADIENTS[(user?.avatar as keyof typeof GRADIENTS) || 'royal']
+            )}>
+              {isImageAvatar(user?.avatar) ? (
+                <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                user?.name ? user.name.substring(0, 1).toUpperCase() : 'A'
+              )}
+              <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white" />
+            </div>
+            {!isCollapsed && (
+              <div className="flex-1 min-w-0 text-left">
+                <p className="text-sm font-semibold text-slate-900 truncate leading-tight">{businessName || 'Workspace'}</p>
+                <p className="text-xs text-slate-400 font-medium truncate mt-0.5">{name || 'View profile'}</p>
+              </div>
+            )}
+            {!isCollapsed && <ChevronDown size={14} className="text-slate-400 group-hover:text-slate-600 transition-colors shrink-0" />}
+          </div>
+        </div>
+
+        {/* 3. Navigation */}
+        <div className="flex-1 px-3 overflow-y-auto custom-scrollbar">
+          <div className="space-y-5 py-2">
+            {menuItems.map((group) => (
+              <div key={group.group} className="space-y-1">
+                {!isCollapsed ? (
+                  <p className="px-3 mb-1 text-xs font-semibold text-slate-400 tracking-wide select-none">{group.group}</p>
+                ) : (
+                  <div className="w-full h-px bg-slate-100 my-3" />
+                )}
+                <nav className="space-y-0.5">
+                  {group.items.map((item) => (
+                    <NavLink
+                      key={item.label}
+                      to={item.path}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={({ isActive }) => cn(
+                        "flex items-center rounded-xl text-sm font-medium transition-all duration-200 group relative cursor-pointer",
+                        isCollapsed ? "p-2.5 justify-center" : "px-3 py-2.5 gap-3",
+                        isActive
+                          ? "bg-gradient-to-r from-[#6D4AFF] to-[#8B5CF6] text-white font-semibold shadow-sm shadow-[#6D4AFF]/30"
+                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                      )}
+                    >
+                      {({ isActive }) => (
+                        <>
+                          <item.icon size={18} strokeWidth={2} className={cn("shrink-0 transition-colors", isActive ? "text-white" : "text-slate-400 group-hover:text-slate-600")} />
+
+                          {!isCollapsed && (
+                            <span className="flex-1">{item.label}</span>
+                          )}
+
+                          {/* Hover Tooltips for Collapsed state */}
+                          {isCollapsed && (
+                            <div className="absolute left-[64px] top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-slate-900 text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]">
+                              {item.label}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </NavLink>
+                  ))}
+                </nav>
+              </div>
+            ))}
+            {user?.role === 'superadmin' && (
+              <div className="space-y-1 pt-2">
+                {!isCollapsed ? (
+                  <p className="px-3 mb-1 text-xs font-semibold text-indigo-650 tracking-wide select-none">System Controller</p>
+                ) : (
+                  <div className="w-full h-px bg-slate-100 my-3" />
+                )}
+                <nav className="space-y-0.5">
+                  <NavLink
+                    to="/admin"
+                    className={({ isActive }) => cn(
+                      "flex items-center rounded-xl text-sm font-medium transition-all duration-200 group relative cursor-pointer",
+                      isCollapsed ? "p-2.5 justify-center" : "px-3 py-2.5 gap-3",
+                      isActive
+                        ? "bg-gradient-to-r from-[#6D4AFF] to-[#8B5CF6] text-white font-semibold shadow-sm"
+                        : "text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50"
+                    )}
+                  >
+                    <Cpu size={18} strokeWidth={2} className="shrink-0 text-indigo-500 group-hover:text-indigo-650" />
+                    {!isCollapsed && <span className="flex-1">Admin Panel</span>}
+                    {isCollapsed && (
+                      <div className="absolute left-[64px] top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-slate-900 text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]">
+                        Admin Panel
+                      </div>
+                    )}
+                  </NavLink>
+                </nav>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 4. Health Score Card */}
+        {!isCollapsed && (
+          <div className="px-4 pb-1">
+            <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-2xl p-4">
+              <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <ShieldCheck size={15} />
+                  </div>
+                  <span className="text-xs font-semibold text-slate-700">Health Score</span>
+                </div>
+                <span className="text-sm font-bold text-slate-900">92%</span>
+              </div>
+              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-full rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#8B5CF6]" style={{ width: '92%' }} />
+              </div>
+              <p className="text-[11px] font-medium text-emerald-600 mt-2">Excellent</p>
+            </div>
+          </div>
+        )}
+
+        {/* 5. Bottom sign out area */}
+        <div className="border-t border-slate-200 p-3 mt-2">
+          {!isCollapsed ? (
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer"
+            >
+              <LogOut size={18} strokeWidth={2} className="shrink-0" />
+              Sign Out
+            </button>
+          ) : (
+            <button
+              onClick={handleLogout}
+              className="w-10 h-10 mx-auto flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer group relative"
+            >
+              <LogOut size={18} strokeWidth={2} />
+              <div className="absolute left-[52px] top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-slate-900 text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]">
+                Sign Out
+              </div>
+            </button>
+          )}
         </div>
       </aside>
 
@@ -379,8 +498,8 @@ export function Sidebar({
                   <div className="flex items-center gap-3">
                     <span className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-650"><Settings size={16} /></span>
                     <div>
-                      <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">Enterprise Profile Settings</h3>
-                      <p className="text-[10px] text-slate-400 font-bold mt-0.5 uppercase tracking-wide">Configure identity & design parameters</p>
+                      <h3 className="text-sm font-bold text-slate-900">Profile Settings</h3>
+                      <p className="text-xs text-slate-400 font-medium mt-0.5">Update your name, business and avatar</p>
                     </div>
                   </div>
                   <button 
@@ -393,40 +512,77 @@ export function Sidebar({
                   </button>
                 </div>
 
-                <div className="p-8 space-y-6">
-                  {/* Avatar Profile Preview & Selector */}
-                  <div className="bg-slate-50 border border-slate-100 p-5 rounded-2xl flex flex-col sm:flex-row items-center gap-6">
-                    <div className={cn(
-                      "w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black transition-all duration-300 shadow-md shrink-0",
-                      GRADIENTS[selectedGradient]
-                    )}>
-                      {name ? name.substring(0, 1).toUpperCase() : 'A'}
-                    </div>
-                    <div className="flex-1 w-full space-y-2.5">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center sm:text-left">Configure Vector Accent</p>
-                      <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                        {Object.keys(GRADIENTS).map((key) => (
-                          <button
-                            key={key}
-                            type="button"
-                            onClick={() => setSelectedGradient(key as keyof typeof GRADIENTS)}
-                            className={cn(
-                              "w-8 h-8 rounded-lg cursor-pointer transition-all duration-300 relative border-2 flex items-center justify-center hover:scale-105 active:scale-95 shadow-sm",
-                              GRADIENTS[key as keyof typeof GRADIENTS],
-                              selectedGradient === key ? "border-indigo-600 scale-110 shadow" : "border-transparent opacity-85 hover:opacity-100"
-                            )}
-                          >
-                            {selectedGradient === key && <CheckCircle2 size={12} className="text-white drop-shadow" />}
-                          </button>
-                        ))}
+                <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                  {/* Avatar Profile Preview & File Upload / Gradient Selector */}
+                  <div className="bg-slate-50 border border-slate-100 p-5 rounded-2xl flex flex-col gap-6">
+                    <div className="flex flex-col sm:flex-row items-center gap-6">
+                      <div className={cn(
+                        "w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black transition-all duration-300 shadow-md shrink-0 overflow-hidden",
+                        isImageAvatar(tempAvatar || undefined) ? "bg-slate-100" : GRADIENTS[selectedGradient as keyof typeof GRADIENTS]
+                      )}>
+                        {isImageAvatar(tempAvatar || undefined) ? (
+                          <img src={tempAvatar!} alt="Avatar Preview" className="w-full h-full object-cover" />
+                        ) : (
+                          name ? name.substring(0, 1).toUpperCase() : 'A'
+                        )}
+                      </div>
+                      <div className="flex-1 w-full space-y-2">
+                        <p className="text-xs font-bold text-slate-500 text-center sm:text-left">Profile Picture</p>
+                        <div className="flex gap-2 justify-center sm:justify-start">
+                          <label className="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm">
+                            Upload Photo
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              className="hidden" 
+                              onChange={handleAvatarUpload}
+                            />
+                          </label>
+                          {tempAvatar && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setTempAvatar(null);
+                                setAvatarFile(null);
+                                setSelectedGradient('royal');
+                              }}
+                              className="px-4 py-2 border border-red-200 bg-red-50 hover:bg-red-105 text-red-650 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                            >
+                              Remove Photo
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
+                    
+                    {/* Gradient color option if not uploaded image */}
+                    {!tempAvatar && (
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-slate-500">Or select a color theme</p>
+                        <div className="flex flex-wrap gap-2">
+                          {Object.keys(GRADIENTS).map((key) => (
+                            <button
+                              key={key}
+                              type="button"
+                              onClick={() => setSelectedGradient(key as keyof typeof GRADIENTS)}
+                              className={cn(
+                                "w-8 h-8 rounded-lg cursor-pointer transition-all duration-300 relative border-2 flex items-center justify-center hover:scale-105 active:scale-95 shadow-sm",
+                                GRADIENTS[key as keyof typeof GRADIENTS],
+                                selectedGradient === key ? "border-indigo-600 scale-110 shadow" : "border-transparent opacity-85 hover:opacity-100"
+                              )}
+                            >
+                              {selectedGradient === key && <CheckCircle2 size={12} className="text-white drop-shadow" />}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Form Inputs */}
                   <div className="space-y-4">
                     <div>
-                      <label className="block mb-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Full Username</label>
+                      <label className="block mb-2 text-xs font-semibold text-slate-500">Full Name</label>
                       <div className="relative">
                         <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
                         <input
@@ -441,7 +597,7 @@ export function Sidebar({
                     </div>
 
                     <div>
-                      <label className="block mb-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Enterprise Business Name</label>
+                      <label className="block mb-2 text-xs font-semibold text-slate-500">Business Name</label>
                       <div className="relative">
                         <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
                         <input
@@ -457,7 +613,7 @@ export function Sidebar({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block mb-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Corporate Email</label>
+                        <label className="block mb-1.5 text-xs font-semibold text-slate-500">Email</label>
                         <div className="relative">
                           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={13} />
                           <input
@@ -471,7 +627,7 @@ export function Sidebar({
                       </div>
 
                       <div>
-                        <label className="block mb-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">System tenant identity</label>
+                        <label className="block mb-1.5 text-xs font-semibold text-slate-500">Tenant ID</label>
                         <button
                           type="button"
                           onClick={handleCopyTenantId}
@@ -487,25 +643,89 @@ export function Sidebar({
                       </div>
                     </div>
                   </div>
+
+                  {/* Change Password Toggle & Fields */}
+                  <div className="border-t border-slate-100 pt-5 space-y-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswordFields(!showPasswordFields)}
+                      className="flex items-center justify-between w-full text-left text-xs font-black text-[#6D4AFF] hover:text-[#8B5CF6] uppercase tracking-widest cursor-pointer hover:underline"
+                    >
+                      <span>🔒 Change Password</span>
+                      <span>{showPasswordFields ? 'Hide' : 'Show'}</span>
+                    </button>
+
+                    {showPasswordFields && (
+                      <div className="space-y-4 pt-1 animate-none">
+                        <div>
+                          <label className="block mb-2 text-xs font-semibold text-slate-500">Current Password</label>
+                          <input
+                            type="password"
+                            value={currentPassword}
+                            onChange={(e) => setCurrentPassword(e.target.value)}
+                            placeholder="••••••••"
+                            className="w-full bg-slate-50 border border-slate-200/65 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
+                          />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block mb-2 text-xs font-semibold text-slate-500">New Password</label>
+                            <input
+                              type="password"
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              placeholder="Min. 6 characters"
+                              className="w-full bg-slate-50 border border-slate-200/65 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
+                            />
+                          </div>
+                          <div>
+                            <label className="block mb-2 text-xs font-semibold text-slate-500">Confirm New Password</label>
+                            <input
+                              type="password"
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              placeholder="Confirm password"
+                              className="w-full bg-slate-50 border border-slate-200/65 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
+                            />
+                          </div>
+                        </div>
+                        {passwordError && (
+                          <p className="text-xs text-red-500 font-semibold">{passwordError}</p>
+                        )}
+                        <button
+                          type="button"
+                          disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
+                          onClick={handleSavePassword}
+                          className="w-full sm:w-auto px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm"
+                        >
+                          {isChangingPassword ? (
+                            <Loader2 size={13} className="animate-spin" />
+                          ) : (
+                            "Update Password"
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Submit Actions */}
                 <div className="bg-slate-50 border-t border-slate-100 px-8 py-5 flex items-center justify-between">
                   <div>
                     {showStatus === 'success' && (
-                      <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1.5 animate-none">
-                        <CheckCircle2 size={12} />
-                        Profile Configured!
+                      <p className="text-xs font-semibold text-emerald-600 flex items-center gap-1.5">
+                        <CheckCircle2 size={14} />
+                        Profile saved
                       </p>
                     )}
                     {showStatus === 'error' && (
-                      <p className="text-[10px] font-black text-red-500 uppercase tracking-widest flex items-center gap-1.5 animate-none">
-                        <X size={12} />
-                        Update Failed
+                      <p className="text-xs font-semibold text-red-500 flex items-center gap-1.5">
+                        <X size={14} />
+                        Update failed
                       </p>
                     )}
                     {!showStatus && (
-                      <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wide">Syncs to system memory</span>
+                      <span className="text-xs text-slate-400 font-medium">Changes are saved automatically</span>
                     )}
                   </div>
                   <div className="flex items-center gap-3">
@@ -513,19 +733,19 @@ export function Sidebar({
                       type="button"
                       disabled={isSaving}
                       onClick={() => setIsProfileModalOpen(false)}
-                      className="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-[10px] font-black uppercase tracking-wider text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all cursor-pointer"
+                      className="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all cursor-pointer"
                     >
-                      Cancel Setup
+                      Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={isSaving || showStatus !== null}
-                      className="relative min-w-[120px] px-5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-900 border border-slate-950 text-[10px] font-black uppercase tracking-wider text-[#FFFFFF] shadow-md active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+                      className="relative min-w-[120px] px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 border border-indigo-600 text-xs font-semibold text-white shadow-sm active:scale-95 transition-all cursor-pointer flex items-center justify-center"
                     >
                       {isSaving ? (
-                        <Loader2 size={12} className="animate-spin text-[#FFFFFF]" />
+                        <Loader2 size={14} className="animate-spin text-white" />
                       ) : (
-                        "Save Protocol"
+                        "Save Changes"
                       )}
                     </button>
                   </div>
@@ -541,59 +761,75 @@ export function Sidebar({
 
 export function Header() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasLoadedIndex, setHasLoadedIndex] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      title: 'Campaign Complete',
-      desc: '"Q2 Customer Retargeting" has finished broadcasting successfully.',
-      time: '15m ago',
-      unread: true,
-      category: 'campaign'
-    },
-    {
-      id: 2,
-      title: 'Template Approved',
-      desc: 'Your WhatsApp template "Feedback Loop V2" was approved by Meta.',
-      time: '2h ago',
-      unread: true,
-      category: 'whatsapp'
-    },
-    {
-      id: 3,
-      title: 'New Lead Inbound',
-      desc: 'A new user (+1 555-019-2834) messaged your active broadcast.',
-      time: '1d ago',
-      unread: false,
-      category: 'inbox'
-    },
-    {
-      id: 4,
-      title: 'Database Synced',
-      desc: 'Contacts index synchronized with clean schema references.',
-      time: '3d ago',
-      unread: false,
-      category: 'system'
+  const [notifications, setNotifications] = useState<any[]>([]);
+
+  const fetchNotifications = async () => {
+    try {
+      const data = await crmApi.getNotifications();
+      
+      const dismissedIds = JSON.parse(localStorage.getItem('dismissed_notifications') || '[]');
+      const readIds = JSON.parse(localStorage.getItem('read_notifications') || '[]');
+      
+      const parsedNotifications = data
+        .filter((n: any) => !dismissedIds.includes(n.id))
+        .map((n: any) => ({
+          ...n,
+          unread: readIds.includes(n.id) ? false : n.unread
+        }));
+        
+      setNotifications(parsedNotifications);
+    } catch (e) {
+      console.warn('Failed to load notifications:', e);
     }
-  ]);
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    const timer = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(timer);
+  }, []);
 
   const unreadCount = notifications.filter(n => n.unread).length;
 
   const markAllAsRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
+    const readIds = JSON.parse(localStorage.getItem('read_notifications') || '[]');
+    notifications.forEach(n => {
+      if (!readIds.includes(n.id)) {
+        readIds.push(n.id);
+      }
+    });
+    localStorage.setItem('read_notifications', JSON.stringify(readIds));
   };
 
   const clearNotification = (id: number) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
+    const dismissedIds = JSON.parse(localStorage.getItem('dismissed_notifications') || '[]');
+    if (!dismissedIds.includes(id)) {
+      dismissedIds.push(id);
+    }
+    localStorage.setItem('dismissed_notifications', JSON.stringify(dismissedIds));
   };
 
   const handleNotificationClick = (id: number) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, unread: false } : n));
+    const readIds = JSON.parse(localStorage.getItem('read_notifications') || '[]');
+    if (!readIds.includes(id)) {
+      readIds.push(id);
+    }
+    localStorage.setItem('read_notifications', JSON.stringify(readIds));
+    
+    const notif = notifications.find(n => n.id === id);
+    if (notif?.action_path) {
+      navigate(notif.action_path);
+    }
   };
 
   // Search source indexes
@@ -705,7 +941,7 @@ export function Header() {
   };
 
   return (
-    <header className="h-20 flex items-center justify-between px-10 bg-white/80 backdrop-blur-xl border-b border-slate-100 sticky top-0 z-40">
+    <header className="h-[72px] flex items-center justify-between px-6 lg:px-8 bg-white/90 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-40">
       {/* Click-away overlay when search results are open */}
       {isFocused && (
         <div 
@@ -715,18 +951,18 @@ export function Header() {
       )}
 
       <div className="flex items-center gap-6 flex-1 relative z-50">
-        <div className="relative max-w-lg w-full hidden md:block group">
-          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-all" strokeWidth={2.5}/>
-          <input 
+        <div className="relative max-w-xl w-full hidden md:block group">
+          <Sparkles size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6D4AFF] transition-all" strokeWidth={2.2}/>
+          <input
             ref={inputRef}
-            type="text" 
+            type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setIsFocused(true)}
-            placeholder="Search Contacts, Campaigns or Templates..." 
-            className="w-full bg-slate-50 border border-slate-100/50 rounded-2xl py-3.5 pl-12 pr-12 text-[11px] font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 shadow-inner transition-all placeholder:text-slate-400 placeholder:uppercase placeholder:tracking-widest"
+            placeholder="Ask AI anything about contacts, campaigns, or conversations..."
+            className="w-full bg-slate-50 border border-slate-200 rounded-full py-2.5 pl-11 pr-12 text-[13px] font-medium text-slate-900 focus:outline-none focus:bg-white focus:border-[#6D4AFF] focus:ring-4 focus:ring-[#6D4AFF]/10 shadow-sm transition-all placeholder:text-slate-400"
           />
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-md text-[9px] font-black text-slate-400 border border-slate-200 uppercase tracking-widest pointer-events-none">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-white px-2 py-1 rounded-lg text-[10px] font-semibold text-slate-400 border border-slate-200 pointer-events-none">
             <Command size={10} strokeWidth={3} className="-mt-0.5" />
             <span>K</span>
           </div>
@@ -974,20 +1210,29 @@ export function Header() {
         />
       )}
 
-      <div className="flex items-center gap-6 relative z-50">
+      <div className="flex items-center gap-3 relative z-50">
+        {/* Date selector */}
+        <button className="hidden lg:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-[13px] font-medium text-slate-600 transition-all cursor-pointer">
+          <Calendar size={15} className="text-slate-400" />
+          <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          <ChevronDown size={13} className="text-slate-400" />
+        </button>
+
         <div className="relative">
-          <button 
+          <button
             onClick={() => setShowNotifications(!showNotifications)}
             className={cn(
-              "relative w-12 h-12 flex items-center justify-center rounded-2xl transition-all group cursor-pointer",
-              showNotifications 
-                ? "bg-indigo-50 text-indigo-600 border border-indigo-100" 
+              "relative w-10 h-10 flex items-center justify-center rounded-xl transition-all group cursor-pointer",
+              showNotifications
+                ? "bg-[#6D4AFF]/10 text-[#6D4AFF] border border-[#6D4AFF]/20"
                 : "text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent"
             )}
           >
-            <Bell size={20} strokeWidth={2.5} />
+            <Bell size={19} strokeWidth={2.2} />
             {unreadCount > 0 && (
-              <span className="absolute top-3 right-3 w-3 h-3 bg-indigo-600 rounded-full border-2 border-white ring-4 ring-transparent group-hover:ring-indigo-50 transition-all shadow-sm" />
+              <span className="absolute top-2 right-2 min-w-[16px] h-4 px-1 flex items-center justify-center bg-rose-500 text-white text-[9px] font-bold rounded-full border-2 border-white">
+                {unreadCount}
+              </span>
             )}
           </button>
 
@@ -1112,10 +1357,24 @@ export function Header() {
         </div>
         
         <div className="h-8 w-px bg-slate-200 mx-1" />
-        
-        <div className="flex items-center gap-4 pl-2 cursor-pointer group">
-          <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:border-slate-900 group-hover:text-white transition-all shadow-premium group-hover:shadow-floating">
-            <Settings size={20} strokeWidth={2.5} />
+
+        <div className="flex items-center gap-3 pl-1 cursor-pointer group">
+          <div className="hidden sm:block text-right">
+            <p className="text-[13px] font-semibold text-slate-900 leading-tight">{user?.name || 'Welcome'}</p>
+            <p className="text-[11px] text-slate-400">{user?.businessName || 'Workspace'}</p>
+          </div>
+          <div className="relative">
+            <div className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden",
+              isImageAvatar(user?.avatar) ? "bg-slate-100" : GRADIENTS[(user?.avatar as keyof typeof GRADIENTS) || 'royal']
+            )}>
+              {isImageAvatar(user?.avatar) ? (
+                <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                user?.name ? user.name.substring(0, 1).toUpperCase() : 'A'
+              )}
+            </div>
+            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
           </div>
         </div>
       </div>
@@ -1124,10 +1383,18 @@ export function Header() {
 }
 
 export function Layout({ children }: { children?: ReactNode }) {
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const stored = localStorage.getItem('sidebar_is_collapsed');
     return stored === 'true';
   });
+
+  useEffect(() => {
+    if (user && user.role === 'superadmin') {
+      navigate('/admin', { replace: true });
+    }
+  }, [user, navigate]);
 
   const toggleCollapsed = (val: boolean) => {
     setIsCollapsed(val);
@@ -1135,14 +1402,14 @@ export function Layout({ children }: { children?: ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] text-slate-900 selection:bg-indigo-500 selection:text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 selection:bg-[#6D4AFF] selection:text-white overflow-x-hidden">
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={toggleCollapsed} />
       <div className={cn(
         "flex flex-col min-h-screen transition-all duration-300 ease-in-out",
         isCollapsed ? "lg:pl-20" : "lg:pl-72"
       )}>
         <Header />
-        <main className="p-8 md:p-12 xl:p-16 max-w-[1800px] w-full mx-auto">
+        <main className="p-5 md:p-6 xl:p-8 max-w-[1600px] w-full mx-auto">
           <Outlet />
         </main>
       </div>

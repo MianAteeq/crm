@@ -6,6 +6,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { MessageSquare, Mail, Lock, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useBrandingStore } from '../../store/brandingStore';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -15,6 +16,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const { websiteName, websiteLogo } = useBrandingStore();
   const [showPassword, setShowPassword] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const { login, isLoading } = useAuthStore();
@@ -30,7 +32,9 @@ export default function LoginPage() {
     setError(null);
     try {
       await login(data.email, data.password);
-      navigate(from, { replace: true });
+      const user = useAuthStore.getState().user;
+      const targetPath = user?.role === 'superadmin' ? '/admin' : from;
+      navigate(targetPath, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     }
@@ -41,10 +45,14 @@ export default function LoginPage() {
       <div className="w-full max-w-[440px] space-y-8">
         <div className="text-center">
           <Link to="/" className="inline-flex items-center gap-3 mb-8 group">
-            <div className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-xl shadow-slate-900/20 transition-transform group-hover:rotate-12">
-              <MessageSquare size={26} strokeWidth={2.5} />
-            </div>
-            <span className="text-3xl font-bold text-slate-900 tracking-tight">throbtech</span>
+            {websiteLogo ? (
+              <img src={websiteLogo} alt="Logo" className="w-12 h-12 object-contain rounded-2xl shrink-0 shadow-xl shadow-slate-900/10 transition-transform group-hover:rotate-12" />
+            ) : (
+              <div className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-xl shadow-slate-900/20 transition-transform group-hover:rotate-12">
+                <MessageSquare size={26} strokeWidth={2.5} />
+              </div>
+            )}
+            <span className="text-3xl font-bold text-slate-900 tracking-tight">{websiteName}</span>
           </Link>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">Welcome back</h1>
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest px-10">Access your enterprise communication portal</p>
@@ -124,7 +132,7 @@ export default function LoginPage() {
         </motion.div>
 
         <p className="text-center text-[11px] font-semibold text-slate-500">
-          New to throbtech? <Link to="/signup" className="text-slate-900 hover:underline underline-offset-4 decoration-2 font-bold">Create an account</Link>
+          New to {websiteName}? <Link to="/signup" className="text-slate-900 hover:underline underline-offset-4 decoration-2 font-bold">Create an account</Link>
         </p>
       </div>
     </div>

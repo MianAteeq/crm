@@ -40,10 +40,7 @@ async function startServer() {
       // Clean leading and trailing slashes from endpoint
       endpoint = endpoint.replace(/^\/+|\/+$/g, '');
       
-      const rawUrl = (process.env.VITE_CRM_API_URL || 'https://crm.throbtech.com').replace(/\/$/, '');
-      
-      // Determine the target base domain (strip /api if present in config)
-      const TARGET_CRM_DOMAIN = rawUrl.endsWith('/api') ? rawUrl.slice(0, -4) : rawUrl;
+      const TARGET_CRM_DOMAIN = CRM_DOMAIN.replace(/\/$/, '').replace(/\/api$/, '');
 
       // Smart routing:
       // If the endpoint is already prefixed with 'api/' or 'broadcasting/', we route directly.
@@ -54,6 +51,10 @@ async function startServer() {
       } else {
         url = `${TARGET_CRM_DOMAIN}/api/${endpoint}`;
       }
+      
+      const hasQuery = req.originalUrl.includes('?');
+      const queryString = hasQuery ? req.originalUrl.substring(req.originalUrl.indexOf('?')) : '';
+      url = url + queryString;
       
       const filteredHeaders: Record<string, string> = {
         'Accept': 'application/json',

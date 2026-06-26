@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { 
   MessageSquare, 
   Layout, 
@@ -11,6 +12,7 @@ import {
 import { motion } from 'motion/react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '../../lib/utils';
+import { crmApi } from '../../services/crmApi';
 
 export function Hero() {
   return (
@@ -52,7 +54,7 @@ export function Hero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <NavLink
-            to="/register"
+            to="/signup"
             className="w-full sm:w-auto px-10 py-5 bg-slate-900 text-white font-bold rounded-2xl transition-all hover:bg-slate-800 active:scale-95 shadow-lg shadow-slate-200 text-sm"
           >
             Start Campaign Free
@@ -114,28 +116,64 @@ export function Features() {
 }
 
 export function Pricing() {
+  const [plans, setPlans] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function loadPlans() {
+      try {
+        const res = await crmApi.getPublicPlans();
+        if (res.success) {
+          setPlans(res.plans || []);
+        }
+      } catch (err) {
+        console.error('Failed to retrieve plans', err);
+      }
+    }
+    loadPlans();
+  }, []);
+
+  const defaultPlans = [
+    { name: 'Starter', price: '$0', features: ['1,000 Contacts', 'Basic Analytics', 'Standard Support', '5 Automation Flows'], highlighted: false, key: 'free' },
+    { name: 'Professional', price: '$49', features: ['10,000 Contacts', 'Advanced Flows', 'Priority 24/7 Support', 'CRM Integration'], highlighted: true, key: 'pro' },
+    { name: 'Enterprise', price: 'Custom', features: ['Unlimited Contacts', 'Meta Verification', 'Dedicated Manager', 'API Access'], highlighted: false, key: 'enterprise' }
+  ];
+
+  const displayPlans = plans.length > 0 ? plans.map(p => ({
+    name: p.name,
+    price: p.price.toLowerCase().includes('/month') 
+      ? p.price.replace(/\/month/i, '') 
+      : p.price.toLowerCase().includes('custom') 
+        ? 'Custom' 
+        : p.price,
+    features: [
+      `${p.limits.contacts} Contacts Ceiling`,
+      `${p.limits.messages} Broadcasts Capacity`,
+      p.limits.campaigns.toLowerCase() !== 'disabled' ? 'Automation Campaigns Included' : 'Manual Campaigns Only',
+      p.limits.ai_replies.toLowerCase() !== 'disabled' ? `AI replies: ${p.limits.ai_replies}` : 'No AI Copilot Replies',
+      'Meta Cloud API Integration'
+    ],
+    highlighted: p.key === 'pro',
+    key: p.key
+  })) : defaultPlans;
+
   return (
     <section id="pricing" className="py-32 px-6">
        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-             <h2 className="text-4xl font-bold text-slate-900 tracking-tight mb-4">Scalable Pricing</h2>
+             <h2 className="text-4xl font-bold text-slate-900 tracking-tight mb-4 animate-fade-in">Scalable Pricing</h2>
              <p className="text-slate-500 font-medium">Simple plans for high-growth automated teams.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-             {[
-               { name: 'Starter', price: '$0', features: ['1,000 Contacts', 'Basic Analytics', 'Standard Support', '5 Automation Flows'], highlighted: false },
-               { name: 'Professional', price: '$49', features: ['10,000 Contacts', 'Advanced Flows', 'Priority 24/7 Support', 'CRM Integration'], highlighted: true },
-               { name: 'Enterprise', price: 'Custom', features: ['Unlimited Contacts', 'Meta Verification', 'Dedicated Manager', 'API Access'], highlighted: false }
-             ].map((plan) => (
+             {displayPlans.map((plan) => (
                <div key={plan.name} className={cn(
-                 "p-12 rounded-[3.5rem] border flex flex-col transition-all",
+                 "p-12 rounded-[3.5rem] border flex flex-col transition-all duration-300 hover:-translate-y-2",
                  plan.highlighted ? "bg-slate-900 text-white border-slate-900 shadow-2xl scale-105 z-10" : "bg-white border-slate-200 text-slate-900"
                )}>
                   <h3 className={cn("text-xs font-bold uppercase tracking-[0.3em] mb-4", plan.highlighted ? "text-brand" : "text-slate-400")}>{plan.name}</h3>
                   <div className="flex items-baseline gap-2 mb-10">
                      <span className="text-5xl font-black tracking-tight">{plan.price}</span>
-                     {plan.price !== 'Custom' && <span className={cn("text-xs font-medium uppercase", plan.highlighted ? "text-slate-400" : "text-slate-400")}>/mo</span>}
+                     {plan.price !== 'Custom' && <span className={cn("text-xs font-medium uppercase", plan.highlighted ? "text-slate-400" : "text-slate-450")}>/mo</span>}
                   </div>
                   <ul className="space-y-4 mb-12 flex-1">
                      {plan.features.map(f => (
@@ -145,14 +183,17 @@ export function Pricing() {
                        </li>
                      ))}
                   </ul>
-                  <button className={cn(
-                    "w-full py-5 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95",
-                    plan.highlighted 
-                      ? "bg-brand text-black hover:bg-white hover:text-black" 
-                      : "bg-slate-900 text-white hover:bg-slate-800"
-                  )}>
+                  <NavLink 
+                    to={`/signup?plan=${plan.key}`}
+                    className={cn(
+                      "w-full py-5 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95 cursor-pointer text-center block",
+                      plan.highlighted 
+                        ? "bg-brand text-black hover:bg-white hover:text-black" 
+                        : "bg-slate-900 text-white hover:bg-slate-800"
+                    )}
+                  >
                     Get Started
-                  </button>
+                  </NavLink>
                </div>
              ))}
           </div>

@@ -24,6 +24,11 @@ export default function MessageInput({ onSend, disabled, recipientPhone, recipie
   const [templateSearch, setTemplateSearch] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<WhatsAppTemplate | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const resetTextareaHeight = () => {
+    if (textareaRef.current) textareaRef.current.style.height = '52px';
+  };
 
   useEffect(() => {
     if (showTemplatePicker && templates.length === 0) {
@@ -51,12 +56,14 @@ export default function MessageInput({ onSend, disabled, recipientPhone, recipie
       onSend(text || selectedFile.name, type, selectedFile);
       setSelectedFile(null);
       setText('');
+      resetTextareaHeight();
       return;
     }
 
     if (!text.trim()) return;
     onSend(text, 'text');
     setText('');
+    resetTextareaHeight();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -260,14 +267,20 @@ export default function MessageInput({ onSend, disabled, recipientPhone, recipie
         </div>
 
         <div className="flex-1 relative">
-          <textarea 
+          <textarea
+            ref={textareaRef}
             rows={1}
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => {
+              setText(e.target.value);
+              const el = e.target;
+              el.style.height = 'auto';
+              el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+            }}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 transition-all resize-none max-h-40 overflow-y-auto shadow-inner"
-            style={{ minHeight: '52px' }}
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-sm font-medium leading-6 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 transition-all resize-none max-h-40 overflow-y-auto shadow-inner block scrollbar-hide"
+            style={{ height: '52px' }}
           />
         </div>
 

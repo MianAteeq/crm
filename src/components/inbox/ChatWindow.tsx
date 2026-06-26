@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { User } from 'lucide-react';
+import { User, ArrowLeft, Bot } from 'lucide-react';
 import { Conversation, Message } from '../../types';
 import MessageBubble from './MessageBubble';
 import MessageInput from './MessageInput';
@@ -11,9 +11,19 @@ interface ChatWindowProps {
   conversation: Conversation;
   onSendMessage: (content: string, type: any, file?: File) => void;
   isTyping?: boolean;
+  onBack?: () => void;
+  isAutoReplyEnabled?: boolean;
+  onToggleAutoReply?: () => void;
 }
 
-export default function ChatWindow({ conversation, onSendMessage, isTyping }: ChatWindowProps) {
+export default function ChatWindow({ 
+  conversation, 
+  onSendMessage, 
+  isTyping, 
+  onBack,
+  isAutoReplyEnabled,
+  onToggleAutoReply
+}: ChatWindowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,7 +49,16 @@ export default function ChatWindow({ conversation, onSendMessage, isTyping }: Ch
     <div className="flex flex-col h-full bg-slate-50 relative overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-slate-200 bg-white flex items-center justify-between z-10 shadow-sm">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+           {onBack && (
+             <button
+               onClick={onBack}
+               className="md:hidden p-2 -ml-1 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+               aria-label="Back to conversations"
+             >
+               <ArrowLeft size={20} />
+             </button>
+           )}
            <div className="relative">
               <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 overflow-hidden">
                  {conversation.contact.avatar ? (
@@ -63,7 +82,20 @@ export default function ChatWindow({ conversation, onSendMessage, isTyping }: Ch
         </div>
 
         <div className="flex items-center gap-2">
-           {/* Actions removed as requested */}
+           {onToggleAutoReply && (
+             <button
+               onClick={onToggleAutoReply}
+               className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm border ${
+                 isAutoReplyEnabled 
+                   ? 'bg-indigo-50 border-indigo-200 text-indigo-600 dark:bg-indigo-950/30 dark:border-indigo-900/50 dark:text-indigo-400' 
+                   : 'bg-slate-100 border-slate-200 text-slate-500 dark:bg-slate-800/50 dark:border-slate-800 dark:text-slate-400'
+               }`}
+               title="Toggle Auto-Reply Simulator"
+             >
+               <Bot size={14} className={isAutoReplyEnabled ? 'animate-pulse text-indigo-500' : 'text-slate-400'} />
+               <span>Auto-Reply: {isAutoReplyEnabled ? 'ON' : 'OFF'}</span>
+             </button>
+           )}
         </div>
       </div>
 

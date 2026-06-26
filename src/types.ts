@@ -78,6 +78,7 @@ export interface User {
   avatar?: string;
   onboardingStep: number;
   tenantId?: string;
+  role?: string;
 }
 
 export interface WhatsAppSettings {
@@ -88,7 +89,11 @@ export interface WhatsAppSettings {
   business_name?: string;
   phone_number?: string;
   webhook_status?: 'active' | 'inactive';
+  is_registered?: boolean;
   last_synced?: string;
+  messaging_limit_tier?: string;
+  openai_key?: string;
+  company_prompt?: string;
 }
 
 export interface WhatsAppConfig {
@@ -132,4 +137,38 @@ export interface Conversation {
   unreadCount: number;
   lastMessage: Message;
   isOnline: boolean;
+  assignedAgent?: string;
+  isPinned?: boolean;
+  is_auto_reply_active?: boolean;
+}
+
+// Enhanced WhatsApp Cloud API types for Embedded Signup
+export interface WhatsAppEmbeddedSignupResponse {
+  code: string;
+  waba_id: string;
+  phone_number_id: string;
+}
+
+export interface WhatsAppConnectionData {
+  id?: string;
+  wabaId: string;
+  phoneNumberId: string;
+  businessName: string;
+  phoneNumber: string;
+  status: 'connected' | 'disconnected' | 'error' | 'pending' | 'expired';
+  lastSynced?: string;
+  createdAt?: string;
+  webhookConfigured?: boolean;
+  numberVerified?: boolean;
+  errorMessage?: string;
+}
+
+export interface WhatsAppDashboardStats {
+  totalConversations: number;
+  messagesSentToday: number;
+  messagesReceivedToday: number;
+  activeChats: number;
+  conversationsTrend?: 'up' | 'down' | 'neutral';
+  messagesTrend?: 'up' | 'down' | 'neutral';
+  messagingLimitTier?: string;
 }

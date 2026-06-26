@@ -7,7 +7,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, name: string) => Promise<void>;
+  signup: (email: string, name: string, password: string, plan?: string) => Promise<void>;
   logout: () => void;
   updateOnboarding: (step: number, data?: Partial<User>) => void;
   updateProfile: (data: Partial<User>) => void;
@@ -27,12 +27,14 @@ export const useAuthStore = create<AuthState>((set) => ({
       const tenantIdValue = response.user.tenant_id || response.tenant_id || '1';
       
       const user: User = {
-        id: response.user.id,
+        id: String(response.user.id),
         email: response.user.email,
         name: response.user.name,
-        businessName: response.user.businessName || 'throbtech Enterprise',
-        onboardingStep: 4, // Assume completed for real users
-        tenantId: String(tenantIdValue)
+        businessName: response.user.tenant?.name || response.user.businessName || 'throbtech Enterprise',
+        avatar: response.user.avatar || 'royal',
+        onboardingStep: 4,
+        tenantId: String(tenantIdValue),
+        role: response.user.role || 'admin'
       };
       
       AuthService.setToken(response.token);
@@ -53,18 +55,32 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  signup: async (email: string, name: string) => {
+  signup: async (email: string, name: string, password: string, plan?: string) => {
     set({ isLoading: true });
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    const newUser: User = {
-      id: 'usr_' + Math.random().toString(36).substr(2, 9),
-      email,
-      name,
-      onboardingStep: 1, // Start onboarding
-    };
-    set({ user: newUser, isAuthenticated: true, isLoading: false });
-    localStorage.setItem('auth_session', JSON.stringify(newUser));
+    try {
+      const response = await AuthService.register(email, name, password, plan);
+      
+      const tenantIdValue = response.user.tenant_id || response.tenant_id || '1';
+      
+      const user: User = {
+        id: String(response.user.id),
+        email: response.user.email,
+        name: response.user.name,
+        businessName: response.tenant?.name || response.user.businessName || 'Workspace',
+        avatar: response.user.avatar || 'royal',
+        onboardingStep: 1, // Start onboarding
+        tenantId: String(tenantIdValue),
+        role: response.user.role || 'admin'
+      };
+      
+      AuthService.setToken(response.token);
+      AuthService.setTenantId(tenantIdValue);
+      set({ user, isAuthenticated: true, isLoading: false });
+      localStorage.setItem('auth_session', JSON.stringify(user));
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
   },
 
   logout: () => {

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { UserPlus, Upload, LayoutGrid, List, Users, Loader2, Star } from 'lucide-react';
+import { UserPlus, Upload, LayoutGrid, List, Users, Loader2, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { contacts as mockContacts, Contact, Tag } from '../data/contactsMock';
 import ContactTable from '../components/contacts/ContactTable';
@@ -29,26 +29,62 @@ export default function Contacts() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const [pagination, setPagination] = useState<{
+    currentPage: number;
+    lastPage: number;
+    perPage: number;
+    total: number;
+  } | null>(null);
+  
   // Modals/Drawers State
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [viewingContact, setViewingContact] = useState<Contact | null>(null);
 
   // Fetch Data
-  const fetchData = async (search?: string, tag?: string, status?: string, touch?: string) => {
+  const fetchData = async (
+    search?: string, 
+    tag?: string, 
+    status?: string, 
+    touch?: string, 
+    page?: number, 
+    per?: number
+  ) => {
     setIsLoading(true);
     try {
       const contactsData = await crmApi.getContacts({ 
         search: search !== undefined ? search : searchQuery,
         tag: tag !== undefined ? tag : selectedTag,
         status: status !== undefined ? status : selectedStatus,
-        lastTouchpoint: touch !== undefined ? touch : lastTouchpoint
+        lastTouchpoint: touch !== undefined ? touch : lastTouchpoint,
+        page: page !== undefined ? page : (page === undefined ? currentPage : page),
+        perPage: per !== undefined ? per : perPage
       });
       setContacts(contactsData);
+      
+      if (contactsData.pagination) {
+        setPagination(contactsData.pagination);
+      } else {
+        setPagination({
+          currentPage: 1,
+          lastPage: 1,
+          perPage: contactsData.length,
+          total: contactsData.length
+        });
+      }
     } catch (error) {
       console.error('Failed to fetch contacts', error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || (pagination && newPage > pagination.lastPage)) return;
+    setCurrentPage(newPage);
+    fetchData(searchQuery, selectedTag, selectedStatus, lastTouchpoint, newPage);
   };
 
   const handleResetFilters = () => {
@@ -87,7 +123,8 @@ export default function Contacts() {
   // Live Search & Filter updates
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchData();
+      setCurrentPage(1);
+      fetchData(searchQuery, selectedTag, selectedStatus, lastTouchpoint, 1);
     }, 400);
 
     return () => clearTimeout(timer);
@@ -269,12 +306,103 @@ export default function Contacts() {
               </div>
             )}
             
+            {/* Pagination Controls */}
+            {pagination && pagination.lastPage > 1 && (
+              <div className="mt-6 bg-white border border-slate-200 rounded-xl px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                <span className="text-xs font-semibold text-slate-500">
+                  Showing <strong className="text-slate-800">{(pagination.currentPage - 1) * pagination.perPage + 1}</strong> to{' '}
+                  <strong className="text-slate-800">
+                    {Math.min(pagination.currentPage * pagination.perPage, pagination.total)}
+                  </strong>{' '}
+                  of <strong className="text-slate-800">{pagination.total}</strong> entries
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="w-8 h-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-slate-650 transition-all active:scale-95"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  
+                  {(() => {
+                    const pages = [];
+                    const maxVisiblePages = 5;
+                    let startPage = Math.max(1, currentPage - 2);
+                    let endPage = Math.min(pagination.lastPage, startPage + maxVisiblePages - 1);
+                    
+                    if (endPage - startPage + 1 < maxVisiblePages) {
+                      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                    }
+
+                    if (startPage > 1) {
+                      pages.push(
+                        <button
+                          key={1}
+                          onClick={() => handlePageChange(1)}
+                          className="w-8 h-8 rounded-lg border text-xs font-bold transition-all active:scale-95 border-slate-200 bg-white hover:bg-slate-50 text-slate-650"
+                        >
+                          1
+                        </button>
+                      );
+                      if (startPage > 2) {
+                        pages.push(<span key="dots-start" className="text-slate-400 px-1 text-xs select-none">...</span>);
+                      }
+                    }
+
+                    for (let p = startPage; p <= endPage; p++) {
+                      pages.push(
+                        <button
+                          key={p}
+                          onClick={() => handlePageChange(p)}
+                          className={`w-8 h-8 rounded-lg border text-xs font-bold transition-all active:scale-95 ${
+                            currentPage === p
+                              ? 'bg-slate-900 border-slate-900 text-white'
+                              : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-650'
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      );
+                    }
+
+                    if (endPage < pagination.lastPage) {
+                      if (endPage < pagination.lastPage - 1) {
+                        pages.push(<span key="dots-end" className="text-slate-400 px-1 text-xs select-none">...</span>);
+                      }
+                      pages.push(
+                        <button
+                          key={pagination.lastPage}
+                          onClick={() => handlePageChange(pagination.lastPage)}
+                          className="w-8 h-8 rounded-lg border text-xs font-bold transition-all active:scale-95 border-slate-200 bg-white hover:bg-slate-50 text-slate-650"
+                        >
+                          {pagination.lastPage}
+                        </button>
+                      );
+                    }
+
+                    return pages;
+                  })()}
+
+                  <button
+                    disabled={currentPage === pagination.lastPage}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="w-8 h-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-slate-650 transition-all active:scale-95"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
+            
             {/* View Stats Footer */}
             <div className="mt-6 flex items-center justify-between px-2">
                <div className="flex items-center gap-6">
                   <div className="flex items-center gap-2">
                      <Users size={14} className="text-slate-400" />
-                     <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Contacts: {filteredContacts.length}</span>
+                     <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                       Contacts: {pagination?.total ?? filteredContacts.length}
+                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                      <Star size={14} className="text-amber-500" />

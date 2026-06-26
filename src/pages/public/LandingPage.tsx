@@ -3,8 +3,11 @@ import Navbar from '../../components/public/Navbar';
 import { Hero, Features, Pricing } from '../../components/public/LandingSections';
 import { MessageSquare, Twitter, Github, Linkedin } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useBrandingStore } from '../../store/brandingStore';
 
 export default function LandingPage() {
+  const { websiteName, websiteLogo } = useBrandingStore();
+
   return (
     <div className="bg-white text-slate-900 min-h-screen selection:bg-brand/20 selection:text-brand-dark">
       <Navbar />
@@ -48,10 +51,14 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
             <div className="md:col-span-1">
               <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center">
-                  <MessageSquare size={20} strokeWidth={2.5} />
-                </div>
-                <span className="text-xl font-bold text-slate-900 tracking-tight">throbtech</span>
+                {websiteLogo ? (
+                  <img src={websiteLogo} alt="Logo" className="w-8 h-8 object-contain rounded-lg shrink-0" />
+                ) : (
+                  <div className="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center">
+                    <MessageSquare size={20} strokeWidth={2.5} />
+                  </div>
+                )}
+                <span className="text-xl font-bold text-slate-900 tracking-tight">{websiteName}</span>
               </div>
               <p className="text-sm font-medium text-slate-500 leading-relaxed">
                 The enterprise-grade WhatsApp marketing engine for teams who value speed, automation, and real-time engagement.
@@ -93,7 +100,7 @@ export default function LandingPage() {
           </div>
 
           <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs font-medium text-slate-400">© 2024 throbtech Technologies Inc. Built for Meta Graph API.</p>
+            <p className="text-xs font-medium text-slate-400">© {new Date().getFullYear()} {websiteName}. Built for Meta Graph API.</p>
             <div className="flex gap-6">
                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">Secure by Design</span>
                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">SLA Guarantee</span>

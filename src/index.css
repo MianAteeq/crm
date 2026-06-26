@@ -83,6 +83,17 @@
   @apply bg-slate-200 rounded-full hover:bg-slate-300;
 }
 
+/* Hide scrollbar entirely (keeps scrolling) */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar,
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Animations */
 @keyframes float {
   0% { transform: translateY(0px); }

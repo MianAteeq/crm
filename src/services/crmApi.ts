@@ -1,17 +1,15 @@
 import { Contact, Tag, WhatsAppSettings, Conversation, Message } from '../types';
 import { AuthService } from './authService';
 
-const getBaseUrl = () => {
-  if (typeof window !== 'undefined' && 
-      (window.location.hostname.endsWith('run.app') || 
-       window.location.hostname.includes('localhost') || 
-       window.location.hostname.includes('127.0.0.1'))) {
-    return '/api';
-  }
-  return 'https://crm.throbtech.com/api';
-};
+// Base URL is driven by VITE_CRM_API_URL in your .env file.
+// In development the Vite proxy forwards /api → http://127.0.0.1:8000
+// so we use a relative path to avoid CORS issues.
+// In production (no Vite proxy) the full URL is used.
+const isDev = import.meta.env.DEV;
+const BASE_URL = isDev
+  ? '/api'
+  : `${import.meta.env.VITE_CRM_API_URL ?? 'https://crm.throbtech.com'}/api`;
 
-const BASE_URL = getBaseUrl();
 
 // Mock Data
 const MOCK_TAGS: Tag[] = [
@@ -145,7 +143,15 @@ class CrmApiService {
   }
 
   // Contacts API
-  async getContacts(params?: { search?: string; status?: string; tag?: string; engagement?: string; lastTouchpoint?: string }): Promise<Contact[]> {
+  async getContacts(params?: { 
+    search?: string; 
+    status?: string; 
+    tag?: string; 
+    engagement?: string; 
+    lastTouchpoint?: string;
+    page?: number;
+    perPage?: number;
+  }): Promise<Contact[] & { pagination?: { currentPage: number; lastPage: number; perPage: number; total: number } }> {
     try {
       let query = '';
       let endpoint = '/contacts';
@@ -159,30 +165,61 @@ class CrmApiService {
         if (params.status) searchParams.append('status', params.status);
         if (params.tag) searchParams.append('tags[]', params.tag);
         if (params.lastTouchpoint) searchParams.append('last_touchpoint', params.lastTouchpoint);
+        if (params.page) searchParams.append('page', String(params.page));
+        if (params.perPage) searchParams.append('per_page', String(params.perPage));
         query = `?${searchParams.toString()}`;
       }
 
       const response = await this.request<any>(`${endpoint}${query}`);
       
       let contactsArray: any[] = [];
-      if (Array.isArray(response)) {
+      let paginationData: any = null;
+
+      if (response && response.current_page !== undefined && Array.isArray(response.data)) {
+        contactsArray = response.data;
+        paginationData = {
+          currentPage: response.current_page,
+          lastPage: response.last_page,
+          perPage: response.per_page,
+          total: response.total
+        };
+      } else if (response?.data && response.data.current_page !== undefined && Array.isArray(response.data.data)) {
+        const paginator = response.data;
+        contactsArray = paginator.data;
+        paginationData = {
+          currentPage: paginator.current_page,
+          lastPage: paginator.last_page,
+          perPage: paginator.per_page,
+          total: paginator.total
+        };
+      } else if (response?.data && Array.isArray(response.data)) {
+        contactsArray = response.data;
+      } else if (Array.isArray(response)) {
         contactsArray = response;
-      } else if (response?.data) {
-        contactsArray = Array.isArray(response.data) ? response.data : (response.data?.data || []);
       } else if (Array.isArray(response?.contacts)) {
         contactsArray = response.contacts;
       }
 
-      if (contactsArray.length === 0 && !params?.search && !params?.tag && !params?.status && !params?.lastTouchpoint) return MOCK_CONTACTS;
+      if (contactsArray.length === 0 && !params?.search && !params?.tag && !params?.status && !params?.lastTouchpoint) {
+        const result: any = [...MOCK_CONTACTS];
+        return result;
+      }
 
-      return contactsArray.map(c => ({ 
+      const mappedContacts: any = contactsArray.map(c => ({ 
         ...c,
         createdAt: c.createdAt || c.created_at,
         last_message: c.last_message || (c.last_interaction?.body) || (c.last_interaction?.message),
         tags: Array.isArray(c.tags) ? c.tags.map((t: any) => typeof t === 'object' ? t.id : t) : [] 
       }));
+
+      if (paginationData) {
+        mappedContacts.pagination = paginationData;
+      }
+
+      return mappedContacts;
     } catch (error) {
-      return MOCK_CONTACTS;
+      const result: any = [...MOCK_CONTACTS];
+      return result;
     }
   }
 
@@ -220,10 +257,13 @@ class CrmApiService {
     }
   }
 
-  async importContacts(file: File): Promise<{ message: string; success_count: number }> {
+  async importContacts(file: File, mappings?: Record<string, string>): Promise<{ message: string; success_count: number }> {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      if (mappings) {
+        formData.append('mappings', JSON.stringify(mappings));
+      }
       return await this.request('/contacts/import', { method: 'POST', body: formData });
     } catch (error) {
       return { message: 'Imported successfully (Mock)', success_count: 50 };
@@ -239,19 +279,17 @@ class CrmApiService {
   }
 
   // WhatsApp API  
-  async getWhatsAppSettings(): Promise<WhatsAppSettings> {
+  async getWhatsAppSettings(sync = false): Promise<WhatsAppSettings> {
     try {
-      const response = await this.request<any>('/whatsapp/settings');
-      return response.data || response;
+      const response = await this.request<any>(`/whatsapp/settings${sync ? '?sync=true' : ''}`);
+      // Backend returns { success, data: {...} } — data can be null if not configured yet
+      const setting = response?.data;
+      if (!setting) {
+        return { access_token: '', phone_number_id: '', business_account_id: '', status: 'disconnected' };
+      }
+      return setting;
     } catch (error) {
-      return {
-        access_token: 'mock_token',
-        phone_number_id: '123456789',
-        business_account_id: '987654321',
-        status: 'connected',
-        business_name: 'Mock Business',
-        phone_number: '+923000000000'
-      };
+      return { access_token: '', phone_number_id: '', business_account_id: '', status: 'disconnected' };
     }
   }
 
@@ -263,6 +301,20 @@ class CrmApiService {
       });
     } catch (error) {
       return { message: 'Settings saved (Mock)', data: settings };
+    }
+  }
+
+  async saveAiSettings(openaiKey: string, companyPrompt: string): Promise<{ success: boolean; message: string; data?: any }> {
+    try {
+      return await this.request('/whatsapp/settings/ai', {
+        method: 'POST',
+        body: JSON.stringify({
+          openai_key: openaiKey,
+          company_prompt: companyPrompt
+        })
+      });
+    } catch (error: any) {
+      return { success: false, message: error?.message || 'Failed to save AI settings' };
     }
   }
 
@@ -350,6 +402,7 @@ class CrmApiService {
           contact,
           unreadCount: typeof rawConv.unread_count === 'number' ? rawConv.unread_count : 0,
           isOnline: false,
+          is_auto_reply_active: rawConv.is_auto_reply_active !== undefined ? !!rawConv.is_auto_reply_active : true,
           lastMessage: {
             id: `msg-${rawConv.id}`,
             sender: lastSender,
@@ -484,6 +537,16 @@ class CrmApiService {
     };
   }
 
+  async simulateIncomingMessage(conversationId: string, userMessage: string): Promise<any> {
+    return await this.request<any>('/messages/simulate-incoming', {
+      method: 'POST',
+      body: JSON.stringify({ 
+        conversation_id: parseInt(conversationId),
+        user_message: userMessage
+      })
+    });
+  }
+
   async sendMedia(conversationId: string, file: File): Promise<Message> {
     const formData = new FormData();
     formData.append('conversation_id', conversationId);
@@ -526,6 +589,18 @@ class CrmApiService {
     } catch (error) {
       console.warn(`[CRM API] markAsRead failed for ${conversationId}`, error);
       return { message: 'Marked as read (Mock)', success: true };
+    }
+  }
+
+  async toggleConversationAutoReply(conversationId: string, isActive: boolean): Promise<{ success: boolean; is_auto_reply_active: boolean }> {
+    try {
+      return await this.request(`/conversations/${conversationId}/toggle-auto-reply`, {
+        method: 'POST',
+        body: JSON.stringify({ is_active: isActive })
+      });
+    } catch (error: any) {
+      console.warn(`[CRM API] toggleConversationAutoReply failed for ${conversationId}`, error);
+      return { success: false, is_auto_reply_active: !isActive };
     }
   }
 
@@ -576,6 +651,287 @@ class CrmApiService {
     return this.request<any>(`/campaigns/${id}`, {
       method: 'DELETE',
     });
+  }
+
+  // WhatsApp Cloud API Connection Methods
+  async connectWhatsAppCloudAPI(data: {
+    code: string;
+    waba_id: string;
+    phone_number_id: string;
+  }): Promise<{ message: string; data?: any }> {
+    try {
+      return await this.request('/whatsapp/connect', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+    } catch (error) {
+      console.error('[CRM API] WhatsApp connection failed:', error);
+      throw error;
+    }
+  }
+
+  async registerWhatsAppNumber(pin: string): Promise<{ success: boolean; message: string }> {
+    try {
+      return await this.request('/whatsapp/register', {
+        method: 'POST',
+        body: JSON.stringify({ pin }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (error) {
+      console.error('[CRM API] WhatsApp number registration failed:', error);
+      throw error;
+    }
+  }
+
+  async getWhatsAppProfile(): Promise<{ success: boolean; data?: { description?: string; about?: string; profile_picture_url?: string } }> {
+    try {
+      return await this.request('/whatsapp/profile');
+    } catch (error) {
+      console.error('[CRM API] Failed to get WhatsApp profile:', error);
+      throw error;
+    }
+  }
+
+  async updateWhatsAppProfile(description: string, about?: string): Promise<{ success: boolean; message: string }> {
+    try {
+      return await this.request('/whatsapp/profile', {
+        method: 'POST',
+        body: JSON.stringify({ description, about })
+      });
+    } catch (error) {
+      console.error('[CRM API] Failed to update WhatsApp profile:', error);
+      throw error;
+    }
+  }
+
+  async uploadWhatsAppLogo(file: File): Promise<{ success: boolean; message: string; profile_picture_url?: string }> {
+    try {
+      const formData = new FormData();
+      formData.append('logo', file);
+      return await this.request('/whatsapp/profile/logo', {
+        method: 'POST',
+        body: formData
+      });
+    } catch (error) {
+      console.error('[CRM API] Failed to upload WhatsApp logo:', error);
+      throw error;
+    }
+  }
+
+  async getWhatsAppConnectionStatus(): Promise<{
+    connected: boolean;
+    data?: {
+      waba_id: string;
+      phone_number_id: string;
+      business_name: string;
+      phone_number: string;
+      webhook_configured: boolean;
+      number_verified: boolean;
+      last_synced?: string;
+    };
+  }> {
+    try {
+      const settings = await this.getWhatsAppSettings();
+
+      if (settings.status === 'connected') {
+        return {
+          connected: true,
+          data: {
+            waba_id: settings.business_account_id,
+            phone_number_id: settings.phone_number_id,
+            business_name: settings.business_name || 'Business Account',
+            phone_number: settings.phone_number || 'Not Set',
+            webhook_configured: settings.webhook_status === 'active',
+            number_verified: true,
+            last_synced: settings.last_synced
+          }
+        };
+      }
+
+      return { connected: false };
+    } catch (error) {
+      console.error('[CRM API] Failed to get WhatsApp connection status:', error);
+      return { connected: false };
+    }
+  }
+
+  async getWhatsAppDashboardStats(): Promise<{
+    total_conversations: number;
+    messages_sent_today: number;
+    messages_received_today: number;
+    active_chats: number;
+  }> {
+    try {
+      return await this.request('/whatsapp/dashboard-stats');
+    } catch (error) {
+      // Return mock data on error
+      return {
+        total_conversations: 0,
+        messages_sent_today: 0,
+        messages_received_today: 0,
+        active_chats: 0
+      };
+    }
+  }
+
+  // User Profile & Account Settings
+  async updateProfile(payload: { name: string; business_name: string; avatar?: string }): Promise<any> {
+    return this.request<any>('/user/profile', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  async changePassword(payload: any): Promise<any> {
+    return this.request<any>('/user/password', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  async uploadAvatar(file: File): Promise<any> {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return this.request<any>('/user/avatar', {
+      method: 'POST',
+      body: formData
+    });
+  }
+
+  async getNotifications(): Promise<any[]> {
+    try {
+      const response = await this.request<any>('/user/notifications');
+      return response?.data || [];
+    } catch (error) {
+      console.warn('[CRM API] Failed to fetch notifications:', error);
+      return [];
+    }
+  }
+
+  // SaaS Super Admin Methods
+  async getAdminStats(): Promise<any> {
+    return this.request<any>('/admin/stats');
+  }
+
+  async getAdminTenants(params?: { search?: string; page?: number }): Promise<any> {
+    const searchParams = new URLSearchParams();
+    if (params?.search) searchParams.append('search', params.search);
+    if (params?.page) searchParams.append('page', String(params.page));
+    const query = searchParams.toString() ? `?${searchParams.toString()}` : '';
+    return this.request<any>(`/admin/tenants${query}`);
+  }
+
+  async updateAdminTenant(id: string | number, payload: { name: string; plan: string }): Promise<any> {
+    return this.request<any>(`/admin/tenants/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  async deleteAdminTenant(id: string | number): Promise<any> {
+    return this.request<any>(`/admin/tenants/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async getAdminUsers(params?: { search?: string; page?: number }): Promise<any> {
+    const searchParams = new URLSearchParams();
+    if (params?.search) searchParams.append('search', params.search);
+    if (params?.page) searchParams.append('page', String(params.page));
+    const query = searchParams.toString() ? `?${searchParams.toString()}` : '';
+    return this.request<any>(`/admin/users${query}`);
+  }
+
+  async updateAdminUser(id: string | number, payload: { name: string; role: string; status: string; password?: string }): Promise<any> {
+    return this.request<any>(`/admin/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  async deleteAdminUser(id: string | number): Promise<any> {
+    return this.request<any>(`/admin/users/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async getAdminPlans(): Promise<any> {
+    return this.request<any>('/admin/plans');
+  }
+
+  async getPublicPlans(): Promise<any> {
+    return this.request<any>('/plans');
+  }
+
+  async createAdminPlan(payload: any): Promise<any> {
+    return this.request<any>('/admin/plans', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  async updateAdminPlan(id: number, payload: any): Promise<any> {
+    return this.request<any>(`/admin/plans/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  async deleteAdminPlan(id: number): Promise<any> {
+    return this.request<any>(`/admin/plans/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async getAdminSettings(): Promise<any> {
+    return this.request<any>('/admin/settings');
+  }
+
+  async updateAdminSettings(payload: any): Promise<any> {
+    return this.request<any>('/admin/settings', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  async getSystemSettings(): Promise<any> {
+    return this.request<any>('/admin/settings/system');
+  }
+
+  async getBranding(): Promise<any> {
+    return this.request<any>('/branding');
+  }
+
+  async updateSystemSettings(formData: FormData): Promise<any> {
+    return this.request<any>('/admin/settings/system', {
+      method: 'POST',
+      body: formData
+    });
+  }
+
+  async testSmtpConnection(payload: any): Promise<any> {
+    return this.request<any>('/admin/settings/system/test-email', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  async clearSystemCache(): Promise<any> {
+    return this.request<any>('/admin/settings/system/clear-cache', {
+      method: 'POST'
+    });
+  }
+
+  async optimizeSystem(): Promise<any> {
+    return this.request<any>('/admin/settings/system/optimize', {
+      method: 'POST'
+    });
+  }
+
+  async getSettingsAuditLogs(page: number = 1): Promise<any> {
+    return this.request<any>(`/admin/settings/system/audit-logs?page=${page}`);
   }
 }
 

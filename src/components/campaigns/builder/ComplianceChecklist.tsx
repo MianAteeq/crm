@@ -3,10 +3,12 @@ import { ShieldCheck, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '../../../lib/utils';
 
+import { WhatsAppTemplate } from '../../../types/whatsapp';
+
 interface ComplianceChecklistProps {
   campaignData: {
     name: string;
-    message: string;
+    template: WhatsAppTemplate | null;
   };
 }
 
@@ -17,7 +19,9 @@ export default function ComplianceChecklist({ campaignData }: ComplianceChecklis
       id: 'content-length',
       label: 'Message length optimized',
       description: 'Ensures the message is within the recommended WhatsApp character limits.',
-      isValid: (campaignData.message || '').length > 0 && (campaignData.message || '').length < 4096,
+      isValid: campaignData.template 
+        ? (campaignData.template.body?.text || '').length > 0 && (campaignData.template.body?.text || '').length < 4096
+        : false,
     },
     {
       id: 'policy-check',

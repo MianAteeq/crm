@@ -3,11 +3,13 @@ import { NavLink, Link } from 'react-router-dom';
 import { MessageSquare, Menu, X } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuthStore } from '../../store/authStore';
+import { useBrandingStore } from '../../store/brandingStore';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuthStore();
+  const { websiteName, websiteLogo } = useBrandingStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,10 +26,14 @@ export default function Navbar() {
     )}>
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 bg-black text-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
-            <MessageSquare size={20} strokeWidth={2.5} />
-          </div>
-          <span className="text-xl font-bold text-slate-900 tracking-tight">throbtech</span>
+          {websiteLogo ? (
+            <img src={websiteLogo} alt="Logo" className="w-9 h-9 object-contain rounded-lg shrink-0 transition-transform group-hover:scale-105" />
+          ) : (
+            <div className="w-9 h-9 bg-black text-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
+              <MessageSquare size={20} strokeWidth={2.5} />
+            </div>
+          )}
+          <span className="text-xl font-bold text-slate-900 tracking-tight">{websiteName}</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -52,7 +58,7 @@ export default function Navbar() {
           </NavLink>
           {!user && (
             <NavLink 
-              to="/register" 
+              to="/signup" 
               className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold transition-all hover:bg-slate-800 active:scale-95 shadow-lg shadow-slate-100"
             >
               Start Free

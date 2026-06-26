@@ -1,17 +1,12 @@
 import { WhatsAppTemplate } from '../types/whatsapp';
 import { AuthService } from './authService';
 
-const getBaseUrl = () => {
-  if (typeof window !== 'undefined' && 
-      (window.location.hostname.endsWith('run.app') || 
-       window.location.hostname.includes('localhost') || 
-       window.location.hostname.includes('127.0.0.1'))) {
-    return '/api';
-  }
-  return 'https://crm.throbtech.com/api';
-};
+// Dev  → /api  (proxied by Vite → http://127.0.0.1:8000)
+// Prod → VITE_CRM_API_URL/api
+const BASE_URL = import.meta.env.DEV
+  ? '/api'
+  : `${import.meta.env.VITE_CRM_API_URL ?? 'https://crm.throbtech.com'}/api`;
 
-const BASE_URL = getBaseUrl();
 
 /**
  * Gets the standard headers for WhatsApp API requests.

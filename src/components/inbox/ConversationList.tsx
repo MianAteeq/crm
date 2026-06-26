@@ -69,13 +69,13 @@ export default function ConversationList({ conversations, activeId, onSelect }: 
             <button
               key={f.id}
               onClick={() => setFilter(f.id as any)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-all whitespace-nowrap ${
-                filter === f.id 
-                  ? 'bg-slate-900 border-slate-900 text-white shadow-sm' 
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all whitespace-nowrap ${
+                filter === f.id
+                  ? 'bg-slate-900 border-slate-900 text-white shadow-sm'
                   : 'bg-white border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              <f.icon size={11} /> {f.label}
+              <f.icon size={13} /> {f.label}
             </button>
           ))}
         </div>
@@ -95,7 +95,7 @@ export default function ConversationList({ conversations, activeId, onSelect }: 
         {filtered.length === 0 && (
           <div className="p-10 text-center opacity-40">
             <Mail size={40} className="text-text-muted mx-auto mb-4" />
-            <p className="text-[10px] font-black uppercase tracking-widest">No conversations found</p>
+            <p className="text-sm font-semibold text-slate-500">No conversations found</p>
           </div>
         )}
       </div>
