@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { crmApi } from '../../services/crmApi';
 import { WhatsAppSettings } from '../../types';
+import { FormSkeleton } from '../../components/ui/Skeleton';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Status = 'connected' | 'disconnected' | 'pending' | 'error';
@@ -494,8 +495,14 @@ export default function WhatsAppSettingsPage() {
           </div>
         </motion.div>
 
-        {/* ─ Connection Banner ─ */}
-        <AnimatePresence>
+        {isFetching ? (
+          <div className="pt-4">
+            <FormSkeleton />
+          </div>
+        ) : (
+          <>
+            {/* ─ Connection Banner ─ */}
+            <AnimatePresence>
           {isConnected && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
@@ -1193,6 +1200,8 @@ export default function WhatsAppSettingsPage() {
             </motion.div>
           )}
         </AnimatePresence>
+          </>
+        )}
 
       </div>
     </div>

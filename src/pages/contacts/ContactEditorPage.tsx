@@ -4,6 +4,7 @@ import { User, Phone, Mail, Tag, Briefcase, MapPin, Calendar, Globe, ArrowLeft, 
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import { Contact, Tag as TagType } from '../../types';
 import { crmApi } from '../../services/crmApi';
+import { FormSkeleton } from '../../components/ui/Skeleton';
 
 export default function ContactEditorPage() {
   const { id } = useParams<{ id: string }>();
@@ -30,11 +31,15 @@ export default function ContactEditorPage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const tagsData = await crmApi.getTags();
+        const tagsData = await crmApi.getTags({
+          headers: { 'X-Skip-Loader': 'true' }
+        });
         setTags(tagsData);
 
         if (id) {
-          const contactData = await crmApi.getContact(id);
+          const contactData = await crmApi.getContact(id, {
+            headers: { 'X-Skip-Loader': 'true' }
+          });
           setFormData(contactData);
         }
       } catch (error) {
@@ -93,9 +98,20 @@ export default function ContactEditorPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh] text-slate-400">
-        <Loader2 size={32} className="animate-spin mb-4" />
-        <p className="text-sm font-bold uppercase tracking-widest">Loading Details...</p>
+      <div className="max-w-7xl mx-auto space-y-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-slate-200/50 animate-pulse" />
+            <div className="space-y-2">
+              <div className="h-6 w-40 bg-slate-200/50 rounded-md animate-pulse" />
+              <div className="h-3.5 w-60 bg-slate-200/50 rounded-md animate-pulse" />
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-12">
+          <FormSkeleton />
+          <FormSkeleton />
+        </div>
       </div>
     );
   }

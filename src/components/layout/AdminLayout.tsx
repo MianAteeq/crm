@@ -47,7 +47,7 @@ export default function AdminLayout() {
     <div className="min-h-screen bg-slate-100 text-slate-900 overflow-x-hidden flex">
       {/* Mobile Toggle */}
       <button
-        className="lg:hidden fixed top-6 right-6 z-[60] w-11 h-11 bg-white text-slate-700 rounded-xl shadow-lg flex items-center justify-center border border-slate-200"
+        className="lg:hidden fixed top-6 right-6 z-[120] w-11 h-11 bg-white text-slate-700 rounded-xl shadow-lg flex items-center justify-center border border-slate-200"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
@@ -55,14 +55,14 @@ export default function AdminLayout() {
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 bg-slate-900 text-slate-300 transform transition-all duration-300 ease-in-out lg:translate-x-0 border-r border-slate-800 flex flex-col",
+        "fixed inset-y-0 left-0 z-[110] bg-slate-900 text-slate-300 transform transition-all duration-300 ease-in-out lg:translate-x-0 border-r border-slate-800 flex flex-col",
         isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
         isCollapsed ? "w-20" : "w-64"
       )}>
         {/* Collapsible Trigger */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden lg:flex absolute right-[-12px] top-9 z-50 w-6 h-6 bg-slate-900 border border-slate-800 rounded-full text-slate-500 hover:text-slate-200 items-center justify-center cursor-pointer shadow-md"
+          className="hidden lg:flex absolute right-[-12px] top-9 z-[120] w-6 h-6 bg-slate-900 border border-slate-800 rounded-full text-slate-500 hover:text-slate-200 items-center justify-center cursor-pointer shadow-md"
         >
           <ChevronLeft size={12} className={cn("transition-transform duration-300", isCollapsed && "rotate-180")} />
         </button>

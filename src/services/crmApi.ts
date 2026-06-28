@@ -1,15 +1,6 @@
 import { Contact, Tag, WhatsAppSettings, Conversation, Message } from '../types';
 import { AuthService } from './authService';
-
-// Base URL is driven by VITE_CRM_API_URL in your .env file.
-// In development the Vite proxy forwards /api → http://127.0.0.1:8000
-// so we use a relative path to avoid CORS issues.
-// In production (no Vite proxy) the full URL is used.
-const isDev = import.meta.env.DEV;
-const BASE_URL = isDev
-  ? '/api'
-  : `${import.meta.env.VITE_CRM_API_URL ?? 'https://crm.throbtech.com'}/api`;
-
+import { apiClient } from './apiClient';
 
 // Mock Data
 const MOCK_TAGS: Tag[] = [
@@ -83,48 +74,30 @@ const MOCK_CONVERSATIONS: Conversation[] = [
 
 class CrmApiService {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    // For now, always return mock data if available, or try real request but fallback
-    const url = `${BASE_URL}${endpoint}`;
-    const token = AuthService.getToken();
-    const tenantId = AuthService.getTenantId();
-    const isFormData = options.body instanceof FormData;
-
-    const headers: HeadersInit = {
-      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-      'Accept': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-      ...(tenantId ? { 'X-Tenant-Id': tenantId } : {}),
-      ...options.headers,
-    };
-
-    const config = {
-      ...options,
-      headers,
-    };
-
     try {
-      const response = await fetch(url, config);
-      
-      if (response.status === 401) {
-        console.error(`[CRM API] Unauthorized request (401) to ${endpoint}. Token exists: ${!!token}`);
-        if (token) {
-          AuthService.removeToken();
-          // Only redirect if we are not already on the login/home page
-          if (window.location.pathname !== '/' && !window.location.pathname.startsWith('/auth')) {
-            console.warn('[CRM API] Redirecting to login due to 401');
-            window.location.href = '/';
-          }
+      const isFormData = options.body instanceof FormData;
+      const headers = {
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+        ...options.headers,
+      } as any;
+
+      let data = options.body;
+      if (typeof data === 'string') {
+        try {
+          data = JSON.parse(data);
+        } catch (e) {
+          // Keep as string
         }
-        throw new Error('Unauthenticated');
       }
 
-      const data = await response.json().catch(() => null);
+      const response = await apiClient.request<T>({
+        url: endpoint,
+        method: (options.method || 'GET') as any,
+        headers,
+        data,
+      });
 
-      if (!response.ok) {
-        throw new Error(data?.message || `API error: ${response.status}`);
-      }
-
-      return data as T;
+      return response.data;
     } catch (error) {
       console.warn(`[CRM API] Request to ${endpoint} failed, returns mock instead`, error);
       throw error; // Let the specific method handle the fallback
@@ -132,9 +105,9 @@ class CrmApiService {
   }
 
   // Tags API
-  async getTags(): Promise<Tag[]> {
+  async getTags(options?: RequestInit): Promise<Tag[]> {
     try {
-      const data = await this.request<any>('/tags');
+      const data = await this.request<any>('/tags', options);
       const tags = Array.isArray(data) ? data : (data?.data || data?.tags || []);
       return (Array.isArray(tags) && tags.length > 0) ? tags : MOCK_TAGS;
     } catch (error) {
@@ -151,7 +124,7 @@ class CrmApiService {
     lastTouchpoint?: string;
     page?: number;
     perPage?: number;
-  }): Promise<Contact[] & { pagination?: { currentPage: number; lastPage: number; perPage: number; total: number } }> {
+  }, options?: RequestInit): Promise<Contact[] & { pagination?: { currentPage: number; lastPage: number; perPage: number; total: number } }> {
     try {
       let query = '';
       let endpoint = '/contacts';
@@ -170,7 +143,7 @@ class CrmApiService {
         query = `?${searchParams.toString()}`;
       }
 
-      const response = await this.request<any>(`${endpoint}${query}`);
+      const response = await this.request<any>(`${endpoint}${query}`, options);
       
       let contactsArray: any[] = [];
       let paginationData: any = null;
@@ -223,9 +196,9 @@ class CrmApiService {
     }
   }
 
-  async getContact(id: string): Promise<Contact> {
+  async getContact(id: string, options?: RequestInit): Promise<Contact> {
     try {
-      const data = await this.request<Contact>(`/contacts/${id}`);
+      const data = await this.request<Contact>(`/contacts/${id}`, options);
       const tags = Array.isArray(data.tags) ? data.tags.map((t: any) => typeof t === 'object' ? t.id : t) : [];
       return { ...data, createdAt: data.createdAt || data.created_at, tags };
     } catch (error) {
@@ -349,9 +322,9 @@ class CrmApiService {
   }
 
   // Conversations API
-  async getConversations(): Promise<Conversation[]> {
+  async getConversations(options?: RequestInit): Promise<Conversation[]> {
     try {
-      const response = await this.request<any>('/conversations');
+      const response = await this.request<any>('/conversations', options);
       let conversationsArray: any[] = [];
       
       const data = response?.response || response?.data || response;
@@ -418,9 +391,9 @@ class CrmApiService {
     }
   }
 
-  async getConversationMessages(id: string): Promise<Message[]> {
+  async getConversationMessages(id: string, options?: RequestInit): Promise<Message[]> {
     try {
-      const response = await this.request<any>(`/conversations/${id}/messages`);
+      const response = await this.request<any>(`/conversations/${id}/messages`, options);
       let messagesArray: any[] = [];
       
       const data = response?.response || response?.data || response;
@@ -581,10 +554,11 @@ class CrmApiService {
     };
   }
 
-  async markAsRead(conversationId: string): Promise<{ message: string; success?: boolean }> {
+  async markAsRead(conversationId: string, options?: RequestInit): Promise<{ message: string; success?: boolean }> {
     try {
       return await this.request(`/conversations/${conversationId}/mark-read`, {
-        method: 'POST'
+        method: 'POST',
+        ...options
       });
     } catch (error) {
       console.warn(`[CRM API] markAsRead failed for ${conversationId}`, error);
@@ -592,11 +566,12 @@ class CrmApiService {
     }
   }
 
-  async toggleConversationAutoReply(conversationId: string, isActive: boolean): Promise<{ success: boolean; is_auto_reply_active: boolean }> {
+  async toggleConversationAutoReply(conversationId: string, isActive: boolean, options?: RequestInit): Promise<{ success: boolean; is_auto_reply_active: boolean }> {
     try {
       return await this.request(`/conversations/${conversationId}/toggle-auto-reply`, {
         method: 'POST',
-        body: JSON.stringify({ is_active: isActive })
+        body: JSON.stringify({ is_active: isActive }),
+        ...options
       });
     } catch (error: any) {
       console.warn(`[CRM API] toggleConversationAutoReply failed for ${conversationId}`, error);
@@ -618,9 +593,10 @@ class CrmApiService {
     });
   }
 
-  async getDashboardInsights(): Promise<any> {
+  async getDashboardInsights(options?: RequestInit): Promise<any> {
     return this.request<any>('/dashboard/insights', {
       method: 'GET',
+      ...options,
     });
   }
 

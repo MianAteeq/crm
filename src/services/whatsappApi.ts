@@ -1,75 +1,34 @@
 import { WhatsAppTemplate } from '../types/whatsapp';
-import { AuthService } from './authService';
-
-// Dev  → /api  (proxied by Vite → http://127.0.0.1:8000)
-// Prod → VITE_CRM_API_URL/api
-const BASE_URL = import.meta.env.DEV
-  ? '/api'
-  : `${import.meta.env.VITE_CRM_API_URL ?? 'https://crm.throbtech.com'}/api`;
-
-
-/**
- * Gets the standard headers for WhatsApp API requests.
- */
-const getHeaders = () => {
-  const token = AuthService.getToken();
-  const tenantId = AuthService.getTenantId();
-  const headers: Record<string, string> = {
-    'Accept': 'application/json',
-  };
-  
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  if (tenantId) {
-    headers['X-Tenant-Id'] = tenantId;
-  }
-  
-  return headers;
-};
+import { apiClient } from './apiClient';
 
 class WhatsAppApiService {
   /**
    * Internal request helper to handle common logic and auth errors.
    */
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${BASE_URL}${endpoint}`;
     const isFormData = options.body instanceof FormData;
+    const headers = {
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+      ...options.headers,
+    } as any;
 
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...getHeaders(),
-        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-        ...options.headers,
-      },
+    let data = options.body;
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch (e) {
+        // Keep as is
+      }
+    }
+
+    const response = await apiClient.request<T>({
+      url: endpoint,
+      method: (options.method || 'GET') as any,
+      headers,
+      data,
     });
 
-    if (response.status === 401) {
-      const token = AuthService.getToken();
-      console.error(`[WhatsApp API] Unauthorized request (401) to ${endpoint}. Token exists: ${!!token}`);
-      if (token) {
-        AuthService.removeToken();
-        if (window.location.pathname !== '/' && !window.location.pathname.startsWith('/auth')) {
-          console.warn('[WhatsApp API] Redirecting to login due to 401');
-          window.location.href = '/';
-        }
-      }
-      throw new Error('Unauthenticated');
-    }
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `API error: ${response.status}`);
-    }
-
-    const text = await response.text();
-    try {
-      return text ? JSON.parse(text) : {} as T;
-    } catch (e) {
-      return {} as T;
-    }
+    return response.data;
   }
 
   /**

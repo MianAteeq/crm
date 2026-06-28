@@ -256,7 +256,7 @@ export function Sidebar({
     <>
       {/* Mobile Toggle */}
       <button
-        className="lg:hidden fixed top-6 right-6 z-[60] w-11 h-11 bg-white text-slate-700 rounded-xl shadow-lg flex items-center justify-center transition-all active:scale-95 border border-slate-200"
+        className="lg:hidden fixed top-6 right-6 z-[120] w-11 h-11 bg-white text-slate-700 rounded-xl shadow-lg flex items-center justify-center transition-all active:scale-95 border border-slate-200"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         <AnimatePresence mode="wait">
@@ -272,14 +272,14 @@ export function Sidebar({
       </button>
 
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 bg-white transform transition-all duration-300 ease-in-out lg:translate-x-0 border-r border-slate-200 flex flex-col overflow-visible",
+        "fixed inset-y-0 left-0 z-[110] bg-white transform transition-all duration-300 ease-in-out lg:translate-x-0 border-r border-slate-200 flex flex-col overflow-visible",
         isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
         isCollapsed ? "w-20" : "w-72"
       )}>
         {/* Collapsible Trigger for Desktop */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden lg:flex absolute right-[-12px] top-9 z-50 w-6 h-6 bg-white hover:bg-slate-50 border border-slate-200 rounded-full text-slate-400 hover:text-slate-700 items-center justify-center cursor-pointer transition-all hover:scale-110 active:scale-95 shadow-sm"
+          className="hidden lg:flex absolute right-[-12px] top-9 z-[120] w-6 h-6 bg-white hover:bg-slate-50 border border-slate-200 rounded-full text-slate-400 hover:text-slate-700 items-center justify-center cursor-pointer transition-all hover:scale-110 active:scale-95 shadow-sm"
         >
           <ChevronLeft size={12} className={cn("transition-transform duration-300", isCollapsed && "rotate-180")} />
         </button>

@@ -11,6 +11,7 @@ import ContactDrawer from '../components/contacts/ContactDrawer';
 import ImportModal from '../components/contacts/ImportModal';
 import ExportDropdown from '../components/contacts/ExportDropdown';
 import { crmApi } from '../services/crmApi';
+import { TableSkeleton, CardSkeleton } from '../components/ui/Skeleton';
 
 export default function Contacts() {
   const navigate = useNavigate();
@@ -61,6 +62,8 @@ export default function Contacts() {
         lastTouchpoint: touch !== undefined ? touch : lastTouchpoint,
         page: page !== undefined ? page : (page === undefined ? currentPage : page),
         perPage: per !== undefined ? per : perPage
+      }, {
+        headers: { 'X-Skip-Loader': 'true' }
       });
       setContacts(contactsData);
       
@@ -98,7 +101,9 @@ export default function Contacts() {
   const fetchTags = async () => {
     setIsTagsLoading(true);
     try {
-      const tagsData = await crmApi.getTags();
+      const tagsData = await crmApi.getTags({
+        headers: { 'X-Skip-Loader': 'true' }
+      });
       setTags(tagsData);
     } catch (error) {
       console.error('Failed to fetch tags', error);
@@ -278,10 +283,15 @@ export default function Contacts() {
             className="relative min-h-[500px]"
           >
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center h-[500px] text-slate-400">
-                <Loader2 size={32} className="animate-spin mb-4" />
-                <p className="text-sm font-bold uppercase tracking-widest">Loading Audience...</p>
-              </div>
+              viewMode === 'table' ? (
+                <TableSkeleton rows={perPage} cols={5} />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {Array.from({ length: 6 }).map((_, idx) => (
+                    <CardSkeleton key={idx} />
+                  ))}
+                </div>
+              )
             ) : viewMode === 'table' ? (
               <ContactTable 
                 contacts={filteredContacts}

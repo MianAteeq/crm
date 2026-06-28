@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Phone, Zap, Shield, MessageSquare, CheckCircle2, ArrowRight, Settings } from 'lucide-react';
 import { WhatsAppStatusCard } from '../../components/whatsapp/WhatsAppStatusCard';
+import { FormSkeleton } from '../../components/ui/Skeleton';
 import { EmbeddedSignupModal } from '../../components/whatsapp/EmbeddedSignupModal';
 import { WhatsAppDashboardWidgets } from '../../components/whatsapp/dashboard/WhatsAppDashboardWidgets';
 import { WhatsAppConnectionData, WhatsAppDashboardStats } from '../../types';
@@ -164,8 +165,12 @@ export default function WhatsAppConnectPage() {
           )}
         </motion.div>
 
-        {/* Error Banner */}
-        {error && (
+        {isLoading ? (
+          <FormSkeleton />
+        ) : (
+          <>
+            {/* Error Banner */}
+            {error && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -284,6 +289,8 @@ export default function WhatsAppConnectPage() {
                 </Link>
               </div>
             </motion.div>
+          </>
+        )}
           </>
         )}
       </div>

@@ -13,6 +13,7 @@ export function useInbox() {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMessagesLoading, setIsMessagesLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -34,7 +35,9 @@ export function useInbox() {
     ));
 
     try {
-      await crmApi.toggleConversationAutoReply(activeConversationId, nextState);
+      await crmApi.toggleConversationAutoReply(activeConversationId, nextState, {
+        headers: { 'X-Skip-Loader': 'true' }
+      });
     } catch (err) {
       console.error('Failed to toggle auto reply:', err);
       // Revert on error
@@ -57,7 +60,9 @@ export function useInbox() {
   const fetchConversations = useCallback(async (silent = false) => {
     if (!silent) setIsLoading(true);
     try {
-      const data = await crmApi.getConversations();
+      const data = await crmApi.getConversations({
+        headers: { 'X-Skip-Loader': 'true' }
+      });
       setConversations(data);
     } catch (error) {
       console.error('Failed to fetch conversations:', error);
@@ -67,8 +72,11 @@ export function useInbox() {
   }, []);
 
   const fetchMessages = useCallback(async (id: string, silent = false) => {
+    if (!silent) setIsMessagesLoading(true);
     try {
-      const data = await crmApi.getConversationMessages(id);
+      const data = await crmApi.getConversationMessages(id, {
+        headers: { 'X-Skip-Loader': 'true' }
+      });
       setMessages(data);
       
       // Mark as read locally or via API if needed
@@ -77,6 +85,8 @@ export function useInbox() {
       ));
     } catch (error) {
       console.error('Failed to fetch messages:', error);
+    } finally {
+      if (!silent) setIsMessagesLoading(false);
     }
   }, []);
 
@@ -253,7 +263,9 @@ export function useInbox() {
     // Mark as read if there are unread messages
     const conv = conversations.find(c => c.id === id);
     if (conv && conv.unreadCount > 0) {
-      crmApi.markAsRead(id).catch(err => {
+      crmApi.markAsRead(id, {
+        headers: { 'X-Skip-Loader': 'true' }
+      }).catch(err => {
         console.warn('Failed to mark as read:', err);
       });
       
@@ -271,6 +283,7 @@ export function useInbox() {
     sendMessage,
     isTyping,
     isLoading,
+    isMessagesLoading,
     isAutoReplyEnabled,
     toggleAutoReply,
     refreshManual: fetchConversations

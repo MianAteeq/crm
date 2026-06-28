@@ -3,14 +3,16 @@ import { Search, Filter, Mail, Star, Users, Wifi, WifiOff } from 'lucide-react';
 import { Conversation } from '../../types';
 import ConversationItem from './ConversationItem';
 import { useRealtime } from '../../hooks/useRealtime';
+import { ConversationListSkeleton } from '../ui/Skeleton';
 
 interface ConversationListProps {
   conversations: Conversation[];
   activeId?: string;
   onSelect: (id: string) => void;
+  isLoading?: boolean;
 }
 
-export default function ConversationList({ conversations, activeId, onSelect }: ConversationListProps) {
+export default function ConversationList({ conversations, activeId, onSelect, isLoading = false }: ConversationListProps) {
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState<'all' | 'unread' | 'assigned'>('all');
 
@@ -83,20 +85,26 @@ export default function ConversationList({ conversations, activeId, onSelect }: 
 
       {/* Conversations List */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
-        {filtered.map(c => (
-          <ConversationItem 
-            key={c.id} 
-            conversation={c} 
-            isActive={activeId === c.id}
-            onClick={() => onSelect(c.id)}
-          />
-        ))}
+        {isLoading && safeConversations.length === 0 ? (
+          <ConversationListSkeleton />
+        ) : (
+          <>
+            {filtered.map(c => (
+              <ConversationItem 
+                key={c.id} 
+                conversation={c} 
+                isActive={activeId === c.id}
+                onClick={() => onSelect(c.id)}
+              />
+            ))}
 
-        {filtered.length === 0 && (
-          <div className="p-10 text-center opacity-40">
-            <Mail size={40} className="text-text-muted mx-auto mb-4" />
-            <p className="text-sm font-semibold text-slate-500">No conversations found</p>
-          </div>
+            {filtered.length === 0 && (
+              <div className="p-10 text-center opacity-40">
+                <Mail size={40} className="text-text-muted mx-auto mb-4" />
+                <p className="text-sm font-semibold text-slate-500">No conversations found</p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

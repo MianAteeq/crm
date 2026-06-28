@@ -31,6 +31,7 @@ import {
 import { motion } from 'motion/react';
 import { cn } from '@/src/lib/utils';
 import { mockCampaigns } from '../data/mockCampaigns';
+import { KpiSkeleton, ChartSkeleton } from '../components/ui/Skeleton';
 import { contacts } from '../data/contactsMock';
 import { mockConversations } from '../data/mockMessages';
 import {
@@ -195,8 +196,12 @@ export default function Dashboard() {
         setIsLoading(true);
         // Fetch insights and conversations in parallel
         const [insightsData, conversationsData] = await Promise.all([
-          crmApi.getDashboardInsights(),
-          crmApi.getConversations().catch(err => {
+          crmApi.getDashboardInsights({
+            headers: { 'X-Skip-Loader': 'true' }
+          }),
+          crmApi.getConversations({
+            headers: { 'X-Skip-Loader': 'true' }
+          }).catch(err => {
             console.warn('[Dashboard] Failed to fetch conversations:', err);
             return [];
           })
@@ -534,19 +539,23 @@ export default function Dashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {kpis.map((k, i) => (
-          <KpiCard
-            key={k.label}
-            label={k.label}
-            value={k.value}
-            change={k.change}
-            positive={k.positive}
-            icon={k.icon}
-            accent={k.accent}
-            spark={k.spark}
-            index={i}
-          />
-        ))}
+        {isLoading ? (
+          Array.from({ length: 6 }).map((_, i) => <KpiSkeleton key={i} />)
+        ) : (
+          kpis.map((k, i) => (
+            <KpiCard
+              key={k.label}
+              label={k.label}
+              value={k.value}
+              change={k.change}
+              positive={k.positive}
+              icon={k.icon}
+              accent={k.accent}
+              spark={k.spark}
+              index={i}
+            />
+          ))
+        )}
       </div>
 
       {/* Customer Journey Funnel */}
@@ -585,9 +594,14 @@ export default function Dashboard() {
       {/* Main grid: charts + live conversations */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Conversations Trend */}
-        <div className="xl:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col min-h-[420px]">
-          <SectionHeader
-            title="Conversations Trend"
+        {isLoading ? (
+          <div className="xl:col-span-2">
+            <ChartSkeleton />
+          </div>
+        ) : (
+          <div className="xl:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col min-h-[420px]">
+            <SectionHeader
+              title="Conversations Trend"
             subtitle="Reach vs engagement over time"
             action={
               <div className="flex items-center gap-4 text-xs font-medium">
@@ -623,6 +637,7 @@ export default function Dashboard() {
             </ResponsiveContainer>
           </div>
         </div>
+        )}
 
         {/* Live Conversations Panel */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col min-h-[420px]">

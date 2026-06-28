@@ -5,7 +5,7 @@ import * as z from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { MessageSquare, Mail, Lock, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useBrandingStore } from '../../store/brandingStore';
 
 const loginSchema = z.object({
@@ -121,13 +121,39 @@ export default function LoginPage() {
               {errors.password && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.password.message}</p>}
             </div>
 
-            <button 
+            <motion.button 
               type="submit" 
               disabled={isLoading}
-              className="w-full py-5 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-[0.2em] rounded-2xl hover:bg-slate-800 disabled:opacity-50 transition-all shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 mt-4"
+              whileHover={{ scale: isLoading ? 1 : 1.01 }}
+              whileTap={{ scale: isLoading ? 1 : 0.99 }}
+              className="w-full py-5 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-[0.2em] rounded-2xl hover:bg-slate-800 disabled:opacity-50 transition-all shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 mt-4 cursor-pointer relative overflow-hidden"
             >
-              {isLoading ? <Loader2 size={18} className="animate-spin" /> : <>Sign In <ArrowRight size={16} /></>}
-            </button>
+              <AnimatePresence mode="wait">
+                {isLoading ? (
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Signing In...</span>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="idle"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="flex items-center gap-2"
+                  >
+                    <span>Sign In</span>
+                    <ArrowRight size={16} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.button>
           </form>
         </motion.div>
 

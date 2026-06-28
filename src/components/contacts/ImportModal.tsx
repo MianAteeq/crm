@@ -154,7 +154,7 @@ export default function ImportModal({ isOpen, onClose, onImport }: ImportModalPr
       const activeMappings: Record<string, string> = {};
       Object.entries(mappings).forEach(([key, val]) => {
         if (val) {
-          activeMappings[key] = val;
+          activeMappings[key] = val as string;
         }
       });
 

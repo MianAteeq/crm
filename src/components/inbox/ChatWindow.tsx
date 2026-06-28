@@ -14,6 +14,7 @@ interface ChatWindowProps {
   onBack?: () => void;
   isAutoReplyEnabled?: boolean;
   onToggleAutoReply?: () => void;
+  isMessagesLoading?: boolean;
 }
 
 export default function ChatWindow({ 
@@ -22,7 +23,8 @@ export default function ChatWindow({
   isTyping, 
   onBack,
   isAutoReplyEnabled,
-  onToggleAutoReply
+  onToggleAutoReply,
+  isMessagesLoading = false
 }: ChatWindowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -104,7 +106,32 @@ export default function ChatWindow({
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-6 space-y-2 custom-scrollbar bg-white shadow-inner"
       >
-        {dateKeys.map((dateKey) => (
+        {isMessagesLoading ? (
+          <div className="space-y-6 animate-pulse py-4">
+            {/* Incoming message skeleton */}
+            <div className="flex items-start gap-3 max-w-[70%]">
+              <div className="w-8 h-8 rounded-full bg-slate-100 shrink-0" />
+              <div className="space-y-2 flex-1">
+                <div className="h-9 bg-slate-100 rounded-2xl w-48" />
+              </div>
+            </div>
+            {/* Outgoing message skeleton */}
+            <div className="flex items-start justify-end gap-3 max-w-[70%] ml-auto">
+              <div className="space-y-2 flex-1 items-end flex flex-col">
+                <div className="h-9 bg-indigo-50 rounded-2xl w-56" />
+              </div>
+            </div>
+            {/* Incoming message skeleton */}
+            <div className="flex items-start gap-3 max-w-[70%]">
+              <div className="w-8 h-8 rounded-full bg-slate-100 shrink-0" />
+              <div className="space-y-2 flex-1">
+                <div className="h-9 bg-slate-100 rounded-2xl w-36" />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {dateKeys.map((dateKey) => (
           <React.Fragment key={dateKey}>
             <div className="flex justify-center my-8">
                <span className="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-[10px] font-bold text-slate-500 uppercase tracking-wider">
@@ -125,6 +152,8 @@ export default function ChatWindow({
             })}
           </React.Fragment>
         ))}
+        </>
+        )}
 
         <AnimatePresence>
           {isTyping && (
@@ -140,6 +169,7 @@ export default function ChatWindow({
         onSend={onSendMessage} 
         recipientPhone={conversation.contact.phone}
         recipientName={conversation.contact.name}
+        conversation={conversation}
       />
     </div>
   );
