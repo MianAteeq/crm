@@ -14,12 +14,25 @@ import TemplatesPage from './pages/whatsapp/TemplatesPage';
 import TemplateBuilderPage from './pages/whatsapp/TemplateBuilderPage';
 import WhatsAppSettingsPage from './pages/settings/WhatsAppSettingsPage';
 
-// Auth Pages
+// Public Pages
 import LandingPage from './pages/public/LandingPage';
+import FeaturesPage from './pages/public/FeaturesPage';
+import SolutionsPage from './pages/public/SolutionsPage';
+import PricingPage from './pages/public/PricingPage';
+import IntegrationsPage from './pages/public/IntegrationsPage';
+import ResourcesPage from './pages/public/ResourcesPage';
+import ContactPage from './pages/public/ContactPage';
+import { 
+  WhatsAppCampaignsPage, RetargetingPage, AutomationPage, SocialMediaPage, 
+  LeadFormsPage, AIResponsesPage, PageBuilderPage, MediaStoragePage 
+} from './pages/public/ServicePages';
+
+// Auth Pages
 import LoginPage from './pages/auth/LoginPage';
 import SignupPage from './pages/auth/SignupPage';
 import OnboardingPage from './pages/auth/OnboardingPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { PrivacyPage, TermsPage } from './pages/public/LegalPages';
 
 // New Enhanced Pages
 import WhatsAppConnectPage from './pages/whatsapp/WhatsAppConnectPage';
@@ -35,6 +48,13 @@ import AdminTenants from './pages/admin/AdminTenants';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminPlans from './pages/admin/AdminPlans';
 import AdminSettings from './pages/admin/AdminSettings';
+
+// Automation Pages & Layout
+import AutomationLayout from './pages/automation/AutomationLayout';
+import AutomationDashboard from './pages/automation/AutomationDashboard';
+import WorkflowsPage from './pages/automation/WorkflowsPage';
+import ExecutionsPage from './pages/automation/ExecutionsPage';
+import WorkflowBuilderPage from './pages/automation/WorkflowBuilderPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,8 +77,26 @@ export default function App() {
       <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/features" element={<FeaturesPage />} />
+        <Route path="/services" element={<FeaturesPage />} />
+        <Route path="/solutions" element={<SolutionsPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/integrations" element={<IntegrationsPage />} />
+        <Route path="/resources" element={<ResourcesPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/services/whatsapp-campaigns" element={<WhatsAppCampaignsPage />} />
+        <Route path="/services/retargeting" element={<RetargetingPage />} />
+        <Route path="/services/crm" element={<RetargetingPage />} />
+        <Route path="/services/automation" element={<AutomationPage />} />
+        <Route path="/services/social-media" element={<SocialMediaPage />} />
+        <Route path="/services/lead-forms" element={<LeadFormsPage />} />
+        <Route path="/services/ai-responses" element={<AIResponsesPage />} />
+        <Route path="/services/page-builder" element={<PageBuilderPage />} />
+        <Route path="/services/media-storage" element={<MediaStoragePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
         <Route path="/onboarding" element={
           <ProtectedRoute>
             <OnboardingPage />
@@ -82,6 +120,16 @@ export default function App() {
           <Route path="templates/builder" element={<TemplateBuilderPage />} />
           <Route path="settings/whatsapp" element={<WhatsAppSettingsPage />} />
           <Route path="whatsapp/connect" element={<WhatsAppConnectPage />} />
+
+          {/* Automation Routes */}
+          <Route path="automation" element={<AutomationLayout />}>
+            <Route index element={<AutomationDashboard />} />
+            <Route path="workflows" element={<WorkflowsPage />} />
+            <Route path="executions" element={<ExecutionsPage />} />
+          </Route>
+          <Route path="automation/workflows/builder/:id" element={<WorkflowBuilderPage />} />
+          <Route path="automation/workflows/builder" element={<WorkflowBuilderPage />} />
+
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
         <Route path="/admin" element={

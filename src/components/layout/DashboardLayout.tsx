@@ -54,6 +54,7 @@ const menuItems = [
   { group: 'Engagement', items: [
     { icon: Send, label: 'Campaigns', path: '/campaigns' },
     { icon: LayoutIcon, label: 'Templates', path: '/templates' },
+    { icon: Zap, label: 'Automation', path: '/automation' },
     { icon: Smartphone, label: 'WhatsApp Numbers', path: '/whatsapp/connect' },
   ]},
   { group: 'System', items: [

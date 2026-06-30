@@ -909,6 +909,50 @@ class CrmApiService {
   async getSettingsAuditLogs(page: number = 1): Promise<any> {
     return this.request<any>(`/admin/settings/system/audit-logs?page=${page}`);
   }
+
+  // ---- Automation API methods ----
+  async getWorkflows(): Promise<any> {
+    return this.request<any>('/automation/workflows');
+  }
+
+  async getWorkflow(id: number | string): Promise<any> {
+    return this.request<any>(`/automation/workflows/${id}`);
+  }
+
+  async createWorkflow(payload: any): Promise<any> {
+    return this.request<any>('/automation/workflows', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  async updateWorkflow(id: number | string, payload: any): Promise<any> {
+    return this.request<any>(`/automation/workflows/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  async deleteWorkflow(id: number | string): Promise<any> {
+    return this.request<any>(`/automation/workflows/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async saveWorkflowCanvas(id: number | string, nodes: any[], connections: any[]): Promise<any> {
+    return this.request<any>(`/automation/workflows/${id}/canvas`, {
+      method: 'POST',
+      body: JSON.stringify({ nodes, connections })
+    });
+  }
+
+  async getAutomationLogs(): Promise<any> {
+    return this.request<any>('/automation/executions');
+  }
+
+  async getAutomationDashboardStats(): Promise<any> {
+    return this.request<any>('/automation/dashboard-stats');
+  }
 }
 
 export const crmApi = new CrmApiService();
