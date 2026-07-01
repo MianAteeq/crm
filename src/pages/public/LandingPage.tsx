@@ -6,6 +6,7 @@ import {
   TrustedBy,
   OmnichannelInbox,
   AIWorkflow,
+  WhatsAppAutomation,
   CRMDashboardPreview,
   Testimonials,
   FinalCTA
@@ -24,6 +25,7 @@ export default function LandingPage() {
         <TrustedBy />
         <OmnichannelInbox />
         <AIWorkflow />
+        <WhatsAppAutomation />
         <CRMDashboardPreview />
         <Testimonials />
         <FinalCTA />

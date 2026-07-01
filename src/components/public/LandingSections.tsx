@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { 
   MessageSquare, 
   Users, 
@@ -30,7 +30,12 @@ import {
   Settings,
   ChevronRight,
   ShieldCheck,
-  UserCheck
+  UserCheck,
+  Bot,
+  PhoneCall,
+  MousePointerClick,
+  BellRing,
+  ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { NavLink } from 'react-router-dom';
@@ -1214,5 +1219,311 @@ export function FinalCTA() {
         </div>
       </div>
     </section>
+  );
+}
+
+// ==========================================
+// AI WHATSAPP AUTOMATION SECTION
+// ==========================================
+export function WhatsAppAutomation() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const features = [
+    {
+      icon: Bot,
+      title: '24/7 AI Customer Replies',
+      desc: 'Automatically answer customer messages day and night using predefined intelligent workflows.',
+      color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+    },
+    {
+      icon: MessageCircle,
+      title: 'Instant Welcome Message',
+      desc: 'Send personalized greetings immediately when a customer starts a WhatsApp conversation.',
+      color: 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+    },
+    {
+      icon: FileText,
+      title: 'Interactive Service Selection',
+      desc: 'Display business services as clickable WhatsApp buttons so customers can quickly navigate to the service they need.',
+      color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20'
+    },
+    {
+      icon: Calendar,
+      title: 'Appointment Booking Automation',
+      desc: 'Automatically collect customer information, preferred date, available time slots, and confirm appointments without staff involvement.',
+      color: 'bg-purple-500/10 text-purple-600 border-purple-500/20'
+    },
+    {
+      icon: MousePointerClick,
+      title: 'Click-to-WhatsApp Advertising',
+      desc: 'Integrate TikTok, Facebook, Instagram, Snapchat, and Google Ads so customers who click ads land directly into a WhatsApp conversation.',
+      color: 'bg-rose-500/10 text-rose-600 border-rose-500/20'
+    },
+    {
+      icon: Database,
+      title: 'CRM & Lead Management',
+      desc: 'Automatically save customer information, create leads, notify sales representatives, and synchronize conversations with the CRM.',
+      color: 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+    }
+  ];
+
+  const workflowSteps = [
+    { label: 'Customer Clicks Ad', sub: 'TikTok • Facebook • Instagram • Snapchat • Google', icon: MousePointerClick },
+    { label: 'WhatsApp Opens Instantly', sub: 'Direct deep-link conversation', icon: MessageCircle },
+    { label: 'Automatic Welcome Message', sub: '"Welcome to Throbtech 👋"', icon: Send },
+    { label: 'Customer Selects Service', sub: 'Book • Quote • Services • Support', icon: FileText },
+    { label: 'AI Asks Required Questions', sub: 'Smart contextual follow-ups', icon: Bot },
+    { label: 'Booking Confirmed', sub: 'Appointment or quote locked in', icon: Calendar },
+    { label: 'Info Saved & Lead Created', sub: 'CRM auto-sync & lead pipeline', icon: Database },
+    { label: 'Sales Team Notified', sub: 'Instant alerts to account managers', icon: BellRing }
+  ];
+
+  const stats = [
+    { value: '24/7', label: 'AI Availability', sub: 'Non-stop coverage' },
+    { value: '98%', label: 'Instant Response Rate', sub: 'Under 3 seconds' },
+    { value: '3X', label: 'Higher Conversion', sub: 'vs traditional forms' },
+    { value: '0', label: 'Manual Intervention', sub: 'Fully automated' }
+  ];
+
+  return (
+    <>
+      {/* ========== MAIN TWO-COLUMN SECTION ========== */}
+      <section
+        ref={sectionRef}
+        id="whatsapp-automation"
+        className="py-32 px-6 bg-white overflow-hidden"
+      >
+        <div className="max-w-7xl mx-auto">
+
+          {/* Section Badge + Title */}
+          <div className="text-center mb-20 max-w-2xl mx-auto space-y-4 flex flex-col items-center">
+            <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50 flex items-center gap-1.5 w-fit">
+              <MessageCircle size={14} className="text-indigo-500" />
+              WhatsApp Automation
+            </span>
+            <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">
+              AI WhatsApp Automation for <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300">Businesses & Clinics</span>
+            </h2>
+            <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[700px] text-slate-500">
+              Transform customer communication with intelligent WhatsApp automation that replies instantly, guides customers through services, books appointments, captures leads, and integrates directly with your marketing campaigns.
+            </p>
+          </div>
+
+          {/* Two-Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+
+            {/* ---- LEFT COLUMN ---- */}
+            <div className="lg:col-span-5 space-y-10">
+              <div className="space-y-5">
+                <h3 className="font-display font-[700] text-[24px] md:text-[28px] leading-[1.2] tracking-[-0.5px] text-slate-900">
+                  Automate every customer touchpoint from ad click to appointment booking
+                </h3>
+                <p className="font-sans font-normal text-[16px] leading-[1.8] text-slate-500">
+                  Deploy AI-powered WhatsApp workflows that handle lead capture, service inquiries, appointment scheduling, and CRM synchronization — completely hands-free.
+                </p>
+              </div>
+
+              {/* Feature Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {features.map((f, idx) => (
+                  <motion.div
+                    key={f.title}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ delay: idx * 0.06 }}
+                    className="p-5 bg-white border border-slate-200/60 rounded-2xl shadow-sm hover:shadow-lg hover:shadow-slate-100 hover:-translate-y-1 hover:border-indigo-500/30 transition-all duration-300 group"
+                  >
+                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center border transition-colors mb-3", f.color)}>
+                      <f.icon size={18} strokeWidth={2.5} />
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-900 mb-1.5 tracking-tight group-hover:text-indigo-600 transition-colors">{f.title}</h4>
+                    <p className="text-slate-500 font-medium text-[11px] leading-relaxed">{f.desc}</p>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Primary CTA */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="pt-2"
+              >
+                <NavLink
+                  to="/contact"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-sans font-semibold text-[15px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(99,102,241,0.35)] active:scale-97 shadow-lg"
+                >
+                  Get Started with WhatsApp AI
+                  <ArrowRight size={16} />
+                </NavLink>
+              </motion.div>
+            </div>
+
+            {/* ---- RIGHT COLUMN: Workflow Visualization ---- */}
+            <div className="lg:col-span-7 w-full">
+              <div className="w-full bg-slate-950 border border-slate-800 rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden">
+
+                {/* Background glow */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-indigo-500/5 rounded-full blur-[80px] pointer-events-none" />
+
+                {/* Console Header */}
+                <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-6 relative z-10">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse" />
+                    <span className="text-xs font-bold tracking-tight text-slate-200">WhatsApp Automation Pipeline</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1 rounded-lg border border-white/5 text-[9px] font-mono text-indigo-400">
+                    <span>LIVE • 8 STEPS</span>
+                  </div>
+                </div>
+
+                {/* Workflow Steps */}
+                <div className="space-y-3 relative z-10">
+                  {workflowSteps.map((step, idx) => (
+                    <motion.div
+                      key={step.label}
+                      initial={{ opacity: 0, x: 20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, margin: "-30px" }}
+                      transition={{ delay: idx * 0.08, duration: 0.4 }}
+                    >
+                      {/* Step Card */}
+                      <div className="flex items-center gap-4 p-3.5 bg-white/5 border border-white/8 rounded-xl backdrop-blur-sm hover:bg-white/8 hover:border-purple-500/20 transition-all duration-300 group">
+                        {/* Step Number */}
+                        <div className="w-9 h-9 bg-purple-500/10 border border-purple-500/25 text-purple-400 font-display font-bold rounded-lg flex items-center justify-center text-xs shrink-0 group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 transition-all duration-300">
+                          {idx + 1}
+                        </div>
+
+                        {/* Step Icon */}
+                        <div className="w-8 h-8 bg-slate-800/80 border border-white/5 rounded-lg flex items-center justify-center shrink-0">
+                          <step.icon size={14} className="text-slate-300 group-hover:text-purple-400 transition-colors" />
+                        </div>
+
+                        {/* Step Content */}
+                        <div className="flex-1 min-w-0">
+                          <span className="text-[12px] font-bold text-white block leading-tight group-hover:text-purple-300 transition-colors">{step.label}</span>
+                          <span className="text-[10px] text-slate-500 font-medium block mt-0.5 truncate">{step.sub}</span>
+                        </div>
+
+                        {/* Status Indicator */}
+                        <div className="w-2 h-2 rounded-full bg-purple-500/50 group-hover:bg-purple-400 transition-colors shrink-0" />
+                      </div>
+
+                      {/* Connector Arrow (except last) */}
+                      {idx < workflowSteps.length - 1 && (
+                        <div className="flex justify-center py-0.5">
+                          <motion.div
+                            initial={{ opacity: 0, scaleY: 0 }}
+                            whileInView={{ opacity: 1, scaleY: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: idx * 0.08 + 0.15 }}
+                            className="flex flex-col items-center"
+                          >
+                            <div className="w-px h-2 bg-gradient-to-b from-indigo-500/40 to-indigo-500/10" />
+                            <ChevronDown size={10} className="text-indigo-500/40 -mt-0.5" />
+                          </motion.div>
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Bottom Status Bar */}
+                <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] relative z-10">
+                  <span className="flex items-center gap-1.5 text-slate-400 font-semibold">
+                    <CheckCircle2 size={11} className="text-indigo-400" />
+                    End-to-end automation • Zero manual intervention
+                  </span>
+                  <span className="text-indigo-400 font-bold uppercase tracking-wider text-[9px]">Active</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ========== STATISTICS STRIP ========== */}
+      <section className="py-16 px-6 bg-slate-50 border-y border-slate-100">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((s, idx) => (
+              <motion.div
+                key={s.label}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.08 }}
+                className="text-center space-y-2 border-r border-slate-200/50 last:border-0"
+              >
+                <span className="block text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">{s.value}</span>
+                <span className="block text-[11px] font-black text-slate-400 uppercase tracking-wider">{s.label}</span>
+                <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest">{s.sub}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ========== CTA SECTION ========== */}
+      <section className="py-28 px-6 bg-slate-950 text-white text-center relative overflow-hidden">
+        {/* Background overlays */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.12),transparent_70%)] pointer-events-none" />
+
+        <div className="max-w-3xl mx-auto space-y-8 relative z-10 flex flex-col items-center">
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-300 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20 flex items-center gap-1.5">
+            <Sparkles size={12} className="text-indigo-400 animate-pulse" />
+            WhatsApp AI
+          </span>
+
+          <h2 className="font-display font-[800] text-[32px] md:text-[42px] lg:text-[52px] leading-[1.08] tracking-[-2px] text-white max-w-2xl">
+            Ready to Automate Your Customer <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300">Conversations?</span>
+          </h2>
+
+          <p className="font-sans font-normal text-[17px] leading-[1.8] max-w-[600px] text-slate-400">
+            Deploy AI-powered WhatsApp automation for your business or clinic and never miss another customer again.
+          </p>
+
+          {/* Glassmorphic Features Bar */}
+          <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-8 text-[12px] font-semibold text-slate-300 font-sans uppercase tracking-[0.5px] bg-white/5 border border-white/10 px-8 py-3.5 rounded-full backdrop-blur-md">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={13} className="text-indigo-455" />
+              <span>Click-to-WhatsApp Ads</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={13} className="text-indigo-455" />
+              <span>AI Booking</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={13} className="text-indigo-455" />
+              <span>CRM Sync</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={13} className="text-indigo-455" />
+              <span>24/7 Auto-Reply</span>
+            </div>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 w-full">
+            <NavLink
+              to="/signup"
+              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(99,102,241,0.4)] active:scale-97 text-center shadow-lg"
+            >
+              Get Started
+            </NavLink>
+            <NavLink
+              to="/contact"
+              className="w-full sm:w-auto px-8 py-4 bg-slate-900 border border-slate-800 text-slate-200 font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:bg-slate-850 hover:text-white active:scale-95 text-center shadow-sm"
+            >
+              Book a Live Demo
+            </NavLink>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
