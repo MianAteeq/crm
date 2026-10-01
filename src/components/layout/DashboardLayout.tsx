@@ -762,13 +762,14 @@ export function Sidebar({
 
 export function Header() {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasLoadedIndex, setHasLoadedIndex] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
 
   const fetchNotifications = async () => {
@@ -1359,24 +1360,66 @@ export function Header() {
         
         <div className="h-8 w-px bg-slate-200 mx-1" />
 
-        <div className="flex items-center gap-3 pl-1 cursor-pointer group">
-          <div className="hidden sm:block text-right">
-            <p className="text-[13px] font-semibold text-slate-900 leading-tight">{user?.name || 'Welcome'}</p>
-            <p className="text-[11px] text-slate-400">{user?.businessName || 'Workspace'}</p>
-          </div>
-          <div className="relative">
-            <div className={cn(
-              "w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden",
-              isImageAvatar(user?.avatar) ? "bg-slate-100" : GRADIENTS[(user?.avatar as keyof typeof GRADIENTS) || 'royal']
-            )}>
-              {isImageAvatar(user?.avatar) ? (
-                <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
-              ) : (
-                user?.name ? user.name.substring(0, 1).toUpperCase() : 'A'
-              )}
+        <div className="relative z-50">
+          {/* Click-away overlay when profile menu is open */}
+          {showProfileMenu && (
+            <div 
+              className="fixed inset-0 z-40 bg-transparent"
+              onClick={() => setShowProfileMenu(false)}
+            />
+          )}
+
+          <div 
+            className="flex items-center gap-3 pl-1 cursor-pointer group"
+            onClick={() => setShowProfileMenu(!showProfileMenu)}
+          >
+            <div className="hidden sm:block text-right">
+              <p className="text-[13px] font-semibold text-slate-900 leading-tight">{user?.name || 'Welcome'}</p>
+              <p className="text-[11px] text-slate-400">{user?.businessName || 'Workspace'}</p>
             </div>
-            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
+            <div className="relative">
+              <div className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm overflow-hidden",
+                isImageAvatar(user?.avatar) ? "bg-slate-100" : GRADIENTS[(user?.avatar as keyof typeof GRADIENTS) || 'royal']
+              )}>
+                {isImageAvatar(user?.avatar) ? (
+                  <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  user?.name ? user.name.substring(0, 1).toUpperCase() : 'A'
+                )}
+              </div>
+              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
+            </div>
           </div>
+
+          <AnimatePresence>
+            {showProfileMenu && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
+                className="absolute right-0 mt-3 w-56 bg-white border border-slate-200/90 rounded-2xl shadow-floating overflow-hidden z-[60] py-1"
+              >
+                <div className="px-4 py-3 border-b border-slate-100">
+                  <p className="text-sm font-bold text-slate-900 truncate">{user?.name || 'User'}</p>
+                  <p className="text-xs text-slate-500 font-medium truncate mt-0.5">{user?.email || 'user@example.com'}</p>
+                </div>
+                <div className="py-1 px-1.5">
+                  <button
+                    onClick={() => {
+                      logout();
+                      navigate('/login');
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors"
+                  >
+                    <LogOut size={16} />
+                    Sign Out
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </header>

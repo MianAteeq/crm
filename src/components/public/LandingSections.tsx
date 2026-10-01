@@ -1,9 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
-import { 
-  MessageSquare, 
-  Users, 
-  BarChart3, 
-  Zap, 
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  MessageSquare,
+  Users,
+  BarChart3,
+  Zap,
   Send,
   ArrowRight,
   Database,
@@ -47,7 +47,7 @@ import { crmApi } from '../../services/crmApi';
 // ==========================================
 const StripeLogo = () => (
   <svg className="h-6 opacity-40 hover:opacity-100 hover:text-[#635BFF] transition-all duration-300 fill-current" viewBox="0 0 80 34" xmlns="http://www.w3.org/2000/svg">
-    <path d="M41.4 12.3c0-3.3 2.5-4.4 6.7-4.4 3.7 0 7.3.9 10.3 2.5V3.1C55.4 1.7 51.5 1 47.9 1 34.6 1 27.6 8.1 27.6 19c0 9.8 6.7 14.1 16.5 14.1 4 0 7.8-.7 10.7-2.1v-7.3c-2.9 1.5-6.3 2.1-9.4 2.1-5.1 0-7-2-7-6.8h23.2v-1.7H41.4zm0-5c0-1.8 1.2-2.8 3.3-2.8 2.2 0 3.3 1 3.3 2.8H41.4zM24.8 9.5c0-.8-.7-1.4-1.5-1.4h-5.5V1h-9.3v7.1H3c-.8 0-1.4.6-1.4 1.4v6.8c0 .8.6 1.4 1.4 1.4h5.5v15.7h9.3V17.7h5.5c.8 0 1.4-.6 1.4-1.4V9.5z"/>
+    <path d="M41.4 12.3c0-3.3 2.5-4.4 6.7-4.4 3.7 0 7.3.9 10.3 2.5V3.1C55.4 1.7 51.5 1 47.9 1 34.6 1 27.6 8.1 27.6 19c0 9.8 6.7 14.1 16.5 14.1 4 0 7.8-.7 10.7-2.1v-7.3c-2.9 1.5-6.3 2.1-9.4 2.1-5.1 0-7-2-7-6.8h23.2v-1.7H41.4zm0-5c0-1.8 1.2-2.8 3.3-2.8 2.2 0 3.3 1 3.3 2.8H41.4zM24.8 9.5c0-.8-.7-1.4-1.5-1.4h-5.5V1h-9.3v7.1H3c-.8 0-1.4.6-1.4 1.4v6.8c0 .8.6 1.4 1.4 1.4h5.5v15.7h9.3V17.7h5.5c.8 0 1.4-.6 1.4-1.4V9.5z" />
   </svg>
 );
 
@@ -65,7 +65,7 @@ const HubSpotLogo = () => (
 
 const VercelLogo = () => (
   <svg className="h-5 opacity-40 hover:opacity-100 hover:text-white transition-all duration-300 fill-current" viewBox="0 0 116 26" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12.2 2L24.4 23H0L12.2 2z"/>
+    <path d="M12.2 2L24.4 23H0L12.2 2z" />
     <text x="32" y="20" className="font-sans font-black tracking-wider text-base">VERCEL</text>
   </svg>
 );
@@ -77,85 +77,256 @@ const NotionLogo = () => (
 );
 
 // ==========================================
-// HERO SECTION
+// HERO SECTION & CHAT MOCKUP
 // ==========================================
-export function Hero() {
-  // Live Dashboard State Loop (WhatsApp -> CRM -> AI -> Calendar -> Analytics)
-  const [pipelineState, setPipelineState] = useState(0);
+const AnimatedChatMockup = () => {
+  const [messages, setMessages] = useState<any[]>([
+    { id: 1, text: "Hello! I'm your AI Copilot ✨\nHow can I help you automate your business today?", isUser: false }
+  ]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: "smooth"
+      });
+    }
+  };
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setPipelineState((prev) => (prev + 1) % 5);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, []);
+    scrollToBottom();
+  }, [messages, isTyping]);
+
+  const handleSend = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!inputValue.trim() || isTyping) return;
+
+    const userMsg = inputValue.trim();
+    setInputValue("");
+
+    // Add user message
+    setMessages(prev => [...prev, { id: Date.now(), text: userMsg, isUser: true }]);
+    setIsTyping(true);
+
+    // Simulate AI response
+    setTimeout(() => {
+      setIsTyping(false);
+      const lowerInput = userMsg.toLowerCase();
+      let responseText = "That's a great question! I'm an AI Copilot designed to help you automate these exact kinds of conversations. How can I help your business further?";
+
+      if (lowerInput.includes('pricing') || lowerInput.includes('cost')) {
+        responseText = "Our pricing starts at $49/mo for the Pro plan, which includes full WhatsApp API access. Would you like the link to our pricing page?";
+      } else if (lowerInput.includes('demo') || lowerInput.includes('tour')) {
+        responseText = "Awesome! You can book a demo directly from our calendar. Shall I send the link? 📅";
+      } else if (lowerInput.includes('help') || lowerInput.includes('support')) {
+        responseText = "I'm here to help! Our support team is also available 24/7. What specific feature do you need assistance with?";
+      } else if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
+        responseText = "Hello there! 👋 How can I assist you with WhatsApp automation today?";
+      } else if (lowerInput.includes('broadcast') || lowerInput.includes('campaign')) {
+        responseText = "With our platform, you can launch targeted broadcast campaigns to thousands of contacts in just a few clicks! 🚀";
+      }
+
+      setMessages(prev => [...prev, { id: Date.now() + 1, text: responseText, isUser: false }]);
+    }, 1200);
+  };
 
   return (
-    <section className="relative min-h-[85vh] pt-44 pb-24 px-6 overflow-hidden bg-slate-950 text-white flex flex-col items-center justify-center">
-      {/* Background Tech Mesh Grid Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15),transparent_70%)] pointer-events-none z-0" />
+    <div className="w-full max-w-[360px] bg-[#0b141a] border border-white/10 rounded-[2rem] shadow-2xl overflow-hidden flex flex-col h-[480px] relative group transition-all hover:shadow-indigo-500/10">
+      {/* WhatsApp Header Mockup */}
+      <div className="bg-[#202c33] px-4 py-3 flex items-center gap-3 border-b border-white/5 relative z-10 shadow-sm">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center p-0.5 shadow-lg shadow-indigo-500/20">
+          <div className="w-full h-full bg-[#202c33] rounded-full flex items-center justify-center">
+            <Bot size={22} className="text-indigo-400" />
+          </div>
+        </div>
+        <div>
+          <h4 className="text-slate-100 font-semibold text-[15px] leading-tight flex items-center gap-1.5">
+            AI Copilot Agent <CheckCircle2 size={12} className="text-indigo-400" />
+          </h4>
+          <span className="text-emerald-500 text-[11px] font-medium flex items-center gap-1">
+            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" /> Always Active
+          </span>
+        </div>
+      </div>
 
-      <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10 w-full flex flex-col items-center">
+      {/* Chat Background (Subtle Texture) */}
+      <div className="absolute inset-0 opacity-5 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CiAgPHBhdGggZD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIvPgogIDxwYXRoIGQ9Ik0wIDEwaDQwdjJIMHptMCAyMGg0MHYySDB6IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjEiLz4KPC9zdmc+')] pointer-events-none" />
+
+      {/* Messages Area */}
+      <div ref={scrollContainerRef} className="flex-1 p-4 flex flex-col gap-3 overflow-y-auto z-10 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+        <AnimatePresence initial={false}>
+          {messages.map((msg) => (
+            <motion.div
+              key={msg.id}
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.2 }}
+              className={cn(
+                "max-w-[85%] rounded-[1.25rem] p-3 text-[13.5px] leading-[1.45] relative shadow-md backdrop-blur-md",
+                msg.isUser
+                  ? "bg-[#005c4b] text-white self-end rounded-tr-sm"
+                  : "bg-[#202c33] text-slate-100 self-start rounded-tl-sm border border-white/5"
+              )}
+            >
+              {!msg.isUser && (
+                <Sparkles size={12} className="absolute -top-1.5 -left-1.5 text-indigo-400" />
+              )}
+              <div className="whitespace-pre-wrap">{msg.text}</div>
+              <div className="text-[10px] text-white/50 text-right mt-1.5 flex justify-end items-center gap-1">
+                <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                {msg.isUser && <CheckCircle2 size={12} className="text-[#53bdeb]" />}
+              </div>
+            </motion.div>
+          ))}
+          {isTyping && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.15 } }}
+              className="bg-[#202c33] text-white self-start rounded-[1.25rem] rounded-tl-sm p-3.5 border border-white/5 flex gap-1.5 w-16 shadow-md"
+            >
+              <motion.div className="w-1.5 h-1.5 bg-slate-400 rounded-full" animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} />
+              <motion.div className="w-1.5 h-1.5 bg-slate-400 rounded-full" animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} />
+              <motion.div className="w-1.5 h-1.5 bg-slate-400 rounded-full" animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Interactive Input Area */}
+      <form onSubmit={handleSend} className="bg-[#202c33] px-3 py-3 flex items-center gap-2 border-t border-white/5 z-10">
+        <div className="w-8 h-8 rounded-full text-slate-400 flex items-center justify-center hover:bg-white/5 cursor-pointer transition-colors shrink-0">
+          <Plus size={20} />
+        </div>
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="Message AI Copilot..."
+          className="flex-1 bg-[#2a3942] focus:bg-[#344651] transition-colors rounded-full h-10 px-4 text-slate-200 text-[13.5px] border border-white/5 outline-none placeholder:text-slate-400"
+        />
+        <button
+          type="submit"
+          disabled={!inputValue.trim() || isTyping}
+          className="w-10 h-10 rounded-full bg-indigo-600 disabled:bg-indigo-600/50 text-white flex items-center justify-center shadow-lg hover:bg-indigo-500 transition-colors shrink-0 disabled:cursor-not-allowed"
+        >
+          <Send size={16} className="ml-0.5" />
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export function Hero() {
+  return (
+    <section className="relative min-h-[90vh] pt-40 pb-24 px-6 overflow-hidden bg-[#020617] text-white flex items-center">
+      {/* Background Animated Tech Mesh & Gradients */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-[120px] pointer-events-none z-0 mix-blend-screen" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/15 rounded-full blur-[120px] pointer-events-none z-0 mix-blend-screen" />
+
+      {/* Floating Automation Icons (Background) */}
+      <motion.div
+        animate={{ y: [-15, 15, -15], rotate: [0, 5, -5, 0] }}
+        transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+        className="absolute top-[20%] left-[10%] opacity-20 hidden lg:block"
+      >
+        <MessageCircle size={48} className="text-indigo-400" />
+      </motion.div>
+      <motion.div
+        animate={{ y: [15, -15, 15], rotate: [0, -10, 10, 0] }}
+        transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
+        className="absolute bottom-[20%] right-[8%] opacity-20 hidden lg:block"
+      >
+        <Zap size={56} className="text-purple-400" />
+      </motion.div>
+      <motion.div
+        animate={{ scale: [0.9, 1.1, 0.9], opacity: [0.1, 0.3, 0.1] }}
+        transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+        className="absolute top-[30%] right-[15%] hidden lg:block"
+      >
+        <Bot size={40} className="text-emerald-400" />
+      </motion.div>
+
+      <div className="max-w-7xl mx-auto relative z-10 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+
+        {/* Left Content Column */}
+        <div className="space-y-8 flex flex-col items-center lg:items-start text-center lg:text-left z-10">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-indigo-500/10 border border-indigo-500/30 rounded-full shadow-lg shadow-indigo-500/5 backdrop-blur-md"
+          >
+            <Sparkles size={14} className="text-indigo-400 animate-pulse" />
+            <span className="font-sans font-[500] text-[13px] uppercase tracking-[1px] text-indigo-300">AI Automation Now Live</span>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="font-display font-[800] text-[44px] sm:text-[54px] md:text-[64px] lg:text-[72px] leading-[1.05] tracking-[-2.5px] text-white max-w-2xl"
+          >
+            AI-Powered <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#25D366] to-[#128C7E]">WhatsApp</span> Automation
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="font-sans font-normal text-[18px] md:text-[20px] leading-[1.7] max-w-[580px] text-slate-300"
+          >
+            Deploy intelligent AI copilots, launch targeted broadcast campaigns, and fully automate your customer journey to drive repeat sales on autopilot.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2 w-full max-w-md lg:max-w-none"
+          >
+            <NavLink
+              to="/signup"
+              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(99,102,241,0.4)] active:scale-97 text-center shadow-lg flex items-center justify-center gap-2"
+            >
+              Start Free Trial <ArrowRight size={18} />
+            </NavLink>
+            <NavLink
+              to="/contact"
+              className="w-full sm:w-auto px-8 py-4 bg-slate-900 border border-slate-700 text-slate-200 font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:bg-slate-800 hover:text-white hover:border-slate-600 active:scale-95 text-center shadow-sm flex items-center justify-center gap-2"
+            >
+              <Bot size={18} /> See AI Demo
+            </NavLink>
+          </motion.div>
+
+          {/* Trust Badges Checklist */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="pt-6 mt-4 border-t border-white/5 flex flex-wrap items-center justify-center lg:justify-start gap-y-3 gap-x-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest"
+          >
+            <span className="flex items-center gap-1.5 text-slate-300"><CheckCircle2 size={14} className="text-[#25D366]" /> Official WhatsApp API</span>
+            <span className="flex items-center gap-1.5 text-slate-300"><CheckCircle2 size={14} className="text-indigo-400" /> Advanced AI Routing</span>
+            <span className="flex items-center gap-1.5 text-slate-300"><CheckCircle2 size={14} className="text-purple-400" /> 24/7 Autopilot</span>
+          </motion.div>
+        </div>
+
+        {/* Right Content Column - AI Chat Mockup */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-indigo-500/10 border border-indigo-500/30 rounded-full shadow-lg shadow-indigo-500/5 backdrop-blur-md"
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2, duration: 0.6, type: "spring" }}
+          className="flex justify-center lg:justify-end relative z-10 mt-8 lg:mt-0"
         >
-          <Sparkles size={14} className="text-indigo-400 animate-pulse" />
-          <span className="font-sans font-[500] text-sm uppercase tracking-[1px] text-indigo-300">API v2.4 Platform Now Live</span>
+          {/* Decorative halo around mockup */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 blur-3xl -z-10 rounded-full transform scale-110" />
+          <AnimatedChatMockup />
         </motion.div>
 
-        <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="font-display font-[800] text-[40px] sm:text-[54px] md:text-[68px] lg:text-[76px] leading-[1.05] tracking-[-2.5px] text-white max-w-3xl"
-        >
-          Unify WhatsApp Marketing & <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300">Customer CRM</span>
-        </motion.h1>
-
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="font-sans font-normal text-[18px] md:text-[20px] leading-[1.8] max-w-[720px] text-slate-350 mx-auto"
-        >
-          Connect your customer database, launch targeted WhatsApp broadcasts, automate birthday greetings, and deploy AI copilot agents to drive repeat sales.
-        </motion.p>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-1 w-full max-w-md"
-        >
-          <NavLink
-            to="/signup"
-            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(99,102,241,0.4)] active:scale-97 text-center shadow-lg"
-          >
-            Start Free Trial
-          </NavLink>
-          <NavLink
-            to="/contact"
-            className="w-full sm:w-auto px-8 py-4 bg-slate-900 border border-slate-800 text-slate-200 font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:bg-slate-850 hover:text-white active:scale-95 text-center shadow-sm"
-          >
-            Book Demo
-          </NavLink>
-        </motion.div>
-
-        {/* Trust Badges Checklist */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="pt-6 border-t border-white/5 flex flex-wrap items-center justify-center gap-y-3 gap-x-6 text-[10.5px] font-bold text-slate-400 uppercase tracking-widest"
-        >
-          <span className="text-yellow-500 font-sans tracking-normal">★★★★★ Trusted by 2,000+ Businesses</span>
-          <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-indigo-400" /> Official WhatsApp API</span>
-          <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-indigo-400" /> SLA 99.99% Uptime</span>
-          <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-indigo-400" /> GDPR & HIPAA Secure</span>
-        </motion.div>
       </div>
     </section>
   );
@@ -169,7 +340,7 @@ export function TrustedBy() {
     <section className="py-16 border-y border-slate-100 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 text-center">
         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-10">Trusted by fast-growing SaaS & retail teams globally</p>
-        
+
         {/* Infinite scrolling logo row with responsive Vector SVG logos */}
         <div className="flex w-full overflow-hidden relative">
           <div className="flex gap-24 animate-marquee whitespace-nowrap py-3 shrink-0 items-center">
@@ -208,7 +379,7 @@ export function Statistics() {
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           {stats.map((s, idx) => (
-            <motion.div 
+            <motion.div
               key={s.label}
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -323,7 +494,7 @@ export function Features() {
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-3 tracking-tight">{f.title}</h3>
                 <p className="text-slate-500 font-medium text-xs leading-relaxed mb-6">{f.desc}</p>
-                
+
                 {/* Benefits Bullet Checklist */}
                 <ul className="space-y-2 mb-6">
                   {f.bullets.map((b) => (
@@ -352,12 +523,12 @@ export function Features() {
 // ==========================================
 export function AIWorkflow() {
   const steps = [
-    { num: '1', title: 'Customer Message', desc: 'Inbound message received via WhatsApp, IG, or chat.' },
-    { num: '2', title: 'AI Detects Intent', desc: 'Analyzes user context, language, and intent.' },
-    { num: '3', title: 'AI Generates Reply', desc: 'Drafts and sends a personalized message in seconds.' },
-    { num: '4', title: 'Books Appointment', desc: 'Suggests slots and registers calendar invites.' },
-    { num: '5', title: 'Updates CRM', desc: 'Records status and creates custom deals.' },
-    { num: '6', title: 'Notifies Sales Team', desc: 'Alerts account managers via unified inbox.' }
+    { icon: MessageCircle, title: 'Inbound Message', desc: 'Customer texts your WhatsApp number or scans a QR code.' },
+    { icon: Zap, title: 'AI Context Engine', desc: 'Instantly analyzes context, language, and purchasing intent.' },
+    { icon: Send, title: 'Interactive Reply', desc: 'Fires back personalized replies with WhatsApp buttons & lists.' },
+    { icon: Calendar, title: 'In-Chat Booking', desc: 'Customer books a meeting slot directly within the chat window.' },
+    { icon: Database, title: 'CRM Sync', desc: 'Automatically logs the lead, tags intent, and updates your CRM.' },
+    { icon: Users, title: 'Smart Handoff', desc: 'Routes complex or high-value chats to human agents seamlessly.' }
   ];
 
   return (
@@ -367,34 +538,39 @@ export function AIWorkflow() {
 
       <div className="max-w-7xl mx-auto text-center relative z-10">
         <div className="max-w-2xl mx-auto space-y-4 mb-20 text-center flex flex-col items-center">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-purple-400 bg-purple-500/10 px-3.5 py-1.5 rounded-full border border-purple-500/20">Zero Agent Friction</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-white">Let AI Handle Every Customer Conversation</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-300">Connect AI to your WhatsApp business settings to automate response generation, support workflows, and pipeline progression dynamically.</p>
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-purple-400 bg-purple-500/10 px-3.5 py-1.5 rounded-full border border-purple-500/20 flex items-center gap-2">
+            <Sparkles size={14} className="text-purple-400" />
+            100% Automated Workflow
+          </span>
+          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-white">Turn WhatsApp Into Your Best Employee</h2>
+          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-300">Deploy AI on your WhatsApp Business number to automate response generation, support workflows, and pipeline progression 24/7.</p>
         </div>
 
         {/* Step-by-Step Flow diagram */}
         <div className="grid grid-cols-1 md:grid-cols-6 gap-6 relative">
           {/* Connecting Line Overlay for Desktop */}
-          <div className="hidden md:block absolute top-[28px] left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-indigo-500/20 via-purple-500/40 to-indigo-500/20 -z-10" />
+          <div className="hidden md:block absolute top-[28px] left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/40 to-purple-500/0 -z-10" />
 
-          {steps.map((s, idx) => (
-            <motion.div 
-              key={s.num}
+          {steps.map((s, idx) => {
+            const Icon = s.icon;
+            return (
+            <motion.div
+              key={idx}
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="flex flex-col items-center group bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md hover:border-purple-500/30 hover:bg-white/10 transition-all duration-300"
+              className="flex flex-col items-center group bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md hover:border-purple-500/30 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1"
             >
-              <div className="w-12 h-12 bg-purple-500/10 border border-purple-500/30 text-purple-400 font-display font-bold rounded-xl flex items-center justify-center text-base shadow-inner group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 transition-all duration-300 relative">
-                {s.num}
-                {/* Pulse dot */}
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-purple-500 rounded-full animate-pulse" />
+              <div className="w-14 h-14 bg-purple-500/10 border border-purple-500/30 text-purple-400 rounded-xl flex items-center justify-center shadow-inner group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 transition-all duration-300 relative">
+                <Icon size={24} strokeWidth={2} />
+                {/* Pulse dot (kept Emerald for WhatsApp vibe) */}
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
               </div>
-              <h3 className="font-display font-[700] text-[16px] text-white mt-6 mb-2 tracking-tight group-hover:text-purple-300 transition-colors">{s.title}</h3>
-              <p className="text-xs text-slate-400 leading-relaxed font-normal">{s.desc}</p>
+              <h3 className="font-display font-[700] text-[16px] text-white mt-6 mb-2 tracking-tight text-center group-hover:text-purple-300 transition-colors">{s.title}</h3>
+              <p className="text-xs text-slate-400 leading-relaxed font-normal text-center">{s.desc}</p>
             </motion.div>
-          ))}
+          )})}
         </div>
       </div>
     </section>
@@ -417,49 +593,48 @@ export function OmnichannelInbox() {
   return (
     <section id="solutions" className="py-32 px-6 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-        
+
         {/* Visual Console Mockup */}
         <div className="lg:col-span-6 w-full flex justify-center">
           <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-[2.5rem] p-5 shadow-2xl relative overflow-hidden flex flex-col h-[380px] text-white">
-            
+
             {/* Console Header */}
             <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-bold tracking-tight text-slate-200">Shared Unified Inbox</span>
+                <span className="text-xs font-bold tracking-tight text-slate-200">WhatsApp Workspace</span>
               </div>
-              <div className="flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-lg border border-white/5 text-[9px] font-mono text-slate-400">
-                <span>6 ACTIVE CHANNELS</span>
+              <div className="flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-lg border border-white/5 text-[9px] font-mono text-emerald-400">
+                <span>OFFICIAL API</span>
               </div>
             </div>
 
             {/* Console Body Split */}
             <div className="flex-1 flex gap-4 mt-3 overflow-hidden">
-              
-              {/* Channel Switcher Sidebar */}
+
+              {/* Channel Switcher Sidebar -> WhatsApp Views Sidebar */}
               <div className="w-1/3 border-r border-white/5 pr-3 space-y-2 text-[10.5px] font-bold text-slate-450">
                 <div className="p-2 bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">💬 WhatsApp</span>
-                  <span className="w-4 h-4 bg-indigo-600 text-white text-[8px] rounded-full flex items-center justify-center">4</span>
+                  <span className="flex items-center gap-1.5">💬 All Chats</span>
+                  <span className="w-4 h-4 bg-emerald-500 text-white text-[8px] rounded-full flex items-center justify-center">4</span>
                 </div>
                 <div className="p-2 hover:bg-white/5 rounded-xl flex items-center justify-between transition-colors cursor-pointer">
-                  <span className="flex items-center gap-1.5 text-slate-300">📸 Instagram</span>
-                  <span className="w-4 h-4 bg-pink-500 text-white text-[8px] rounded-full flex items-center justify-center">2</span>
+                  <span className="flex items-center gap-1.5 text-slate-300">🤖 AI Copilot</span>
                 </div>
                 <div className="p-2 hover:bg-white/5 rounded-xl flex items-center gap-1.5 text-slate-400 transition-colors cursor-pointer">
-                  <span>👥 Messenger</span>
+                  <span>🏷️ Sales Leads</span>
                 </div>
                 <div className="p-2 hover:bg-white/5 rounded-xl flex items-center gap-1.5 text-slate-400 transition-colors cursor-pointer">
-                  <span>🌐 Live Chat</span>
+                  <span>🎫 Support</span>
                 </div>
                 <div className="p-2 hover:bg-white/5 rounded-xl flex items-center gap-1.5 text-slate-400 transition-colors cursor-pointer">
-                  <span>✉️ Email</span>
+                  <span>🚀 Broadcasts</span>
                 </div>
               </div>
 
               {/* Chat Thread Area */}
               <div className="flex-1 flex flex-col justify-between">
-                
+
                 {/* Active contact bar */}
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
                   <div>
@@ -471,7 +646,7 @@ export function OmnichannelInbox() {
 
                 {/* Message feed */}
                 <div className="flex-1 flex flex-col justify-end gap-3 my-3">
-                  
+
                   {/* Incoming */}
                   <div className="flex flex-col items-start max-w-[85%] self-start space-y-1">
                     <div className="p-3 bg-slate-950 border border-white/5 rounded-2xl rounded-tl-none text-xs leading-relaxed text-slate-200">
@@ -493,9 +668,9 @@ export function OmnichannelInbox() {
 
                 {/* Response Input block */}
                 <div className="flex items-center gap-2 border-t border-white/5 pt-2">
-                  <input 
-                    type="text" 
-                    placeholder="Send auto-reply or type response..." 
+                  <input
+                    type="text"
+                    placeholder="Send auto-reply or type response..."
                     className="flex-1 bg-slate-950 border border-white/5 rounded-xl h-8 px-3 text-[10px] placeholder-slate-650 focus:outline-none focus:border-indigo-650"
                     disabled
                   />
@@ -513,18 +688,18 @@ export function OmnichannelInbox() {
 
         {/* Text Area */}
         <div className="lg:col-span-6 space-y-8 text-left">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50">Omnichannel Hub</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Unify all your channels in one dashboard</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Stop swapping tabs between WhatsApp settings, Instagram DMs, support emails, and live chat. Throb routes all incoming messages to one shared workspace so agents solve tickets faster.</p>
-          
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50">WhatsApp Automation</span>
+          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Scale your business on WhatsApp</h2>
+          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Stop manually replying to repetitive queries. Automate responses, route conversations to the right team, and send targeted broadcast campaigns on the world's most popular messaging app.</p>
+
           <div className="grid grid-cols-2 gap-6 pt-4">
             <div className="space-y-2">
-              <span className="block text-2xl font-black text-slate-900">45%</span>
-              <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Faster Response Time</span>
+              <span className="block text-2xl font-black text-slate-900">98%</span>
+              <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Message Open Rate</span>
             </div>
             <div className="space-y-2">
-              <span className="block text-2xl font-black text-slate-900">100%</span>
-              <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Unified Lead Capture</span>
+              <span className="block text-2xl font-black text-slate-900">24/7</span>
+              <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Automated Support</span>
             </div>
           </div>
         </div>
@@ -605,7 +780,7 @@ export function CRMDashboardPreview() {
 
         {/* Kanban Board Interface Mockup */}
         <div className="w-full bg-white border border-slate-200 shadow-xl rounded-[2.5rem] p-8 flex flex-col gap-8">
-          
+
           {/* Header of Board */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-6 gap-4">
             <div>
@@ -615,7 +790,7 @@ export function CRMDashboardPreview() {
               </div>
               <span className="text-[11px] font-semibold text-slate-450 mt-0.5 block">Pipeline Value: <strong className="text-indigo-600">$14,600 USD</strong> • 3 active customer profiles</span>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <span className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">REST API: Active</span>
               <a href="#contact" className="px-4 py-2 bg-slate-900 hover:bg-indigo-650 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">
@@ -628,7 +803,7 @@ export function CRMDashboardPreview() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {columns.map((col) => (
               <div key={col.title} className={cn("p-5 bg-slate-50/50 border border-slate-200/80 rounded-2.5xl flex flex-col gap-4 border-t-4", col.color)}>
-                
+
                 {/* Column header info */}
                 <div className="flex justify-between items-center border-b border-slate-200/50 pb-2">
                   <div>
@@ -642,7 +817,7 @@ export function CRMDashboardPreview() {
                 <div className="space-y-3 flex-1">
                   {col.deals.map((deal, dealIdx) => (
                     <div key={dealIdx} className="p-4 bg-white border border-slate-200/60 shadow-sm rounded-2xl flex flex-col gap-3.5 hover:border-indigo-400 hover:shadow-md transition-all duration-350 group">
-                      
+
                       {/* Card Header Profile & Tag */}
                       <div className="flex justify-between items-start gap-2">
                         <div className="flex items-center gap-2.5">
@@ -741,13 +916,13 @@ export function AnalyticsDashboard() {
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-        
+
         {/* Text Area */}
         <div className="lg:col-span-5 space-y-8 text-left">
           <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-400 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20">Unified Metrics</span>
           <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-white">Campaign analytics with pixel-perfect accuracy</h2>
           <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-300">Monitor conversion rates, sales pipelines, message volume, and support resolution metrics. Our real-time data visualizer tracks agent response speeds and total return-on-investment automatically.</p>
-          
+
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-5 h-5 rounded bg-emerald-500/20 flex items-center justify-center"><CheckCircle2 size={12} className="text-emerald-400" /></div>
@@ -786,11 +961,11 @@ export function AnalyticsDashboard() {
                 <line x1="50" y1="250" x2="550" y2="250" stroke="rgba(255,255,255,0.08)" />
 
                 {/* Line Path */}
-                <path 
-                  d="M50,220 C120,180 180,120 250,140 C320,160 380,80 450,100 C520,120 530,60 550,50" 
-                  fill="none" 
-                  stroke="url(#chartGradient)" 
-                  strokeWidth="4" 
+                <path
+                  d="M50,220 C120,180 180,120 250,140 C320,160 380,80 450,100 C520,120 530,60 550,50"
+                  fill="none"
+                  stroke="url(#chartGradient)"
+                  strokeWidth="4"
                   strokeLinecap="round"
                 />
 
@@ -816,7 +991,7 @@ export function AnalyticsDashboard() {
                 <text x="550" y="275" fill="#64748b" fontSize="10" fontWeight="bold">Jun</text>
               </svg>
             </div>
-            
+
             {/* KPI Cards */}
             <div className="grid grid-cols-3 gap-4 border-t border-white/5 pt-6">
               <div>
@@ -893,49 +1068,88 @@ export function Testimonials() {
       author: "Jessica Lin",
       role: "VP of Support, TechCorp",
       stats: "300% Higher Conversion",
-      logo: "TechCorp"
+      logo: "TechCorp",
+      avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
+      gradient: "from-indigo-500/5 to-purple-500/5"
     },
     {
       text: "Our marketing workflows became unified in minutes. The WhatsApp Graph API integration is compliant, robust, and performs flawlessly during high-volume promo sales events.",
       author: "Marcus Aurel",
       role: "Founder, FissionMonster",
-      stats: "4x Faster Response Time",
-      logo: "FissionMonster"
+      stats: "4x Faster Response",
+      logo: "FissionMonster",
+      avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
+      gradient: "from-purple-500/5 to-pink-500/5"
     }
   ];
 
   return (
-    <section id="resources" className="py-32 px-6 bg-white">
-      <div className="max-w-7xl mx-auto space-y-24">
-        <div className="text-center max-w-xl mx-auto space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50">Testimonials</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Hear it from teams who build on Throb</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">See how high-growth startups and local businesses streamline customer support, scale marketing outreach, and automate replies.</p>
+    <section id="resources" className="py-32 px-6 bg-slate-50 relative overflow-hidden border-y border-slate-100">
+      {/* Background decoration */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/5 blur-[120px] rounded-full" />
+        <div className="absolute top-[60%] -right-[10%] w-[50%] h-[50%] bg-purple-500/5 blur-[120px] rounded-full" />
+      </div>
+
+      <div className="max-w-7xl mx-auto space-y-20 relative z-10">
+        <div className="text-center max-w-2xl mx-auto space-y-6">
+          <span className="font-sans font-[600] text-[13px] uppercase tracking-[1.5px] text-indigo-600 bg-white px-4 py-2 rounded-full border border-indigo-100 shadow-sm shadow-indigo-100/50 inline-flex items-center gap-2">
+            <Star size={14} className="fill-indigo-600 text-indigo-600" />
+            Success Stories
+          </span>
+          <h2 className="font-display font-[800] text-[36px] md:text-[48px] lg:text-[56px] leading-[1.1] tracking-[-1.5px] text-slate-900">
+            Hear it from teams who <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">build on Throb</span>
+          </h2>
+          <p className="font-sans font-medium text-[18px] leading-[1.8] max-w-[620px] mx-auto text-slate-500">
+            See how high-growth startups and local businesses streamline customer support, scale marketing outreach, and automate replies.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {reviews.map((r) => (
-            <div key={r.author} className="p-12 bg-slate-50 border border-slate-150 rounded-[3rem] flex flex-col justify-between hover:border-slate-300 transition-all">
-              <div className="space-y-6">
-                <div className="flex gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} className="text-yellow-500 text-lg">★</span>
-                  ))}
-                </div>
-                <p className="text-slate-600 font-medium italic text-base leading-relaxed">"{r.text}"</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+          {reviews.map((r, idx) => (
+            <motion.div 
+              key={r.author} 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.2 }}
+              className="group relative bg-white p-10 md:p-12 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between overflow-hidden"
+            >
+              {/* Subtle background gradient on hover */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${r.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+              
+              {/* Massive decorative quote mark */}
+              <div className="absolute -top-6 -left-6 text-slate-50 opacity-100 group-hover:text-indigo-50/80 transition-colors duration-500 pointer-events-none">
+                <svg width="180" height="180" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14.017 18L14.017 10.609C14.017 4.905 17.748 1.039 23 0L23.995 2.151C21.563 3.068 20 5.789 20 8H24V18H14.017ZM0 18V10.609C0 4.905 3.748 1.038 9 0L9.996 2.151C7.563 3.068 6 5.789 6 8H9.983L9.983 18L0 18Z" />
+                </svg>
               </div>
 
-              <div className="mt-10 pt-8 border-t border-slate-200/80 flex items-center justify-between">
-                <div>
-                  <span className="font-extrabold text-sm text-slate-900 block">{r.author}</span>
-                  <span className="text-xs text-slate-500 font-medium block mt-1">{r.role}</span>
+              <div className="relative z-10 space-y-8 flex-1">
+                <div className="flex gap-1.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={18} className="fill-yellow-400 text-yellow-400 drop-shadow-sm" />
+                  ))}
                 </div>
-                <div className="text-right">
-                  <span className="text-xs font-black text-indigo-650 block uppercase tracking-wider">{r.stats}</span>
-                  <span className="text-[10px] text-slate-400 font-bold block mt-1 uppercase tracking-widest">{r.logo}</span>
+                <p className="text-slate-700 font-display font-medium text-[20px] md:text-[22px] leading-[1.6] tracking-tight">
+                  "{r.text}"
+                </p>
+              </div>
+
+              <div className="relative z-10 mt-12 pt-8 border-t border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <img src={r.avatar} alt={r.author} className="w-14 h-14 rounded-full border-2 border-white shadow-md object-cover" />
+                  <div>
+                    <span className="font-bold text-[16px] text-slate-900 block">{r.author}</span>
+                    <span className="text-[13px] text-slate-500 font-medium block mt-0.5">{r.role}</span>
+                  </div>
+                </div>
+                <div className="text-right flex flex-col items-end gap-1.5">
+                  <span className="text-[11px] font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md uppercase tracking-wider">{r.stats}</span>
+                  <span className="text-[11px] text-slate-400 font-bold block uppercase tracking-widest">{r.logo}</span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -965,18 +1179,39 @@ export function Pricing() {
   }, []);
 
   const defaultPlans = [
-    { name: 'Starter', price: 0, features: ['1,000 Contacts Limit', 'Basic Analytics Tracker', 'Standard Support Line', '5 Automation Workflows'], highlighted: false, key: 'free' },
-    { name: 'Business', price: 49, features: ['10,000 Contacts Limit', 'Advanced Workflow Paths', 'Priority 24/7 Support Line', 'Complete CRM Sync'], highlighted: true, key: 'pro' },
-    { name: 'Enterprise', price: 'Custom', features: ['Unlimited Contacts Cap', 'Meta API Verification Help', 'Dedicated Manager Assign', 'Full Developer API Access'], highlighted: false, key: 'enterprise' }
+    { 
+      name: 'Starter', 
+      price: 0, 
+      desc: 'Perfect for small businesses starting out.',
+      features: ['1 WhatsApp Number', '100 AI Auto-Replies / mo', 'Basic WhatsApp Broadcasts', 'Standard Team Inbox'], 
+      highlighted: false, 
+      key: 'free' 
+    },
+    { 
+      name: 'Business', 
+      price: 49, 
+      desc: 'For high-growth teams scaling their reach.',
+      features: ['Official WhatsApp API', 'Unlimited AI Copilot Replies', 'Advanced Sequence Flows', 'Full CRM & Store Sync'], 
+      highlighted: true, 
+      key: 'pro' 
+    },
+    { 
+      name: 'Enterprise', 
+      price: 'Custom', 
+      desc: 'Custom workflows and dedicated support.',
+      features: ['Unlimited WhatsApp Numbers', 'Meta Green Tick Assistance', 'Custom Interactive Flows', 'Dedicated Success Manager'], 
+      highlighted: false, 
+      key: 'enterprise' 
+    }
   ];
 
   const displayPlans = plans.length > 0 ? plans.map(p => {
-    let rawPrice = p.price.toLowerCase().includes('/month') 
-      ? p.price.replace(/\/month/i, '') 
-      : p.price.toLowerCase().includes('custom') 
-        ? 'Custom' 
+    let rawPrice = p.price.toLowerCase().includes('/month')
+      ? p.price.replace(/\/month/i, '')
+      : p.price.toLowerCase().includes('custom')
+        ? 'Custom'
         : p.price;
-        
+
     let numericPrice = parseFloat(rawPrice.replace(/[^0-9.]/g, ''));
     if (isNaN(numericPrice)) {
       numericPrice = rawPrice;
@@ -984,13 +1219,14 @@ export function Pricing() {
 
     return {
       name: p.name,
+      desc: p.key === 'pro' ? 'For high-growth teams scaling their reach.' : p.key === 'enterprise' ? 'Custom workflows and dedicated support.' : 'Perfect for small businesses starting out.',
       price: numericPrice,
       features: [
         `${p.limits.contacts} Contacts Ceiling`,
         `${p.limits.messages} Broadcasts Capacity`,
-        p.limits.campaigns.toLowerCase() !== 'disabled' ? 'Automation Campaigns Included' : 'Manual Campaigns Only',
+        p.limits.campaigns.toLowerCase() !== 'disabled' ? 'Advanced Automation Flows' : 'Manual Campaigns Only',
         p.limits.ai_replies.toLowerCase() !== 'disabled' ? `AI replies: ${p.limits.ai_replies}` : 'No AI Copilot Replies',
-        'Meta Cloud API Integration'
+        'Official WhatsApp API Integration'
       ],
       highlighted: p.key === 'pro',
       key: p.key
@@ -1005,76 +1241,86 @@ export function Pricing() {
   };
 
   return (
-    <section id="pricing" className="py-32 px-6 bg-slate-50/50">
-       <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16 max-w-xl mx-auto space-y-4">
-             <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50">Pricing Plans</span>
-             <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Flexible plans for high-growth teams</h2>
-             <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Choose a plan that fits your business scale. Unlock unlimited contacts, advanced AI auto-replies, automated sequence flows, and CRM integrations.</p>
+    <section id="pricing" className="py-32 px-6 bg-white relative overflow-hidden border-t border-slate-100">
+      {/* Background glow effects */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-200 to-transparent" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-50/50 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="text-center mb-16 max-w-2xl mx-auto space-y-4">
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50">Pricing Plans</span>
+          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Scale your WhatsApp operations</h2>
+          <p className="font-sans font-normal text-[18px] leading-[1.8] text-slate-500">Choose a plan that fits your business scale. Unlock unlimited contacts, advanced AI auto-replies, and seamless CRM integrations.</p>
+        </div>
+
+        {/* Monthly / Yearly billing Toggle Switch */}
+        <div className="flex items-center justify-center gap-4 mb-20">
+          <span className={cn("text-xs font-black uppercase tracking-wider", !isYearly ? "text-slate-900" : "text-slate-400")}>Monthly Billing</span>
+          <button
+            onClick={() => setIsYearly(!isYearly)}
+            className="w-14 h-7 bg-indigo-50 border border-indigo-100 rounded-full p-1 transition-all duration-300 relative focus:outline-none cursor-pointer hover:bg-indigo-100"
+          >
+            <div className={cn("w-5 h-5 bg-indigo-600 rounded-full transition-all duration-300 shadow-sm", isYearly ? "translate-x-7" : "translate-x-0")} />
+          </button>
+          <div className="flex items-center gap-2">
+            <span className={cn("text-xs font-black uppercase tracking-wider", isYearly ? "text-slate-900" : "text-slate-400")}>Yearly Billing</span>
+            <span className="text-[9px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-md border border-indigo-200">Save 20%</span>
           </div>
+        </div>
 
-          {/* Monthly / Yearly billing Toggle Switch */}
-          <div className="flex items-center justify-center gap-4 mb-20">
-            <span className={cn("text-xs font-black uppercase tracking-wider", !isYearly ? "text-slate-900" : "text-slate-400")}>Monthly Billing</span>
-            <button 
-              onClick={() => setIsYearly(!isYearly)}
-              className="w-14 h-7 bg-slate-900 rounded-full p-1 transition-all duration-300 relative focus:outline-none cursor-pointer"
-            >
-              <div className={cn("w-5 h-5 bg-white rounded-full transition-all duration-300", isYearly ? "translate-x-7" : "translate-x-0")} />
-            </button>
-            <div className="flex items-center gap-2">
-              <span className={cn("text-xs font-black uppercase tracking-wider", isYearly ? "text-indigo-600" : "text-slate-400")}>Yearly Billing</span>
-              <span className="text-[8px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md border border-emerald-200">Save 20%</span>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center max-w-6xl mx-auto">
+          {displayPlans.map((plan) => (
+            <div key={plan.name} className={cn(
+              "p-10 rounded-[2.5rem] flex flex-col transition-all duration-500 relative group overflow-hidden",
+              plan.highlighted
+                ? "bg-white text-slate-900 border-2 border-indigo-600 shadow-[0_20px_60px_rgba(79,70,229,0.15)] md:-translate-y-4 z-10"
+                : "bg-white text-slate-900 border border-slate-200/80 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-900/5 hover:-translate-y-2"
+            )}>
+              
+              {plan.highlighted && (
+                <div className="absolute top-6 right-6 bg-indigo-50 text-indigo-700 border border-indigo-200 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                  <Sparkles size={12} className="text-indigo-600" /> Most Popular
+                </div>
+              )}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-             {displayPlans.map((plan) => (
-               <div key={plan.name} className={cn(
-                 "p-12 rounded-[3.5rem] border flex flex-col transition-all duration-300 hover:-translate-y-2 relative overflow-hidden",
-                 plan.highlighted 
-                   ? "bg-slate-900 text-white border-slate-900 shadow-2xl scale-105 z-10 hover:shadow-[0_15px_40px_rgba(99,102,241,0.2)]" 
-                   : "bg-white border-slate-200 text-slate-900 hover:border-slate-300"
-               )}>
-                  {plan.highlighted && (
-                    <div className="absolute top-0 right-0 bg-indigo-600 text-white text-[8.5px] font-black uppercase tracking-widest px-5 py-2.5 rounded-bl-3xl shadow-sm">
-                      Most Popular
-                    </div>
-                  )}
+              <h3 className={cn("text-sm font-black uppercase tracking-[0.2em] mb-2", plan.highlighted ? "text-indigo-600" : "text-slate-500")}>{plan.name}</h3>
+              <p className="text-slate-500 text-xs font-medium mb-6 min-h-[32px]">{plan.desc}</p>
+              
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-5xl font-black tracking-tight text-slate-900">{getPriceLabel(plan)}</span>
+                {plan.price !== 'Custom' && <span className="text-sm font-medium text-slate-400">/mo</span>}
+              </div>
 
-                  <h3 className={cn("text-xs font-bold uppercase tracking-[0.3em] mb-4", plan.highlighted ? "text-indigo-400" : "text-slate-400")}>{plan.name}</h3>
-                  <div className="flex items-baseline gap-2 mb-10">
-                     <span className="text-5xl font-black tracking-tight">{getPriceLabel(plan)}</span>
-                     {plan.price !== 'Custom' && <span className={cn("text-xs font-medium uppercase", plan.highlighted ? "text-slate-400" : "text-slate-450")}>/mo</span>}
+              <div className="h-6 mb-8">
+                {isYearly && plan.price !== 'Custom' && (
+                  <span className="block text-[10.5px] font-bold text-indigo-600 uppercase tracking-wider bg-indigo-50 w-fit px-2.5 py-1 rounded-md border border-indigo-100">Billed annually</span>
+                )}
+              </div>
+
+              <div className="flex-1 space-y-4 mb-10">
+                {plan.features.map((f: string) => (
+                  <div key={f} className="flex items-start gap-3 text-sm font-medium text-slate-700">
+                    <CheckCircle2 size={18} className={cn("shrink-0 mt-0.5", plan.highlighted ? "text-indigo-600" : "text-indigo-400")} />
+                    <span>{f}</span>
                   </div>
-                  
-                  {isYearly && plan.price !== 'Custom' && (
-                    <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-6 -mt-8">Billed annually</span>
-                  )}
-
-                  <ul className="space-y-4 mb-12 flex-1">
-                     {plan.features.map(f => (
-                       <li key={f} className="flex items-center gap-3 text-sm font-medium opacity-80">
-                          <div className={cn("w-1.5 h-1.5 rounded-full", plan.highlighted ? "bg-indigo-400" : "bg-slate-900")} />
-                          {f}
-                       </li>
-                     ))}
-                  </ul>
-                  <NavLink 
-                    to={`/signup?plan=${plan.key}`}
-                    className={cn(
-                      "w-full py-5 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95 cursor-pointer text-center block",
-                      plan.highlighted 
-                        ? "bg-indigo-600 text-white hover:bg-indigo-750 shadow-lg shadow-indigo-600/20" 
-                        : "bg-slate-900 text-white hover:bg-slate-800"
-                    )}
-                  >
-                    Get Started
-                  </NavLink>
-               </div>
-             ))}
-          </div>
-       </div>
+                ))}
+              </div>
+              
+              <NavLink
+                to={`/signup?plan=${plan.key}`}
+                className={cn(
+                  "w-full py-4 rounded-xl font-bold text-[13px] uppercase tracking-widest transition-all active:scale-95 cursor-pointer text-center block relative overflow-hidden group-hover:shadow-md",
+                  plan.highlighted
+                    ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-600/30"
+                    : "bg-slate-50 border border-slate-200 text-slate-800 hover:border-indigo-600 hover:text-indigo-600 hover:bg-white"
+                )}
+              >
+                <span className="relative z-10">Get Started</span>
+              </NavLink>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
@@ -1083,63 +1329,118 @@ export function Pricing() {
 // FAQ ACCORDION SECTION
 // ==========================================
 export function FAQ() {
-  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   const faqs = [
     {
-      q: "Can I try the platform before subscribing?",
-      a: "Yes, you can register for our Starter free plan without entering credit card details. It allows you to explore visual builder automation and sync up to 1,000 contacts instantly."
+      q: "How do I connect my WhatsApp number to the AI automation platform?",
+      a: "We use Meta's official WhatsApp Business Cloud API. You simply verify your business and link your phone number ID. It's 100% secure, fully compliant, and ensures maximum message delivery rates."
     },
     {
-      q: "How does the WhatsApp Graph API connection work?",
-      a: "We connect directly to Meta's official WhatsApp Business Cloud API. You supply your access token and phone number ID, ensuring 100% security, zero server maintenance, and stable delivery speeds."
+      q: "Can the AI copilot handle customer support and bookings simultaneously?",
+      a: "Yes! Our AI is trained to understand context. It can answer FAQs, route complex queries to your human agents, and instantly trigger WhatsApp booking flows right inside the chat."
     },
     {
-      q: "Is there any limit to workflows or campaigns?",
-      a: "Starter plans support up to 5 workflows. Business and Enterprise plans provide unlimited workflows, allowing custom branches, delayed queues, API integrations, and webhook triggers."
+      q: "Is there a limit to how many WhatsApp broadcast messages I can send?",
+      a: "Broadcast limits are determined by your Meta API tier (starting at 1,000 to 100K+ messages/day). Our platform seamlessly supports high-volume broadcasts for your marketing campaigns without throttling."
     },
     {
-      q: "Can I connect my CRM like HubSpot or Salesforce?",
-      a: "Absolutely. Our CRM lead integration pulls leads directly from HubSpot, Salesforce, Facebook Lead Ads, Instagram forms, and webhook links automatically."
+      q: "Can I integrate my existing CRM with your WhatsApp automation?",
+      a: "Absolutely. We offer native integrations for HubSpot, Salesforce, and custom webhooks. Whenever a lead interacts with your WhatsApp bot, their profile and chat history automatically sync to your CRM."
+    },
+    {
+      q: "Will my WhatsApp account get banned for using automation?",
+      a: "No. Because we use the official Meta Cloud API, you are fully compliant with WhatsApp's terms of service. You will not risk being banned, unlike unofficial web scraping tools."
     }
   ];
 
   return (
-    <section className="py-32 px-6 bg-white">
-      <div className="max-w-4xl mx-auto space-y-16">
-        <div className="text-center space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50">FAQ</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Frequently Asked Questions</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Find answers to common questions about accounts, setup, billing, automation limits, compliance guidelines, and CRM connections.</p>
+    <section className="py-32 px-6 bg-slate-50 relative overflow-hidden">
+      {/* Decorative Background */}
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-indigo-50/50 -skew-x-12 transform origin-top-right z-0" />
+      <div className="absolute top-20 right-20 w-72 h-72 bg-purple-200/50 rounded-full blur-[80px] pointer-events-none z-0" />
+      <div className="absolute bottom-20 left-20 w-72 h-72 bg-indigo-200/50 rounded-full blur-[80px] pointer-events-none z-0" />
+
+      <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+        
+        {/* Left Content Area */}
+        <div className="lg:col-span-5 space-y-8 sticky top-24">
+          <div className="space-y-4">
+            <span className="font-sans font-[600] text-[13px] uppercase tracking-[1.5px] text-indigo-600 bg-white px-4 py-2 rounded-full border border-indigo-100 shadow-sm shadow-indigo-100/50 inline-flex items-center gap-2">
+              <HelpCircle size={14} className="text-indigo-600" />
+              Support Center
+            </span>
+            <h2 className="font-display font-[800] text-[36px] md:text-[44px] leading-[1.1] tracking-[-1px] text-slate-900">
+              Got questions about <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">WhatsApp AI?</span>
+            </h2>
+            <p className="font-sans font-medium text-[18px] leading-[1.7] text-slate-500">
+              Everything you need to know about setting up your WhatsApp Business API, automation limits, compliance, and CRM integrations.
+            </p>
+          </div>
+
+          <div className="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex items-start gap-4">
+            <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
+              <MessageCircle size={24} className="text-indigo-600" />
+            </div>
+            <div>
+              <h4 className="font-bold text-slate-900 mb-1">Still have questions?</h4>
+              <p className="text-sm text-slate-500 mb-3">Our WhatsApp automation experts are ready to help you build the perfect workflow.</p>
+              <a href="#contact" className="text-sm font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1.5 transition-colors">
+                Chat with our team <ArrowRight size={14} />
+              </a>
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-4">
+        {/* Right FAQ Accordion Area */}
+        <div className="lg:col-span-7 space-y-4">
           {faqs.map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
-              <div 
-                key={idx} 
-                className="border border-slate-150 rounded-2xl overflow-hidden bg-slate-50/30 transition-all duration-300 hover:border-slate-300"
+              <div
+                key={idx}
+                className={cn(
+                  "border rounded-2xl overflow-hidden transition-all duration-300",
+                  isOpen 
+                    ? "bg-white border-indigo-200 shadow-lg shadow-indigo-900/5" 
+                    : "bg-white/60 border-slate-200/80 hover:bg-white hover:border-slate-300"
+                )}
               >
                 <button
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
-                  className="w-full p-6 text-left flex items-center justify-between gap-4 font-bold text-slate-905 text-sm md:text-base cursor-pointer focus:outline-none"
+                  className="w-full p-6 text-left flex items-start justify-between gap-4 cursor-pointer focus:outline-none"
                 >
-                  <span>{faq.q}</span>
-                  <div className="shrink-0 text-slate-500">
+                  <div className="flex gap-4">
+                    <span className={cn(
+                      "font-mono text-xs font-bold mt-1 shrink-0",
+                      isOpen ? "text-indigo-600" : "text-slate-400"
+                    )}>
+                      {String(idx + 1).padStart(2, '0')}
+                    </span>
+                    <span className={cn(
+                      "font-bold text-[15px] md:text-[17px] leading-snug transition-colors",
+                      isOpen ? "text-indigo-900" : "text-slate-800"
+                    )}>
+                      {faq.q}
+                    </span>
+                  </div>
+                  <div className={cn(
+                    "shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+                    isOpen ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-500"
+                  )}>
                     {isOpen ? <Minus size={16} strokeWidth={2.5} /> : <Plus size={16} strokeWidth={2.5} />}
                   </div>
                 </button>
-                
+
                 <AnimatePresence initial={false}>
                   {isOpen && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25, ease: "easeInOut" }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                      <div className="px-6 pb-6 text-xs md:text-sm font-medium text-slate-500 leading-relaxed border-t border-slate-100 pt-4">
+                      <div className="px-6 pb-6 pl-[52px] text-[14px] md:text-[15px] font-medium text-slate-500 leading-relaxed">
                         {faq.a}
                       </div>
                     </motion.div>
@@ -1165,7 +1466,7 @@ export function FinalCTA() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.12),transparent_70%)] pointer-events-none" />
 
       <div className="max-w-4xl mx-auto space-y-10 relative z-10 flex flex-col items-center">
-        
+
         {/* Sparkles tag */}
         <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-300 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20 flex items-center gap-1.5">
           <Sparkles size={12} className="text-indigo-400 animate-pulse" />
@@ -1181,7 +1482,7 @@ export function FinalCTA() {
         <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-400">
           Join thousands of high-growth teams who automate WhatsApp messages, nurture leads, and scale conversion pipelines automatically.
         </p>
-        
+
         {/* Glassmorphic Checklist Bar */}
         <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-8 text-[12px] font-semibold text-slate-300 font-sans uppercase tracking-[0.5px] bg-white/5 border border-white/10 px-8 py-3.5 rounded-full backdrop-blur-md">
           <div className="flex items-center gap-2">
@@ -1446,23 +1747,36 @@ export function WhatsAppAutomation() {
       </section>
 
       {/* ========== STATISTICS STRIP ========== */}
-      <section className="py-16 px-6 bg-slate-50 border-y border-slate-100">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((s, idx) => (
-              <motion.div
-                key={s.label}
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.08 }}
-                className="text-center space-y-2 border-r border-slate-200/50 last:border-0"
-              >
-                <span className="block text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">{s.value}</span>
-                <span className="block text-[11px] font-black text-slate-400 uppercase tracking-wider">{s.label}</span>
-                <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest">{s.sub}</span>
-              </motion.div>
-            ))}
+      <section className="py-20 px-6 bg-white relative overflow-hidden">
+        
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="bg-slate-950 border border-slate-800/60 shadow-[0_20px_60px_rgba(0,0,0,0.15)] rounded-[2.5rem] p-10 md:p-14 relative overflow-hidden group">
+            {/* Animated Background Glows */}
+            <div className="absolute top-0 left-1/4 w-1/2 h-1/2 bg-indigo-500/20 blur-[100px] pointer-events-none rounded-full group-hover:bg-indigo-500/30 transition-colors duration-700" />
+            <div className="absolute bottom-0 right-1/4 w-1/2 h-1/2 bg-purple-500/20 blur-[100px] pointer-events-none rounded-full group-hover:bg-purple-500/30 transition-colors duration-700" />
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 relative z-10">
+              {stats.map((s, idx) => (
+                <motion.div
+                  key={s.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="flex flex-col items-center text-center group/stat"
+                >
+                  <div className="relative mb-5">
+                    <span className="text-5xl md:text-6xl font-display font-extrabold bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-slate-400 tracking-tighter group-hover/stat:scale-110 group-hover/stat:-translate-y-1 transition-all duration-500 block drop-shadow-lg">
+                      {s.value}
+                    </span>
+                    {/* Tiny decorative WhatsApp green dot on hover */}
+                    <span className="absolute top-0 -right-4 w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(52,211,153,1)] opacity-0 group-hover/stat:opacity-100 transition-opacity duration-300" />
+                  </div>
+                  <span className="block text-[12px] font-black text-indigo-300 uppercase tracking-[0.2em] mb-1.5">{s.label}</span>
+                  <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">{s.sub}</span>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

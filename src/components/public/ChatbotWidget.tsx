@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   MessageCircle,
@@ -9,6 +9,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { useBrandingStore } from '../../store/brandingStore';
 
 // ==========================================
 // KNOWLEDGE BASE - Predefined Q&A Pairs
@@ -148,11 +149,14 @@ const quickActions = [
 // CHATBOT WIDGET COMPONENT
 // ==========================================
 export default function ChatbotWidget() {
+  const { websiteName, websiteLogo } = useBrandingStore();
+  const botName = websiteName || 'Throbtech AI';
+
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
-      text: 'Hi there! 👋 I\'m the Throbtech AI assistant. How can I help you today?\n\nYou can ask me about our features, pricing, WhatsApp automation, or anything else!',
+      text: `Hi there! 👋 I'm the ${botName} assistant. How can I help you today?\n\nYou can ask me about our features, pricing, WhatsApp automation, or anything else!`,
       sender: 'bot',
       timestamp: new Date()
     }
@@ -295,11 +299,15 @@ export default function ChatbotWidget() {
               
               <div className="relative z-10 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl flex items-center justify-center">
-                    <Bot size={18} className="text-white" />
+                  <div className="w-9 h-9 bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl flex items-center justify-center overflow-hidden">
+                    {websiteLogo ? (
+                      <img src={websiteLogo} alt="Logo" className="w-full h-full object-cover" />
+                    ) : (
+                      <Bot size={18} className="text-white" />
+                    )}
                   </div>
                   <div>
-                    <h3 className="font-display font-bold text-[14px] tracking-tight leading-tight">Throbtech AI</h3>
+                    <h3 className="font-display font-bold text-[14px] tracking-tight leading-tight">{botName}</h3>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       <span className="text-[10px] font-semibold text-indigo-200 uppercase tracking-wider">Online Now</span>
@@ -427,7 +435,7 @@ export default function ChatbotWidget() {
                 </button>
               </div>
               <p className="text-[9px] text-slate-400 font-semibold text-center mt-2 uppercase tracking-wider">
-                Powered by Throbtech AI • Instant Responses
+                Powered by {botName} • Instant Responses
               </p>
             </form>
           </motion.div>

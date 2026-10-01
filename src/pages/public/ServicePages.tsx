@@ -25,43 +25,66 @@ function ServicePageLayout({ title, subtitle, category, description, color, bull
   }, []);
 
   return (
-    <div className="bg-white text-slate-900 min-h-screen selection:bg-indigo-500/20 selection:text-indigo-900 overflow-x-hidden pt-24 font-sans">
+    <div className="bg-slate-50 text-slate-900 min-h-screen selection:bg-indigo-500/20 selection:text-indigo-900 overflow-x-hidden font-sans">
       <Navbar />
       
       <main>
         {/* Service Hero Header */}
-        <section className="py-24 px-6 bg-slate-50/60 relative overflow-hidden border-b border-slate-200/50">
-          {/* Tech Grid & Radial Glow overlay */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.05),transparent_70%)] pointer-events-none" />
+        <section className="pt-48 pb-36 px-6 bg-slate-950 text-white text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15),transparent_60%)] pointer-events-none" />
+          
+          <div className="max-w-4xl mx-auto space-y-6 relative z-10 flex flex-col items-center justify-center">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center gap-4"
+            >
+              <NavLink to="/features" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-white uppercase tracking-[0.2em] transition-colors mb-2">
+                <ArrowLeft size={14} /> Back to Services
+              </NavLink>
+              <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20">
+                {category}
+              </span>
+            </motion.div>
 
-          <div className="max-w-4xl mx-auto text-center space-y-6 relative z-10">
-            <NavLink to="/features" className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-650 uppercase tracking-widest hover:text-indigo-800 transition-colors mb-2">
-              <ArrowLeft size={12} /> Back to Services
-            </NavLink>
-            <span className={cn("block text-[11px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border w-fit mx-auto", color)}>
-              {category}
-            </span>
-            <h1 className="font-display font-[800] text-[38px] md:text-[54px] lg:text-[64px] tracking-[-2px] leading-tight text-slate-900">
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="text-4xl md:text-6xl font-extrabold tracking-tight"
+            >
               {title}
-            </h1>
-            <p className="font-sans font-normal text-[18px] md:text-[20px] leading-[1.8] max-w-2xl mx-auto text-slate-500">
+            </motion.h1>
+
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-slate-450 font-medium text-sm md:text-base max-w-2xl mx-auto leading-relaxed"
+            >
               {subtitle}
-            </p>
+            </motion.p>
           </div>
         </section>
 
         {/* Detailed Showcase Grid */}
-        <section className="py-24 px-6 max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+        <section className="py-24 px-6 max-w-7xl mx-auto relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
             
             {/* Left Content column */}
-            <div className="lg:col-span-6 space-y-8">
+            <motion.div 
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-5 space-y-10"
+            >
               <div className="space-y-4">
-                <h2 className="font-display font-[700] text-[28px] md:text-[36px] tracking-[-1px] text-slate-900">
+                <h2 className="font-display font-[800] text-[32px] md:text-[40px] tracking-[-1px] text-slate-900 leading-[1.2]">
                   Why High-Growth Teams Use This Tool
                 </h2>
-                <p className="text-slate-500 text-[16px] leading-[1.8]">
+                <p className="text-slate-500 text-[17px] leading-[1.7] font-medium">
                   {description}
                 </p>
               </div>
@@ -69,45 +92,81 @@ function ServicePageLayout({ title, subtitle, category, description, color, bull
               {/* Bullet checklist cards */}
               <div className="space-y-4">
                 {bullets.map((b, idx) => (
-                  <div key={idx} className="p-5 bg-slate-50/50 border border-slate-200/60 rounded-2xl flex items-start gap-4 hover:border-indigo-500/30 transition-all shadow-sm">
-                    <div className="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100/50 flex items-center justify-center text-indigo-600 shrink-0">
-                      <CheckCircle2 size={16} />
+                  <motion.div 
+                    key={idx} 
+                    whileHover={{ scale: 1.02, x: 5 }}
+                    className="p-6 bg-white border border-slate-200/80 rounded-2xl flex items-start gap-5 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0 shadow-inner mt-1">
+                      <CheckCircle2 size={20} strokeWidth={2.5} />
                     </div>
                     <div>
-                      <span className="block text-sm font-bold text-slate-800">{b.split(':')[0]}</span>
-                      <span className="block text-[12px] text-slate-500 mt-1 leading-relaxed">{b.split(':')[1] || ''}</span>
+                      <span className="block text-[15px] font-bold text-slate-900 mb-1">{b.split(':')[0]}</span>
+                      <span className="block text-[13px] text-slate-500 leading-relaxed font-medium">{b.split(':')[1] || ''}</span>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* Right Visual mockup column */}
-            <div className="lg:col-span-6 flex justify-center w-full">
-              {mockup}
-            </div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7, type: "spring", bounce: 0.4 }}
+              className="lg:col-span-7 flex items-center justify-center w-full h-full"
+            >
+              <div className="relative w-full max-w-lg mx-auto flex items-center justify-center">
+                {/* Glowing backdrop for the mockup */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/40 to-purple-500/40 blur-2xl transform rotate-3 rounded-[3rem] -m-2" />
+                <div className="relative transform hover:-translate-y-2 hover:scale-[1.02] transition-all duration-500 w-full">
+                  {mockup}
+                </div>
+              </div>
+            </motion.div>
 
           </div>
         </section>
 
         {/* Reusable CTA Block */}
-        <section className="py-24 px-6 border-t border-slate-200/50 bg-slate-50 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.04),transparent_60%)] pointer-events-none" />
-          <div className="max-w-3xl mx-auto text-center space-y-8 relative z-10">
-            <h2 className="font-display font-[800] text-[32px] md:text-[48px] tracking-[-1.5px] leading-tight text-slate-900">
+        <section className="py-32 px-6 relative overflow-hidden mt-12">
+          <div className="absolute inset-0 bg-slate-900" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.25),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+          
+          <div className="max-w-4xl mx-auto text-center space-y-10 relative z-10">
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="font-display font-[800] text-[40px] md:text-[56px] tracking-[-1.5px] leading-[1.1] text-white"
+            >
               Ready to automate your workflow?
-            </h2>
-            <p className="font-sans font-normal text-slate-500 max-w-xl mx-auto text-[16px]">
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="font-sans font-medium text-slate-300 max-w-2xl mx-auto text-[18px] md:text-[20px]"
+            >
               Set up your account in minutes and connect your WhatsApp Business API configurations.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <NavLink to="/signup" className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-sans font-semibold text-[15px] tracking-[0.3px] rounded-xl hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(99,102,241,0.25)] transition-all">
-                Start Free Trial
+            </motion.p>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-4"
+            >
+              <NavLink to="/signup" className="btn-premium-gradient !text-[13px] !px-10 !py-4 w-full sm:w-auto text-center !tracking-[0.2em]">
+                Start Free Trial <ArrowRight size={18} />
               </NavLink>
-              <NavLink to="/contact" className="w-full sm:w-auto px-8 py-4 bg-white border border-slate-200 text-slate-700 font-sans font-semibold text-[15px] tracking-[0.3px] rounded-xl hover:bg-slate-50 transition-all shadow-sm">
+              <NavLink to="/contact" className="px-10 py-4 bg-white/10 border border-white/20 text-white font-sans font-black text-[13px] uppercase tracking-[0.2em] rounded-2xl hover:bg-white/20 transition-all shadow-sm backdrop-blur-md w-full sm:w-auto text-center flex items-center justify-center gap-2">
                 Schedule Live Demo
               </NavLink>
-            </div>
+            </motion.div>
           </div>
         </section>
       </main>
@@ -454,6 +513,63 @@ export function MediaStoragePage() {
             <div className="p-3.5 bg-indigo-600/10 border border-indigo-500/20 rounded-xl flex justify-between items-center text-xs font-bold">
               <span className="text-white">Workspace Storage Utilized</span>
               <span className="text-indigo-450">1.44 GB / 10 GB (14.4%)</span>
+            </div>
+          </div>
+        </div>
+      }
+    />
+  );
+}
+
+// 9. WhatsApp Analytics Page
+export function WhatsAppAnalyticsPage() {
+  return (
+    <ServicePageLayout
+      title="WhatsApp Analytics"
+      subtitle="Track message delivery, open rates, engagement metrics, and campaign ROI in real-time."
+      category="Analytics & Reporting"
+      color="bg-sky-500/10 text-sky-400 border-sky-500/20"
+      description="Gain deep insights into your messaging performance. Understand how your audience interacts with your campaigns through comprehensive analytics. Monitor delivery statuses, read receipts, and click-through rates to optimize your communication strategy."
+      bullets={[
+        "Real-Time Delivery Tracking: Monitor exactly how many messages are sent, delivered, and read instantly.",
+        "Engagement Metrics: Analyze click-through rates on interactive buttons and links to gauge audience interest.",
+        "Comprehensive ROI Reporting: Connect your campaign costs to generated leads and conversions to measure true ROI."
+      ]}
+      mockup={
+        <div className="w-full max-w-lg bg-slate-900 border border-white/10 rounded-3xl p-6 space-y-6 shadow-xl text-left">
+          <div className="flex items-center justify-between border-b border-white/5 pb-4">
+            <span className="text-xs font-bold text-slate-400 uppercase">Analytics Dashboard</span>
+            <span className="text-[10px] bg-sky-500/20 text-sky-400 border border-sky-500/30 px-2 py-0.5 rounded-full font-bold uppercase">Live</span>
+          </div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3 font-mono">
+              <div className="p-4 bg-slate-950 border border-white/5 rounded-xl space-y-1">
+                <span className="text-[10px] text-slate-500 block">Total Messages Sent</span>
+                <span className="text-xl font-bold text-white">45,280</span>
+                <span className="text-[9px] text-emerald-400 block">↑ 12% vs last month</span>
+              </div>
+              <div className="p-4 bg-slate-950 border border-white/5 rounded-xl space-y-1">
+                <span className="text-[10px] text-slate-500 block">Average Open Rate</span>
+                <span className="text-xl font-bold text-sky-400">98.5%</span>
+                <span className="text-[9px] text-emerald-400 block">↑ 2.1% vs last month</span>
+              </div>
+            </div>
+            <div className="p-4 bg-slate-950 border border-white/5 rounded-xl space-y-3">
+               <span className="text-[10px] font-bold text-slate-400 uppercase block">Delivery Funnel</span>
+               <div className="space-y-2">
+                 <div>
+                   <div className="flex justify-between text-[10px] text-slate-400 mb-1"><span>Sent</span><span>100%</span></div>
+                   <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-slate-400 w-full"></div></div>
+                 </div>
+                 <div>
+                   <div className="flex justify-between text-[10px] text-slate-400 mb-1"><span>Delivered</span><span>99.2%</span></div>
+                   <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-indigo-400 w-[99.2%]"></div></div>
+                 </div>
+                 <div>
+                   <div className="flex justify-between text-[10px] text-slate-400 mb-1"><span>Read</span><span>98.5%</span></div>
+                   <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-sky-400 w-[98.5%]"></div></div>
+                 </div>
+               </div>
             </div>
           </div>
         </div>

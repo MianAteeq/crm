@@ -46,124 +46,123 @@ export default function LoginPage() {
     <div className="bg-white min-h-screen flex flex-col justify-between selection:bg-indigo-500/20 selection:text-indigo-900 font-sans">
       <Navbar />
       
-      <div className="flex-1 flex items-center justify-center p-6 pt-32 pb-24 bg-slate-50/50 bg-[dashed-pattern]">
-        <div className="w-full max-w-[440px] space-y-8">
+      <div className="flex-1 flex items-center justify-center p-6 pt-32 pb-24 bg-slate-50 relative overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-indigo-400/20 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-purple-400/20 rounded-full blur-[100px] pointer-events-none" />
+        
+        <div className="w-full max-w-[440px] space-y-8 relative z-10">
           <div className="text-center">
-            <Link to="/" className="inline-flex items-center gap-3 mb-8 group">
-              {websiteLogo ? (
-                <img src={websiteLogo} alt="Logo" className="w-12 h-12 object-contain rounded-2xl shrink-0 shadow-xl shadow-slate-900/10 transition-transform group-hover:rotate-12" />
-              ) : (
-                <div className="w-12 h-12 bg-slate-950 text-white rounded-2xl flex items-center justify-center shadow-xl shadow-slate-900/20 transition-transform group-hover:rotate-12">
-                  <MessageSquare size={26} strokeWidth={2.5} />
-                </div>
-              )}
-              <span className="text-3xl font-bold text-slate-900 tracking-tight">{websiteName}</span>
-            </Link>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">Welcome back</h1>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest px-10">Access your enterprise communication portal</p>
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-3">Welcome back</h1>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest px-10">Access your enterprise communication portal</p>
           </div>
 
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-slate-200 p-10 rounded-[2.5rem] shadow-xl relative"
+            className="relative group"
           >
-            <div className="absolute -top-1 px-8 py-2 bg-slate-950 text-white text-[9px] font-bold uppercase tracking-widest rounded-full left-1/2 transform -translate-x-1/2 -translate-y-1/2 whitespace-nowrap shadow-lg">
-              Secure Authentication Gateway
+            {/* Background Glow */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-[3rem] blur-xl opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+
+            <div className="bg-white/90 backdrop-blur-xl border border-slate-200/60 p-10 rounded-[2.5rem] shadow-2xl relative">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-6 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-[9px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg whitespace-nowrap">
+                Secure Authentication Gateway
+              </div>
+
+              {error && (
+                <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-600 animate-in fade-in slide-in-from-top-2">
+                  <div className="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
+                    <Lock size={14} />
+                  </div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest leading-relaxed">
+                    {error}
+                  </p>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
+                <div className="space-y-2.5">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Business Email</label>
+                  <div className="relative group/input">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                    <input 
+                      {...register('email')}
+                      type="email"
+                      placeholder="name@company.com"
+                      className={`w-full h-14 bg-slate-50/50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
+                        errors.email ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white'
+                      }`}
+                    />
+                  </div>
+                  {errors.email && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.email.message}</p>}
+                </div>
+
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between pl-1">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Password</label>
+                    <button type="button" className="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 transition-colors">Forgot Password?</button>
+                  </div>
+                  <div className="relative group/input">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                    <input 
+                      {...register('password')}
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      className={`w-full h-14 bg-slate-50/50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
+                        errors.password ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white'
+                      }`}
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 transition-colors"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {errors.password && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.password.message}</p>}
+                </div>
+
+                <motion.button 
+                  type="submit" 
+                  disabled={isLoading}
+                  whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                  className="w-full h-14 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 transition-all shadow-xl shadow-indigo-600/25 flex items-center justify-center gap-3 mt-8 cursor-pointer relative overflow-hidden"
+                >
+                  <AnimatePresence mode="wait">
+                    {isLoading ? (
+                      <motion.div
+                        key="loading"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="flex items-center gap-2"
+                      >
+                        <Loader2 size={16} className="animate-spin" />
+                        <span>Authenticating...</span>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="idle"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="flex items-center gap-2"
+                      >
+                        <span>Sign In Securely</span>
+                        <ArrowRight size={16} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.button>
+              </form>
             </div>
-
-            {error && (
-              <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-600 animate-in fade-in slide-in-from-top-2">
-                <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
-                  <Lock size={14} />
-                </div>
-                <p className="text-[10px] font-bold uppercase tracking-widest leading-relaxed">
-                  {error}
-                </p>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Business Email</label>
-                <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" size={18} />
-                  <input 
-                    {...register('email')}
-                    type="email"
-                    placeholder="name@company.com"
-                    className={`w-full bg-slate-50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
-                      errors.email ? 'border-rose-300 bg-rose-50' : 'border-slate-100 focus:border-slate-900 focus:bg-white focus:shadow-sm'
-                    }`}
-                  />
-                </div>
-                {errors.email && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.email.message}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between pl-1">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Password</label>
-                  <button type="button" className="text-[9px] font-bold text-slate-900 uppercase tracking-widest hover:underline">Forgot?</button>
-                </div>
-                <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" size={18} />
-                  <input 
-                    {...register('password')}
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    className={`w-full bg-slate-50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
-                      errors.password ? 'border-rose-300 bg-rose-50' : 'border-slate-100 focus:border-slate-900 focus:bg-white focus:shadow-sm'
-                    }`}
-                  />
-                  <button 
-                    type="button" 
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 transition-colors"
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                {errors.password && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.password.message}</p>}
-              </div>
-
-              <motion.button 
-                type="submit" 
-                disabled={isLoading}
-                whileHover={{ scale: isLoading ? 1 : 1.01 }}
-                whileTap={{ scale: isLoading ? 1 : 0.99 }}
-                className="w-full py-5 bg-slate-950 text-white text-[10px] font-bold uppercase tracking-[0.2em] rounded-2xl hover:bg-slate-800 disabled:opacity-50 transition-all shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 mt-4 cursor-pointer relative overflow-hidden"
-              >
-                <AnimatePresence mode="wait">
-                  {isLoading ? (
-                    <motion.div
-                      key="loading"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="flex items-center gap-2"
-                    >
-                      <Loader2 size={16} className="animate-spin" />
-                      <span>Signing In...</span>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="idle"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="flex items-center gap-2"
-                    >
-                      <span>Sign In</span>
-                      <ArrowRight size={16} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.button>
-            </form>
           </motion.div>
 
-          <p className="text-center text-[11px] font-semibold text-slate-500">
-            New to {websiteName}? <Link to="/signup" className="text-slate-900 hover:underline underline-offset-4 decoration-2 font-bold">Create an account</Link>
+          <p className="text-center text-[12px] font-semibold text-slate-500 pt-4">
+            New to {websiteName}? <Link to="/signup" className="text-indigo-600 hover:text-indigo-700 font-bold ml-1">Create an account</Link>
           </p>
         </div>
       </div>

@@ -116,9 +116,9 @@ function KpiCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.4, ease: 'easeOut' }}
-      className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 p-5"
+      className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 p-5 flex flex-col h-full"
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 shrink-0">
         <div
           className="w-10 h-10 rounded-xl flex items-center justify-center"
           style={{ backgroundColor: `${accent}14`, color: accent }}
@@ -128,7 +128,7 @@ function KpiCard({
         {change && (
           <div
             className={cn(
-              'flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full',
+              'flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0',
               positive ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'
             )}
           >
@@ -137,8 +137,8 @@ function KpiCard({
           </div>
         )}
       </div>
-      <p className="text-[13px] font-medium text-slate-500">{label}</p>
-      <div className="flex items-end justify-between gap-2 mt-1">
+      <p className="text-[13px] font-medium text-slate-500 flex-1">{label}</p>
+      <div className="flex items-end justify-between gap-2 mt-1 shrink-0">
         <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{value}</h2>
         <div className="w-20 h-9 -mb-1 shrink-0">
           <ResponsiveContainer width="100%" height="100%">

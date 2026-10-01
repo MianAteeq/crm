@@ -24,7 +24,8 @@ import ResourcesPage from './pages/public/ResourcesPage';
 import ContactPage from './pages/public/ContactPage';
 import { 
   WhatsAppCampaignsPage, RetargetingPage, AutomationPage, SocialMediaPage, 
-  LeadFormsPage, AIResponsesPage, PageBuilderPage, MediaStoragePage 
+  LeadFormsPage, AIResponsesPage, PageBuilderPage, MediaStoragePage,
+  WhatsAppAnalyticsPage
 } from './pages/public/ServicePages';
 
 // Auth Pages
@@ -113,6 +114,7 @@ export default function App() {
         <Route path="/services/ai-responses" element={<AIResponsesPage />} />
         <Route path="/services/page-builder" element={<PageBuilderPage />} />
         <Route path="/services/media-storage" element={<MediaStoragePage />} />
+        <Route path="/services/analytics" element={<WhatsAppAnalyticsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />

@@ -24,22 +24,24 @@ export default function Footer() {
   return (
     <footer className="py-24 px-6 border-t border-slate-100 bg-slate-950 text-white">
       <div className="max-w-7xl mx-auto space-y-16">
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-6 xl:gap-8">
           
           {/* Main Info */}
-          <div className="md:col-span-2 space-y-6 text-left">
-            <div className="flex items-center gap-2.5">
+          <div className="sm:col-span-2 lg:col-span-3 space-y-6 text-left lg:pr-4">
+            <div className="flex items-center">
               {websiteLogo ? (
-                <img src={websiteLogo} alt="Logo" className="w-8 h-8 object-contain rounded-lg shrink-0" />
+                <img src={websiteLogo} alt="Logo" className="w-56 h-auto object-contain rounded-lg shrink-0" />
               ) : (
-                <div className="w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center">
-                  <MessageCircle size={18} strokeWidth={2.5} />
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center">
+                    <MessageCircle size={18} strokeWidth={2.5} />
+                  </div>
+                  <span className="text-xl font-bold tracking-tight">{websiteName}</span>
                 </div>
               )}
-              <span className="text-xl font-bold tracking-tight">{websiteName}</span>
             </div>
             <p className="text-xs font-medium text-slate-400 leading-relaxed max-w-sm">
-              The enterprise-grade customer engagement CRM for teams who value speed, automation, and real-time WhatsApp and social media campaigns.
+              The enterprise-grade WhatsApp automation platform for teams who value speed, efficiency, and real-time customer engagement.
             </p>
             <div className="flex gap-3">
               <a href="#" className="w-9 h-9 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-white transition-all">
@@ -55,7 +57,7 @@ export default function Footer() {
           </div>
           
           {/* Company links */}
-          <div>
+          <div className="lg:col-span-2">
             <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Company</h4>
             <ul className="space-y-3.5 text-left">
               <li><Link to="/" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Home Page</Link></li>
@@ -65,19 +67,19 @@ export default function Footer() {
           </div>
 
           {/* Services list (reflecting the exact user list) */}
-          <div>
+          <div className="lg:col-span-2">
             <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Services</h4>
             <ul className="space-y-3.5 text-left">
-              <li><Link to="/features" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">WhatsApp Campaigns</Link></li>
-              <li><Link to="/features" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Automated Messaging</Link></li>
-              <li><Link to="/solutions" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">AI Auto Response</Link></li>
-              <li><Link to="/solutions" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">CRM & Form Integration</Link></li>
-              <li><Link to="/features" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Social Media Planner</Link></li>
+              <li><Link to="/services/whatsapp-campaigns" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">WhatsApp Campaigns</Link></li>
+              <li><Link to="/services/automation" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Automated Messaging</Link></li>
+              <li><Link to="/services/ai-responses" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">AI Auto Response</Link></li>
+              <li><Link to="/services/flow-builder" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">WhatsApp Flow Builder</Link></li>
+              <li><Link to="/services/team-inbox" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Shared Team Inbox</Link></li>
             </ul>
           </div>
 
           {/* Legal & Trust */}
-          <div>
+          <div className="lg:col-span-2">
             <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">Trust & Legal</h4>
             <ul className="space-y-3.5 text-left">
               <li><Link to="/privacy" className="text-xs font-bold text-slate-400 hover:text-white transition-colors">Privacy Policy</Link></li>
@@ -88,7 +90,7 @@ export default function Footer() {
           </div>
 
           {/* Newsletter subscription form */}
-          <div className="space-y-4 text-left">
+          <div className="sm:col-span-2 lg:col-span-3 space-y-4 text-left">
             <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Subscribe to Updates</h4>
             <p className="text-[11px] font-semibold text-slate-400 leading-normal">Get the latest product features, updates, and SaaS benchmarks delivered directly to your inbox weekly.</p>
             <form onSubmit={handleSubscribe} className="flex gap-2">

@@ -16,18 +16,18 @@ export function PrivacyPage() {
     <div className="bg-white text-slate-900 min-h-screen selection:bg-indigo-500/20 selection:text-indigo-900 font-sans overflow-x-hidden">
       <Navbar />
 
-      <main className="pt-24">
+      <main>
         {/* Hero Header */}
-        <section className="py-20 px-6 bg-slate-50/60 border-b border-slate-200/50 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-          <div className="max-w-4xl mx-auto text-center space-y-4 relative z-10">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-indigo-650 uppercase tracking-widest bg-indigo-50 border border-indigo-100/80 px-3.5 py-1.5 rounded-full">
+        <section className="pt-48 pb-36 px-6 bg-slate-950 text-white text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15),transparent_60%)] pointer-events-none" />
+          <div className="max-w-4xl mx-auto space-y-6 relative z-10">
+            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20">
               Trust & Transparency
             </span>
-            <h1 className="text-4xl md:text-5xl font-[800] tracking-[-1.5px] text-slate-900 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
               Privacy Policy
             </h1>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
+            <p className="text-slate-450 font-medium text-sm md:text-base max-w-xl mx-auto leading-relaxed uppercase tracking-widest">
               Last updated: June 30, 2026
             </p>
           </div>
@@ -114,18 +114,18 @@ export function TermsPage() {
     <div className="bg-white text-slate-900 min-h-screen selection:bg-indigo-500/20 selection:text-indigo-900 font-sans overflow-x-hidden">
       <Navbar />
 
-      <main className="pt-24">
+      <main>
         {/* Hero Header */}
-        <section className="py-20 px-6 bg-slate-50/60 border-b border-slate-200/50 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-          <div className="max-w-4xl mx-auto text-center space-y-4 relative z-10">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-indigo-650 uppercase tracking-widest bg-indigo-50 border border-indigo-100/80 px-3.5 py-1.5 rounded-full">
+        <section className="pt-48 pb-36 px-6 bg-slate-950 text-white text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15),transparent_60%)] pointer-events-none" />
+          <div className="max-w-4xl mx-auto space-y-6 relative z-10">
+            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20">
               User Agreement
             </span>
-            <h1 className="text-4xl md:text-5xl font-[800] tracking-[-1.5px] text-slate-900 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
               Terms & Conditions
             </h1>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
+            <p className="text-slate-450 font-medium text-sm md:text-base max-w-xl mx-auto leading-relaxed uppercase tracking-widest">
               Last updated: June 30, 2026
             </p>
           </div>

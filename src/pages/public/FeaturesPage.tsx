@@ -119,26 +119,24 @@ export default function FeaturesPage() {
         {/* ==========================================
             PAGE HERO (LIGHT STYLE - CENTERED)
             ========================================== */}
-        <section className="py-32 px-6 bg-slate-50/60 text-slate-900 relative overflow-hidden border-b border-slate-200/50">
-          {/* Grids and Glows overlay */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[130px] pointer-events-none" />
-
-          <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10 flex flex-col items-center justify-center">
-            <span className="inline-flex items-center gap-1.5 text-xs font-black text-indigo-650 uppercase tracking-widest bg-indigo-50 border border-indigo-100/80 px-3.5 py-1.5 rounded-full">
+        <section className="pt-48 pb-36 px-6 bg-slate-950 text-white text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15),transparent_60%)] pointer-events-none" />
+          
+          <div className="max-w-4xl mx-auto space-y-6 relative z-10">
+            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20">
               Core Suite Capabilities
             </span>
-            <h1 className="font-display font-[800] text-[44px] md:text-[60px] tracking-[-2px] leading-tight text-slate-900 max-w-3xl">
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
               Everything You Need to Grow Customer Engagement
             </h1>
-            <p className="font-sans font-normal text-[16px] md:text-[18px] leading-[1.75] text-slate-500 max-w-2xl mx-auto">
+            <p className="text-slate-450 font-medium text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
               From WhatsApp Business API to AI Automation, CRM, Marketing Automation, Landing Pages, Analytics, and Social Media Management — everything is available in one intelligent platform.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-              <NavLink to="/signup" className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-sans font-semibold text-[15px] tracking-[0.3px] rounded-xl hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(99,102,241,0.25)] transition-all text-center">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+              <NavLink to="/signup" className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-sm tracking-wide rounded-xl hover:scale-[1.02] transition-all text-center">
                 Start Free Trial
               </NavLink>
-              <NavLink to="/contact" className="w-full sm:w-auto px-8 py-4 bg-white border border-slate-200 text-slate-700 font-sans font-semibold text-[15px] tracking-[0.3px] rounded-xl hover:bg-slate-50 transition-all text-center shadow-sm">
+              <NavLink to="/contact" className="w-full sm:w-auto px-8 py-3.5 bg-white/10 border border-white/20 text-white font-bold text-sm tracking-wide rounded-xl hover:bg-white/20 transition-all text-center">
                 Book Live Demo
               </NavLink>
             </div>

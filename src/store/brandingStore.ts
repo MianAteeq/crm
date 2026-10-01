@@ -10,9 +10,9 @@ interface BrandingState {
 }
 
 export const useBrandingStore = create<BrandingState>((set) => ({
-  websiteName: 'THROB CRM',
-  websiteTitle: 'THROB - Premium WhatsApp CRM SaaS Portal',
-  websiteLogo: null,
+  websiteName: 'Fission Monster',
+  websiteTitle: 'Fission Monster - Premium WhatsApp Automation Platform',
+  websiteLogo: 'https://fissionmonster.com/static/img/fm-icon.png',
   websiteFavicon: null,
 
   loadBranding: async () => {
@@ -20,9 +20,9 @@ export const useBrandingStore = create<BrandingState>((set) => ({
       const data = await crmApi.getBranding();
       if (data && data.success) {
         set({
-          websiteName: data.website_name || 'THROB CRM',
-          websiteTitle: data.website_title || 'THROB - Premium WhatsApp CRM SaaS Portal',
-          websiteLogo: data.website_logo,
+          websiteName: data.website_name || 'Fission Monster',
+          websiteTitle: data.website_title || 'Fission Monster - Premium WhatsApp Automation Platform',
+          websiteLogo: data.website_logo || 'https://fissionmonster.com/static/img/fm-icon.png',
           websiteFavicon: data.website_favicon,
         });
 

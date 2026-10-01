@@ -5,7 +5,7 @@ import * as z from 'zod';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { MessageSquare, Mail, Lock, User, Eye, EyeOff, Loader2, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useBrandingStore } from '../../store/brandingStore';
 import { crmApi } from '../../services/crmApi';
 import Navbar from '../../components/public/Navbar';
@@ -34,6 +34,7 @@ interface DbPlan {
 export default function SignupPage() {
   const { websiteName, websiteLogo } = useBrandingStore();
   const [showPassword, setShowPassword] = React.useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
   const { signup, isLoading } = useAuthStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -68,11 +69,13 @@ export default function SignupPage() {
   const strength = password.length === 0 ? 0 : password.length < 6 ? 1 : 2;
 
   const onSubmit = async (data: SignupForm) => {
+    setApiError(null);
     try {
       await signup(data.email, data.name, data.password, selectedPlanKey);
       navigate('/onboarding');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      setApiError(error.response?.data?.message || error.message || 'Failed to create account. Please try again.');
     }
   };
 
@@ -80,103 +83,72 @@ export default function SignupPage() {
     <div className="bg-white min-h-screen flex flex-col justify-between selection:bg-indigo-500/20 selection:text-indigo-900 font-sans">
       <Navbar />
       
-      <div className="flex-1 flex items-center justify-center p-6 pt-32 pb-24 bg-slate-50/50 bg-[dashed-pattern]">
-        <div className="w-full max-w-[440px] space-y-8">
+      <div className="flex-1 flex items-center justify-center p-6 pt-32 pb-24 bg-slate-50 relative overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-indigo-400/20 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-purple-400/20 rounded-full blur-[100px] pointer-events-none" />
+        
+        <div className="w-full max-w-[440px] space-y-8 relative z-10">
           <div className="text-center">
-            <Link to="/" className="inline-flex items-center gap-3 mb-6 group">
-              {websiteLogo ? (
-                <img src={websiteLogo} alt="Logo" className="w-12 h-12 object-contain rounded-2xl shrink-0 shadow-lg shadow-slate-900/5 transition-transform group-hover:rotate-12" />
-              ) : (
-                <div className="w-12 h-12 bg-slate-950 text-white rounded-2xl flex items-center justify-center shadow-xl transition-transform group-hover:rotate-12">
-                  <MessageSquare size={26} strokeWidth={2.5} />
-                </div>
-              )}
-              <span className="text-3xl font-black text-slate-900 tracking-tight">{websiteName}</span>
-            </Link>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-1.5">Join the future</h1>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1">Launch your WhatsApp engine in minutes</p>
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-3">Join the future</h1>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest px-10">Launch your WhatsApp engine in minutes</p>
           </div>
 
           <motion.div 
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-slate-200/80 p-8 rounded-[2.5rem] shadow-xl relative"
+            className="relative group"
           >
-            {/* Selected Plan Details Card */}
-            {activePlan ? (
-              <div className="mb-6 p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl flex items-center justify-between shadow-inner select-none">
-                <div className="flex items-center gap-3">
-                  <div className="w-8.5 h-8.5 rounded-xl bg-indigo-650 text-white flex items-center justify-center font-black">
-                    <Sparkles size={14} className="animate-pulse" />
-                  </div>
-                  <div>
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Chosen Plan Tier</p>
-                    <p className="text-xs font-black text-slate-900 mt-1">{activePlan.name}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs font-extrabold text-indigo-650 tracking-tight">{activePlan.price}</span>
-                </div>
-              </div>
-            ) : (
-              <div className="mb-6 p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between select-none">
-                <div className="flex items-center gap-3">
-                  <div className="w-8.5 h-8.5 rounded-xl bg-slate-200 text-slate-500 flex items-center justify-center font-black">
-                    <Sparkles size={14} />
-                  </div>
-                  <div>
-                    <p className="text-[9px] font-black text-slate-400 tracking-widest uppercase leading-none">Chosen Plan Tier</p>
-                    <p className="text-xs font-black text-slate-700 mt-1">Free Tier</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs font-extrabold text-slate-500 tracking-tight">$0/month</span>
-                </div>
-              </div>
-            )}
+            {/* Background Glow */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-[3rem] blur-xl opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-450 uppercase tracking-widest pl-1">Full Name</label>
-                <div className="relative group">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" size={16} />
+            <div className="bg-white/90 backdrop-blur-xl border border-slate-200/60 p-10 rounded-[2.5rem] shadow-2xl relative">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-6 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-[9px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg whitespace-nowrap">
+                Create Free Account
+              </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
+              <div className="space-y-2.5">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Full Name</label>
+                <div className="relative group/input">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
                   <input 
                     {...register('name')}
                     placeholder="Ali Ahmad"
-                    className={`w-full bg-slate-50 border rounded-2xl py-3.5 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none transition-all ${
-                      errors.name ? 'border-rose-300 bg-rose-50' : 'border-slate-200/80 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-900/5'
+                    className={`w-full h-14 bg-slate-50/50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
+                      errors.name ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white'
                     }`}
                   />
                 </div>
-                {errors.name && <p className="text-[9px] font-bold text-rose-600 pl-1">{errors.name.message}</p>}
+                {errors.name && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.name.message}</p>}
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-450 uppercase tracking-widest pl-1">Work Email</label>
-                <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" size={16} />
+              <div className="space-y-2.5">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Work Email</label>
+                <div className="relative group/input">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
                   <input 
                     {...register('email')}
                     type="email"
                     placeholder="name@company.com"
-                    className={`w-full bg-slate-50 border rounded-2xl py-3.5 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none transition-all ${
-                      errors.email ? 'border-rose-300 bg-rose-50' : 'border-slate-200/80 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-900/5'
+                    className={`w-full h-14 bg-slate-50/50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
+                      errors.email ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white'
                     }`}
                   />
                 </div>
-                {errors.email && <p className="text-[9px] font-bold text-rose-600 pl-1">{errors.email.message}</p>}
+                {errors.email && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.email.message}</p>}
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-450 uppercase tracking-widest pl-1">Password</label>
-                <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" size={16} />
+              <div className="space-y-2.5">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Password</label>
+                <div className="relative group/input">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
                   <input 
                     {...register('password')}
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
-                    className={`w-full bg-slate-50 border rounded-2xl py-3.5 pl-11 pr-12 text-xs font-bold text-slate-900 focus:outline-none transition-all ${
-                      errors.password ? 'border-rose-300 bg-rose-50' : 'border-slate-200/80 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-900/5'
+                    className={`w-full h-14 bg-slate-50/50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
+                      errors.password ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white'
                     }`}
                   />
                   <button 
@@ -184,7 +156,7 @@ export default function SignupPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 transition-colors"
                   >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
                 {/* Strength indicator */}
@@ -197,41 +169,74 @@ export default function SignupPage() {
                       </div>
                    ))}
                 </div>
-                {errors.password && <p className="text-[9px] font-bold text-rose-600 pl-1">{errors.password.message}</p>}
+                {errors.password && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.password.message}</p>}
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-455 uppercase tracking-widest pl-1">Confirm Password</label>
-                <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" size={16} />
+              <div className="space-y-2.5">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Confirm Password</label>
+                <div className="relative group/input">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
                   <input 
                     {...register('confirmPassword')}
                     type="password"
                     placeholder="••••••••"
-                    className={`w-full bg-slate-50 border rounded-2xl py-3.5 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none transition-all ${
-                      errors.confirmPassword ? 'border-rose-300 bg-rose-50' : 'border-slate-200/80 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-900/5'
+                    className={`w-full h-14 bg-slate-50/50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
+                      errors.confirmPassword ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white'
                     }`}
                   />
                 </div>
-                {errors.confirmPassword && <p className="text-[9px] font-bold text-rose-600 pl-1">{errors.confirmPassword.message}</p>}
+                {errors.confirmPassword && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.confirmPassword.message}</p>}
               </div>
 
-              <p className="text-[9px] font-semibold text-slate-400 leading-normal text-center px-4 pt-1">
-                By creating an account, you agree to our <Link to="/terms" className="text-slate-900 font-bold hover:underline">Terms</Link> and <Link to="/privacy" className="text-slate-900 font-bold hover:underline">Privacy Policy</Link>.
+              <p className="text-[10px] font-semibold text-slate-500 leading-normal text-center px-4 pt-2">
+                By creating an account, you agree to our <Link to="/terms" className="text-indigo-600 font-bold hover:underline">Terms</Link> and <Link to="/privacy" className="text-indigo-600 font-bold hover:underline">Privacy Policy</Link>.
               </p>
 
-              <button 
+              {apiError && (
+                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-center mt-4">
+                  <p className="text-[11px] font-bold text-rose-600">{apiError}</p>
+                </div>
+              )}
+
+              <motion.button 
                 type="submit" 
                 disabled={isLoading}
-                className="w-full py-4.5 bg-slate-950 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-slate-800 disabled:opacity-50 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-3 mt-4 cursor-pointer"
+                whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                className="w-full h-14 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 transition-all shadow-xl shadow-indigo-600/25 flex items-center justify-center gap-3 mt-8 cursor-pointer relative overflow-hidden"
               >
-                {isLoading ? <Loader2 size={16} className="animate-spin text-white" /> : <>Create Account <ArrowRight size={15} /></>}
-              </button>
+                <AnimatePresence mode="wait">
+                  {isLoading ? (
+                    <motion.div
+                      key="loading"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex items-center gap-2"
+                    >
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Creating Account...</span>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="idle"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="flex items-center gap-2"
+                    >
+                      <span>Create Account</span>
+                      <ArrowRight size={16} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.button>
             </form>
+            </div>
           </motion.div>
 
-          <p className="text-center text-xs font-semibold text-slate-500">
-            Already have an account? <Link to="/login" className="text-slate-900 hover:underline underline-offset-4 decoration-2 font-black">Login here</Link>
+          <p className="text-center text-[12px] font-semibold text-slate-500 pt-4">
+            Already have an account? <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-bold ml-1">Login here</Link>
           </p>
         </div>
       </div>
