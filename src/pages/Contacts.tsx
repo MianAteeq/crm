@@ -12,6 +12,7 @@ import ImportModal from '../components/contacts/ImportModal';
 import ExportDropdown from '../components/contacts/ExportDropdown';
 import { crmApi } from '../services/crmApi';
 import { TableSkeleton, CardSkeleton } from '../components/ui/Skeleton';
+import { toast } from '../components/ui/Toast';
 
 export default function Contacts() {
   const navigate = useNavigate();
@@ -23,8 +24,13 @@ export default function Contacts() {
   const [isLoading, setIsLoading] = useState(false);
   const [tags, setTags] = useState<Tag[]>([]);
   const [isTagsLoading, setIsTagsLoading] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [campaigns, setCampaigns] = useState<{ id: number | string; name: string }[]>([]);
   const [searchQuery, setSearchQuery] = useState(urlQuery);
   const [selectedTag, setSelectedTag] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedEmailStatus, setSelectedEmailStatus] = useState('');
+  const [selectedCampaign, setSelectedCampaign] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [lastTouchpoint, setLastTouchpoint] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -50,6 +56,9 @@ export default function Contacts() {
     tag?: string, 
     status?: string, 
     touch?: string, 
+    cat?: string,
+    emailStat?: string,
+    camp?: string,
     page?: number, 
     per?: number
   ) => {
@@ -60,6 +69,9 @@ export default function Contacts() {
         tag: tag !== undefined ? tag : selectedTag,
         status: status !== undefined ? status : selectedStatus,
         lastTouchpoint: touch !== undefined ? touch : lastTouchpoint,
+        category_id: cat !== undefined ? cat : selectedCategory,
+        email_status: emailStat !== undefined ? emailStat : selectedEmailStatus,
+        campaign_id: camp !== undefined ? camp : selectedCampaign,
         page: page !== undefined ? page : (page === undefined ? currentPage : page),
         perPage: per !== undefined ? per : perPage
       }, {
@@ -87,7 +99,7 @@ export default function Contacts() {
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || (pagination && newPage > pagination.lastPage)) return;
     setCurrentPage(newPage);
-    fetchData(searchQuery, selectedTag, selectedStatus, lastTouchpoint, newPage);
+    fetchData(searchQuery, selectedTag, selectedStatus, lastTouchpoint, selectedCategory, selectedEmailStatus, selectedCampaign, newPage);
   };
 
   const handleResetFilters = () => {
@@ -95,26 +107,47 @@ export default function Contacts() {
     setSelectedTag('');
     setSelectedStatus('');
     setLastTouchpoint('');
-    fetchData('', '', '', '');
+    setSelectedCategory('');
+    setSelectedEmailStatus('');
+    setSelectedCampaign('');
+    fetchData('', '', '', '', '', '', '', 1);
   };
 
-  const fetchTags = async () => {
+  const fetchTagsAndCategories = async () => {
     setIsTagsLoading(true);
     try {
-      const tagsData = await crmApi.getTags({
-        headers: { 'X-Skip-Loader': 'true' }
-      });
+      const [tagsData, categoriesData] = await Promise.all([
+        crmApi.getTags({ headers: { 'X-Skip-Loader': 'true' } }).catch(() => []),
+        crmApi.getCategories().catch(() => [])
+      ]);
       setTags(tagsData);
+      setCategories(categoriesData);
     } catch (error) {
-      console.error('Failed to fetch tags', error);
+      console.error('Failed to fetch tags/categories', error);
     } finally {
       setIsTagsLoading(false);
     }
   };
 
-  // Fetch Tags and Initial Data on mount
+  const fetchCampaigns = async () => {
+    try {
+      const res = await crmApi.getCampaigns().catch(async () => {
+        // Fallback to emailCampaignApi
+        const { emailCampaignApi } = await import('../services/emailCampaignApi');
+        const cRes = await emailCampaignApi.getCampaigns();
+        return cRes.data || cRes || [];
+      });
+      const list = Array.isArray(res) ? res : (res?.data || []);
+      setCampaigns(list.map((c: any) => ({ id: c.id, name: c.name || `Campaign #${c.id}` })));
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  // Fetch Tags, Categories, Campaigns and Initial Data on mount
   useEffect(() => {
-    fetchTags();
+    fetchTagsAndCategories();
+    fetchCampaigns();
   }, []);
 
   // Sync state with URL search parameters
@@ -129,11 +162,11 @@ export default function Contacts() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setCurrentPage(1);
-      fetchData(searchQuery, selectedTag, selectedStatus, lastTouchpoint, 1);
+      fetchData(searchQuery, selectedTag, selectedStatus, lastTouchpoint, selectedCategory, selectedEmailStatus, selectedCampaign, 1);
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, selectedTag, selectedStatus, lastTouchpoint]);
+  }, [searchQuery, selectedTag, selectedStatus, lastTouchpoint, selectedCategory, selectedEmailStatus, selectedCampaign]);
 
   const displayTags = useMemo(() => {
     if (Array.isArray(tags) && tags.length > 0) return tags;
@@ -166,25 +199,34 @@ export default function Contacts() {
     }
   };
 
-  const handleDeleteContact = async (id: string) => {
+  const handleDeleteContact = async (id: string | number) => {
+    if (!confirm('Are you sure you want to delete this contact?')) return;
     try {
       await crmApi.deleteContact(id);
-      setContacts(prev => prev.filter(c => c.id !== id));
+      setContacts(prev => prev.filter(c => String(c.id) !== String(id)));
       setViewingContact(null);
-      setSelectedIds(prev => prev.filter(i => i !== id));
-    } catch (error) {
+      setSelectedIds(prev => prev.filter(i => String(i) !== String(id)));
+      toast.success('Contact Deleted', 'The contact has been removed successfully.');
+      fetchData();
+    } catch (error: any) {
       console.error('Failed to delete contact', error);
-      alert('Error deleting contact.');
+      toast.error('Delete Failed', error?.response?.data?.message || error.message || 'Error deleting contact.');
     }
   };
 
   const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+    if (!confirm(`Are you sure you want to delete ${selectedIds.length} selected contacts?`)) return;
     try {
-      await Promise.all(selectedIds.map(id => crmApi.deleteContact(id)));
-      setContacts(prev => prev.filter(c => !selectedIds.includes(c.id)));
+      await crmApi.batchDeleteContacts(selectedIds);
+      const strIds = selectedIds.map(String);
+      setContacts(prev => prev.filter(c => !strIds.includes(String(c.id))));
       setSelectedIds([]);
-    } catch (error) {
+      toast.success('Contacts Deleted', `${selectedIds.length} contacts removed successfully.`);
+      fetchData();
+    } catch (error: any) {
       console.error('Failed to delete contacts', error);
+      toast.error('Bulk Delete Failed', error?.response?.data?.message || error.message || 'Failed to delete selected contacts.');
     }
   };
 
@@ -267,6 +309,14 @@ export default function Contacts() {
               onSearchChange={setSearchQuery}
               selectedTag={selectedTag}
               onTagChange={setSelectedTag}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+              categories={categories}
+              selectedEmailStatus={selectedEmailStatus}
+              onEmailStatusChange={setSelectedEmailStatus}
+              selectedCampaign={selectedCampaign}
+              onCampaignChange={setSelectedCampaign}
+              campaigns={campaigns}
               selectedStatus={selectedStatus}
               onStatusChange={setSelectedStatus}
               lastTouchpoint={lastTouchpoint}
@@ -300,6 +350,7 @@ export default function Contacts() {
                 onSelect={handleSelect}
                 onSelectAll={handleSelectAll}
                 onView={setViewingContact}
+                onDelete={handleDeleteContact}
               />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

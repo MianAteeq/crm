@@ -1,4 +1,4 @@
-import { Contact, Tag, WhatsAppSettings, Conversation, Message } from '../types';
+import { Contact, Tag, Category, ContactScraperHistoryItem, WhatsAppSettings, Conversation, Message } from '../types';
 import { AuthService } from './authService';
 import { apiClient } from './apiClient';
 
@@ -120,6 +120,9 @@ class CrmApiService {
     search?: string; 
     status?: string; 
     tag?: string; 
+    category_id?: string | number;
+    email_status?: string;
+    campaign_id?: string | number;
     engagement?: string; 
     lastTouchpoint?: string;
     page?: number;
@@ -130,13 +133,16 @@ class CrmApiService {
       let endpoint = '/contacts';
 
       if (params) {
-        const hasAdvancedFilters = params.status || params.tag || params.lastTouchpoint;
-        if (hasAdvancedFilters) endpoint = '/contacts/advance-search';
+        const hasAdvancedTouchpoint = params.lastTouchpoint && !params.category_id && !params.email_status && !params.campaign_id;
+        if (hasAdvancedTouchpoint) endpoint = '/contacts/advance-search';
 
         const searchParams = new URLSearchParams();
         if (params.search) searchParams.append('search', params.search);
         if (params.status) searchParams.append('status', params.status);
-        if (params.tag) searchParams.append('tags[]', params.tag);
+        if (params.tag) searchParams.append('tag', params.tag);
+        if (params.category_id) searchParams.append('category_id', String(params.category_id));
+        if (params.email_status) searchParams.append('email_status', params.email_status);
+        if (params.campaign_id) searchParams.append('campaign_id', String(params.campaign_id));
         if (params.lastTouchpoint) searchParams.append('last_touchpoint', params.lastTouchpoint);
         if (params.page) searchParams.append('page', String(params.page));
         if (params.perPage) searchParams.append('per_page', String(params.perPage));
@@ -243,11 +249,72 @@ class CrmApiService {
     }
   }
 
-  async deleteContact(id: string): Promise<{ message: string }> {
+  async deleteContact(id: string | number): Promise<{ success?: boolean; message: string }> {
+    return await this.request(`/contacts/${id}`, { method: 'DELETE' });
+  }
+
+  async batchDeleteContacts(ids: (string | number)[]): Promise<{ success: boolean; message: string; deleted_count?: number }> {
+    return await this.request('/contacts/batch-delete', {
+      method: 'POST',
+      body: JSON.stringify({ ids: ids.map(id => Number(id)) }),
+    });
+  }
+
+  // Categories API (Requirement 1, 5, 12)
+  async getCategories(params?: { status?: string; search?: string }): Promise<Category[]> {
     try {
-      return await this.request(`/contacts/${id}`, { method: 'DELETE' });
-    } catch (error) {
-      return { message: 'Deleted successfully (Mock)' };
+      const searchParams = new URLSearchParams();
+      if (params?.status) searchParams.append('status', params.status);
+      if (params?.search) searchParams.append('search', params.search);
+      const query = searchParams.toString() ? `?${searchParams.toString()}` : '';
+      const response = await this.request<any>(`/categories${query}`);
+      return Array.isArray(response) ? response : (response?.data || []);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  async getCategory(id: number | string): Promise<Category | null> {
+    try {
+      const response = await this.request<any>(`/categories/${id}`);
+      return response?.data || response;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async createCategory(data: Partial<Category>): Promise<Category> {
+    const response = await this.request<any>('/categories', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response?.data || response;
+  }
+
+  async updateCategory(id: number | string, data: Partial<Category>): Promise<Category> {
+    const response = await this.request<any>(`/categories/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response?.data || response;
+  }
+
+  async deleteCategory(id: number | string): Promise<void> {
+    await this.request(`/categories/${id}`, { method: 'DELETE' });
+  }
+
+  async getCategoryEmailStats(id: number | string): Promise<any> {
+    const response = await this.request<any>(`/categories/${id}/email-stats`);
+    return response?.data || response;
+  }
+
+  // Contact Scraper History (Requirement 7 & 20)
+  async getContactScraperHistory(contactId: string | number): Promise<ContactScraperHistoryItem[]> {
+    try {
+      const response = await this.request<any>(`/contacts/${contactId}/scraper-history`);
+      return Array.isArray(response?.data) ? response.data : (Array.isArray(response) ? response : []);
+    } catch (e) {
+      return [];
     }
   }
 
@@ -277,12 +344,12 @@ class CrmApiService {
     }
   }
 
-  async saveAiSettings(openaiKey: string, companyPrompt: string): Promise<{ success: boolean; message: string; data?: any }> {
+  async saveAiSettings(openaiKey: string | undefined, companyPrompt: string): Promise<{ success: boolean; message: string; data?: any }> {
     try {
       return await this.request('/whatsapp/settings/ai', {
         method: 'POST',
         body: JSON.stringify({
-          openai_key: openaiKey,
+          openai_key: openaiKey || undefined,
           company_prompt: companyPrompt
         })
       });

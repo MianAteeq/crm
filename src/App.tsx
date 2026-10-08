@@ -13,6 +13,13 @@ import ContactEditorPage from './pages/contacts/ContactEditorPage';
 import TemplatesPage from './pages/whatsapp/TemplatesPage';
 import TemplateBuilderPage from './pages/whatsapp/TemplateBuilderPage';
 import WhatsAppSettingsPage from './pages/settings/WhatsAppSettingsPage';
+import BusinessScraperPage from './pages/scraper/BusinessScraperPage';
+import EmailCampaignsPage from './pages/campaigns/EmailCampaignsPage';
+import EmailCampaignBuilderPage from './pages/campaigns/EmailCampaignBuilderPage';
+import EmailCampaignReportPage from './pages/campaigns/EmailCampaignReportPage';
+import EmailTemplatesPage from './pages/campaigns/EmailTemplatesPage';
+import EmailSettingsPage from './pages/settings/EmailSettingsPage';
+import AiMarketingAgentPage from './pages/campaigns/AiMarketingAgentPage';
 
 // Public Pages
 import LandingPage from './pages/public/LandingPage';
@@ -52,6 +59,7 @@ import AdminTenants from './pages/admin/AdminTenants';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminPlans from './pages/admin/AdminPlans';
 import AdminSettings from './pages/admin/AdminSettings';
+import AdminSendingDomains from './pages/admin/AdminSendingDomains';
 
 // Automation Pages & Layout
 import AutomationLayout from './pages/automation/AutomationLayout';
@@ -80,6 +88,7 @@ function PublicChatbot() {
                        !pathname.startsWith('/settings') && 
                        !pathname.startsWith('/whatsapp') && 
                        !pathname.startsWith('/automation') && 
+                       !pathname.startsWith('/scraper') && 
                        !pathname.startsWith('/admin') && 
                        !pathname.startsWith('/onboarding');
   if (!isPublicPage) return null;
@@ -135,9 +144,19 @@ export default function App() {
           <Route path="campaigns" element={<CampaignsPage />} />
           <Route path="campaigns/create" element={<CampaignBuilderPage />} />
           <Route path="campaigns/:id" element={<CampaignDetailPage />} />
+
+          {/* Email Campaign Routes */}
+          <Route path="email-campaigns/ai-agent" element={<AiMarketingAgentPage />} />
+          <Route path="email-campaigns" element={<EmailCampaignsPage />} />
+          <Route path="email-campaigns/create" element={<EmailCampaignBuilderPage />} />
+          <Route path="email-campaigns/:id/report" element={<EmailCampaignReportPage />} />
+          <Route path="email-templates" element={<EmailTemplatesPage />} />
+          <Route path="settings/email" element={<EmailSettingsPage />} />
+
           <Route path="contacts" element={<Contacts />} />
           <Route path="contacts/add" element={<ContactEditorPage />} />
           <Route path="contacts/edit/:id" element={<ContactEditorPage />} />
+          <Route path="scraper" element={<BusinessScraperPage />} />
           <Route path="templates" element={<TemplatesPage />} />
           <Route path="templates/builder" element={<TemplateBuilderPage />} />
           <Route path="settings/whatsapp" element={<WhatsAppSettingsPage />} />
@@ -162,6 +181,7 @@ export default function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="tenants" element={<AdminTenants />} />
           <Route path="users" element={<AdminUsers />} />
+          <Route path="sending-domains" element={<AdminSendingDomains />} />
           <Route path="plans" element={<AdminPlans />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>

@@ -45,20 +45,99 @@ export interface Tag {
   color?: string;
 }
 
+export interface Category {
+  id: number | string;
+  name: string;
+  slug: string;
+  description?: string;
+  status: 'active' | 'inactive';
+  metrics?: {
+    total_businesses: number;
+    total_contacts: number;
+    contacts_with_email: number;
+    email_activity: {
+      sent: number;
+      delivered: number;
+      bounced: number;
+      failed: number;
+      pending: number;
+      unsubscribed: number;
+      delivery_rate: number;
+      bounce_rate: number;
+    };
+  };
+}
+
+export interface Business {
+  id: number | string;
+  business_name: string;
+  normalized_business_name?: string;
+  website?: string;
+  website_domain?: string;
+  phone?: string;
+  normalized_phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  google_place_id?: string;
+  google_maps_url?: string;
+  rating?: number;
+  review_count?: number;
+  source?: string;
+  first_discovered_at?: string;
+  last_discovered_at?: string;
+  categories?: Category[];
+}
+
+export interface ContactScraperHistoryItem {
+  id: number | string;
+  search_id?: number | string;
+  search_query: string;
+  location: string;
+  category_name: string;
+  discovery_source: string;
+  discovered_at: string;
+  source_full: string;
+}
+
 export interface Contact {
   id: string;
   name: string;
+  first_name?: string;
+  last_name?: string;
   phone: string;
+  phone_normalized?: string;
   email?: string;
+  email_normalized?: string;
+  business_id?: number | string;
+  business?: Business;
   company?: string;
+  business_name?: string;
   job_title?: string;
+  contact_type?: string;
   address?: string;
   birthday?: string;
   website?: string;
   notes?: string;
   avatar?: string;
-  status: 'active' | 'unsubscribed' | 'archived' | 'lead' | 'customer';
+  status: 'active' | 'unsubscribed' | 'archived' | 'lead' | 'customer' | string;
   tags: string[]; // These will be tag IDs
+  categories?: Category[];
+  category_id?: number | string;
+  category_ids?: (number | string)[];
+  category?: string;
+  category_name?: string;
+  email_status?: string;
+  last_email?: string;
+  last_campaign?: string;
+  delivery_status?: string;
+  lead_quality_score?: number;
+  lead_quality_grade?: string;
+  enrichment_status?: string;
+  source?: string;
+  last_scraped_at?: string;
+  last_enriched_at?: string;
   lastSeen?: string;
   lastContacted?: string; // UI specific
   totalCampaigns?: number; // UI specific

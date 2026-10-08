@@ -145,3 +145,31 @@
 .phone-input-error .PhoneInputCountry {
   @apply border-red-500 bg-red-50/30;
 }
+
+/* Rich Text & Email Canvas List Styles */
+.email-canvas-body ul,
+.rich-text-editor ul,
+[contenteditable] ul {
+  list-style-type: disc !important;
+  padding-left: 28px !important;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+.email-canvas-body ol,
+.rich-text-editor ol,
+[contenteditable] ol {
+  list-style-type: decimal !important;
+  padding-left: 28px !important;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+.email-canvas-body li,
+.rich-text-editor li,
+[contenteditable] li {
+  display: list-item !important;
+  margin-top: 4px !important;
+  margin-bottom: 4px !important;
+}
+

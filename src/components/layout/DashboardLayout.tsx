@@ -34,7 +34,8 @@ import {
   Lock,
   Zap,
   ShieldCheck,
-  Cpu
+  Cpu,
+  Globe
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { useAuthStore } from '../../store/authStore';
@@ -50,15 +51,22 @@ const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: MessageSquare, label: 'Conversations', path: '/inbox' },
     { icon: Users, label: 'Contacts', path: '/contacts' },
+    { icon: Compass, label: 'Business Scraper', path: '/scraper' },
   ]},
-  { group: 'Engagement', items: [
-    { icon: Send, label: 'Campaigns', path: '/campaigns' },
-    { icon: LayoutIcon, label: 'Templates', path: '/templates' },
-    { icon: Zap, label: 'Automation', path: '/automation' },
+  { group: 'Email Marketing', items: [
+    { icon: Sparkles, label: 'AI Marketing Agent', path: '/email-campaigns/ai-agent' },
+    { icon: Mail, label: 'Email Campaigns', path: '/email-campaigns' },
+    { icon: FileText, label: 'Email Templates', path: '/email-templates' },
+    { icon: Globe, label: 'Sending Domains', path: '/settings/email' },
+  ]},
+  { group: 'WhatsApp Marketing', items: [
+    { icon: Send, label: 'WhatsApp Campaigns', path: '/campaigns' },
+    { icon: LayoutIcon, label: 'WhatsApp Templates', path: '/templates' },
     { icon: Smartphone, label: 'WhatsApp Numbers', path: '/whatsapp/connect' },
+    { icon: Settings, label: 'WhatsApp Settings', path: '/settings/whatsapp' },
   ]},
-  { group: 'System', items: [
-    { icon: Settings, label: 'Settings', path: '/settings/whatsapp' },
+  { group: 'Automation', items: [
+    { icon: Zap, label: 'Workflows & Automation', path: '/automation' },
   ]}
 ];
 

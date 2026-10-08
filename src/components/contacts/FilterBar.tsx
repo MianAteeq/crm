@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
-import { Search, Filter, SlidersHorizontal, ChevronDown, Calendar, Users, Target, Inbox } from 'lucide-react';
+import { Search, Filter, SlidersHorizontal, ChevronDown, Mail, Layers, Megaphone } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-
-import { Tag as TagType } from '../../types';
+import { Tag as TagType, Category } from '../../types';
 
 interface FilterBarProps {
   searchQuery: string;
   onSearchChange: (val: string) => void;
   selectedTag: string;
   onTagChange: (val: string) => void;
+  selectedCategory?: string;
+  onCategoryChange?: (val: string) => void;
+  categories?: Category[];
+  selectedEmailStatus?: string;
+  onEmailStatusChange?: (val: string) => void;
+  selectedCampaign?: string;
+  onCampaignChange?: (val: string) => void;
+  campaigns?: { id: number | string; name: string }[];
   selectedStatus: string;
   onStatusChange: (val: string) => void;
   lastTouchpoint: string;
@@ -23,6 +30,14 @@ export default function FilterBar({
   onSearchChange, 
   selectedTag, 
   onTagChange, 
+  selectedCategory = '',
+  onCategoryChange,
+  categories = [],
+  selectedEmailStatus = '',
+  onEmailStatusChange,
+  selectedCampaign = '',
+  onCampaignChange,
+  campaigns = [],
   selectedStatus,
   onStatusChange,
   lastTouchpoint,
@@ -35,12 +50,13 @@ export default function FilterBar({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col md:flex-row items-center gap-4">
+      <div className="flex flex-col lg:flex-row items-center gap-3">
+        {/* Search input */}
         <div className="relative flex-1 w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
           <input 
             type="text"
-            placeholder="Search by name, phone, tags..."
+            placeholder="Search contacts, business, phone, email..."
             value={searchQuery}
             onKeyDown={(e) => e.key === 'Enter' && onApplyFilters()}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -48,40 +64,80 @@ export default function FilterBar({
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <div className="relative flex-1 md:flex-none">
+        {/* Category Selector (Requirement 1 & 13) */}
+        {onCategoryChange && (
+          <div className="relative w-full sm:w-auto min-w-[170px]">
             <select 
-              value={selectedTag}
-              onChange={(e) => onTagChange(e.target.value)}
-              className="w-full md:w-40 appearance-none bg-white border border-slate-200 rounded-xl py-2.5 pl-10 pr-10 text-xs font-bold text-slate-600 cursor-pointer focus:outline-none hover:border-slate-400 transition-all"
+              value={selectedCategory}
+              onChange={(e) => onCategoryChange(e.target.value)}
+              className="w-full appearance-none bg-white border border-slate-200 rounded-xl py-2.5 pl-9 pr-8 text-xs font-bold text-slate-700 cursor-pointer focus:outline-none hover:border-slate-400 transition-all"
             >
-              <option value="">All Tags</option>
-              {tags.map(tag => (
-                <option key={tag.id} value={tag.id}>{tag.name}</option>
+              <option value="">All Categories</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
-            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+            <Layers className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
           </div>
+        )}
 
-          <button 
-            onClick={onApplyFilters}
-            className="flex items-center gap-2 bg-black text-white rounded-xl py-2.5 px-4 text-xs font-bold transition-all shadow-md shadow-black/20 hover:bg-slate-900"
-          >
-            <Search size={14} />
-            <span>Filter</span>
-          </button>
+        {/* Email Status Selector (Requirement 13) */}
+        {onEmailStatusChange && (
+          <div className="relative w-full sm:w-auto min-w-[160px]">
+            <select 
+              value={selectedEmailStatus}
+              onChange={(e) => onEmailStatusChange(e.target.value)}
+              className="w-full appearance-none bg-white border border-slate-200 rounded-xl py-2.5 pl-9 pr-8 text-xs font-bold text-slate-700 cursor-pointer focus:outline-none hover:border-slate-400 transition-all"
+            >
+              <option value="">Email: All</option>
+              <option value="never_sent">Never Sent</option>
+              <option value="sent">Sent</option>
+              <option value="delivered">Delivered</option>
+              <option value="bounced">Bounced</option>
+              <option value="failed">Failed</option>
+              <option value="unsubscribed">Unsubscribed</option>
+            </select>
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+          </div>
+        )}
 
-          <button 
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className={`flex items-center gap-2 rounded-xl py-2.5 px-4 text-xs font-bold transition-all border ${
-              showAdvanced ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-400'
-            }`}
+        {/* Tags Selector */}
+        <div className="relative w-full sm:w-auto min-w-[130px]">
+          <select 
+            value={selectedTag}
+            onChange={(e) => onTagChange(e.target.value)}
+            className="w-full appearance-none bg-white border border-slate-200 rounded-xl py-2.5 pl-9 pr-8 text-xs font-bold text-slate-700 cursor-pointer focus:outline-none hover:border-slate-400 transition-all"
           >
-            <SlidersHorizontal size={14} />
-            <span>Options</span>
-          </button>
+            <option value="">All Tags</option>
+            {tags.map(tag => (
+              <option key={tag.id} value={tag.id}>{tag.name}</option>
+            ))}
+          </select>
+          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
         </div>
+
+        {/* Filter Button */}
+        <button 
+          onClick={onApplyFilters}
+          className="flex items-center gap-2 bg-black text-white rounded-xl py-2.5 px-4 text-xs font-bold transition-all shadow-md shadow-black/20 hover:bg-slate-900 whitespace-nowrap cursor-pointer"
+        >
+          <Search size={14} />
+          <span>Filter</span>
+        </button>
+
+        {/* Options / Advanced Dropdown Button */}
+        <button 
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          className={`flex items-center gap-2 rounded-xl py-2.5 px-4 text-xs font-bold transition-all border whitespace-nowrap cursor-pointer ${
+            showAdvanced ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-400'
+          }`}
+        >
+          <SlidersHorizontal size={14} />
+          <span>Options</span>
+        </button>
       </div>
 
       <AnimatePresence>
@@ -92,14 +148,33 @@ export default function FilterBar({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="mt-4 p-6 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="mt-4 p-6 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Campaign Filter (Requirement 13 & 15) */}
+              {onCampaignChange && (
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <Megaphone size={12} /> Target Campaign
+                  </label>
+                  <select 
+                    value={selectedCampaign}
+                    onChange={(e) => onCampaignChange(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-400 cursor-pointer"
+                  >
+                    <option value="">All Campaigns</option>
+                    {campaigns.map(camp => (
+                      <option key={camp.id} value={camp.id}>{camp.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               {/* Status Filter */}
-              <div className="space-y-4">
+              <div className="space-y-2">
                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                    Life Cycle Status
                  </label>
                  <div className="flex flex-wrap gap-2">
-                   {['active', 'inactive'].map(status => (
+                   {['active', 'inactive', 'unsubscribed'].map(status => (
                      <button 
                         key={status} 
                         type="button"
@@ -117,7 +192,7 @@ export default function FilterBar({
               </div>
 
               {/* Activity Filter */}
-              <div className="space-y-4">
+              <div className="space-y-2">
                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                    Last Touchpoint
                  </label>
@@ -133,18 +208,18 @@ export default function FilterBar({
                  </select>
               </div>
 
-              {/* Tags Filter */}
-              <div className="lg:col-span-2 space-y-4">
+              {/* Tag Selection list */}
+              <div className="space-y-2">
                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                    Available Tags
+                    Quick Tag Select
                  </label>
-                 <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto no-scrollbar pb-2">
+                 <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto no-scrollbar">
                     {tags.map(tag => (
                       <button 
                         key={tag.id}
                         type="button"
                         onClick={() => onTagChange(selectedTag === tag.id ? '' : tag.id)}
-                        className={`px-3 py-1.5 border rounded-lg text-[10px] font-bold transition-all ${
+                        className={`px-2.5 py-1 border rounded-lg text-[10px] font-bold transition-all ${
                           selectedTag === tag.id
                           ? 'bg-slate-900 border-slate-900 text-white shadow-sm'
                           : 'bg-white border-slate-200 text-slate-600 hover:border-slate-900'
@@ -157,17 +232,17 @@ export default function FilterBar({
               </div>
 
               <div className="lg:col-span-4 pt-4 border-t border-slate-200 flex items-center justify-between">
-                 <button onClick={() => setShowAdvanced(false)} className="text-[11px] font-bold text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-all">Dismiss</button>
+                 <button onClick={() => setShowAdvanced(false)} className="text-[11px] font-bold text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-all cursor-pointer">Dismiss</button>
                  <div className="flex gap-4">
                     <button 
                       onClick={onResetFilters}
-                      className="text-[11px] font-bold text-red-500 uppercase tracking-widest hover:underline"
+                      className="text-[11px] font-bold text-red-500 uppercase tracking-widest hover:underline cursor-pointer"
                     >
-                      Reset
+                      Reset All
                     </button>
                     <button 
                       onClick={onApplyFilters}
-                      className="px-6 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-slate-800 transition-all"
+                      className="px-6 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-slate-800 transition-all cursor-pointer"
                     >
                       Apply Filters
                     </button>

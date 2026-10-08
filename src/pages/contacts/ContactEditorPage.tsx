@@ -1,10 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { User, Phone, Mail, Tag, Briefcase, MapPin, Calendar, Globe, ArrowLeft, Loader2, Save } from 'lucide-react';
+import { 
+  User, Phone, Mail, Tag, Briefcase, MapPin, Calendar, Globe, 
+  ArrowLeft, Loader2, Save, Layers, Plus, Check, X, Sparkles, Building2 
+} from 'lucide-react';
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
-import { Contact, Tag as TagType } from '../../types';
+import { Contact, Tag as TagType, Category } from '../../types';
 import { crmApi } from '../../services/crmApi';
 import { FormSkeleton } from '../../components/ui/Skeleton';
+
+const CONTACT_TYPES = [
+  'General',
+  'Owner',
+  'Founder',
+  'CEO',
+  'Director',
+  'Manager',
+  'Marketing',
+  'Sales',
+  'Reception',
+  'Other'
+];
+
+const SUGGESTED_CATEGORIES = [
+  'Dental Clinics',
+  'Aesthetic Clinics',
+  'Real Estate',
+  'Car Dealerships',
+  'Software Agencies',
+  'Restaurants',
+  'Hotels'
+];
 
 export default function ContactEditorPage() {
   const { id } = useParams<{ id: string }>();
@@ -12,11 +38,19 @@ export default function ContactEditorPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [tags, setTags] = useState<TagType[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<(string | number)[]>([]);
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [creatingCategoryLoading, setCreatingCategoryLoading] = useState(false);
+
   const [formData, setFormData] = useState<Partial<Contact>>({
     name: '',
     phone: '',
     email: '',
     tags: [],
+    category_ids: [],
+    contact_type: 'General',
     notes: '',
     status: 'active',
     company: '',
@@ -31,16 +65,34 @@ export default function ContactEditorPage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const tagsData = await crmApi.getTags({
-          headers: { 'X-Skip-Loader': 'true' }
-        });
+        const [tagsData, categoriesData] = await Promise.all([
+          crmApi.getTags({ headers: { 'X-Skip-Loader': 'true' } }).catch(() => []),
+          crmApi.getCategories().catch(() => [])
+        ]);
         setTags(tagsData);
+        setCategories(categoriesData);
 
         if (id) {
           const contactData = await crmApi.getContact(id, {
             headers: { 'X-Skip-Loader': 'true' }
           });
-          setFormData(contactData);
+          setFormData({
+            ...contactData,
+            contact_type: contactData.contact_type || 'General'
+          });
+
+          // Extract category associations
+          const catIds: (string | number)[] = [];
+          if (Array.isArray(contactData.categories) && contactData.categories.length > 0) {
+            contactData.categories.forEach((c: any) => {
+              if (c && c.id) catIds.push(c.id);
+            });
+          } else if (Array.isArray(contactData.category_ids) && contactData.category_ids.length > 0) {
+            catIds.push(...contactData.category_ids);
+          } else if (contactData.category_id) {
+            catIds.push(contactData.category_id);
+          }
+          setSelectedCategoryIds(catIds);
         }
       } catch (error) {
         console.error('Failed to fetch data', error);
@@ -69,14 +121,19 @@ export default function ContactEditorPage() {
 
     setIsSaving(true);
     try {
+      const payload: Partial<Contact> = {
+        ...formData,
+        status: formData.status || 'active',
+        tags: formData.tags || [],
+        contact_type: formData.contact_type || 'General',
+        category_ids: selectedCategoryIds,
+        category_id: selectedCategoryIds.length > 0 ? selectedCategoryIds[0] : undefined,
+      };
+
       if (id) {
-        await crmApi.updateContact(id, formData);
+        await crmApi.updateContact(id, payload);
       } else {
-        await crmApi.createContact({
-          ...formData,
-          status: formData.status || 'active',
-          tags: formData.tags || []
-        });
+        await crmApi.createContact(payload);
       }
       navigate('/contacts');
     } catch (error) {
@@ -93,6 +150,64 @@ export default function ContactEditorPage() {
       setFormData({ ...formData, tags: currentTags.filter(t => t !== tagId) });
     } else {
       setFormData({ ...formData, tags: [...currentTags, tagId] });
+    }
+  };
+
+  const toggleCategory = (catId: string | number) => {
+    setSelectedCategoryIds(prev => {
+      const exists = prev.some(id => String(id) === String(catId));
+      if (exists) {
+        return prev.filter(id => String(id) !== String(catId));
+      } else {
+        return [...prev, catId];
+      }
+    });
+  };
+
+  const handleCreateCategory = async (nameToCreate?: string) => {
+    const catName = (nameToCreate || newCategoryName).trim();
+    if (!catName) return;
+
+    // Check if category with this name already exists in categories list
+    const existing = categories.find(c => c.name.toLowerCase() === catName.toLowerCase());
+    if (existing) {
+      if (!selectedCategoryIds.some(id => String(id) === String(existing.id))) {
+        setSelectedCategoryIds(prev => [...prev, existing.id]);
+      }
+      setNewCategoryName('');
+      setIsCreatingCategory(false);
+      return;
+    }
+
+    setCreatingCategoryLoading(true);
+    try {
+      const newCat = await crmApi.createCategory({
+        name: catName,
+        status: 'active'
+      });
+      if (newCat && newCat.id) {
+        setCategories(prev => {
+          const exists = prev.some(c => String(c.id) === String(newCat.id) || c.name.toLowerCase() === catName.toLowerCase());
+          return exists ? prev : [...prev, newCat];
+        });
+        setSelectedCategoryIds(prev => [...prev, newCat.id]);
+        setNewCategoryName('');
+        setIsCreatingCategory(false);
+      }
+    } catch (err) {
+      console.error('Failed to create category on backend, adding local category', err);
+      const fallbackCat: Category = {
+        id: `custom_${Date.now()}`,
+        name: catName,
+        slug: catName.toLowerCase().replace(/\s+/g, '-'),
+        status: 'active'
+      };
+      setCategories(prev => [...prev, fallbackCat]);
+      setSelectedCategoryIds(prev => [...prev, fallbackCat.id]);
+      setNewCategoryName('');
+      setIsCreatingCategory(false);
+    } finally {
+      setCreatingCategoryLoading(false);
     }
   };
 
@@ -122,6 +237,7 @@ export default function ContactEditorPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button 
+            type="button"
             onClick={() => navigate('/contacts')}
             className="p-2 lg:p-3 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-400 transition-all shadow-sm"
           >
@@ -148,14 +264,18 @@ export default function ContactEditorPage() {
       </div>
 
       <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-12">
-        {/* Left Column: Core Identity */}
+        {/* Left Column: Core Identity & Professional Context */}
         <div className="space-y-6">
+          {/* Identity & Contact Details */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-8 shadow-sm">
             <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
                <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
                   <User size={20} />
                </div>
-               <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Identity & Contact</span>
+               <div>
+                 <span className="text-xs font-bold uppercase tracking-widest text-slate-900 block">Identity & Contact</span>
+                 <p className="text-[11px] text-slate-500 font-medium">Primary contact information and communication channels</p>
+               </div>
             </div>
 
             <div className="space-y-6">
@@ -189,6 +309,7 @@ export default function ContactEditorPage() {
                   <div className="relative">
                     <Mail size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input 
+                      type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="ahmad@company.com"
@@ -197,81 +318,284 @@ export default function ContactEditorPage() {
                   </div>
                 </div>
               </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Status</label>
+                <select
+                  value={formData.status || 'active'}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
+                >
+                  <option value="active">Active</option>
+                  <option value="lead">Lead</option>
+                  <option value="customer">Customer</option>
+                  <option value="unsubscribed">Unsubscribed</option>
+                  <option value="archived">Archived</option>
+                </select>
+              </div>
             </div>
           </div>
 
+          {/* Professional Context */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-8 shadow-sm">
             <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
                <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
                   <Briefcase size={20} />
                </div>
-               <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Professional Context</span>
+               <div>
+                 <span className="text-xs font-bold uppercase tracking-widest text-slate-900 block">Professional Context</span>
+                 <p className="text-[11px] text-slate-500 font-medium">Business entity, role hierarchy and position</p>
+               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Company</label>
-                <input 
-                  value={formData.company}
-                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  placeholder="Tech Solutions"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
-                />
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Company / Business Name</label>
+                  <div className="relative">
+                    <Building2 size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input 
+                      value={formData.company}
+                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                      placeholder="Tech Solutions Ltd"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 pl-11 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Job Title</label>
+                  <input 
+                    value={formData.job_title}
+                    onChange={(e) => setFormData({ ...formData, job_title: e.target.value })}
+                    placeholder="Managing Director"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
+                  />
+                </div>
               </div>
+
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Job Title</label>
-                <input 
-                  value={formData.job_title}
-                  onChange={(e) => setFormData({ ...formData, job_title: e.target.value })}
-                  placeholder="Manager"
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Contact Role / Type</label>
+                <select
+                  value={formData.contact_type || 'General'}
+                  onChange={(e) => setFormData({ ...formData, contact_type: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
-                />
+                >
+                  {CONTACT_TYPES.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+                <p className="text-[11px] text-slate-400 font-medium ml-1">
+                  Categorizes whether this contact is an Executive (Owner/CEO), Operations, Reception or General staff.
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Labels & Extras */}
+        {/* Right Column: Categories, Tags & Extended Info */}
         <div className="space-y-6">
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-8 shadow-sm">
+          {/* Category Selection Card */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-6 shadow-sm">
+            <div className="flex items-center justify-between border-b border-slate-50 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                  <Layers size={20} />
+                </div>
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-widest text-slate-900 block">Select Category</span>
+                  <p className="text-[11px] text-slate-500 font-medium">Industry categorization for email campaigns & directory targeting</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsCreatingCategory(!isCreatingCategory)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-400 transition-all"
+              >
+                {isCreatingCategory ? <X size={14} /> : <Plus size={14} />}
+                <span>{isCreatingCategory ? 'Cancel' : 'New Category'}</span>
+              </button>
+            </div>
+
+            {/* Inline Add Category Input */}
+            {isCreatingCategory && (
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                <label className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">
+                  Add New Industry Category
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleCreateCategory();
+                      }
+                    }}
+                    placeholder="e.g. Dental Clinics, Real Estate..."
+                    className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900"
+                  />
+                  <button
+                    type="button"
+                    disabled={creatingCategoryLoading || !newCategoryName.trim()}
+                    onClick={() => handleCreateCategory()}
+                    className="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center gap-1.5"
+                  >
+                    {creatingCategoryLoading ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
+                    <span>Add</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Selected Categories Indicator */}
+            {selectedCategoryIds.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
+                  Selected Categories ({selectedCategoryIds.length})
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {selectedCategoryIds.map(catId => {
+                    const found = categories.find(c => String(c.id) === String(catId));
+                    const name = found ? found.name : `Category #${catId}`;
+                    return (
+                      <span
+                        key={catId}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg text-xs font-bold shadow-sm"
+                      >
+                        <Check size={12} className="text-indigo-600" />
+                        <span>{name}</span>
+                        <button
+                          type="button"
+                          onClick={() => toggleCategory(catId)}
+                          className="hover:text-red-500 transition-colors ml-0.5"
+                          title="Remove category"
+                        >
+                          <X size={12} />
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Existing Categories Badges */}
+            <div className="space-y-2">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
+                Available Categories
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {categories.map(category => {
+                  const isSelected = selectedCategoryIds.some(id => String(id) === String(category.id));
+                  return (
+                    <button
+                      key={category.id}
+                      type="button"
+                      onClick={() => toggleCategory(category.id)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
+                        isSelected
+                          ? 'bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/10'
+                          : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400 hover:bg-slate-50'
+                      }`}
+                    >
+                      {isSelected && <Check size={13} className="text-white" />}
+                      <span>{category.name}</span>
+                    </button>
+                  );
+                })}
+
+                {categories.length === 0 && (
+                  <p className="text-xs text-slate-400 italic py-1">No custom categories created yet.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Quick Suggestion Chips */}
+            <div className="space-y-2 pt-2 border-t border-slate-100">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <Sparkles size={12} className="text-amber-500" />
+                <span>Suggested Industry Categories</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {SUGGESTED_CATEGORIES.map(sug => {
+                  const existing = categories.find(c => c.name.toLowerCase() === sug.toLowerCase());
+                  const isSelected = existing && selectedCategoryIds.some(id => String(id) === String(existing.id));
+                  return (
+                    <button
+                      key={sug}
+                      type="button"
+                      onClick={() => handleCreateCategory(sug)}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all border ${
+                        isSelected
+                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50/50'
+                      }`}
+                    >
+                      {isSelected ? `✓ ${sug}` : `+ ${sug}`}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Tags & Labels */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-6 shadow-sm">
             <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
                <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
                   <Tag size={20} />
                </div>
-               <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Tags & Categorization</span>
+               <div>
+                 <span className="text-xs font-bold uppercase tracking-widest text-slate-900 block">Tags & Labels</span>
+                 <p className="text-[11px] text-slate-500 font-medium">Quick organizational tags for filtering and segmentation</p>
+               </div>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {tags.map(tag => (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => toggleTag(tag.id)}
-                  className={`px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-tight border transition-all ${
-                    formData.tags?.includes(tag.id) 
-                      ? 'bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/10' 
-                      : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'
-                  }`}
-                >
-                  {tag.name}
-                </button>
-              ))}
+              {tags.map(tag => {
+                const isSelected = formData.tags?.includes(tag.id);
+                return (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => toggleTag(tag.id)}
+                    className={`px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-tight border transition-all ${
+                      isSelected 
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/10' 
+                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'
+                    }`}
+                  >
+                    {tag.name}
+                  </button>
+                );
+              })}
+              {tags.length === 0 && (
+                <p className="text-xs text-slate-400 italic">No tags available.</p>
+              )}
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-8 shadow-sm">
+          {/* Extended Information */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-6 shadow-sm">
             <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
                <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
                   <MapPin size={20} />
                </div>
-               <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Extended Information</span>
+               <div>
+                 <span className="text-xs font-bold uppercase tracking-widest text-slate-900 block">Extended Information</span>
+                 <p className="text-[11px] text-slate-500 font-medium">Location, online presence and internal notes</p>
+               </div>
             </div>
 
             <div className="space-y-6">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Address</label>
                 <input 
-                  value={formData.address}
+                  value={formData.address || ''}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   placeholder="123 Street, City, Country"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
@@ -285,7 +609,7 @@ export default function ContactEditorPage() {
                     <Calendar size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input 
                       type="date"
-                      value={formData.birthday}
+                      value={formData.birthday || ''}
                       onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 pl-11 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
                     />
@@ -297,7 +621,7 @@ export default function ContactEditorPage() {
                   <div className="relative">
                     <Globe size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input 
-                      value={formData.website}
+                      value={formData.website || ''}
                       onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                       placeholder="https://example.com"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 pl-11 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
@@ -310,9 +634,9 @@ export default function ContactEditorPage() {
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Internal Notes</label>
                 <textarea 
                   rows={4}
-                  value={formData.notes}
+                  value={formData.notes || ''}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="Add internal context or preferences..."
+                  placeholder="Add internal context, preferences, or audit details..."
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all resize-none"
                 />
               </div>

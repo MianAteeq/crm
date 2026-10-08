@@ -276,10 +276,6 @@ export default function WhatsAppSettingsPage() {
   };
 
   const handleSaveAiSettings = async () => {
-    if (!openaiKey.trim()) {
-      addToast('error', 'OpenAI API Key is required.');
-      return;
-    }
     if (!companyPrompt.trim()) {
       addToast('error', 'Company prompt / context is required.');
       return;
@@ -287,7 +283,7 @@ export default function WhatsAppSettingsPage() {
 
     setIsSavingAi(true);
     try {
-      const res = await crmApi.saveAiSettings(openaiKey, companyPrompt);
+      const res = await crmApi.saveAiSettings(openaiKey || undefined, companyPrompt);
       if (res.success) {
         addToast('success', 'AI settings updated successfully!');
         if (res.data) {
@@ -930,24 +926,25 @@ export default function WhatsAppSettingsPage() {
                   </div>
 
                   <div className="p-6 space-y-5">
+                    {/* Universal OpenAI Status Banner */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20 border border-emerald-200 dark:border-emerald-800 flex items-start gap-3.5">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                        <Sparkles size={16} />
+                      </div>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-xs font-bold text-emerald-900 dark:text-emerald-200 uppercase tracking-wider">Universal Platform OpenAI Key Active</h4>
+                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-extrabold rounded-full">One Key For All Vendors</span>
+                        </div>
+                        <p className="text-[11px] text-emerald-700 dark:text-emerald-300 leading-relaxed font-medium">
+                          OpenAI is centrally configured on the server for all vendors. You do not need to purchase or connect an OpenAI account. Simply specify your business information and FAQs below!
+                        </p>
+                      </div>
+                    </div>
+
                     <div className="space-y-4">
                       <div>
-                        <FieldLabel required>OpenAI API Key</FieldLabel>
-                        <div className="relative group">
-                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#6D4AFF] transition-colors" size={15} />
-                          <input
-                            type="password"
-                            value={openaiKey}
-                            onChange={e => setOpenaiKey(e.target.value)}
-                            placeholder={openaiKey && openaiKey.includes('•') ? '••••••••••••••••••••••••' : 'sk-proj-xxxxxxxxxxxxxxx'}
-                            className="w-full bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl py-3 pl-10 pr-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/5 focus:border-[#6D4AFF] focus:bg-white dark:focus:bg-slate-800 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                          />
-                        </div>
-                        <p className="text-[10px] text-slate-400 mt-1">Your API key is stored securely and masked for safety. Required to communicate with OpenAI.</p>
-                      </div>
-
-                      <div>
-                        <FieldLabel required>Company Idea / Context</FieldLabel>
+                        <FieldLabel required>Company Idea / Context (AI Knowledge Base)</FieldLabel>
                         <textarea
                           rows={8}
                           value={companyPrompt}
@@ -956,6 +953,21 @@ export default function WhatsAppSettingsPage() {
                           className="w-full bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/5 focus:border-[#6D4AFF] focus:bg-white dark:focus:bg-slate-800 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                         />
                         <p className="text-[10px] text-slate-400 mt-1">Provide all details the AI needs to answer questions about pricing, features, support, hours, etc.</p>
+                      </div>
+
+                      <div>
+                        <FieldLabel>Custom OpenAI API Key (Optional Override)</FieldLabel>
+                        <div className="relative group">
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#6D4AFF] transition-colors" size={15} />
+                          <input
+                            type="password"
+                            value={openaiKey}
+                            onChange={e => setOpenaiKey(e.target.value)}
+                            placeholder={openaiKey && openaiKey.includes('•') ? '••••••••••••••••••••••••' : 'Using Universal Platform Key'}
+                            className="w-full bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl py-3 pl-10 pr-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/5 focus:border-[#6D4AFF] focus:bg-white dark:focus:bg-slate-800 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                          />
+                        </div>
+                        <p className="text-[10px] text-slate-400 mt-1">Leave empty to use the platform's universal OpenAI key shared across all vendors.</p>
                       </div>
                     </div>
 
@@ -988,10 +1000,10 @@ export default function WhatsAppSettingsPage() {
                   <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-4">How it works</h3>
                   <div className="space-y-4">
                     <div className="flex gap-3">
-                      <div className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 text-[#6D4AFF] flex items-center justify-center shrink-0 text-xs font-extrabold">1</div>
+                      <div className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 flex items-center justify-center shrink-0 text-xs font-extrabold">1</div>
                       <div>
-                        <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Connect OpenAI</h4>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Input your OpenAI api key. It is used to generate smart replies using gpt-4o-mini.</p>
+                        <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Universal OpenAI Active</h4>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Central platform OpenAI (gpt-4o-mini) is shared for all vendors automatically.</p>
                       </div>
                     </div>
                     <div className="flex gap-3">
