@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import Layout from '../components/Layout';
 
 const WhatsappCampaigns = () => {
 
@@ -34,8 +35,7 @@ const WhatsappCampaigns = () => {
   }, []);
 
   return (
-    <>
-      <div>
+        <Layout>
 
         {/*[if lte IE 9]>
     	<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
@@ -43,294 +43,7 @@ const WhatsappCampaigns = () => {
         {/*********************************
    		Code Start From Here 
 	******************************** */}
-        <div className="mouseCursor cursor-outer" />
-        <div className="mouseCursor cursor-inner" />
         {/*==============================
-    Mobile Menu
-  ============================== */}
-        <div className="th-menu-wrapper">
-          <div className="th-menu-area text-center">
-            <button className="th-menu-toggle"><i className="fal fa-times" /></button>
-            <div className="mobile-logo">
-              <a href="/home-ai-startup"><img src="assets/img/logo.svg" alt="Aior " /></a>
-            </div>
-            <div className="th-mobile-menu">
-              <ul>
-                <li className="menu-item-has-children">
-                  <a href="/home-ai-startup">Home</a>
-                  <ul className="sub-menu">
-                    <li><a href="/home-ai-startup">Home Ai Startup</a></li>
-                    <li><a href="/home-ai-chatbot">Home Ai Chatbot</a></li>
-                    <li><a href="/home-ai-image-generate">Home Ai Image Generate</a></li>
-                    <li><a href="/home-ai-writer-tool">Home AI Writer Tool</a></li>
-                    <li><a href="/home-business-intelligence">Home Business Intelligence</a></li>
-                    <li><a href="/home-ai-agent">home-ai-agent</a></li>
-                    <li><a href="/home-productivity-tools">Home productivity tools</a></li>
-                    <li><a href="/home-ai-chatbot-tool">Home AI chatbot tool</a></li>
-                    <li><a href="/home-cloud-based-saas">Home cloud Based Saas</a></li>
-                    <li><a href="/home-saas-product-showcase">Home Saas product Showcase</a></li>
-                    <li><a href="/home-finance-crypto-service">Home finance crypto service</a> </li>
-                  </ul>
-                </li>
-                <li><a href="/about">About Us</a></li>
-                <li><a href="/features">Features</a></li>
-                <li className="menu-item-has-children">
-                  <a href="#">Case Studies</a>
-                  <ul className="sub-menu">
-                    <li><a href="/case-studies">Case Studies</a></li>
-                    <li><a href="/case-studies-2">Case Studies style 2</a></li>
-                    <li><a href="/case-studies-details">Case Studies Details</a></li>
-                  </ul>
-                </li>
-                <li className="menu-item-has-children">
-                  <a href="#">Pages</a>
-                  <ul className="sub-menu">
-                    <li><a href="/cases">cases</a></li>
-                    <li><a href="/integrations">Integrations</a></li>
-                    <li><a href="/team">Team</a></li>
-                    <li><a href="/team-details">Team Details</a></li>
-                    <li><a href="/faq">FAQ</a></li>
-                    <li><a href="/testimonial">Testimonial</a></li>
-                    <li><a href="/pricing">Price Table</a></li>
-                    <li><a href="/contact">Contact Us</a></li>
-                    <li><a href="/error">Error Page</a></li>
-                  </ul>
-                </li>
-                <li className="menu-item-has-children">
-                  <a href="#">Blog</a>
-                  <ul className="sub-menu">
-                    <li><a href="/blog">Blog</a></li>
-                    <li><a href="/blog-details">Blog Details</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>{/*==============================
-	Header Area
-==============================*/}
-        <style>{`
-          .custom-mega-menu {
-            width: 360px !important;
-            padding: 8px 8px 0 8px !important;
-            border-radius: 12px !important;
-            box-shadow: 0 16px 40px rgba(34,197,94,0.25) !important;
-            background: #22C55E !important;
-            border: 2px solid #16a34a !important;
-            transform-origin: top center;
-          }
-          .custom-mega-menu li {
-            margin: 0 !important;
-            display: block !important;
-          }
-          .custom-mega-menu li::before, .custom-mega-menu li::after,
-          .custom-mega-menu a::before, .custom-mega-menu a::after {
-            display: none !important;
-          }
-          .custom-mega-menu .mega-menu-item {
-            display: flex !important;
-            align-items: flex-start !important;
-            gap: 16px !important;
-            padding: 14px 16px !important;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-            border-bottom: none !important;
-            border-radius: 8px !important;
-            margin-bottom: 2px !important;
-            background: transparent !important;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-          }
-          .custom-mega-menu .mega-menu-item::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #12263A;
-            border-radius: 8px;
-            z-index: -1;
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: block !important;
-          }
-          .custom-mega-menu .mega-menu-item:hover::before {
-            transform: scaleX(1);
-          }
-          .custom-mega-menu .mega-menu-item:hover {
-            transform: translateX(4px);
-          }
-          .custom-mega-menu .mega-menu-item .icon-box {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #22C55E;
-            font-size: 20px;
-            flex-shrink: 0;
-            background: #12263A;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          }
-          .custom-mega-menu .mega-menu-item:hover .icon-box {
-            background: #22C55E;
-            color: #12263A;
-            transform: scale(1.15) rotate(-5deg);
-          }
-          .custom-mega-menu .mega-menu-item .text-box {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            text-align: left;
-          }
-          .custom-mega-menu .mega-menu-item .text-box h4 {
-            font-size: 15px !important;
-            font-weight: 800 !important;
-            color: #12263A !important;
-            margin-bottom: 2px !important;
-            line-height: 1.3 !important;
-            padding: 0 !important;
-            text-transform: none !important;
-            transition: color 0.3s ease !important;
-          }
-          .custom-mega-menu .mega-menu-item .text-box p {
-            font-size: 13px !important;
-            color: rgba(18,38,58,0.85) !important;
-            margin: 0 !important;
-            line-height: 1.4 !important;
-            text-transform: none !important;
-            white-space: normal !important;
-            font-weight: 500;
-            transition: color 0.3s ease !important;
-          }
-          .custom-mega-menu .mega-menu-item:hover .text-box h4 {
-            color: #fff !important;
-          }
-          .custom-mega-menu .mega-menu-item:hover .text-box p {
-            color: rgba(255,255,255,0.8) !important;
-          }
-          .custom-mega-menu .mega-menu-footer {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            padding: 16px 20px !important;
-            background: #16a34a !important;
-            border-top: 1px solid #15803d !important;
-            border-radius: 0 0 10px 10px !important;
-            margin: 8px -8px 0 -8px !important;
-          }
-          .custom-mega-menu .mega-menu-footer span {
-            font-size: 13px;
-            color: #12263A;
-            font-weight: 600;
-            text-transform: none !important;
-          }
-          .custom-mega-menu .mega-menu-footer .footer-link {
-            padding: 0 !important;
-            font-size: 13px !important;
-            font-weight: 800 !important;
-            color: #12263A !important;
-            background: transparent !important;
-            display: inline-flex !important;
-            align-items: center;
-            border-bottom: none !important;
-            text-transform: none !important;
-            transition: all 0.3s ease !important;
-          }
-          .custom-mega-menu .mega-menu-footer .footer-link:hover {
-            color: #fff !important;
-            transform: translateX(4px);
-          }
-        `}</style>
-        <header className="th-header header-layout2 header-absolute">
-          <div className="sticky-wrapper">
-            {/* Main Menu Area */}
-            <div className="menu-area">
-              <div className="container th-container">
-                <div className="row align-items-center justify-content-between">
-                  <div className="col-auto">
-                    <div className="header-logo">
-                      <a href="/home-ai-chatbot"><img src="assets/img/logo.png" alt="Aior " style={{ width: '180px', height: 'auto' }} /></a>
-                    </div>
-                  </div>
-                  <div className="col-auto">
-                    <nav className="main-menu style2 d-none d-lg-inline-block">
-                      <ul>
-                        <li className="menu-item-has-children">
-                          <a href="/#">Services</a>
-                          <ul className="sub-menu custom-mega-menu">
-                            <li>
-                              <a href="/whatsapp-campaigns" className="mega-menu-item">
-                                <div className="icon-box"><i className="fal fa-paper-plane"></i></div>
-                                <div className="text-box">
-                                  <h4>Targeted WhatsApp Campaigns</h4>
-                                  <p>Personalized broadcasts with real-time tracking.</p>
-                                </div>
-                              </a>
-                            </li>
-                            <li>
-                              <a href="/automated-messaging" className="mega-menu-item">
-                                <div className="icon-box"><i className="fal fa-clock"></i></div>
-                                <div className="text-box">
-                                  <h4>Automated WhatsApp Messaging</h4>
-                                  <p>Birthday greetings &amp; automated follow-ups.</p>
-                                </div>
-                              </a>
-                            </li>
-                            <li>
-                              <a href="/#" className="mega-menu-item">
-                                <div className="icon-box"><i className="fal fa-sparkles"></i></div>
-                                <div className="text-box">
-                                  <h4>WhatsApp AI Copilot</h4>
-                                  <p>Automate chat answers &amp; resolve queries 24/7.</p>
-                                </div>
-                              </a>
-                            </li>
-                            <li>
-                              <a href="/#" className="mega-menu-item">
-                                <div className="icon-box"><i className="fal fa-database"></i></div>
-                                <div className="text-box">
-                                  <h4>Contact List Retargeting</h4>
-                                  <p>Boost bookings and conversions via WhatsApp.</p>
-                                </div>
-                              </a>
-                            </li>
-                            <li>
-                              <a href="/#" className="mega-menu-item">
-                                <div className="icon-box"><i className="fal fa-chart-bar"></i></div>
-                                <div className="text-box">
-                                  <h4>WhatsApp Analytics</h4>
-                                  <p>Track message delivery, open rates, and ROI.</p>
-                                </div>
-                              </a>
-                            </li>
-                            <li className="mega-menu-footer">
-                              <span>Need a custom solution?</span>
-                              <a href="/pricing" className="footer-link">View Pricing &rarr;</a>
-                            </li>
-                          </ul>
-                        </li>
-                        <li><a href="/pricing">Pricing</a></li>
-                        <li><a href="/contact">Contact</a></li>
-                      </ul>
-                    </nav>
-                    <div className="header-button">
-                      <button type="button" className="th-menu-toggle d-inline-block d-lg-none"><i className="far fa-bars" /></button>
-                    </div>
-                  </div>
-                  <div className="col-auto d-none d-xl-block">
-                    <div className="header-button">
-                      <a href="/contact" className="th-btn2 style2">Login <img src="assets/img/icon/user.svg" alt /></a>
-                      <a href="/contact" className="th-btn2 d-none d-xxl-block">Start Free Trial</a>
-                      <button type="button" className="th-menu-toggle d-inline-block d-xl-none"><i className="far fa-bars" /></button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>{/*==============================
 {/*======== Whatsapp Campaigns Page Content ========*/}
 <div className="whatsapp-campaigns-page">
   <style>{`
@@ -402,68 +115,126 @@ const WhatsappCampaigns = () => {
   </section>
 
   {/* Main Content Section */}
-  <section className="content-section" style={{ backgroundColor: '#fff', padding: '80px 0' }}>
-    <div className="container">
-      {/* Section Header */}
-      <div className="row justify-content-center text-center mb-4">
-        <div className="col-lg-8">
-          <div style={{ display: 'inline-block', padding: '6px 16px', background: '#F0FDF4', color: '#166534', borderRadius: '30px', fontWeight: '800', fontSize: '11px', letterSpacing: '1px', marginBottom: '20px' }}>GROWTH TOOLS</div>
+  <section className="content-section position-relative overflow-hidden" style={{ backgroundColor: '#FAFAF9', padding: '120px 0' }}>
+    {/* Abstract Brush Paints (Theme colored blobs) */}
+    <div className="position-absolute" style={{ top: '10%', left: '-10%', width: '500px', height: '500px', background: '#22C55E', filter: 'blur(150px)', opacity: 0.15, borderRadius: '50%', pointerEvents: 'none' }}></div>
+    <div className="position-absolute" style={{ bottom: '-10%', right: '-5%', width: '600px', height: '600px', background: '#166534', filter: 'blur(200px)', opacity: 0.1, borderRadius: '50%', pointerEvents: 'none' }}></div>
+    <div className="position-absolute" style={{ top: '40%', left: '40%', width: '400px', height: '400px', background: '#F0FDF4', filter: 'blur(100px)', opacity: 0.6, borderRadius: '50%', pointerEvents: 'none' }}></div>
+
+    <div className="container position-relative z-1">
+      <div className="row align-items-center gy-5">
+        
+        {/* Left Column: Text & Features */}
+        <div className="col-lg-5 pe-lg-5">
+          <div style={{ display: 'inline-block', padding: '6px 16px', background: '#F0FDF4', color: '#166534', borderRadius: '30px', fontWeight: '800', fontSize: '11px', letterSpacing: '1px', marginBottom: '20px', border: '1px solid rgba(34,197,94,0.2)' }}>GROWTH TOOLS</div>
           <h2 className="mb-4" style={{ color: '#12263A', fontWeight: '800', fontSize: '2.75rem', lineHeight: '1.2' }}>Why High-Growth Teams Use This Tool</h2>
-          <p className="mb-0 mx-auto" style={{ color: '#57534E', fontSize: '1.1rem', lineHeight: '1.7', maxWidth: '700px' }}>
+          <p className="mb-5" style={{ color: '#57534E', fontSize: '1.1rem', lineHeight: '1.7' }}>
             Connect directly with customers where they are active. Unlike email broadcasts that average 15-20% open rates, WhatsApp campaigns regularly yield 90%+ open rates and up to 40% click-through metrics, driving immediate appointment bookings and repeat transactions.
           </p>
-        </div>
-      </div>
 
-      {/* Feature Grid */}
-      <div className="row gy-4 mb-5">
-        <div className="col-lg-4">
-          <div className="feature-item p-4 rounded-4" style={{ background: '#FAFAF9', border: '1px solid #E7E5E4', transition: 'transform 0.3s ease', minHeight: '250px' }}>
-            <div className="feature-icon-box mb-4" style={{ width: '56px', height: '56px', borderRadius: '12px', background: '#F0FDF4', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <i className="fal fa-bullseye-arrow fs-4"></i>
-            </div>
-            <h4 style={{ color: '#12263A', fontSize: '1.2rem', fontWeight: '800', marginBottom: '12px' }}>Database Segmentation</h4>
-            <p className="mb-0" style={{ color: '#57534E', fontSize: '0.95rem', lineHeight: '1.6' }}>Send unique marketing offers to specific audience tags like "Inactive Patients" or "Premium Members".</p>
-          </div>
-        </div>
-
-        <div className="col-lg-4">
-          <div className="feature-item p-4 rounded-4" style={{ background: '#FAFAF9', border: '1px solid #E7E5E4', transition: 'transform 0.3s ease', minHeight: '250px' }}>
-            <div className="feature-icon-box mb-4" style={{ width: '56px', height: '56px', borderRadius: '12px', background: '#F0FDF4', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <i className="fal fa-hand-pointer fs-4"></i>
-            </div>
-            <h4 style={{ color: '#12263A', fontSize: '1.2rem', fontWeight: '800', marginBottom: '12px' }}>Interactive Quick-Reply</h4>
-            <p className="mb-0" style={{ color: '#57534E', fontSize: '0.95rem', lineHeight: '1.6' }}>One-touch single-tap buttons inside the WhatsApp bubble to schedule meetings instantly.</p>
-          </div>
-        </div>
-
-        <div className="col-lg-4">
-          <div className="feature-item p-4 rounded-4" style={{ background: '#FAFAF9', border: '1px solid #E7E5E4', transition: 'transform 0.3s ease', minHeight: '250px' }}>
-            <div className="feature-icon-box mb-4" style={{ width: '56px', height: '56px', borderRadius: '12px', background: '#F0FDF4', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <i className="fal fa-chart-line fs-4"></i>
-            </div>
-            <h4 style={{ color: '#12263A', fontSize: '1.2rem', fontWeight: '800', marginBottom: '12px' }}>Live Delivery Metrics</h4>
-            <p className="mb-0" style={{ color: '#57534E', fontSize: '0.95rem', lineHeight: '1.6' }}>Track exact Sent, Delivered, and Read logs in real-time, validating your campaign targets.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Dashboard Image */}
-      <div className="row justify-content-center">
-        <div className="col-12 text-center position-relative">
-          <img src="assets/img/normal/whatsapp_dashboard_wide.jpg" alt="Campaign Dashboard" className="img-fluid rounded-4 w-100" style={{ border: '1px solid #E7E5E4', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)' }} />
-          
-          {/* Floating Badge (no glow) */}
-          <div className="position-absolute" style={{ bottom: '-15px', right: '5%', zIndex: 3 }}>
-            <div style={{ background: '#fff', padding: '10px 20px', borderRadius: '10px', boxShadow: '0 10px 30px -5px rgba(0,0,0,0.1)', border: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#F0FDF4', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <i className="fas fa-arrow-up" style={{ fontSize: '12px' }}></i>
+          <div className="d-flex flex-column gap-4">
+            {/* Feature 1 */}
+            <div className="d-flex align-items-start gap-3">
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fff', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 10px 20px rgba(34,197,94,0.1)' }}>
+                <i className="fal fa-bullseye-arrow fs-5"></i>
               </div>
-              <div style={{ textAlign: 'left' }}>
-                <h5 style={{ margin: 0, fontSize: '14px', fontWeight: '800', color: '#12263A' }}>99.4%</h5>
-                <span style={{ fontSize: '11px', color: '#57534E', fontWeight: '600' }}>Delivery Rate</span>
+              <div>
+                <h4 style={{ color: '#12263A', fontSize: '1.15rem', fontWeight: '800', marginBottom: '6px' }}>Database Segmentation</h4>
+                <p className="mb-0" style={{ color: '#57534E', fontSize: '0.95rem', lineHeight: '1.6' }}>Send unique marketing offers to specific audience tags like "Inactive Patients" or "Premium Members".</p>
               </div>
             </div>
+            
+            {/* Feature 2 */}
+            <div className="d-flex align-items-start gap-3">
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fff', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 10px 20px rgba(34,197,94,0.1)' }}>
+                <i className="fal fa-hand-pointer fs-5"></i>
+              </div>
+              <div>
+                <h4 style={{ color: '#12263A', fontSize: '1.15rem', fontWeight: '800', marginBottom: '6px' }}>Interactive Quick-Reply</h4>
+                <p className="mb-0" style={{ color: '#57534E', fontSize: '0.95rem', lineHeight: '1.6' }}>One-touch single-tap buttons inside the WhatsApp bubble to schedule meetings instantly.</p>
+              </div>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="d-flex align-items-start gap-3">
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fff', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 10px 20px rgba(34,197,94,0.1)' }}>
+                <i className="fal fa-chart-line fs-5"></i>
+              </div>
+              <div>
+                <h4 style={{ color: '#12263A', fontSize: '1.15rem', fontWeight: '800', marginBottom: '6px' }}>Live Delivery Metrics</h4>
+                <p className="mb-0" style={{ color: '#57534E', fontSize: '0.95rem', lineHeight: '1.6' }}>Track exact Sent, Delivered, and Read logs in real-time, validating your campaign targets.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Campaign UI Visualization */}
+        <div className="col-lg-7">
+          <div className="p-4 p-md-5 rounded-4 position-relative mt-5 mt-lg-0" style={{ background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.5)', boxShadow: '0 30px 60px -15px rgba(0,0,0,0.05), 0 0 40px rgba(34,197,94,0.1)' }}>
+            
+            {/* Header */}
+            <div className="d-flex justify-content-between align-items-center mb-5 pb-3" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+              <div className="d-flex align-items-center gap-3">
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 5px 15px rgba(34,197,94,0.3)' }}>
+                  <i className="fas fa-bullhorn fs-6"></i>
+                </div>
+                <div>
+                  <h5 className="mb-1" style={{ color: '#12263A', fontSize: '1rem', fontWeight: '800', letterSpacing: '0.5px' }}>CAMPAIGN MANAGER</h5>
+                  <span style={{ color: '#57534E', fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>Broadcast Preview</span>
+                </div>
+              </div>
+              <div className="d-flex align-items-center gap-2" style={{ background: '#F0FDF4', padding: '6px 12px', borderRadius: '30px', border: '1px solid rgba(34,197,94,0.2)' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22C55E', animation: 'pulseGlow 2s infinite' }}></div>
+                <span className="d-none d-sm-inline" style={{ color: '#166534', fontSize: '0.75rem', fontWeight: '700', letterSpacing: '1px' }}>SENDING</span>
+              </div>
+            </div>
+
+            {/* Stats row */}
+            <div className="row g-3 mb-4">
+              <div className="col-4">
+                 <div className="p-3 text-center" style={{ background: '#fff', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 5px 15px rgba(0,0,0,0.02)' }}>
+                   <div style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Audience</div>
+                   <div style={{ color: '#12263A', fontSize: '1.25rem', fontWeight: '800' }}>2,450</div>
+                 </div>
+              </div>
+              <div className="col-4">
+                 <div className="p-3 text-center" style={{ background: '#fff', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 5px 15px rgba(0,0,0,0.02)' }}>
+                   <div style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Delivered</div>
+                   <div style={{ color: '#22C55E', fontSize: '1.25rem', fontWeight: '800' }}>99.4%</div>
+                 </div>
+              </div>
+              <div className="col-4">
+                 <div className="p-3 text-center" style={{ background: '#fff', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 5px 15px rgba(0,0,0,0.02)' }}>
+                   <div style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Read</div>
+                   <div style={{ color: '#3B82F6', fontSize: '1.25rem', fontWeight: '800' }}>87.2%</div>
+                 </div>
+              </div>
+            </div>
+
+            {/* Campaign Message Preview */}
+            <div className="p-4" style={{ background: '#F8FAFC', borderRadius: '24px', border: '1px solid #E2E8F0', position: 'relative' }}>
+              <div className="mb-3 d-flex align-items-center gap-2">
+                 <span style={{ color: '#57534E', fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px' }}>Message Preview</span>
+              </div>
+              
+              <div className="p-4" style={{ background: '#DCF8C6', borderRadius: '16px 16px 16px 0', border: '1px solid rgba(34,197,94,0.2)', boxShadow: '0 10px 20px rgba(0,0,0,0.05)', maxWidth: '90%' }}>
+                 <p className="mb-3" style={{ color: '#166534', fontSize: '1.05rem', fontWeight: '500', lineHeight: '1.5' }}>
+                   "Hi {"{First Name}"}! We missed you. Enjoy 20% off your next premium treatment if you book this week. Limited slots available!"
+                 </p>
+                 <div className="d-flex gap-2">
+                   <div style={{ background: '#fff', color: '#166534', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid rgba(34,197,94,0.3)' }}>
+                     <i className="fas fa-calendar-check"></i> Book Now
+                   </div>
+                   <div style={{ background: '#fff', color: '#166534', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid rgba(34,197,94,0.3)' }}>
+                     <i className="fas fa-times-circle"></i> Opt Out
+                   </div>
+                 </div>
+                 <div className="text-end mt-2">
+                    <span style={{ fontSize: '0.65rem', color: '#15803D', fontWeight: '600' }}>10:42 AM <i className="fas fa-check-double text-info"></i></span>
+                 </div>
+              </div>
+            </div>
+            
           </div>
         </div>
       </div>
@@ -497,109 +268,11 @@ const WhatsappCampaigns = () => {
     </div>
   </section>
 </div>
-        <footer className="footer-wrapper footer-layout2" data-bg-src="assets/img/bg/footer_bg_2.png">
-          <div className="container">
-            <div className="widget-area">
-              <div className="footer-top ">
-                <div className="row gx-40 gy-4 justify-content-center justify-content-lg-between">
-                  <div className="col-lg-5 col-xl-4">
-                    <div className="footer-logo"><img src="assets/img/logo-2.png" alt="Talkinexx Logo" /></div>
-                  </div>
-                  <div className="col-lg-6 col-xl-5">
-                    <div className="ps-xl-5">
-                      <h2 className="box-title text-white">Try Talkinexx Today Free</h2>
-                      <div className="btn-group justify-content-center justify-content-lg-start">
-                        <a href="/contact" className="th-btn2">Start Free Trial</a>
-                        <a href="/contact" className="th-btn2 style3">Book a Demo</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="container">
-            <div className="row gy-4 justify-content-between">
-              <div className="col-md-6 col-xl-3">
-                <div className="widget footer-widget">
-                  <h3 className="widget_title" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>Talkinexx</h3>
-                  <div className="th-widget-about">
-                    <p className="about-text" style={{ fontSize: '14px', lineHeight: '1.7' }}>The enterprise-grade WhatsApp automation platform for teams who value speed, efficiency, and real-time customer engagement.</p>
-                    <div className="th-social">
-                      <a href="https://www.twitter.com/"><i className="fab fa-twitter" /></a>
-                      <a href="https://github.com/"><i className="fab fa-github" /></a>
-                      <a href="https://www.linkedin.com/"><i className="fab fa-linkedin-in" /></a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-6 col-xl-auto">
-                <div className="widget widget_nav_menu footer-widget">
-                  <h3 className="widget_title" style={{ textTransform: 'uppercase', letterSpacing: '1px', fontSize: '13px', color: '#8892A0' }}>Company</h3>
-                  <div className="menu-all-pages-container">
-                    <ul className="menu">
-                      <li><a href="/">Home Page</a></li>
-                      <li><a href="/pricing">Pricing Plans</a></li>
-                      <li><a href="/contact">Contact Sales</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-6 col-xl-auto">
-                <div className="widget widget_nav_menu footer-widget">
-                  <h3 className="widget_title" style={{ textTransform: 'uppercase', letterSpacing: '1px', fontSize: '13px', color: '#8892A0' }}>Services</h3>
-                  <div className="menu-all-pages-container">
-                    <ul className="menu">
-                      <li><a href="/#">WhatsApp Campaigns</a></li>
-                      <li><a href="/#">Automated Messaging</a></li>
-                      <li><a href="/#">AI Auto Response</a></li>
-                      <li><a href="/#">WhatsApp Flow Builder</a></li>
-                      <li><a href="/#">Shared Team Inbox</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-6 col-xl-auto">
-                <div className="widget widget_nav_menu footer-widget">
-                  <h3 className="widget_title" style={{ textTransform: 'uppercase', letterSpacing: '1px', fontSize: '13px', color: '#8892A0' }}>Trust &amp; Legal</h3>
-                  <div className="menu-all-pages-container">
-                    <ul className="menu">
-                      <li><a href="/#">Privacy Policy</a></li>
-                      <li><a href="/#">Terms &amp; Conditions</a></li>
-                      <li><a href="/#">SLA Guarantee</a></li>
-                      <li><a href="/#">Secure by Design</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="container">
-            <div className="copyright-wrap">
-              <div className="row gy-2 align-items-center justify-content-between">
-                <div className="col-auto">
-                  <p className="copyright-text mb-0" style={{ color: '#8892A0' }}>&copy; 2026 Talkinexx. Built for Meta Graph API.</p>
-                </div>
-                <div className="col-auto">
-                  <div className="d-flex" style={{ gap: '30px' }}>
-                    <a href="/#" style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold', color: '#fff' }}>Secure by Design</a>
-                    <a href="/#" style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold', color: '#fff' }}>SLA Guarantee</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </footer>
+        
         {/*********************************
 			Code End  Here 
 	******************************** */}
-        {/* Scroll To Top */}
-        <div className="scroll-top">
-          <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
-            <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" style={{ transition: 'stroke-dashoffset 10ms linear 0s', strokeDasharray: '307.919, 307.919', strokeDashoffset: '307.919' }}>
-            </path>
-          </svg>
-        </div>
+        
         {/*==============================
     All Js File
 ============================== */}
@@ -618,9 +291,7 @@ const WhatsappCampaigns = () => {
         {/* gsap area end */}
         {/* Lenis Js */}
         {/* Main Js File */}
-      </div>
-
-    </>
+      </Layout>
   );
 };
 

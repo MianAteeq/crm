@@ -1,651 +1,186 @@
-
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
+import Layout from '../components/Layout';
 
 const Contact = () => {
-    
-    return (
-        <>
-            <div>
-  {/*[if lte IE 9]>
-    	<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-  <![endif]*/}
-  {/*********************************
-   		Code Start From Here 
-	******************************** */}
-  <div className="mouseCursor cursor-outer" />
-  <div className="mouseCursor cursor-inner" />
-  {/*==============================
-    Sidemenu
-============================== */}
-  <div className="sidemenu-wrapper ">
-    <div className="sidemenu-content">
-      <button className="closeButton sideMenuCls"><i className="far fa-times" /></button>
-      <div className="widget footer-widget mb-0">
-        <div className="th-widget-about">
-          <div className="about-logo">
-            <a href="/"><img src="assets/img/logo.svg" alt="Aior " /></a>
-          </div>
-          <p className="about-text">Aior is a Canada-based startup design agency specializing in modern, user-centric digital experiences.
-            We help brands grow through strategic design, branding, and creative innovation.</p>
-          <div className="th-social mb-40">
-            <a href="https://www.facebook.com/"><i className="fab fa-facebook-f" /></a>
-            <a href="https://www.twitter.com/"><i className="fab fa-twitter" /></a>
-            <a href="https://www.youtube.com/"><i className="fa-brands fa-instagram" /></a>
-            <a href="https://www.linkedin.com/"><i className="fab fa-linkedin-in" /></a>
-            <a href="https://www.youtube.com/"><i className="fab fa-youtube" /></a>
-          </div>
-        </div>
-      </div>
-      <div className="widget footer-widget">
-        <h3 className="widget_title">Recent Posts</h3>
-        <div className="recent-post-wrap">
-          <div className="recent-post">
-            <div className="media-img">
-              <a href="/blog-details"><img src="assets/img/blog/recent-post-1-1.jpg" alt="Blog Image" /></a>
-            </div>
-            <div className="media-body">
-              <div className="recent-post-meta">
-                <a href="/blog"><i className="fa-sharp fa-solid fa-calendar-days" />january 02,
-                  2026</a>
-              </div>
-              <h4 className="post-title"><a className="text-inherit" href="/blog-details">Developing AI systems that scale efficiently as data.</a></h4>
-            </div>
-          </div>
-          <div className="recent-post">
-            <div className="media-img">
-              <a href="/blog-details"><img src="assets/img/blog/recent-post-1-2.jpg" alt="Blog Image" /></a>
-            </div>
-            <div className="media-body">
-              <div className="recent-post-meta">
-                <a href="/blog"><i className="fa-sharp fa-solid fa-calendar-days" />january 25,
-                  2026</a>
-              </div>
-              <h4 className="post-title"><a className="text-inherit" href="/blog-details">Addressing issues related to AI fairness, transparency</a></h4>
-            </div>
-          </div>
-          <div className="recent-post">
-            <div className="media-img">
-              <a href="/blog-details"><img src="assets/img/blog/recent-post-1-3.jpg" alt="Blog Image" /></a>
-            </div>
-            <div className="media-body">
-              <div className="recent-post-meta">
-                <a href="/blog"><i className="fa-sharp fa-solid fa-calendar-days" />26 january,
-                  2026</a>
-              </div>
-              <h4 className="post-title"><a className="text-inherit" href="/blog-details">AI chatbot integration refers to embedding.</a></h4>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  {/*==============================
-    Mobile Menu
-  ============================== */}
-  <div className="th-menu-wrapper">
-    <div className="th-menu-area text-center">
-      <button className="th-menu-toggle"><i className="fal fa-times" /></button>
-      <div className="mobile-logo">
-        <a href="/home-ai-startup"><img src="assets/img/logo.svg" alt="Aior " /></a>
-      </div>
-      <div className="th-mobile-menu">
-        <ul>
-          <li className="menu-item-has-children">
-            <a href="/home-ai-startup">Home</a>
-            <ul className="sub-menu">
-              <li><a href="/home-ai-startup">Home Ai Startup</a></li>
-              <li><a href="/home-ai-chatbot">Home Ai Chatbot</a></li>
-              <li><a href="/home-ai-image-generate">Home Ai Image Generate</a></li>
-              <li><a href="/home-ai-writer-tool">Home AI Writer Tool</a></li>
-              <li><a href="/home-business-intelligence">Home Business Intelligence</a></li>
-              <li><a href="/home-ai-agent">home-ai-agent</a></li>
-              <li><a href="/home-productivity-tools">Home productivity tools</a></li>
-              <li><a href="/home-ai-chatbot-tool">Home AI chatbot tool</a></li>
-              <li><a href="/home-cloud-based-saas">Home cloud Based Saas</a></li>
-              <li><a href="/home-saas-product-showcase">Home Saas product Showcase</a></li>
-              <li><a href="/home-finance-crypto-service">Home finance crypto service</a> </li>
-            </ul>
-          </li>
-          <li><a href="/about">About Us</a></li>
-          <li><a href="/features">Features</a></li>
-          <li className="menu-item-has-children">
-            <a href="#">Case Studies</a>
-            <ul className="sub-menu">
-              <li><a href="/case-studies">Case Studies</a></li>
-              <li><a href="/case-studies-2">Case Studies style 2</a></li>
-              <li><a href="/case-studies-details">Case Studies Details</a></li>
-            </ul>
-          </li>
-          <li className="menu-item-has-children">
-            <a href="#">Pages</a>
-            <ul className="sub-menu">
-              <li><a href="/cases">cases</a></li>
-              <li><a href="/integrations">Integrations</a></li>
-              <li><a href="/team">Team</a></li>
-              <li><a href="/team-details">Team Details</a></li>
-              <li><a href="/faq">FAQ</a></li>
-              <li><a href="/testimonial">Testimonial</a></li>
-              <li><a href="/pricing">Price Table</a></li>
-              <li><a href="/contact">Contact Us</a></li>
-              <li><a href="/error">Error Page</a></li>
-            </ul>
-          </li>
-          <li className="menu-item-has-children">
-            <a href="#">Blog</a>
-            <ul className="sub-menu">
-              <li><a href="/blog">Blog</a></li>
-              <li><a href="/blog-details">Blog Details</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>{/*==============================       
-	Header Area
-==============================*/}
-  <header className="th-header header-layout1">
-    <div className="container th-container">
-      <div className="menu-area">
-        <div className="sticky-wrapper">
-          {/* Main Menu Area */}
-          <div className="container">
-            <div className="row align-items-center justify-content-between">
-              <div className="col-auto">
-                <div className="header-logo">
-                  <a href="/home-ai-startup"><img src="assets/img/logo.svg" alt="Aior " /></a>
-                </div>
-              </div>
-              <div className="col-auto">
-                <nav className="main-menu style2 d-none d-xl-inline-block">
-                  <ul>
-                    <li className="menu-item-has-children">
-                      <a href="/home-ai-startup">Home</a>
-                      <ul className="mega-menu mega-menu-content allow-natural-scroll">
-                        <li>
-                          <div className="container">
-                            <div className="row gy-4">
-                              <div className="col-lg-4">
-                                <div className="mega-menu-box">
-                                  <div className="mega-menu-img">
-                                    <img src="assets/img/pages/home-ai-startup.jpg" alt="Home One" />
-                                    <div className="btn-wrap">
-                                      <a href="/home-ai-startup" className="th-btn">Multipage</a>
-                                      <a href="/home-ai-startup-op" className="th-btn">Onepage</a>
-                                    </div>
-                                  </div>
-                                  <h2 className="mega-menu-title"><a href="/home-ai-startup">01. Home Ai Startup</a>
-                                  </h2>
-                                </div>
-                              </div>
-                              <div className="col-lg-4">
-                                <div className="mega-menu-box">
-                                  <div className="mega-menu-img">
-                                    <img src="assets/img/pages/home-ai-chatbot.jpg" alt="Home Two" />
-                                    <div className="btn-wrap">
-                                      <a href="/home-ai-chatbot" className="th-btn">Multipage</a>
-                                      <a href="/home-ai-chatbot-op" className="th-btn">Onepage</a>
-                                    </div>
-                                  </div>
-                                  <h2 className="mega-menu-title"><a href="/home-ai-chatbot">02. Home Ai Chatbot</a></h2>
-                                </div>
-                              </div>
-                              <div className="col-lg-4">
-                                <div className="mega-menu-box">
-                                  <div className="mega-menu-img">
-                                    <img src="assets/img/pages/home-ai-image-generate.jpg" alt="Home Three" />
-                                    <div className="btn-wrap">
-                                      <a href="/home-ai-image-generate" className="th-btn">Multipage</a>
-                                      <a href="/home-ai-image-generate-op" className="th-btn">Onepage</a>
-                                    </div>
-                                  </div>
-                                  <h2 className="mega-menu-title"><a href="/home-ai-image-generate">03. Home Ai Image
-                                      Generate</a>
-                                  </h2>
-                                </div>
-                              </div>
-                              <div className="col-lg-4">
-                                <div className="mega-menu-box">
-                                  <div className="mega-menu-img">
-                                    <img src="assets/img/pages/home-ai-writer-tool.jpg" alt="Home Three" />
-                                    <div className="btn-wrap">
-                                      <a href="/home-ai-writer-tool" className="th-btn">Multipage</a>
-                                      <a href="/home-ai-writer-tool-op" className="th-btn">Onepage</a>
-                                    </div>
-                                  </div>
-                                  <h2 className="mega-menu-title"><a href="/home-ai-writer-tool">04. Home AI Writer
-                                      Tool</a>
-                                  </h2>
-                                </div>
-                              </div>
-                              <div className="col-lg-4">
-                                <div className="mega-menu-box">
-                                  <div className="mega-menu-img">
-                                    <img src="assets/img/pages/home-business-intelligence.jpg" alt="Home Three" />
-                                    <div className="btn-wrap">
-                                      <a href="/home-business-intelligence" className="th-btn">Multipage</a>
-                                      <a href="/home-business-intelligence-op" className="th-btn">Onepage</a>
-                                    </div>
-                                  </div>
-                                  <h2 className="mega-menu-title"><a href="/home-business-intelligence">05. Home Business
-                                      Intelligence</a>
-                                  </h2>
-                                </div>
-                              </div>
-                              <div className="col-lg-4">
-                                <div className="mega-menu-box">
-                                  <div className="mega-menu-img">
-                                    <img src="assets/img/pages/home-ai-agent.jpg" alt="Home Three" />
-                                    <div className="btn-wrap">
-                                      <a href="/home-ai-agent" className="th-btn">Multipage</a>
-                                      <a href="/home-ai-agent-op" className="th-btn">Onepage</a>
-                                    </div>
-                                  </div>
-                                  <h2 className="mega-menu-title"><a href="/home-ai-agent">06. Home Ai Agent</a>
-                                  </h2>
-                                </div>
-                              </div>
-                              <div className="col-lg-4">
-                                <div className="mega-menu-box">
-                                  <div className="mega-menu-img">
-                                    <img src="assets/img/pages/home-productivity-tools.jpg" alt="Home Three" />
-                                    <div className="btn-wrap">
-                                      <a href="/home-productivity-tools" className="th-btn">Multipage</a>
-                                      <a href="/home-productivity-tools-op" className="th-btn">Onepage</a>
-                                    </div>
-                                  </div>
-                                  <h2 className="mega-menu-title"><a href="/home-productivity-tools">07. Home productivity
-                                      tools</a>
-                                  </h2>
-                                </div>
-                              </div>
-                              <div className="col-lg-4">
-                                <div className="mega-menu-box">
-                                  <div className="mega-menu-img">
-                                    <img src="assets/img/pages/home-ai-chatbot-tool.jpg" alt="Home Three" />
-                                    <div className="btn-wrap">
-                                      <a href="/home-ai-chatbot-tool" className="th-btn">Multipage</a>
-                                      <a href="/home-ai-chatbot-tool-op" className="th-btn">Onepage</a>
-                                    </div>
-                                  </div>
-                                  <h2 className="mega-menu-title"><a href="/home-ai-chatbot-tool">08. Home AI chatbot
-                                      tool</a>
-                                  </h2>
-                                </div>
-                              </div>
-                              <div className="col-lg-4">
-                                <div className="mega-menu-box">
-                                  <div className="mega-menu-img">
-                                    <img src="assets/img/pages/home-cloud-based-saas.jpg" alt="Home Three" />
-                                    <div className="btn-wrap">
-                                      <a href="/home-cloud-based-saas" className="th-btn">Multipage</a>
-                                      <a href="/home-cloud-based-saas-op" className="th-btn">Onepage</a>
-                                    </div>
-                                  </div>
-                                  <h2 className="mega-menu-title"><a href="/home-cloud-based-saas">09. Home cloud Based
-                                      Saas</a>
-                                  </h2>
-                                </div>
-                              </div>
-                              <div className="col-lg-4">
-                                <div className="mega-menu-box">
-                                  <div className="mega-menu-img">
-                                    <img src="assets/img/pages/home-saas-product-showcase.jpg" alt="Home Three" />
-                                    <div className="btn-wrap">
-                                      <a href="/home-saas-product-showcase" className="th-btn">Multipage</a>
-                                      <a href="/home-saas-product-showcase-op" className="th-btn">Onepage</a>
-                                    </div>
-                                  </div>
-                                  <h2 className="mega-menu-title"><a href="/home-saas-product-showcase">10 Home Saas
-                                      product Showcase</a>
-                                  </h2>
-                                </div>
-                              </div>
-                              <div className="col-lg-4">
-                                <div className="mega-menu-box">
-                                  <div className="mega-menu-img">
-                                    <img src="assets/img/pages/home-finance-crypto-service.jpg" alt="Home Three" />
-                                    <div className="btn-wrap">
-                                      <a href="/home-finance-crypto-service" className="th-btn">Multipage</a>
-                                      <a href="/home-finance-crypto-service-op" className="th-btn">Onepage</a>
-                                    </div>
-                                  </div>
-                                  <h2 className="mega-menu-title"><a href="/home-finance-crypto-service">11 Home finance crypto service</a>
-                                  </h2>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                      </ul>
-                    </li>
-                    <li><a href="/about">About Us</a></li>
-                    <li><a href="/features">Features</a></li>
-                    <li className="menu-item-has-children">
-                      <a href="#">Case Studies</a>
-                      <ul className="sub-menu">
-                        <li><a href="/case-studies">Case Studies</a></li>
-                        <li><a href="/case-studies-2">Case Studies style 2</a></li>
-                        <li><a href="/case-studies-details">Case Studies Details</a></li>
-                      </ul>
-                    </li>
-                    <li className="menu-item-has-children">
-                      <a href="#">Pages</a>
-                      <ul className="sub-menu">
-                        <li><a href="/cases">cases</a></li>
-                        <li><a href="/integrations">Integrations</a></li>
-                        <li><a href="/team">Team</a></li>
-                        <li><a href="/team-details">Team Details</a></li>
-                        <li><a href="/faq">FAQ</a></li>
-                        <li><a href="/testimonial">Testimonial</a></li>
-                        <li><a href="/pricing">Price Table</a></li>
-                        <li><a href="/contact">Contact Us</a></li>
-                        <li><a href="/error">Error Page</a></li>
-                      </ul>
-                    </li>
-                    <li className="menu-item-has-children">
-                      <a href="#">Blog</a>
-                      <ul className="sub-menu">
-                        <li><a href="/blog">Blog</a></li>
-                        <li><a href="/blog-details">Blog Details</a></li>
-                      </ul>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
-              <div className="col-auto">
-                <div className="header-button">
-                  <a href="/contact" className="th-btn">Contact Us <span className="icon"><img src="assets/img/icon/arrow-right.svg" alt /></span></a>
-                  <a href="#" className="icon-btn sideMenuToggler d-none d-md-block"><img src="assets/img/icon/grid.svg" alt /></a>
-                  <button type="button" className="th-menu-toggle d-inline-block d-xl-none"><i className="far fa-bars" /></button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>{/*==============================
-    Breadcumb
-============================== */}
-  <div className="breadcumb-wrapper " data-bg-src="assets/img/bg/breadcumb-bg.jpg">
-    <div className="container">
-      <div className="breadcumb-content">
-        <h1 className="breadcumb-title text-anime-style-3">Contact Us</h1>
-        <ul className="breadcumb-menu wow fadeInUp">
-          <li><a href="/home-ai-startup">Home</a></li>
-          <li>Contact Us</li>
-        </ul>
-      </div>
-    </div>
-  </div>{/*==============================
-Contact Info Area  
-==============================*/}
-  <div className="space overflow-hidden">
-    <div className="container">
-      <div className="row gy-4">
-        <div className="col-xl-4 col-md-6">
-          <div className="contact-media">
-            <div className="icon-btn">
-              <i className="fa-sharp fa-solid fa-location-dot" />
-            </div>
-            <div className="media-body">
-              <h2 className="box-title">Location</h2>
-              <p className="box-text">300 SW 1st Ave, Suite 155, Fort Lauderdale, FL 33301</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-xl-4 col-md-6">
-          <div className="contact-media">
-            <div className="icon-btn">
-              <i className="fa-sharp fa-solid fa-envelope" />
-            </div>
-            <div className="media-body">
-              <h2 className="box-title">Email</h2>
-              <p className="box-text">
-                <a href="mailto:team@example.com">team@example.com</a>
-                <a href="mailto:aiors@example.com">aiors@example.com</a>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="col-xl-4 col-md-6">
-          <div className="contact-media">
-            <div className="icon-btn">
-              <i className="fa-sharp fa-solid fa-phone" />
-            </div>
-            <div className="media-body">
-              <h2 className="box-title">Phone Number</h2>
-              <a href="tel:+00123456789">+(00) 12 - 345 6789</a>
-              <a href="tel:+00109876543">+(00) 10 - 9876 543</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>{/*==============================
-Contact Area  
-==============================*/}
-  <section className="contact-sec space overflow-hidden" data-bg-src="assets/img/bg/contact_bg_1.jpg" id="contact-sec">
-    <div className="container th-container4">
-      <div className="contact-area">
-        <div className="row gy-40 gx-100 align-items-end">
-          <div className="col-xl-8">
-            <form action="mail.php" method="POST" className="contact-form ajax-contact">
-              <h3 className="title">Ready to Discuss your Project with us?</h3>
-              <div className="row">
-                <div className="form-group col-md-6">
-                  <input type="text" className="form-control" name="name" id="name" placeholder="Full Name" />
-                </div>
-                <div className="form-group col-md-6">
-                  <input type="email" className="form-control" name="email" id="email" placeholder="Email" />
-                </div>
-                <div className="form-group col-md-6">
-                  <input type="tel" className="form-control" name="number" id="number" placeholder="Phone Number" />
-                </div>
-                <div className="form-group col-md-6">
-                  <select name="subject" id="subject" className="form-select nice-select">
-                    <option value disabled selected hidden>Select Service</option>
-                    <option value="Bridal Makeup">Bridal Makeup</option>
-                    <option value="Beard Treatments">Beard Treatments</option>
-                    <option value="Hair Coloring">Hair Coloring</option>
-                    <option value="Aromatherapy">Aromatherapy </option>
-                  </select>
-                </div>
-                <div className="form-group col-12">
-                  <textarea name="message" id="message" cols={30} rows={3} className="form-control" placeholder="Your Message" defaultValue={""} />
-                </div>
-                <div className="form-btn col-12">
-                  <p className="box-text">By sending this form I confirm that I have read and accept the&nbsp;Privacy Policy</p>
-                  <button className="th-btn">Send Message <span className="icon"><img src="assets/img/icon/arrow-right.svg" alt /></span></button>
-                </div>
-              </div>
-              <p className="form-messages mb-0 mt-3" />
-            </form>
-          </div>
-          <div className="col-xl-4">
-            <div className="contact-review">
-              <div className="box-profile">
-                <div className="box-author">
-                  <img src="assets/img/normal/author.png" alt="Avater" />
-                </div>
-                <div className="box-quote"><img src="assets/img/icon/quote3.svg" alt /></div>
-              </div>
-              <p className="box-text">The collaborative approach they took was refreshing and effective</p>
-              <div className="box-info">
-                <h3 className="box-title">Jems Colin</h3>
-                <span className="box-desig">CTO, Ailitic</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>{/*==============================
-Map Area  
-==============================*/}
-  <div className="overflow-hidden">
-    <div className="contact-map">
-      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3644.7310056272386!2d89.2286059153658!3d24.00527418490799!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39fe9b97badc6151%3A0x30b048c9fb2129bc!2sAngfuztheme!5e0!3m2!1sen!2sbd!4v1651028958211!5m2!1sen!2sbd" allowFullScreen loading="lazy" />
-      <div className="contact-icon">
-        <img src="assets/img/icon/location-dot.svg" alt />
-      </div>
-    </div>
-  </div>
-  <div className="position-relative space  overflow-hidden">
-    <div className="marquee-content positive-relative overflow-hidden">
-      <div className="marquee">
-        <div className="marquee-group style6">
-          <div className="item "><span>Empowering Every Industry By Trusworthy AIu</span></div>
-          <div className="item"><span>Empowering Every Industry By Trusworthy AIus</span></div>
-          <div className="item "><span>Empowering Every Industry By Trusworthy AIu</span></div>
-          <div className="item"><span>Empowering Every Industry By Trusworthy AIu</span></div>
-          <div className="item "><span>Empowering Every Industry By Trusworthy AIu</span></div>
-          <div className="item"><span>Empowering Every Industry By Trusworthy AIus</span></div>
-          <div className="item "><span>Empowering Every Industry By Trusworthy AIu</span></div>
-          <div className="item"><span>Empowering Every Industry By Trusworthy AIu</span></div>
-        </div>
-        <div aria-hidden="true" className="marquee-group style6">
-          <div className="item "><span>Empowering Every Industry By Trusworthy AIu</span></div>
-          <div className="item"><span>Empowering Every Industry By Trusworthy AIus</span></div>
-          <div className="item "><span>Empowering Every Industry By Trusworthy AIu</span></div>
-          <div className="item"><span>Empowering Every Industry By Trusworthy AIu</span></div>
-          <div className="item "><span>Empowering Every Industry By Trusworthy AIu</span></div>
-          <div className="item"><span>Empowering Every Industry By Trusworthy AIus</span></div>
-          <div className="item "><span>Empowering Every Industry By Trusworthy AIu</span></div>
-          <div className="item"><span>Empowering Every Industry By Trusworthy AIu</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  {/*==============================
-	Footer Area
-==============================*/}
-  <footer className="footer-wrapper footer-layout1" data-bg-src="assets/img/bg/footer_bg_1.jpg">
-    <div className="widget-area">
-      <div className="container th-container5">
-        <div className="footer-top">
-          <h2 className="box-title text-white">Start Your AI Journey With Our Experts</h2>
-          <div className>
-            <form className="newsletter-form"><input className="form-control" type="email" placeholder="Enter your email to stay inform" required /> <button type="submit" className="th-btn">Start Free Trial <span className="icon"><img src="assets/img/icon/arrow-right.svg" alt /></span></button></form>
-          </div>
-        </div>
-      </div>
-      <div className="container th-container5">
-        <div className="row gy-4 justify-content-between">
-          <div className="col-md-6 col-xl-3">
-            <div className="widget footer-widget mb-0">
-              <div className="th-widget-about">
-                <div className="about-logo">
-                  <a href="/"><img src="assets/img/logo-white.svg" alt="Aior " /></a>
-                </div>
-                <p className="about-text">Aior is a startup design agency based in Canada</p>
-                <div className="th-social">
-                  <a href="https://www.facebook.com/"><i className="fab fa-facebook-f" /></a>
-                  <a href="https://www.twitter.com/"><i className="fab fa-twitter" /></a>
-                  <a href="https://www.youtube.com/"><i className="fa-brands fa-instagram" /></a>
-                  <a href="https://www.linkedin.com/"><i className="fab fa-linkedin-in" /></a>
-                  <a href="https://www.youtube.com/"><i className="fab fa-youtube" /></a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-6 col-xl-auto">
-            <div className="widget widget_nav_menu footer-line footer-widget">
-              <h3 className="widget_title">Product</h3>
-              <div className="menu-all-pages-container">
-                <ul className="menu">
-                  <li><a href="#">Features</a></li>
-                  <li><a href="/contact">Benefites</a></li>
-                  <li><a href="/contact">Integrations</a></li>
-                  <li><a href="/contact">Pricing</a></li>
-                  <li><a href="/contact">Changelog</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-6 col-xl-auto">
-            <div className="widget widget_nav_menu  footer-line footer-widget">
-              <h3 className="widget_title">Service</h3>
-              <div className="menu-all-pages-container">
-                <ul className="menu">
-                  <li><a href="/contact">24/7 Support</a></li>
-                  <li><a href="/contact">Enhanced User Experience</a></li>
-                  <li><a href="/contact">API Access</a></li>
-                  <li><a href="/contact">Monthly Subscription</a></li>
-                  <li><a href="/contact">Version History</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-6 col-xl-auto">
-            <div className="widget widget_nav_menu footer-widget">
-              <h3 className="widget_title">About Tool</h3>
-              <div className="menu-all-pages-container">
-                <ul className="menu">
-                  <li><a href="/contact">Customizable</a></li>
-                  <li><a href="/contact">Increased Efficiency</a></li>
-                  <li><a href="/contact">Third-party Apps</a></li>
-                  <li><a href="/contact">One-time Purchase</a></li>
-                  <li><a href="/contact">Update Log</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div className="container th-container5">
-      <div className="copyright-wrap">
-        <div className="row gy-2 align-items-center justify-content-between">
-          <div className="col-xl-6">
-            <p className="copyright-text"><i className="fal fa-copyright" /> Copyright <a href="https://themeforest.net/user/themehour">Aior </a> 2026 . All Rights Reserved.</p>
-          </div>
-          <div className="col-xl-6 text-center text-xl-end">
-            <div className="footer-links">
-              <ul>
-                <li><a href="/about">Privacy Policy</a></li>
-                <li><a href="/about">Terms of Services</a></li>
-                <li><a href="/about">Cookis Policy</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
-  {/*********************************
-			Code End  Here 
-	******************************** */}
-  {/* Scroll To Top */}
-  <div className="scroll-top">
-    <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
-      <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" style={{transition: 'stroke-dashoffset 10ms linear 0s', strokeDasharray: '307.919, 307.919', strokeDashoffset: '307.919'}}>
-      </path>
-    </svg>
-  </div>
-  {/*==============================
-    All Js File
-============================== */}
-  {/* Jquery */}
-  {/* Swiper Slider */}
-  {/* Bootstrap */}
-  {/* Magnific Popup */}
-  {/* Counter Up */}
-  {/* Circle Progress */}
-  {/* Range Slider */}
-  {/* Imagesloadedr */}
-  {/* isotope */}
-  {/* Nice-select */}
-  {/* wow */}
-  {/* gsap area start */}
-  {/* gsap area end */}
-  {/* Lenis Js */}
-  {/* Main Js File */}
-</div>
+    // FAQ state management
+    const [activeFaq, setActiveFaq] = useState(0);
 
-        </>
+    const faqs = [
+        {
+            question: "How do I connect my WhatsApp number to the AI automation platform?",
+            answer: "We use Meta's official WhatsApp Business Cloud API. You simply verify your business and link your phone number ID. It's 100% secure, fully compliant, and ensures maximum message delivery rates."
+        },
+        {
+            question: "Can the AI copilot handle customer support and bookings simultaneously?",
+            answer: "Yes, the AI is trained to understand context and intent. It can seamlessly transition from answering support queries to guiding users through a complete booking flow, capturing all necessary data along the way."
+        },
+        {
+            question: "Is there a limit to how many WhatsApp broadcast messages I can send?",
+            answer: "Your limit depends on your Meta Trust Tier. New numbers start at 250 conversations per 24 hours, but can scale up to 100,000+ as your quality rating improves. Our system manages these limits automatically."
+        },
+        {
+            question: "Can I integrate my existing CRM with your WhatsApp automation?",
+            answer: "Absolutely. We offer native integrations for Salesforce, HubSpot, and Zoho, plus robust webhooks and a REST API for connecting any custom backend systems."
+        },
+        {
+            question: "Will my WhatsApp account get banned for using automation?",
+            answer: "No, as long as you follow Meta's Commerce Policies. Because we use the official Cloud API, your account is fully compliant. Avoid sending spam and ensure you have user opt-ins."
+        }
+    ];
+
+    return (
+        <Layout>
+            {/* Top Contact Section */}
+            <section className="contact-hero space" style={{ background: '#FAFAF9', padding: '120px 0 80px 0' }}>
+                <div className="container">
+                    <div className="row justify-content-between align-items-center gy-5">
+                        
+                        {/* Left Side: Text and Contact Info */}
+                        <div className="col-lg-5">
+                            <div className="mb-5">
+                                <span className="d-inline-block fw-bold" style={{ background: '#F0FDF4', color: '#166534', padding: '6px 16px', borderRadius: '30px', fontSize: '11px', letterSpacing: '1px', border: '1px solid rgba(34,197,94,0.2)', marginBottom: '20px', textTransform: 'uppercase' }}>We're Available</span>
+                                <h1 className="sec-title mb-4" style={{ color: '#12263A', fontWeight: '800', fontSize: '3.5rem', letterSpacing: '-1.5px', lineHeight: '1.1' }}>
+                                    Let's build something <span style={{ color: '#22C55E' }}>great together.</span>
+                                </h1>
+                                <p style={{ color: '#57534E', fontSize: '1.1rem', lineHeight: '1.7', marginBottom: '40px' }}>
+                                    Our support desk is online 24/7. Reach out via email, phone, or live WhatsApp to resolve account setup issues and configure your automations.
+                                </p>
+                            </div>
+
+                            <div className="contact-info-list d-flex flex-column gap-3">
+                                {/* Card 1 */}
+                                <div className="d-flex align-items-center p-3" style={{ background: '#fff', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
+                                    <div className="icon-wrapper d-flex align-items-center justify-content-center me-3" style={{ width: '50px', height: '50px', background: '#F0FDF4', borderRadius: '12px', color: '#22C55E', fontSize: '20px' }}>
+                                        <i className="fa-regular fa-envelope"></i>
+                                    </div>
+                                    <div>
+                                        <p className="text-uppercase mb-1" style={{ fontSize: '10px', fontWeight: '700', color: '#64748B', letterSpacing: '1px' }}>Email (24/7 Online)</p>
+                                        <h4 className="mb-0" style={{ fontSize: '1.05rem', fontWeight: '700', color: '#12263A' }}>support@talkinexx.com</h4>
+                                    </div>
+                                </div>
+                                {/* Card 2 */}
+                                <div className="d-flex align-items-center p-3" style={{ background: '#fff', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
+                                    <div className="icon-wrapper d-flex align-items-center justify-content-center me-3" style={{ width: '50px', height: '50px', background: '#F0FDF4', borderRadius: '12px', color: '#22C55E', fontSize: '22px' }}>
+                                        <i className="fa-brands fa-whatsapp"></i>
+                                    </div>
+                                    <div>
+                                        <p className="text-uppercase mb-1" style={{ fontSize: '10px', fontWeight: '700', color: '#64748B', letterSpacing: '1px' }}>WhatsApp Live Chat</p>
+                                        <h4 className="mb-0" style={{ fontSize: '1.05rem', fontWeight: '700', color: '#12263A' }}>+1 (800) 555-0288</h4>
+                                    </div>
+                                </div>
+                                {/* Card 3 */}
+                                <div className="d-flex align-items-center p-3" style={{ background: '#fff', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
+                                    <div className="icon-wrapper d-flex align-items-center justify-content-center me-3" style={{ width: '50px', height: '50px', background: '#F0FDF4', borderRadius: '12px', color: '#22C55E', fontSize: '20px' }}>
+                                        <i className="fal fa-shield-check"></i>
+                                    </div>
+                                    <div>
+                                        <p className="text-uppercase mb-1" style={{ fontSize: '10px', fontWeight: '700', color: '#64748B', letterSpacing: '1px' }}>SLA Guarantee</p>
+                                        <h4 className="mb-0" style={{ fontSize: '1.05rem', fontWeight: '700', color: '#12263A' }}>99.9% Server Uptime</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Side: Contact Form */}
+                        <div className="col-lg-6">
+                            <div className="form-card" style={{ background: '#fff', padding: '50px', borderRadius: '24px', boxShadow: '0 20px 40px rgba(18, 38, 58, 0.08)' }}>
+                                <h3 className="mb-2" style={{ color: '#12263A', fontWeight: '800', fontSize: '1.8rem' }}>Drop us a line</h3>
+                                <p className="mb-4" style={{ color: '#57534E', fontSize: '0.95rem' }}>Fill out the form below and we'll get back to you shortly.</p>
+                                
+                                <form>
+                                    <div className="row gy-3">
+                                        <div className="col-md-6">
+                                            <label className="text-uppercase" style={{ fontSize: '10px', fontWeight: '700', color: '#64748B', letterSpacing: '1px', marginBottom: '8px' }}>Full Name</label>
+                                            <input type="text" className="form-control shadow-none" placeholder="e.g. John Doe" style={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '14px 16px', fontSize: '0.95rem' }} />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="text-uppercase" style={{ fontSize: '10px', fontWeight: '700', color: '#64748B', letterSpacing: '1px', marginBottom: '8px' }}>Work Email</label>
+                                            <input type="email" className="form-control shadow-none" placeholder="name@company.com" style={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '14px 16px', fontSize: '0.95rem' }} />
+                                        </div>
+                                        <div className="col-12">
+                                            <label className="text-uppercase" style={{ fontSize: '10px', fontWeight: '700', color: '#64748B', letterSpacing: '1px', marginBottom: '8px' }}>Company Name (Optional)</label>
+                                            <input type="text" className="form-control shadow-none" placeholder="ThinkTech LLC" style={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '14px 16px', fontSize: '0.95rem' }} />
+                                        </div>
+                                        <div className="col-12">
+                                            <label className="text-uppercase" style={{ fontSize: '10px', fontWeight: '700', color: '#64748B', letterSpacing: '1px', marginBottom: '8px' }}>Your Message</label>
+                                            <textarea className="form-control shadow-none" rows="4" placeholder="Describe your outreach campaign details or request support help..." style={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '14px 16px', fontSize: '0.95rem' }}></textarea>
+                                        </div>
+                                        <div className="col-12 mt-4">
+                                            <button type="button" className="w-100 d-inline-flex align-items-center justify-content-center text-decoration-none" style={{ background: '#22C55E', color: '#fff', border: 'none', borderRadius: '12px', padding: '18px 40px', fontWeight: '800', transition: 'all 0.3s ease', boxShadow: '0 10px 20px rgba(34,197,94,0.3)', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.9rem' }} onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}>
+                                                SEND MESSAGE <i className="fas fa-arrow-right ms-2" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            {/* Bottom FAQ Section */}
+            <section className="faq-section space" style={{ background: '#fff', padding: '100px 0' }}>
+                <div className="container">
+                    <div className="row justify-content-between">
+                        
+                        {/* Left Side: FAQ Text and Support Card */}
+                        <div className="col-lg-4 mb-5 mb-lg-0">
+                            <span className="d-inline-block fw-bold" style={{ background: '#F0FDF4', color: '#166534', padding: '6px 16px', borderRadius: '30px', fontSize: '11px', letterSpacing: '1px', border: '1px solid rgba(34,197,94,0.2)', marginBottom: '20px', textTransform: 'uppercase' }}>SUPPORT CENTER</span>
+                            <h2 className="sec-title mb-4" style={{ color: '#12263A', fontWeight: '800', fontSize: '2.5rem', letterSpacing: '-1px', lineHeight: '1.2' }}>
+                                Got questions about <br/><span style={{ color: '#22C55E' }}>WhatsApp AI?</span>
+                            </h2>
+                            <p style={{ color: '#57534E', fontSize: '1.05rem', lineHeight: '1.7', marginBottom: '40px' }}>
+                                Everything you need to know about setting up your WhatsApp Business API, automation limits, compliance, and CRM integrations.
+                            </p>
+
+                            <div className="support-card p-4" style={{ border: '1px solid #E2E8F0', borderRadius: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
+                                <div className="d-flex align-items-start gap-3">
+                                    <div className="icon-wrapper d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '40px', height: '40px', background: '#F0FDF4', borderRadius: '50%', color: '#22C55E', fontSize: '18px' }}>
+                                        <i className="fa-regular fa-comment-dots"></i>
+                                    </div>
+                                    <div>
+                                        <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#12263A', marginBottom: '8px' }}>Still have questions?</h4>
+                                        <p style={{ fontSize: '0.9rem', color: '#64748B', lineHeight: '1.5', marginBottom: '15px' }}>Our WhatsApp automation experts are ready to help you build the perfect workflow.</p>
+                                        <a href="/contact" style={{ color: '#22C55E', fontWeight: '700', fontSize: '0.9rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>Chat with our team <i className="fa-solid fa-arrow-right-long" style={{ fontSize: '12px' }}></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Side: Accordion */}
+                        <div className="col-lg-7">
+                            <div className="faq-accordion d-flex flex-column gap-3">
+                                {faqs.map((faq, index) => {
+                                    const isActive = activeFaq === index;
+                                    return (
+                                        <div key={index} className="faq-item" style={{ border: isActive ? '2px solid #22C55E' : '1px solid #E2E8F0', borderRadius: '12px', background: '#fff', overflow: 'hidden', transition: 'all 0.3s ease', boxShadow: isActive ? '0 10px 20px rgba(34,197,94,0.05)' : 'none' }}>
+                                            <button 
+                                                className="faq-button w-100 text-start d-flex justify-content-between align-items-center p-4 bg-transparent border-0" 
+                                                onClick={() => setActiveFaq(isActive ? null : index)}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <span style={{ fontSize: '1.05rem', fontWeight: '700', color: '#12263A', paddingRight: '20px' }}>{faq.question}</span>
+                                                <div className="icon d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '28px', height: '28px', borderRadius: '50%', background: isActive ? '#22C55E' : '#F1F5F9', color: isActive ? '#fff' : '#64748B', transition: 'all 0.3s ease' }}>
+                                                    <i className={`fa-solid ${isActive ? 'fa-minus' : 'fa-plus'}`} style={{ fontSize: '12px' }}></i>
+                                                </div>
+                                            </button>
+                                            <div className="faq-answer" style={{ maxHeight: isActive ? '500px' : '0', overflow: 'hidden', transition: 'max-height 0.3s ease' }}>
+                                                <div className="p-4 pt-0" style={{ color: '#57534E', fontSize: '0.95rem', lineHeight: '1.6' }}>
+                                                    {faq.answer}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </Layout>
     );
 };
 
 export default Contact;
-    

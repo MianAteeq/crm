@@ -22,6 +22,11 @@ import BlogDetails from './pages/BlogDetails';
 import About from './pages/About';
 import WhatsappCampaigns from './pages/WhatsappCampaigns';
 import AutomatedMessaging from './pages/AutomatedMessaging';
+import WhatsAppAiCopilot from './pages/WhatsAppAiCopilot';
+import ContactListRetargeting from './pages/ContactListRetargeting';
+import WhatsAppAnalytics from './pages/WhatsAppAnalytics';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 
 function App() {
   return (
@@ -35,8 +40,13 @@ function App() {
         <Route path="/integrations" element={<Integrations />} />
         <Route path="/home-1" element={<Home />} />
         <Route path="/" element={<HomeAiChatbot />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/whatsapp-campaigns" element={<WhatsappCampaigns />} />
         <Route path="/automated-messaging" element={<AutomatedMessaging />} />
+        <Route path="/whatsapp-ai-copilot" element={<WhatsAppAiCopilot />} />
+        <Route path="/contact-list-retargeting" element={<ContactListRetargeting />} />
+        <Route path="/whatsapp-analytics" element={<WhatsAppAnalytics />} />
         <Route path="/features" element={<Features />} />
         <Route path="/faq" element={<Faq />} />
         <Route path="/error" element={<Error />} />
