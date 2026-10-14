@@ -30,6 +30,16 @@ const Contact = () => {
 
     return (
         <Layout>
+            <style>{`
+                @media (max-width: 575px) {
+                    .form-card {
+                        padding: 28px 18px !important;
+                    }
+                    .contact-hero {
+                        padding: 100px 0 50px 0 !important;
+                    }
+                }
+            `}</style>
             {/* Top Contact Section */}
             <section className="contact-hero space" style={{ background: '#FAFAF9', padding: '120px 0 80px 0' }}>
                 <div className="container">
@@ -38,8 +48,8 @@ const Contact = () => {
                         {/* Left Side: Text and Contact Info */}
                         <div className="col-lg-5">
                             <div className="mb-5">
-                                <span className="d-inline-block fw-bold" style={{ background: '#F0FDF4', color: '#166534', padding: '6px 16px', borderRadius: '30px', fontSize: '11px', letterSpacing: '1px', border: '1px solid rgba(34,197,94,0.2)', marginBottom: '20px', textTransform: 'uppercase' }}>We're Available</span>
-                                <h1 className="sec-title mb-4" style={{ color: '#12263A', fontWeight: '800', fontSize: '3.5rem', letterSpacing: '-1.5px', lineHeight: '1.1' }}>
+                                <span className="d-inline-block fw-bold" style={{ background: '#F0FDF4', color: '#166534', padding: '6px 16px', borderRadius: '30px', fontSize: '11px', letterSpacing: '1px', border: '1px solid rgba(34,197,94,0.2)', marginBottom: '20px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>We're Available</span>
+                                <h1 className="sec-title mb-4" style={{ color: '#12263A', fontWeight: '800', fontSize: 'clamp(2rem, 5vw, 3.5rem)', letterSpacing: '-1.5px', lineHeight: '1.1' }}>
                                     Let's build something <span style={{ color: '#22C55E' }}>great together.</span>
                                 </h1>
                                 <p style={{ color: '#57534E', fontSize: '1.1rem', lineHeight: '1.7', marginBottom: '40px' }}>
@@ -106,7 +116,7 @@ const Contact = () => {
                                             <textarea className="form-control shadow-none" rows="4" placeholder="Describe your outreach campaign details or request support help..." style={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '14px 16px', fontSize: '0.95rem' }}></textarea>
                                         </div>
                                         <div className="col-12 mt-4">
-                                            <button type="button" className="w-100 d-inline-flex align-items-center justify-content-center text-decoration-none" style={{ background: '#22C55E', color: '#fff', border: 'none', borderRadius: '12px', padding: '18px 40px', fontWeight: '800', transition: 'all 0.3s ease', boxShadow: '0 10px 20px rgba(34,197,94,0.3)', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.9rem' }} onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}>
+                                            <button type="button" className="w-100 d-inline-flex align-items-center justify-content-center text-decoration-none" style={{ background: '#22C55E', color: '#fff', border: 'none', borderRadius: '12px', padding: '18px 40px', fontWeight: '800', transition: 'all 0.3s ease', boxShadow: 'none', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.9rem' }} onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}>
                                                 SEND MESSAGE <i className="fas fa-arrow-right ms-2" />
                                             </button>
                                         </div>
@@ -126,7 +136,7 @@ const Contact = () => {
                         
                         {/* Left Side: FAQ Text and Support Card */}
                         <div className="col-lg-4 mb-5 mb-lg-0">
-                            <span className="d-inline-block fw-bold" style={{ background: '#F0FDF4', color: '#166534', padding: '6px 16px', borderRadius: '30px', fontSize: '11px', letterSpacing: '1px', border: '1px solid rgba(34,197,94,0.2)', marginBottom: '20px', textTransform: 'uppercase' }}>SUPPORT CENTER</span>
+                            <span className="d-inline-block fw-bold" style={{ background: '#F0FDF4', color: '#166534', padding: '6px 16px', borderRadius: '30px', fontSize: '11px', letterSpacing: '1px', border: '1px solid rgba(34,197,94,0.2)', marginBottom: '20px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>SUPPORT CENTER</span>
                             <h2 className="sec-title mb-4" style={{ color: '#12263A', fontWeight: '800', fontSize: '2.5rem', letterSpacing: '-1px', lineHeight: '1.2' }}>
                                 Got questions about <br/><span style={{ color: '#22C55E' }}>WhatsApp AI?</span>
                             </h2>

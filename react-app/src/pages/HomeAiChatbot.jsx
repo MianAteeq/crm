@@ -1,7 +1,9 @@
 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import Layout from '../components/Layout';
 
 const HomeAiChatbot = () => {
+  const [billingCycle, setBillingCycle] = useState('monthly');
 
   useEffect(() => {
     // Explicitly initialize the slider when the component mounts
@@ -35,326 +37,31 @@ const HomeAiChatbot = () => {
   }, []);
 
   return (
-    <>
+    <Layout>
       <div>
-
-        {/*[if lte IE 9]>
-    	<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-  <![endif]*/}
-        {/*********************************
-   		Code Start From Here 
-	******************************** */}
-        <div className="mouseCursor cursor-outer" />
-        <div className="mouseCursor cursor-inner" />
         {/*==============================
-    Mobile Menu
-  ============================== */}
-        <div className="th-menu-wrapper">
-          <div className="th-menu-area text-center">
-            <button className="th-menu-toggle"><i className="fal fa-times" /></button>
-            <div className="mobile-logo">
-              <a href="/home-ai-startup"><img src="assets/img/logo.svg" alt="Aior " /></a>
-            </div>
-            <div className="th-mobile-menu">
-              <ul>
-                <li className="menu-item-has-children">
-                  <a href="/home-ai-startup">Home</a>
-                  <ul className="sub-menu">
-                    <li><a href="/home-ai-startup">Home Ai Startup</a></li>
-                    <li><a href="/home-ai-chatbot">Home Ai Chatbot</a></li>
-                    <li><a href="/home-ai-image-generate">Home Ai Image Generate</a></li>
-                    <li><a href="/home-ai-writer-tool">Home AI Writer Tool</a></li>
-                    <li><a href="/home-business-intelligence">Home Business Intelligence</a></li>
-                    <li><a href="/home-ai-agent">home-ai-agent</a></li>
-                    <li><a href="/home-productivity-tools">Home productivity tools</a></li>
-                    <li><a href="/home-ai-chatbot-tool">Home AI chatbot tool</a></li>
-                    <li><a href="/home-cloud-based-saas">Home cloud Based Saas</a></li>
-                    <li><a href="/home-saas-product-showcase">Home Saas product Showcase</a></li>
-                    <li><a href="/home-finance-crypto-service">Home finance crypto service</a> </li>
-                  </ul>
-                </li>
-                <li><a href="/about">About Us</a></li>
-                <li><a href="/features">Features</a></li>
-                <li className="menu-item-has-children">
-                  <a href="#">Case Studies</a>
-                  <ul className="sub-menu">
-                    <li><a href="/case-studies">Case Studies</a></li>
-                    <li><a href="/case-studies-2">Case Studies style 2</a></li>
-                    <li><a href="/case-studies-details">Case Studies Details</a></li>
-                  </ul>
-                </li>
-                <li className="menu-item-has-children">
-                  <a href="#">Pages</a>
-                  <ul className="sub-menu">
-                    <li><a href="/cases">cases</a></li>
-                    <li><a href="/integrations">Integrations</a></li>
-                    <li><a href="/team">Team</a></li>
-                    <li><a href="/team-details">Team Details</a></li>
-                    <li><a href="/faq">FAQ</a></li>
-                    <li><a href="/testimonial">Testimonial</a></li>
-                    <li><a href="/pricing">Price Table</a></li>
-                    <li><a href="/contact">Contact Us</a></li>
-                    <li><a href="/error">Error Page</a></li>
-                  </ul>
-                </li>
-                <li className="menu-item-has-children">
-                  <a href="#">Blog</a>
-                  <ul className="sub-menu">
-                    <li><a href="/blog">Blog</a></li>
-                    <li><a href="/blog-details">Blog Details</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>{/*==============================
-	Header Area
-==============================*/}
-        <style>{`
-          .custom-mega-menu {
-            width: 360px !important;
-            padding: 8px 8px 0 8px !important;
-            border-radius: 12px !important;
-            box-shadow: 0 16px 40px rgba(34,197,94,0.25) !important;
-            background: #22C55E !important;
-            border: 2px solid #16a34a !important;
-            transform-origin: top center;
-          }
-          .custom-mega-menu li {
-            margin: 0 !important;
-            display: block !important;
-          }
-          .custom-mega-menu li::before, .custom-mega-menu li::after,
-          .custom-mega-menu a::before, .custom-mega-menu a::after {
-            display: none !important;
-          }
-          .custom-mega-menu .mega-menu-item {
-            display: flex !important;
-            align-items: flex-start !important;
-            gap: 16px !important;
-            padding: 14px 16px !important;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-            border-bottom: none !important;
-            border-radius: 8px !important;
-            margin-bottom: 2px !important;
-            background: transparent !important;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-          }
-          .custom-mega-menu .mega-menu-item::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #12263A;
-            border-radius: 8px;
-            z-index: -1;
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: block !important;
-          }
-          .custom-mega-menu .mega-menu-item:hover::before {
-            transform: scaleX(1);
-          }
-          .custom-mega-menu .mega-menu-item:hover {
-            transform: translateX(4px);
-          }
-          .custom-mega-menu .mega-menu-item .icon-box {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #22C55E;
-            font-size: 20px;
-            flex-shrink: 0;
-            background: #12263A;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          }
-          .custom-mega-menu .mega-menu-item:hover .icon-box {
-            background: #22C55E;
-            color: #12263A;
-            transform: scale(1.15) rotate(-5deg);
-          }
-          .custom-mega-menu .mega-menu-item .text-box {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            text-align: left;
-          }
-          .custom-mega-menu .mega-menu-item .text-box h4 {
-            font-size: 15px !important;
-            font-weight: 800 !important;
-            color: #12263A !important;
-            margin-bottom: 2px !important;
-            line-height: 1.3 !important;
-            padding: 0 !important;
-            text-transform: none !important;
-            transition: color 0.3s ease !important;
-          }
-          .custom-mega-menu .mega-menu-item .text-box p {
-            font-size: 13px !important;
-            color: rgba(18,38,58,0.85) !important;
-            margin: 0 !important;
-            line-height: 1.4 !important;
-            text-transform: none !important;
-            white-space: normal !important;
-            font-weight: 500;
-            transition: color 0.3s ease !important;
-          }
-          .custom-mega-menu .mega-menu-item:hover .text-box h4 {
-            color: #fff !important;
-          }
-          .custom-mega-menu .mega-menu-item:hover .text-box p {
-            color: rgba(255,255,255,0.8) !important;
-          }
-          .custom-mega-menu .mega-menu-footer {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            padding: 16px 20px !important;
-            background: #16a34a !important;
-            border-top: 1px solid #15803d !important;
-            border-radius: 0 0 10px 10px !important;
-            margin: 8px -8px 0 -8px !important;
-          }
-          .custom-mega-menu .mega-menu-footer span {
-            font-size: 13px;
-            color: #12263A;
-            font-weight: 600;
-            text-transform: none !important;
-          }
-          .custom-mega-menu .mega-menu-footer .footer-link {
-            padding: 0 !important;
-            font-size: 13px !important;
-            font-weight: 800 !important;
-            color: #12263A !important;
-            background: transparent !important;
-            display: inline-flex !important;
-            align-items: center;
-            border-bottom: none !important;
-            text-transform: none !important;
-            transition: all 0.3s ease !important;
-          }
-          .custom-mega-menu .mega-menu-footer .footer-link:hover {
-            color: #fff !important;
-            transform: translateX(4px);
-          }
-        `}</style>
-        <header className="th-header header-layout2 header-absolute">
-          <div className="sticky-wrapper">
-            {/* Main Menu Area */}
-            <div className="menu-area">
-              <div className="container th-container">
-                <div className="row align-items-center justify-content-between">
-                  <div className="col-auto">
-                    <div className="header-logo">
-                      <a href="/home-ai-chatbot"><img src="assets/img/logo.png" alt="Aior " style={{ width: '180px', height: 'auto' }} /></a>
-                    </div>
-                  </div>
-                  <div className="col-auto">
-                    <nav className="main-menu style2 d-none d-lg-inline-block">
-                      <ul>
-                        <li className="menu-item-has-children">
-                          <a href="/#">Services</a>
-                          <ul className="sub-menu custom-mega-menu">
-                            <li>
-                              <a href="/whatsapp-campaigns" className="mega-menu-item">
-                                <div className="icon-box"><i className="fal fa-paper-plane"></i></div>
-                                <div className="text-box">
-                                  <h4>Targeted WhatsApp Campaigns</h4>
-                                  <p>Personalized broadcasts with real-time tracking.</p>
-                                </div>
-                              </a>
-                            </li>
-                            <li>
-                              <a href="/automated-messaging" className="mega-menu-item">
-                                <div className="icon-box"><i className="fal fa-clock"></i></div>
-                                <div className="text-box">
-                                  <h4>Automated WhatsApp Messaging</h4>
-                                  <p>Birthday greetings &amp; automated follow-ups.</p>
-                                </div>
-                              </a>
-                            </li>
-                            <li>
-                              <a href="/#" className="mega-menu-item">
-                                <div className="icon-box"><i className="fal fa-sparkles"></i></div>
-                                <div className="text-box">
-                                  <h4>WhatsApp AI Copilot</h4>
-                                  <p>Automate chat answers &amp; resolve queries 24/7.</p>
-                                </div>
-                              </a>
-                            </li>
-                            <li>
-                              <a href="/#" className="mega-menu-item">
-                                <div className="icon-box"><i className="fal fa-database"></i></div>
-                                <div className="text-box">
-                                  <h4>Contact List Retargeting</h4>
-                                  <p>Boost bookings and conversions via WhatsApp.</p>
-                                </div>
-                              </a>
-                            </li>
-                            <li>
-                              <a href="/#" className="mega-menu-item">
-                                <div className="icon-box"><i className="fal fa-chart-bar"></i></div>
-                                <div className="text-box">
-                                  <h4>WhatsApp Analytics</h4>
-                                  <p>Track message delivery, open rates, and ROI.</p>
-                                </div>
-                              </a>
-                            </li>
-                            <li className="mega-menu-footer">
-                              <span>Need a custom solution?</span>
-                              <a href="/pricing" className="footer-link">View Pricing &rarr;</a>
-                            </li>
-                          </ul>
-                        </li>
-                        <li><a href="/pricing">Pricing</a></li>
-                        <li><a href="/contact">Contact</a></li>
-                      </ul>
-                    </nav>
-                    <div className="header-button">
-                      <button type="button" className="th-menu-toggle d-inline-block d-lg-none"><i className="far fa-bars" /></button>
-                    </div>
-                  </div>
-                  <div className="col-auto d-none d-xl-block">
-                    <div className="header-button">
-                      <a href="/contact" className="th-btn2 style2">Login <img src="assets/img/icon/user.svg" alt /></a>
-                      <a href="/contact" className="th-btn2 d-none d-xxl-block">Start Free Trial</a>
-                      <button type="button" className="th-menu-toggle d-inline-block d-xl-none"><i className="far fa-bars" /></button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>{/*==============================
 Hero Area
 ==============================*/}
+
         <div className="th-hero-wrapper hero-2" id="hero" data-bg-src="assets/img/bg/hero_bg_2.jpg">
           <div className="container">
             <div className="row align-items-center">
               <div className="col-xl-6">
                 <div className="hero-style2">
-                  <h1 className="hero-title">Automate <span className="text-theme">Conversations</span> with Intelligent AI
+                  <h1 className="hero-title">Automate <span className="text-theme">WhatsApp Conversations</span> with Intelligent AI
                   </h1>
-                  <p className="hero-text">Boost engagement, automate support, and scale your business with our AI-powered
-                    chatbot
-                    tool.</p>
+                  <p className="hero-text">Boost customer engagement, automate 24/7 support, and scale your business with official WhatsApp Cloud API and intelligent AI chatbots.</p>
                   <div className="btn-group justify-content-xl-start justify-content-center">
                     <a href="/contact" className="th-btn2">Build Your Chatbot</a>
                     <a href="/contact" className="th-btn2 style2">Book a Demo</a>
                   </div>
                   <div className="client-box mb-sm-0 mb-3 justify-content-xl-start justify-content-center">
                     <div className="client-thumb-group">
-                      <div className="thumb"><img src="assets/img/shape/client-1-1.png" alt="avater" />
+                      <div className="thumb"><img src="assets/img/shape/client-1-1.png" alt="Satisfied Talkinexx Client" />
                       </div>
-                      <div className="thumb"><img src="assets/img/shape/client-1-2.png" alt="avater" />
+                      <div className="thumb"><img src="assets/img/shape/client-1-2.png" alt="Happy Enterprise Customer" />
                       </div>
-                      <div className="thumb"><img src="assets/img/shape/client-1-3.png" alt="avater" />
+                      <div className="thumb"><img src="assets/img/shape/client-1-3.png" alt="Business Automation User" />
                       </div>
                     </div>
                     <div className="client-wrapp">
@@ -374,8 +81,8 @@ Hero Area
                     <path d="M -100,600 C 300,500 400,200 900,100" fill="none" stroke="#22C55E" strokeWidth="140" strokeLinecap="round" opacity="0.4" />
                   </svg>
 
-                  <img src="assets/img/hero/hero-img.png" alt style={{ position: 'relative', zIndex: 1 }} />
-                  <div className="hero-bottom-text jump" style={{ zIndex: 2 }}><img src="assets/img/shape/avatar.svg" alt /><span className="title">How
+                  <img src="assets/img/hero/hero-img.png" alt="Talkinexx WhatsApp Cloud Automation Platform Dashboard" style={{ position: 'relative', zIndex: 1 }} />
+                  <div className="hero-bottom-text jump" style={{ zIndex: 2 }}><img src="assets/img/shape/avatar.svg" alt="AI Virtual Assistant" /><span className="title">How
                     can I help you?</span></div>
                   <div className="hero-bottom-text style2 jump-reverse" style={{ zIndex: 2 }}><span className="title">Can you please help me to
                     extract the file</span></div>
@@ -676,13 +383,13 @@ Brand Area
                   <h2 className="sec-title text-anime-style-3">Success Stories</h2>
                   <p className="wow fadeInUp fs-18">From converting up to 44% of chats into sales and cutting support
                     costs, to
-                    gaining actionable insights for new strategies, brands in any industry can thrive with Aiorchat.
+                    gaining actionable insights for new strategies, brands in any industry can thrive with Talkinexx WhatsApp Automation.
                   </p>
                 </div>
               </div>
               <div className="col-auto">
                 <div className="btn-group mb-0 mb-md-5">
-                  <a href="/case-studies" className="th-btn2">All Success Stories</a>
+                  <a href="/contact" className="th-btn2">Book a Demo</a>
                 </div>
               </div>
             </div>
@@ -706,6 +413,20 @@ Brand Area
                 }
                 .cards-marquee-card {
                   width: 400px;
+                  height: 220px;
+                  overflow: hidden;
+                  box-sizing: border-box;
+                }
+                .cards-marquee-card .card-icon-img {
+                  width: 26px !important;
+                  height: 26px !important;
+                  object-fit: contain;
+                  display: block;
+                }
+                .cards-marquee-card .card-icon-wrap {
+                  margin-bottom: 8px;
+                  display: flex;
+                  align-items: center;
                 }
                 @keyframes slideCards {
                   0% { transform: translateX(0); }
@@ -713,100 +434,135 @@ Brand Area
                 }
                 @media (max-width: 768px) {
                   .cards-marquee-card {
-                    width: 320px;
+                    width: 320px !important;
+                    height: 215px !important;
+                    padding: 10px !important;
+                  }
+                  .cards-marquee-card .card-img-col {
+                    flex: 0 0 40% !important;
+                  }
+                  .cards-marquee-card .card-content-col {
+                    padding: 8px 8px 30px 12px !important;
+                    justify-content: flex-start !important;
+                  }
+                  .cards-marquee-card .card-icon-wrap {
+                    margin-bottom: 4px !important;
+                  }
+                  .cards-marquee-card .card-icon-img {
+                    width: 20px !important;
+                    height: 20px !important;
+                  }
+                  .cards-marquee-card .card-title {
+                    font-size: 15px !important;
+                    margin-bottom: 4px !important;
+                    line-height: 1.2 !important;
+                  }
+                  .cards-marquee-card .card-desc {
+                    font-size: 11px !important;
+                    line-height: 1.4 !important;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                  }
+                  .cards-marquee-card .card-arrow-btn {
+                    width: 30px !important;
+                    height: 30px !important;
+                    bottom: 10px !important;
+                    right: 10px !important;
                   }
                 }
               `}} />
               <div className="cards-marquee-track">
                 {/* First Set */}
-                <div className="cards-marquee-card" style={{ display: 'flex', alignItems: 'stretch', backgroundColor: '#fff', borderRadius: '24px', padding: '12px', height: '220px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid #F3F4F6', position: 'relative' }}>
-                  <div style={{ flex: '0 0 45%', position: 'relative' }}>
+                <div className="cards-marquee-card" style={{ display: 'flex', alignItems: 'stretch', backgroundColor: '#fff', borderRadius: '24px', padding: '12px', height: '220px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid #F3F4F6', position: 'relative', overflow: 'hidden' }}>
+                  <div className="card-img-col" style={{ flex: '0 0 45%', position: 'relative' }}>
                     <img src="assets/img/service/service_chatbot_1.jpg" alt="Tailored Solutions" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }} />
                   </div>
-                  <div style={{ flex: '1', padding: '12px 12px 40px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div style={{ marginBottom: '16px' }}>
-                      <img src="assets/img/icon/service_2_1.svg" alt="Icon" style={{ width: '40px', height: '40px' }} />
+                  <div className="card-content-col" style={{ flex: '1', padding: '12px 12px 36px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div className="card-icon-wrap">
+                      <img src="assets/img/icon/service_2_1.svg" alt="Icon" className="card-icon-img" />
                     </div>
-                    <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#000', marginBottom: '8px', lineHeight: '1.2' }}>Tailored Solutions</h3>
-                    <p style={{ fontSize: '12px', color: '#57534E', lineHeight: '1.6', margin: 0 }}>From converting up to 44% of chats into sales and cutting support costs, to gaining actionable insights.</p>
+                    <h3 className="card-title" style={{ fontSize: '18px', fontWeight: '800', color: '#000', marginBottom: '8px', lineHeight: '1.2' }}>Tailored Solutions</h3>
+                    <p className="card-desc" style={{ fontSize: '12px', color: '#57534E', lineHeight: '1.6', margin: 0 }}>From converting up to 44% of chats into sales and cutting support costs, to gaining actionable insights.</p>
                   </div>
-                  <a href="/case-studies" style={{ position: 'absolute', bottom: '16px', right: '16px', width: '36px', height: '36px', backgroundColor: '#F3F4F6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', transition: 'all 0.3s ease' }}>
+                  <a href="/case-studies" className="card-arrow-btn" style={{ position: 'absolute', bottom: '16px', right: '16px', width: '36px', height: '36px', backgroundColor: '#F3F4F6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', transition: 'all 0.3s ease' }}>
                     <i className="fa-solid fa-chevron-right" style={{ fontSize: '12px' }}></i>
                   </a>
                 </div>
-                <div className="cards-marquee-card" style={{ display: 'flex', alignItems: 'stretch', backgroundColor: '#fff', borderRadius: '24px', padding: '12px', height: '220px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid #F3F4F6', position: 'relative' }}>
-                  <div style={{ flex: '0 0 45%', position: 'relative' }}>
+                <div className="cards-marquee-card" style={{ display: 'flex', alignItems: 'stretch', backgroundColor: '#fff', borderRadius: '24px', padding: '12px', height: '220px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid #F3F4F6', position: 'relative', overflow: 'hidden' }}>
+                  <div className="card-img-col" style={{ flex: '0 0 45%', position: 'relative' }}>
                     <img src="assets/img/service/service_chatbot_2.jpg" alt="Affordable Pricing" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }} />
                   </div>
-                  <div style={{ flex: '1', padding: '12px 12px 40px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div style={{ marginBottom: '16px' }}>
-                      <img src="assets/img/icon/service_2_2.svg" alt="Icon" style={{ width: '40px', height: '40px' }} />
+                  <div className="card-content-col" style={{ flex: '1', padding: '12px 12px 36px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div className="card-icon-wrap">
+                      <img src="assets/img/icon/service_2_2.svg" alt="Icon" className="card-icon-img" />
                     </div>
-                    <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#000', marginBottom: '8px', lineHeight: '1.2' }}>Affordable Pricing</h3>
-                    <p style={{ fontSize: '12px', color: '#57534E', lineHeight: '1.6', margin: 0 }}>From converting up to 44% of chats into sales and cutting support costs, to gaining actionable insights.</p>
+                    <h3 className="card-title" style={{ fontSize: '18px', fontWeight: '800', color: '#000', marginBottom: '8px', lineHeight: '1.2' }}>Affordable Pricing</h3>
+                    <p className="card-desc" style={{ fontSize: '12px', color: '#57534E', lineHeight: '1.6', margin: 0 }}>From converting up to 44% of chats into sales and cutting support costs, to gaining actionable insights.</p>
                   </div>
-                  <a href="/case-studies" style={{ position: 'absolute', bottom: '16px', right: '16px', width: '36px', height: '36px', backgroundColor: '#F3F4F6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', transition: 'all 0.3s ease' }}>
+                  <a href="/case-studies" className="card-arrow-btn" style={{ position: 'absolute', bottom: '16px', right: '16px', width: '36px', height: '36px', backgroundColor: '#F3F4F6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', transition: 'all 0.3s ease' }}>
                     <i className="fa-solid fa-chevron-right" style={{ fontSize: '12px' }}></i>
                   </a>
                 </div>
-                <div className="cards-marquee-card" style={{ display: 'flex', alignItems: 'stretch', backgroundColor: '#fff', borderRadius: '24px', padding: '12px', height: '220px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid #F3F4F6', position: 'relative' }}>
-                  <div style={{ flex: '0 0 45%', position: 'relative' }}>
+                <div className="cards-marquee-card" style={{ display: 'flex', alignItems: 'stretch', backgroundColor: '#fff', borderRadius: '24px', padding: '12px', height: '220px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid #F3F4F6', position: 'relative', overflow: 'hidden' }}>
+                  <div className="card-img-col" style={{ flex: '0 0 45%', position: 'relative' }}>
                     <img src="assets/img/service/service_chatbot_3.jpg" alt="Customer Support" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }} />
                   </div>
-                  <div style={{ flex: '1', padding: '12px 12px 40px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div style={{ marginBottom: '16px' }}>
-                      <img src="assets/img/icon/service_2_3.svg" alt="Icon" style={{ width: '40px', height: '40px' }} />
+                  <div className="card-content-col" style={{ flex: '1', padding: '12px 12px 36px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div className="card-icon-wrap">
+                      <img src="assets/img/icon/service_2_3.svg" alt="Icon" className="card-icon-img" />
                     </div>
-                    <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#000', marginBottom: '8px', lineHeight: '1.2' }}>Customer Support</h3>
-                    <p style={{ fontSize: '12px', color: '#57534E', lineHeight: '1.6', margin: 0 }}>From converting up to 44% of chats into sales and cutting support costs, to gaining actionable insights.</p>
+                    <h3 className="card-title" style={{ fontSize: '18px', fontWeight: '800', color: '#000', marginBottom: '8px', lineHeight: '1.2' }}>Customer Support</h3>
+                    <p className="card-desc" style={{ fontSize: '12px', color: '#57534E', lineHeight: '1.6', margin: 0 }}>From converting up to 44% of chats into sales and cutting support costs, to gaining actionable insights.</p>
                   </div>
-                  <a href="/case-studies" style={{ position: 'absolute', bottom: '16px', right: '16px', width: '36px', height: '36px', backgroundColor: '#F3F4F6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', transition: 'all 0.3s ease' }}>
+                  <a href="/case-studies" className="card-arrow-btn" style={{ position: 'absolute', bottom: '16px', right: '16px', width: '36px', height: '36px', backgroundColor: '#F3F4F6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', transition: 'all 0.3s ease' }}>
                     <i className="fa-solid fa-chevron-right" style={{ fontSize: '12px' }}></i>
                   </a>
                 </div>
                 {/* Second Set for seamless loop */}
-                <div className="cards-marquee-card" style={{ display: 'flex', alignItems: 'stretch', backgroundColor: '#fff', borderRadius: '24px', padding: '12px', height: '220px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid #F3F4F6', position: 'relative' }}>
-                  <div style={{ flex: '0 0 45%', position: 'relative' }}>
+                <div className="cards-marquee-card" style={{ display: 'flex', alignItems: 'stretch', backgroundColor: '#fff', borderRadius: '24px', padding: '12px', height: '220px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid #F3F4F6', position: 'relative', overflow: 'hidden' }}>
+                  <div className="card-img-col" style={{ flex: '0 0 45%', position: 'relative' }}>
                     <img src="assets/img/service/service_chatbot_1.jpg" alt="Tailored Solutions" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }} />
                   </div>
-                  <div style={{ flex: '1', padding: '12px 12px 40px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div style={{ marginBottom: '16px' }}>
-                      <img src="assets/img/icon/service_2_1.svg" alt="Icon" style={{ width: '40px', height: '40px' }} />
+                  <div className="card-content-col" style={{ flex: '1', padding: '12px 12px 36px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div className="card-icon-wrap">
+                      <img src="assets/img/icon/service_2_1.svg" alt="Icon" className="card-icon-img" />
                     </div>
-                    <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#000', marginBottom: '8px', lineHeight: '1.2' }}>Tailored Solutions</h3>
-                    <p style={{ fontSize: '12px', color: '#57534E', lineHeight: '1.6', margin: 0 }}>From converting up to 44% of chats into sales and cutting support costs, to gaining actionable insights.</p>
+                    <h3 className="card-title" style={{ fontSize: '18px', fontWeight: '800', color: '#000', marginBottom: '8px', lineHeight: '1.2' }}>Tailored Solutions</h3>
+                    <p className="card-desc" style={{ fontSize: '12px', color: '#57534E', lineHeight: '1.6', margin: 0 }}>From converting up to 44% of chats into sales and cutting support costs, to gaining actionable insights.</p>
                   </div>
-                  <a href="/case-studies" style={{ position: 'absolute', bottom: '16px', right: '16px', width: '36px', height: '36px', backgroundColor: '#F3F4F6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', transition: 'all 0.3s ease' }}>
+                  <a href="/case-studies" className="card-arrow-btn" style={{ position: 'absolute', bottom: '16px', right: '16px', width: '36px', height: '36px', backgroundColor: '#F3F4F6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', transition: 'all 0.3s ease' }}>
                     <i className="fa-solid fa-chevron-right" style={{ fontSize: '12px' }}></i>
                   </a>
                 </div>
-                <div className="cards-marquee-card" style={{ display: 'flex', alignItems: 'stretch', backgroundColor: '#fff', borderRadius: '24px', padding: '12px', height: '220px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid #F3F4F6', position: 'relative' }}>
-                  <div style={{ flex: '0 0 45%', position: 'relative' }}>
+                <div className="cards-marquee-card" style={{ display: 'flex', alignItems: 'stretch', backgroundColor: '#fff', borderRadius: '24px', padding: '12px', height: '220px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)', border: '1px solid #F3F4F6', position: 'relative', overflow: 'hidden' }}>
+                  <div className="card-img-col" style={{ flex: '0 0 45%', position: 'relative' }}>
                     <img src="assets/img/service/service_chatbot_2.jpg" alt="Affordable Pricing" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }} />
                   </div>
-                  <div style={{ flex: '1', padding: '12px 12px 40px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div style={{ marginBottom: '16px' }}>
-                      <img src="assets/img/icon/service_2_2.svg" alt="Icon" style={{ width: '40px', height: '40px' }} />
+                  <div className="card-content-col" style={{ flex: '1', padding: '12px 12px 36px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div className="card-icon-wrap">
+                      <img src="assets/img/icon/service_2_2.svg" alt="Icon" className="card-icon-img" />
                     </div>
-                    <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#000', marginBottom: '8px', lineHeight: '1.2' }}>Affordable Pricing</h3>
-                    <p style={{ fontSize: '12px', color: '#57534E', lineHeight: '1.6', margin: 0 }}>From converting up to 44% of chats into sales and cutting support costs, to gaining actionable insights.</p>
+                    <h3 className="card-title" style={{ fontSize: '18px', fontWeight: '800', color: '#000', marginBottom: '8px', lineHeight: '1.2' }}>Affordable Pricing</h3>
+                    <p className="card-desc" style={{ fontSize: '12px', color: '#57534E', lineHeight: '1.6', margin: 0 }}>From converting up to 44% of chats into sales and cutting support costs, to gaining actionable insights.</p>
                   </div>
-                  <a href="/case-studies" style={{ position: 'absolute', bottom: '16px', right: '16px', width: '36px', height: '36px', backgroundColor: '#F3F4F6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', transition: 'all 0.3s ease' }}>
+                  <a href="/case-studies" className="card-arrow-btn" style={{ position: 'absolute', bottom: '16px', right: '16px', width: '36px', height: '36px', backgroundColor: '#F3F4F6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', transition: 'all 0.3s ease' }}>
                     <i className="fa-solid fa-chevron-right" style={{ fontSize: '12px' }}></i>
                   </a>
                 </div>
-                <div className="cards-marquee-card" style={{ display: 'flex', alignItems: 'stretch', backgroundColor: '#fff', borderRadius: '24px', padding: '12px', height: '220px', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.05)', position: 'relative' }}>
-                  <div style={{ flex: '0 0 45%', position: 'relative' }}>
+                <div className="cards-marquee-card" style={{ display: 'flex', alignItems: 'stretch', backgroundColor: '#fff', borderRadius: '24px', padding: '12px', height: '220px', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.05)', position: 'relative', overflow: 'hidden' }}>
+                  <div className="card-img-col" style={{ flex: '0 0 45%', position: 'relative' }}>
                     <img src="assets/img/service/service_chatbot_3.jpg" alt="Customer Support" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }} />
                   </div>
-                  <div style={{ flex: '1', padding: '12px 12px 40px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div style={{ marginBottom: '16px' }}>
-                      <img src="assets/img/icon/service_2_3.svg" alt="Icon" style={{ width: '40px', height: '40px' }} />
+                  <div className="card-content-col" style={{ flex: '1', padding: '12px 12px 36px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div className="card-icon-wrap">
+                      <img src="assets/img/icon/service_2_3.svg" alt="Icon" className="card-icon-img" />
                     </div>
-                    <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#000', marginBottom: '8px', lineHeight: '1.2' }}>Customer Support</h3>
-                    <p style={{ fontSize: '12px', color: '#57534E', lineHeight: '1.6', margin: 0 }}>From converting up to 44% of chats into sales and cutting support costs, to gaining actionable insights.</p>
+                    <h3 className="card-title" style={{ fontSize: '18px', fontWeight: '800', color: '#000', marginBottom: '8px', lineHeight: '1.2' }}>Customer Support</h3>
+                    <p className="card-desc" style={{ fontSize: '12px', color: '#57534E', lineHeight: '1.6', margin: 0 }}>From converting up to 44% of chats into sales and cutting support costs, to gaining actionable insights.</p>
                   </div>
-                  <a href="/case-studies" style={{ position: 'absolute', bottom: '16px', right: '16px', width: '36px', height: '36px', backgroundColor: '#F3F4F6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', transition: 'all 0.3s ease' }}>
+                  <a href="/case-studies" className="card-arrow-btn" style={{ position: 'absolute', bottom: '16px', right: '16px', width: '36px', height: '36px', backgroundColor: '#F3F4F6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', transition: 'all 0.3s ease' }}>
                     <i className="fa-solid fa-chevron-right" style={{ fontSize: '12px' }}></i>
                   </a>
                 </div>
@@ -936,20 +692,111 @@ Cta Area
                   0%, 100% { transform: translateY(0) scale(1); }
                   50% { transform: translateY(-30px) scale(1.1); }
                 }
+                /* CTA Robot and Responsive Styles */
+                .cta-area3-custom {
+                  background: linear-gradient(135deg, rgb(18, 38, 58) 0%, rgb(22, 101, 52) 100%);
+                  border-radius: 32px;
+                  position: relative;
+                  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                  margin-top: 100px;
+                  margin-bottom: 80px;
+                  overflow: visible;
+                }
+                .cta-row-custom {
+                  min-height: 420px;
+                  position: relative;
+                  z-index: 3;
+                }
+                .cta-robot-col {
+                  position: absolute;
+                  left: 0;
+                  bottom: 0;
+                  width: 45%;
+                  z-index: 5;
+                  display: flex;
+                  align-items: flex-end;
+                  justify-content: flex-start;
+                }
                 .robot-img-popout {
                   position: relative;
                   z-index: 5;
                   max-width: 650px;
                   width: 650px;
                   left: -50px;
-                  bottom: -37px; /* Feet resting inside the box */
+                  bottom: -37px;
+                  display: block;
                 }
+                .cta-content-col {
+                  padding: 80px 40px 80px 0;
+                  z-index: 10;
+                }
+                .cta-title-text {
+                  font-weight: 800;
+                  font-size: 48px;
+                  line-height: 1.2;
+                }
+                .cta-desc-text {
+                  font-size: 18px;
+                  opacity: 0.85;
+                  line-height: 1.6;
+                  max-width: 90%;
+                }
+                .cta-btn-wrapper {
+                  display: flex;
+                  justify-content: flex-start;
+                  margin-top: 8px;
+                }
+
                 @media (max-width: 991px) {
+                  .cta-area3-custom {
+                    margin-top: 50px !important;
+                    margin-bottom: 50px !important;
+                    padding: 44px 20px 0 20px !important;
+                    border-radius: 24px !important;
+                    overflow: hidden !important;
+                    text-align: center !important;
+                  }
+                  .cta-row-custom {
+                    min-height: auto !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: center !important;
+                  }
+                  .cta-content-col {
+                    padding: 0 !important;
+                    width: 100% !important;
+                    text-align: center !important;
+                  }
+                  .cta-title-text {
+                    font-size: clamp(26px, 6vw, 36px) !important;
+                  }
+                  .cta-desc-text {
+                    font-size: 15px !important;
+                    max-width: 100% !important;
+                    margin: 0 auto 20px auto !important;
+                  }
+                  .cta-btn-wrapper {
+                    justify-content: center !important;
+                    width: 100% !important;
+                  }
+                  .cta-robot-col {
+                    position: relative !important;
+                    left: auto !important;
+                    bottom: 0 !important;
+                    width: 100% !important;
+                    display: flex !important;
+                    justify-content: center !important;
+                    align-items: flex-end !important;
+                    margin-top: 25px !important;
+                    z-index: 5;
+                  }
                   .robot-img-popout {
-                    max-width: 100%;
-                    width: auto;
-                    left: 0;
-                    bottom: 0px;
+                    position: relative !important;
+                    left: 0 !important;
+                    bottom: -15px !important;
+                    max-width: 250px !important;
+                    width: 70% !important;
+                    margin: 0 auto !important;
                   }
                 }
                 .cta-premium-btn {
@@ -963,11 +810,13 @@ Cta Area
                   font-size: 16px;
                   font-weight: 700;
                   border: none;
+                  box-shadow: none !important;
                   transition: all 0.3s ease;
                   text-decoration: none;
                 }
                 .cta-premium-btn:hover {
                   transform: scale(1.02) translateY(-2px);
+                  box-shadow: none !important;
                 }
                 .cta-premium-btn .btn-icon {
                   background: rgba(255, 255, 255, 0.2);
@@ -986,41 +835,29 @@ Cta Area
                 }
               `}
             </style>
-            <div className="cta-area3" style={{
-              background: 'linear-gradient(135deg, rgb(18, 38, 58) 0%, rgb(22, 101, 52) 100%)',
-              borderRadius: '32px',
-              position: 'relative',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-              marginTop: '100px',
-              marginBottom: '80px'
-            }}>
+            <div className="cta-area3 cta-area3-custom">
 
               {/* Animated Background Elements */}
               <div className="animated-bg-shape shape-1"></div>
               <div className="animated-bg-shape shape-2"></div>
               <div className="animated-bg-shape shape-3"></div>
 
-              <div className="row justify-content-end align-items-center" style={{ minHeight: '420px', position: 'relative', zIndex: 3 }}>
+              <div className="row justify-content-end align-items-center cta-row-custom">
 
-                {/* Robot Image */}
-                <div className="col-lg-5 position-absolute" style={{ left: 0, bottom: 0, zIndex: 5 }}>
-                  <img src="assets/img/normal/cta_robot_new.png" alt="AI Robot" className="robot-img-popout" />
-                </div>
-
-                {/* Text Content */}
-                <div className="col-lg-7 col-xl-7" style={{ padding: '80px 40px 80px 0', zIndex: 10 }}>
+                {/* Text Content: First in mobile flow, right column on desktop */}
+                <div className="col-lg-7 col-xl-7 cta-content-col">
                   <div className="title-area mb-4">
                     <span className="badge mb-3 px-3 py-2 rounded-pill" style={{ fontSize: '13px', letterSpacing: '1px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}>
                       <i className="fa-solid fa-bolt text-warning me-2"></i> POWERED BY ADVANCED AI
                     </span>
-                    <h2 className="sec-title text-white mb-3" style={{ fontWeight: 800, fontSize: '48px', lineHeight: 1.2 }}>
+                    <h2 className="sec-title text-white mb-3 cta-title-text">
                       Generate <span style={{ color: '#22C55E' }}>AI Chatbots</span><br />in a Few Clicks
                     </h2>
-                    <p className="box-text text-white" style={{ fontSize: '18px', opacity: 0.8, lineHeight: 1.6, maxWidth: '90%' }}>
+                    <p className="box-text text-white cta-desc-text">
                       Instantly transform your customer engagement. Get started for free in minutes—no credit card required, no coding needed.
                     </p>
                   </div>
-                  <div className="btn-group justify-content-start mt-2">
+                  <div className="cta-btn-wrapper">
                     <a href="/contact" className="cta-premium-btn">
                       Start Free Trial
                       <span className="btn-icon">
@@ -1028,6 +865,11 @@ Cta Area
                       </span>
                     </a>
                   </div>
+                </div>
+
+                {/* Robot Image: Absolute on desktop left, bottom centered on mobile */}
+                <div className="col-lg-5 cta-robot-col">
+                  <img src="assets/img/normal/cta_robot_new.png" alt="AI Robot" className="robot-img-popout" />
                 </div>
               </div>
             </div>
@@ -1056,7 +898,7 @@ Testimonial Area
                           <div className="box-author">
                             <img src="assets/img/testimonial/sarah_jenkins.jpg" alt="Sarah Jenkins" />
                           </div>
-                          <div className="box-quote"><img src="assets/img/icon/quote2.svg" alt /></div>
+                          <div className="box-quote"><img src="assets/img/icon/quote2.svg" alt="" /></div>
                         </div>
                         <span className="rating"><i className="fa-sharp fa-solid fa-star-sharp" /><i className="fa-sharp fa-solid fa-star-sharp" /><i className="fa-sharp fa-solid fa-star-sharp" /><i className="fa-sharp fa-solid fa-star-sharp" /><i className="fa-sharp fa-solid fa-star-sharp" /></span>
                       </div>
@@ -1065,7 +907,7 @@ Testimonial Area
                         <h3 className="box-title">Sarah Jenkins</h3>
                         <span className="box-desig">Customer Success Manager</span>
                       </div>
-                      <div className="shape"><img src="assets/img/shape/testi-element.png" alt /></div>
+                      <div className="shape"><img src="assets/img/shape/testi-element.png" alt="" /></div>
                     </div>
                   </div>
                   <div className="swiper-slide">
@@ -1075,7 +917,7 @@ Testimonial Area
                           <div className="box-author">
                             <img src="assets/img/testimonial/mark_robinson.jpg" alt="Mark Robinson" />
                           </div>
-                          <div className="box-quote"><img src="assets/img/icon/quote2.svg" alt /></div>
+                          <div className="box-quote"><img src="assets/img/icon/quote2.svg" alt="" /></div>
                         </div>
                         <span className="rating"><i className="fa-sharp fa-solid fa-star-sharp" /><i className="fa-sharp fa-solid fa-star-sharp" /><i className="fa-sharp fa-solid fa-star-sharp" /><i className="fa-sharp fa-solid fa-star-sharp" /><i className="fa-sharp fa-solid fa-star-sharp" /></span>
                       </div>
@@ -1084,7 +926,7 @@ Testimonial Area
                         <h3 className="box-title">Marcus Chen</h3>
                         <span className="box-desig">E-Commerce Director</span>
                       </div>
-                      <div className="shape"><img src="assets/img/shape/testi-element.png" alt /></div>
+                      <div className="shape"><img src="assets/img/shape/testi-element.png" alt="" /></div>
                     </div>
                   </div>
                   <div className="swiper-slide">
@@ -1094,7 +936,7 @@ Testimonial Area
                           <div className="box-author">
                             <img src="assets/img/testimonial/elena_rodriguez.jpg" alt="Elena Rodriguez" />
                           </div>
-                          <div className="box-quote"><img src="assets/img/icon/quote2.svg" alt /></div>
+                          <div className="box-quote"><img src="assets/img/icon/quote2.svg" alt="" /></div>
                         </div>
                         <span className="rating"><i className="fa-sharp fa-solid fa-star-sharp" /><i className="fa-sharp fa-solid fa-star-sharp" /><i className="fa-sharp fa-solid fa-star-sharp" /><i className="fa-sharp fa-solid fa-star-sharp" /><i className="fa-sharp fa-solid fa-star-sharp" /></span>
                       </div>
@@ -1103,7 +945,7 @@ Testimonial Area
                         <h3 className="box-title">Elena Rodriguez</h3>
                         <span className="box-desig">Founder & CEO</span>
                       </div>
-                      <div className="shape"><img src="assets/img/shape/testi-element.png" alt /></div>
+                      <div className="shape"><img src="assets/img/shape/testi-element.png" alt="" /></div>
                     </div>
                   </div>
                   <div className="swiper-slide">
@@ -1191,6 +1033,74 @@ Price Area
             .price-card .available-list li::after {
               display: none !important;
             }
+
+            /* Responsive Pricing Switcher Styles */
+            .pricing-tabs-container {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              flex-wrap: nowrap;
+            }
+            .pricing-tabs .switch-area {
+              display: inline-flex;
+              align-items: center;
+              background: #EDF5F3;
+              border-radius: 50px;
+              padding: 4px;
+              position: relative;
+              gap: 4px;
+            }
+            .pricing-tabs .toggler {
+              white-space: nowrap !important;
+              cursor: pointer;
+              border-radius: 50px !important;
+              font-weight: 700 !important;
+              font-size: 14px !important;
+              line-height: 1 !important;
+              padding: 12px 24px !important;
+              margin-bottom: 0 !important;
+              transition: all 0.25s ease !important;
+              background: transparent !important;
+              color: #12263A !important;
+              border: none !important;
+              box-shadow: none !important;
+              user-select: none;
+            }
+            .pricing-tabs .toggler:hover {
+              color: #22C55E !important;
+            }
+            .pricing-tabs .toggler.toggler--is-active {
+              background: #22C55E !important;
+              color: #ffffff !important;
+              box-shadow: none !important;
+            }
+            .pricing-save-badge {
+              background-color: #E8F0FE;
+              color: #456FF8;
+              border-radius: 6px;
+              padding: 7px 12px;
+              font-size: 11px;
+              font-weight: 700;
+              letter-spacing: 0.5px;
+              white-space: nowrap !important;
+              display: inline-flex;
+              align-items: center;
+            }
+
+            @media (max-width: 575px) {
+              .pricing-tabs .switch-area {
+                padding: 3px;
+                gap: 2px;
+              }
+              .pricing-tabs .toggler {
+                font-size: 12px !important;
+                padding: 8px 14px !important;
+              }
+              .pricing-save-badge {
+                padding: 6px 8px !important;
+                font-size: 10px !important;
+              }
+            }
           `}</style>
           <div className="container">
             <div className="row justify-content-center">
@@ -1204,22 +1114,32 @@ Price Area
             </div>
             <div className="row justify-content-center mb-5">
               <div className="col-auto">
-                <div className="sec-btn d-flex align-items-center">
+                <div className="pricing-tabs-container d-flex align-items-center justify-content-center">
                   <div className="pricing-tabs">
                     <div className="switch-area">
-                      <label className="toggler toggler--is-active ms-0 fw-bold" id="filt-monthly">MONTHLY BILLING</label>
-                      <div className="toggle">
-                        <input type="checkbox" id="switcher" className="check" />
-                        <b className="b switch" />
-                      </div>
-                      <label className="toggler fw-bold" id="filt-yearly">YEARLY BILLING</label>
+                      <button
+                        type="button"
+                        className={`toggler ${billingCycle === 'monthly' ? 'toggler--is-active' : ''} ms-0 fw-bold`}
+                        id="filt-monthly"
+                        onClick={() => setBillingCycle('monthly')}
+                      >
+                        MONTHLY<span className="d-none d-sm-inline"> BILLING</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={`toggler ${billingCycle === 'yearly' ? 'toggler--is-active' : ''} fw-bold`}
+                        id="filt-yearly"
+                        onClick={() => setBillingCycle('yearly')}
+                      >
+                        YEARLY<span className="d-none d-sm-inline"> BILLING</span>
+                      </button>
                     </div>
                   </div>
-                  <span className="badge ms-3" style={{ backgroundColor: '#E8F0FE', color: '#456FF8', borderRadius: '4px', padding: '6px 10px', fontSize: '11px', letterSpacing: '0.5px' }}>SAVE 20%</span>
+                  <span className="pricing-save-badge ms-2 ms-sm-3">SAVE 20%</span>
                 </div>
               </div>
             </div>
-            <div id="monthly" className="wrapper-full">
+            <div id="monthly" className={`wrapper-full ${billingCycle === 'yearly' ? 'hide' : ''}`}>
               <div className="row gy-4 justify-content-center align-items-center">
 
                 {/* Starter Plan */}
@@ -1301,7 +1221,7 @@ Price Area
 
               </div>
             </div>
-            <div id="yearly" className="wrapper-full hide">
+            <div id="yearly" className={`wrapper-full ${billingCycle === 'monthly' ? 'hide' : ''}`}>
               <div className="row gy-4 justify-content-center align-items-center">
 
                 {/* Starter Plan */}
@@ -1490,134 +1410,12 @@ Blog Area
               </div>
             </div>
           </div>
-        </section>{/*==============================
-	Footer Area
-==============================*/}
-        <footer className="footer-wrapper footer-layout2" data-bg-src="assets/img/bg/footer_bg_2.png">
-          <div className="container">
-            <div className="widget-area">
-              <div className="footer-top ">
-                <div className="row gx-40 gy-4 justify-content-center justify-content-lg-between">
-                  <div className="col-lg-5 col-xl-4">
-                    <div className="footer-logo"><img src="assets/img/logo-2.png" alt="Talkinexx Logo" /></div>
-                  </div>
-                  <div className="col-lg-6 col-xl-5">
-                    <div className="ps-xl-5">
-                      <h2 className="box-title text-white">Try Talkinexx Today Free</h2>
-                      <div className="btn-group justify-content-center justify-content-lg-start">
-                        <a href="/contact" className="th-btn2">Start Free Trial</a>
-                        <a href="/contact" className="th-btn2 style3">Book a Demo</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="container">
-            <div className="row gy-4 justify-content-between">
-              <div className="col-md-6 col-xl-3">
-                <div className="widget footer-widget">
-                  <h3 className="widget_title" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>Talkinexx</h3>
-                  <div className="th-widget-about">
-                    <p className="about-text" style={{ fontSize: '14px', lineHeight: '1.7' }}>The enterprise-grade WhatsApp automation platform for teams who value speed, efficiency, and real-time customer engagement.</p>
-                    <div className="th-social">
-                      <a href="https://www.twitter.com/"><i className="fab fa-twitter" /></a>
-                      <a href="https://github.com/"><i className="fab fa-github" /></a>
-                      <a href="https://www.linkedin.com/"><i className="fab fa-linkedin-in" /></a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-6 col-xl-auto">
-                <div className="widget widget_nav_menu footer-widget">
-                  <h3 className="widget_title" style={{ textTransform: 'uppercase', letterSpacing: '1px', fontSize: '13px', color: '#8892A0' }}>Company</h3>
-                  <div className="menu-all-pages-container">
-                    <ul className="menu">
-                      <li><a href="/">Home Page</a></li>
-                      <li><a href="/pricing">Pricing Plans</a></li>
-                      <li><a href="/contact">Contact Sales</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-6 col-xl-auto">
-                <div className="widget widget_nav_menu footer-widget">
-                  <h3 className="widget_title" style={{ textTransform: 'uppercase', letterSpacing: '1px', fontSize: '13px', color: '#8892A0' }}>Services</h3>
-                  <div className="menu-all-pages-container">
-                    <ul className="menu">
-                      <li><a href="/#">WhatsApp Campaigns</a></li>
-                      <li><a href="/#">Automated Messaging</a></li>
-                      <li><a href="/#">AI Auto Response</a></li>
-                      <li><a href="/#">WhatsApp Flow Builder</a></li>
-                      <li><a href="/#">Shared Team Inbox</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-6 col-xl-auto">
-                <div className="widget widget_nav_menu footer-widget">
-                  <h3 className="widget_title" style={{ textTransform: 'uppercase', letterSpacing: '1px', fontSize: '13px', color: '#8892A0' }}>Trust &amp; Legal</h3>
-                  <div className="menu-all-pages-container">
-                    <ul className="menu">
-                      <li><a href="/#">Privacy Policy</a></li>
-                      <li><a href="/#">Terms &amp; Conditions</a></li>
-                      <li><a href="/#">SLA Guarantee</a></li>
-                      <li><a href="/#">Secure by Design</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="container">
-            <div className="copyright-wrap">
-              <div className="row gy-2 align-items-center justify-content-between">
-                <div className="col-auto">
-                  <p className="copyright-text mb-0" style={{ color: '#8892A0' }}>&copy; 2026 Talkinexx. Built for Meta Graph API.</p>
-                </div>
-                <div className="col-auto">
-                  <div className="d-flex" style={{ gap: '30px' }}>
-                    <a href="/#" style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold', color: '#fff' }}>Secure by Design</a>
-                    <a href="/#" style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold', color: '#fff' }}>SLA Guarantee</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </footer>
-        {/*********************************
-			Code End  Here 
-	******************************** */}
-        {/* Scroll To Top */}
-        <div className="scroll-top">
-          <svg className="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
-            <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" style={{ transition: 'stroke-dashoffset 10ms linear 0s', strokeDasharray: '307.919, 307.919', strokeDashoffset: '307.919' }}>
-            </path>
-          </svg>
-        </div>
-        {/*==============================
-    All Js File
-============================== */}
-        {/* Jquery */}
-        {/* Swiper Slider */}
-        {/* Bootstrap */}
-        {/* Magnific Popup */}
-        {/* Counter Up */}
-        {/* Circle Progress */}
-        {/* Range Slider */}
-        {/* Imagesloadedr */}
-        {/* isotope */}
-        {/* Nice-select */}
-        {/* wow */}
-        {/* gsap area start */}
-        {/* gsap area end */}
-        {/* Lenis Js */}
-        {/* Main Js File */}
+        </section>
       </div>
-
-    </>
+    </Layout>
   );
 };
 
 export default HomeAiChatbot;
+
+

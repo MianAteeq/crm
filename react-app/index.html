@@ -1,13 +1,99 @@
 <!doctype html>
-<html class="no-js" lang="zxx">
+<html class="no-js" lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Aior - AI & SaaS - Home ai startup</title>
-    <meta name="author" content="themehour">
-    <meta name="description" content="Aior  - AI & SaaS">
-    <meta name="keywords" content="Aior  - AI & SaaS">
-    <meta name="robots" content="INDEX,FOLLOW">
+    <title>Talkinexx | WhatsApp Cloud Automation & AI Chatbot Platform</title>
+
+    <!-- Primary SEO Meta Tags -->
+    <meta name="title" content="Talkinexx | WhatsApp Cloud Automation & AI Chatbot Platform">
+    <meta name="description" content="Scale conversations with Talkinexx - the leading WhatsApp Cloud Automation and AI Chatbot SaaS. Official Meta API, high-speed broadcasts & 24/7 AI support.">
+    <meta name="keywords" content="WhatsApp Cloud API, WhatsApp Automation, WhatsApp AI Chatbot, WhatsApp Broadcast, Meta Business API, WhatsApp CRM, Customer Support AI, Talkinexx">
+    <meta name="author" content="Talkinexx">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="theme-color" content="#0B1520">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://talkinexx.com/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Talkinexx">
+    <meta property="og:url" content="https://talkinexx.com/">
+    <meta property="og:title" content="Talkinexx | WhatsApp Cloud Automation & AI Chatbot Platform">
+    <meta property="og:description" content="Scale conversations with Talkinexx - the leading WhatsApp Cloud Automation and AI Chatbot SaaS. Official Meta API, high-speed broadcasts & 24/7 AI support.">
+    <meta property="og:image" content="https://talkinexx.com/assets/img/logo.png">
+    <meta property="og:image:alt" content="Talkinexx WhatsApp Cloud Automation Platform">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@Talkinexx">
+    <meta name="twitter:creator" content="@Talkinexx">
+    <meta name="twitter:url" content="https://talkinexx.com/">
+    <meta name="twitter:title" content="Talkinexx | WhatsApp Cloud Automation & AI Chatbot Platform">
+    <meta name="twitter:description" content="Scale conversations with Talkinexx - the leading WhatsApp Cloud Automation and AI Chatbot SaaS. Official Meta API, high-speed broadcasts & 24/7 AI support.">
+    <meta name="twitter:image" content="https://talkinexx.com/assets/img/logo.png">
+
+    <!-- Structured Data (Schema.org JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://talkinexx.com/#website",
+          "url": "https://talkinexx.com/",
+          "name": "Talkinexx",
+          "description": "Official WhatsApp Cloud API & AI Chatbot Automation SaaS",
+          "publisher": {
+            "@id": "https://talkinexx.com/#organization"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://talkinexx.com/?s={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://talkinexx.com/#organization",
+          "name": "Talkinexx",
+          "url": "https://talkinexx.com/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://talkinexx.com/assets/img/logo.png"
+          },
+          "sameAs": [
+            "https://twitter.com/Talkinexx",
+            "https://linkedin.com/company/talkinexx",
+            "https://facebook.com/talkinexx"
+          ]
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "Talkinexx WhatsApp Cloud Automation",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Cloud, Web browser",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "ratingCount": "1480",
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        }
+      ]
+    }
+    </script>
+
     <!-- Mobile Specific Metas -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Favicons -->
@@ -30,69 +116,281 @@
 
   
     <style>
-      /* Professional Preloader Overrides */
+      /* Talkinexx Smart Compact Preloader */
+      #preloader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999999;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        background: #0B1520;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s ease;
+      }
+
+      #preloader.preloader-loaded {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+
       .preloader-bg {
-          background-color: #12263A !important;
+        position: absolute;
+        width: 100%;
+        height: 50%;
+        background: #0B1520;
+        transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+        z-index: 5;
       }
-      
-      /* Scale down the wrapper so TALKINEXX fits properly */
+      .preloader-bg-one { top: 0; }
+      .preloader-bg-two { bottom: 0; }
+
+      #preloader.preloader-loaded .preloader-bg-one {
+        transform: translateY(-100%) !important;
+      }
+      #preloader.preloader-loaded .preloader-bg-two {
+        transform: translateY(100%) !important;
+      }
+
+      /* Clean Talkinexx loader wrapper */
       .loader-wrapper {
-          font-size: 42px !important;
-          scale: 1 !important;
-          letter-spacing: 4px !important;
-          font-weight: 800 !important;
-          color: transparent !important;
-          z-index: 10 !important;
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.35s ease, transform 0.35s ease;
+        user-select: none;
+        pointer-events: none;
+        padding: 12px;
+        box-sizing: border-box;
       }
 
-      /* Clean, elegant text animation */
-      .loader-letter {
-          display: inline-block !important;
-          position: relative !important;
-          z-index: 20 !important; /* Ensure it's above the glowing strips */
-          opacity: 0; /* No !important here so animation can override it */
-          animation: float-glow 2.5s infinite ease-in-out !important;
-          color: #FAFAF9 !important;
-          -webkit-text-stroke: 0 !important;
-          text-shadow: none !important;
-      }
-      
-      /* Staggered animation delays for 9 letters */
-      .loader-letter:nth-child(1) { animation-delay: 0.1s !important; }
-      .loader-letter:nth-child(2) { animation-delay: 0.2s !important; }
-      .loader-letter:nth-child(3) { animation-delay: 0.3s !important; }
-      .loader-letter:nth-child(4) { animation-delay: 0.4s !important; }
-      .loader-letter:nth-child(5) { animation-delay: 0.5s !important; }
-      .loader-letter:nth-child(6) { animation-delay: 0.6s !important; }
-      .loader-letter:nth-child(7) { animation-delay: 0.7s !important; }
-      .loader-letter:nth-child(8) { animation-delay: 0.8s !important; }
-      .loader-letter:nth-child(9) { animation-delay: 0.9s !important; }
-
-      @keyframes float-glow {
-          0%, 100% {
-              opacity: 0;
-              transform: translateY(8px);
-              color: #FAFAF9;
-              text-shadow: none;
-          }
-          50% {
-              opacity: 1;
-              transform: translateY(0);
-              color: #FAFAF9;
-              text-shadow: 0px 0px 20px rgba(34, 197, 94, 1), 0px 0px 40px rgba(34, 197, 94, 0.8);
-          }
+      #preloader.preloader-loaded .loader-wrapper {
+        opacity: 0 !important;
+        transform: scale(0.95) !important;
       }
 
-      /* White and Green combination for the glowing background strips */
-      .loader::after {
-          z-index: 1 !important; /* Ensure it's behind the text */
-          opacity: 0.6 !important; /* Make it subtle so text pops */
-          background-image: 
-            radial-gradient(circle at 50% 50%, #22C55E 0%, transparent 60%), 
-            radial-gradient(circle at 45% 45%, #FAFAF9 0%, transparent 50%), 
-            radial-gradient(circle at 55% 55%, #166534 0%, transparent 50%), 
-            radial-gradient(circle at 45% 55%, #FAFAF9 0%, transparent 50%), 
-            radial-gradient(circle at 55% 45%, #22C55E 0%, transparent 50%) !important;
+      .talkinexx-preloader-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+      }
+
+      /* Ambient Center Glow */
+      .talkinexx-preloader-content::before {
+        content: '';
+        position: absolute;
+        width: 130px;
+        height: 130px;
+        background: radial-gradient(circle, rgba(34, 197, 94, 0.18) 0%, transparent 70%);
+        top: 35%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: -1;
+        pointer-events: none;
+        filter: blur(18px);
+      }
+
+      /* Automation Node Container */
+      .automation-node-container {
+        position: relative;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 8px;
+      }
+
+      .pulse-ring {
+        position: absolute;
+        border-radius: 50%;
+        border: 1px solid rgba(34, 197, 94, 0.35);
+        pointer-events: none;
+        animation: radarPulse 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+      }
+      .ring-1 { width: 36px; height: 36px; animation-delay: 0s; }
+      .ring-2 { width: 36px; height: 36px; animation-delay: 0.7s; }
+
+      @keyframes radarPulse {
+        0% { transform: scale(0.9); opacity: 0.7; }
+        50% { opacity: 0.3; }
+        100% { transform: scale(1.45); opacity: 0; }
+      }
+
+      /* Central WhatsApp Chat Node */
+      .whatsapp-central-badge {
+        position: relative;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #22C55E 0%, #16A34A 80%, #14532D 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        z-index: 2;
+        animation: badgeFloat 2.6s infinite ease-in-out;
+      }
+
+      @keyframes badgeFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-2px); }
+      }
+
+      .wa-speech-svg {
+        width: 22px;
+        height: 22px;
+        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+      }
+
+      /* AI Chat Typing Indicator Dots */
+      .wa-typing-dots {
+        position: absolute;
+        top: 48%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        gap: 2.5px;
+        z-index: 3;
+      }
+
+      .typing-dot {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background-color: #FFFFFF;
+        box-shadow: 0 0 3px rgba(255, 255, 255, 0.9);
+        animation: typingWave 1.3s infinite ease-in-out both;
+      }
+      .dot-1 { animation-delay: 0s; }
+      .dot-2 { animation-delay: 0.18s; }
+      .dot-3 { animation-delay: 0.36s; }
+
+      @keyframes typingWave {
+        0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+        30% { transform: translateY(-2.5px); opacity: 1; }
+      }
+
+      /* Real-time Verified Double Check (Cyan Blue ticks) */
+      .wa-tick-badge {
+        position: absolute;
+        bottom: -2px;
+        right: -2px;
+        background: #0B1520;
+        border: 1px solid #22C55E;
+        border-radius: 50%;
+        width: 14px;
+        height: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        z-index: 4;
+      }
+      .wa-tick-badge svg {
+        width: 8px;
+        height: 6px;
+      }
+
+      /* Brand Title */
+      .talkinexx-preloader-brand {
+        font-family: 'Urbanist', 'Sora', sans-serif;
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+        line-height: 1;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .brand-talkin {
+        color: #FFFFFF;
+        text-shadow: 0 1px 4px rgba(255, 255, 255, 0.12);
+      }
+      .brand-exx {
+        color: #22C55E;
+        text-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+      }
+
+      /* Slim Progress Bar */
+      .preloader-progress-box {
+        width: 90px;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 6px;
+      }
+      .preloader-progress-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #16A34A 0%, #22C55E 70%, #86EFAC 100%);
+        border-radius: 4px;
+        box-shadow: 0 0 5px rgba(34, 197, 94, 0.6);
+        animation: progressFill 1.2s infinite cubic-bezier(0.65, 0, 0.35, 1);
+      }
+      @keyframes progressFill {
+        0% { width: 0%; transform: translateX(0); }
+        50% { width: 75%; }
+        100% { width: 100%; transform: translateX(0); }
+      }
+
+      /* Smart Subtitle */
+      .talkinexx-preloader-sub {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-family: 'Urbanist', sans-serif;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.9px;
+        text-transform: uppercase;
+        color: #64748B;
+      }
+      .sub-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #22C55E;
+        box-shadow: 0 0 5px #22C55E;
+      }
+
+      @media (max-width: 575px) {
+        .talkinexx-preloader-brand {
+          font-size: 15px;
+        }
+        .preloader-progress-box {
+          width: 80px;
+        }
+        .automation-node-container {
+          width: 40px;
+          height: 40px;
+          margin-bottom: 6px;
+        }
+        .whatsapp-central-badge {
+          width: 32px;
+          height: 32px;
+        }
+        .wa-speech-svg {
+          width: 19px;
+          height: 19px;
+        }
       }
     </style>
 
@@ -101,17 +399,56 @@
     <div id="preloader">
       <div class="preloader-bg preloader-bg-one"></div>
       <div class="preloader-bg preloader-bg-two"></div>
-      <div class="loader-wrapper">
-          <span class="loader-letter">T</span>
-          <span class="loader-letter">A</span>
-          <span class="loader-letter">L</span>
-          <span class="loader-letter">K</span>
-          <span class="loader-letter">I</span>
-          <span class="loader-letter">N</span>
-          <span class="loader-letter">E</span>
-          <span class="loader-letter">X</span>
-          <span class="loader-letter">X</span>
-          <div class="loader"></div>
+      <div class="loader-wrapper talkinexx-preloader-wrapper">
+        <div class="talkinexx-preloader-content">
+          <!-- WhatsApp Automation Pulse Node -->
+          <div class="automation-node-container">
+            <div class="pulse-ring ring-1"></div>
+            <div class="pulse-ring ring-2"></div>
+            
+            <div class="whatsapp-central-badge">
+              <!-- Speech Bubble SVG -->
+              <svg class="wa-speech-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M32 6C17.64 6 6 17.64 6 32C6 36.96 7.42 41.6 9.88 45.54L6.5 57.5L18.82 54.26C22.62 56.5 27.16 57.8 32 57.8C46.36 57.8 58 46.16 58 31.8C58 17.44 46.36 6 32 6Z" fill="url(#waGradPrimary)"/>
+                <defs>
+                  <linearGradient id="waGradPrimary" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#22C55E"/>
+                    <stop offset="1" stop-color="#15803D"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <!-- 3 Animated AI Chat Typing Dots -->
+              <div class="wa-typing-dots">
+                <span class="typing-dot dot-1"></span>
+                <span class="typing-dot dot-2"></span>
+                <span class="typing-dot dot-3"></span>
+              </div>
+              <!-- Real-time Verified Double Check (Cyan Blue ticks) -->
+              <div class="wa-tick-badge">
+                <svg viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 6.5L4.5 10L11 2" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M5 6.5L8.5 10L15 2" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Brand Title -->
+          <div class="talkinexx-preloader-brand">
+            <span class="brand-talkin">Talkin</span><span class="brand-exx">exx</span>
+          </div>
+
+          <!-- Micro Progress Bar -->
+          <div class="preloader-progress-box">
+            <div class="preloader-progress-bar"></div>
+          </div>
+
+          <!-- Short Status Tagline -->
+          <div class="talkinexx-preloader-sub">
+            <span class="sub-dot"></span>
+            <span>WhatsApp Automation</span>
+          </div>
+        </div>
       </div>
     </div>
     <div id="root"></div>
@@ -134,5 +471,52 @@
     <script src="/assets/js/DrawSVGPlugin3.min.js"></script>
     <script src="/assets/js/lenis.min.js"></script>
     <script src="/assets/js/main.js"></script>
+    <script>
+      /* Fail-safe Preloader Dismissal (Fast & Snappy) */
+      (function() {
+        var dismissed = false;
+        function dismissTalkinexxPreloader() {
+          if (dismissed) return;
+          dismissed = true;
+          var p = document.getElementById('preloader');
+          if (p) {
+            p.classList.add('preloader-loaded');
+            setTimeout(function() {
+              p.style.display = 'none';
+            }, 500);
+          }
+        }
+
+        if (document.readyState === 'complete') {
+          setTimeout(dismissTalkinexxPreloader, 400);
+        } else {
+          window.addEventListener('load', function() {
+            setTimeout(dismissTalkinexxPreloader, 400);
+          });
+        }
+
+        // Fast fallback: dismiss after 800ms max under any condition
+        setTimeout(dismissTalkinexxPreloader, 800);
+
+        // Helper for testing
+        window.showTalkinexxPreloader = function() {
+          var p = document.getElementById('preloader');
+          if (!p) return;
+          p.classList.remove('preloader-loaded');
+          p.style.display = 'flex';
+          p.style.opacity = '1';
+          p.style.visibility = 'visible';
+          var w = p.querySelector('.loader-wrapper');
+          if (w) {
+            w.style.opacity = '1';
+            w.style.transform = 'none';
+          }
+          var bg1 = p.querySelector('.preloader-bg-one');
+          if (bg1) bg1.style.transform = 'none';
+          var bg2 = p.querySelector('.preloader-bg-two');
+          if (bg2) bg2.style.transform = 'none';
+        };
+      })();
+    </script>
   </body>
 </html>

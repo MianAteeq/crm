@@ -1,8 +1,9 @@
 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 
 const Pricing = () => {
+    const [billingCycle, setBillingCycle] = useState('monthly');
     
     return (
         <Layout>
@@ -28,24 +29,24 @@ const Pricing = () => {
   <section className="hero-section text-center position-relative pt-150 pb-100" style={{ background: '#FAFAF9', overflow: 'hidden', padding: '180px 0 120px 0' }}>
     <div className="container position-relative" style={{ zIndex: 3 }}>
       <span className="badge mb-4" style={{ backgroundColor: 'rgba(34,197,94,0.1)', color: '#166534', padding: '8px 16px', borderRadius: '30px', letterSpacing: '2px', fontSize: '12px', border: '1px solid rgba(34,197,94,0.2)', textTransform: 'uppercase', display: 'inline-block', animation: 'floatBob 4s ease-in-out infinite' }}>PRICING & PLANS</span>
-      <h1 className="mb-4" style={{ color: '#12263A', fontSize: '4rem', fontWeight: '800', letterSpacing: '-1px' }}>Flexible Plans for Every Scale</h1>
+      <h1 className="mb-4" style={{ color: '#12263A', fontSize: 'clamp(2.1rem, 5.5vw, 4rem)', fontWeight: '800', letterSpacing: '-1px' }}>Flexible WhatsApp Cloud API Pricing</h1>
       <p className="mx-auto" style={{ color: '#57534E', maxWidth: '650px', fontSize: '1.25rem', lineHeight: '1.6' }}>
-        No hidden fees, no complex setup. Connect your phone number & start sending campaigns instantly.
+        No hidden fees, no complex setup. Connect your WhatsApp Business number &amp; start sending automated campaigns instantly.
       </p>
     </div>
     
     {/* Floating Decorative Elements */}
-    <div className="position-absolute" style={{ top: '20%', left: '10%', zIndex: 2, animation: 'floatBob 5s ease-in-out infinite', opacity: 0.7 }}>
+    <div className="position-absolute hero-floating-badge d-none d-lg-block" style={{ top: '20%', left: '10%', zIndex: 2, animation: 'floatBob 5s ease-in-out infinite', opacity: 0.7 }}>
       <div style={{ width: '60px', height: '60px', background: '#fff', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(34,197,94,0.2)' }}>
         <i className="fab fa-whatsapp" style={{ fontSize: '30px', color: '#22C55E' }}></i>
       </div>
     </div>
-    <div className="position-absolute" style={{ top: '30%', right: '12%', zIndex: 2, animation: 'floatBob 7s ease-in-out infinite reverse', opacity: 0.7 }}>
+    <div className="position-absolute hero-floating-badge d-none d-lg-block" style={{ top: '30%', right: '12%', zIndex: 2, animation: 'floatBob 7s ease-in-out infinite reverse', opacity: 0.7 }}>
       <div style={{ width: '50px', height: '50px', background: '#12263A', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(18,38,58,0.2)' }}>
         <i className="fal fa-chart-line" style={{ fontSize: '20px', color: '#22C55E' }}></i>
       </div>
     </div>
-    <div className="position-absolute" style={{ bottom: '15%', left: '20%', zIndex: 2, animation: 'spinSlow 15s linear infinite', opacity: 0.1 }}>
+    <div className="position-absolute hero-floating-badge d-none d-lg-block" style={{ bottom: '15%', left: '20%', zIndex: 2, animation: 'spinSlow 15s linear infinite', opacity: 0.1 }}>
       <svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" stroke="#22C55E" strokeWidth="2" fill="none" strokeDasharray="10 5" /></svg>
     </div>
 
@@ -76,6 +77,79 @@ Price Area
       .price-card .available-list li::after {
         display: none !important;
       }
+      @media (max-width: 575px) {
+        .price-card {
+          padding: 28px 18px !important;
+        }
+      }
+
+      /* Responsive Pricing Switcher Styles */
+      .pricing-tabs-container {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: nowrap;
+      }
+      .pricing-tabs .switch-area {
+        display: inline-flex;
+        align-items: center;
+        background: #EDF5F3;
+        border-radius: 50px;
+        padding: 4px;
+        position: relative;
+        gap: 4px;
+      }
+      .pricing-tabs .toggler {
+        white-space: nowrap !important;
+        cursor: pointer;
+        border-radius: 50px !important;
+        font-weight: 700 !important;
+        font-size: 14px !important;
+        line-height: 1 !important;
+        padding: 12px 24px !important;
+        margin-bottom: 0 !important;
+        transition: all 0.25s ease !important;
+        background: transparent !important;
+        color: #12263A !important;
+        border: none !important;
+        box-shadow: none !important;
+        user-select: none;
+      }
+      .pricing-tabs .toggler:hover {
+        color: #22C55E !important;
+      }
+      .pricing-tabs .toggler.toggler--is-active {
+        background: #22C55E !important;
+        color: #ffffff !important;
+        box-shadow: none !important;
+      }
+      .pricing-save-badge {
+        background-color: #E8F0FE;
+        color: #456FF8;
+        border-radius: 6px;
+        padding: 7px 12px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        white-space: nowrap !important;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      @media (max-width: 575px) {
+        .pricing-tabs .switch-area {
+          padding: 3px;
+          gap: 2px;
+        }
+        .pricing-tabs .toggler {
+          font-size: 12px !important;
+          padding: 8px 14px !important;
+        }
+        .pricing-save-badge {
+          padding: 6px 8px !important;
+          font-size: 10px !important;
+        }
+      }
     `}</style>
     <div className="container">
       <div className="row justify-content-center">
@@ -89,22 +163,32 @@ Price Area
       </div>
       <div className="row justify-content-center mb-5">
         <div className="col-auto">
-          <div className="sec-btn d-flex align-items-center">
+          <div className="pricing-tabs-container d-flex align-items-center justify-content-center">
             <div className="pricing-tabs">
               <div className="switch-area">
-                <label className="toggler toggler--is-active ms-0 fw-bold" id="filt-monthly">MONTHLY BILLING</label>
-                <div className="toggle">
-                  <input type="checkbox" id="switcher" className="check" />
-                  <b className="b switch" />
-                </div>
-                <label className="toggler fw-bold" id="filt-yearly">YEARLY BILLING</label>
+                <button
+                  type="button"
+                  className={`toggler ${billingCycle === 'monthly' ? 'toggler--is-active' : ''} ms-0 fw-bold`}
+                  id="filt-monthly"
+                  onClick={() => setBillingCycle('monthly')}
+                >
+                  MONTHLY<span className="d-none d-sm-inline"> BILLING</span>
+                </button>
+                <button
+                  type="button"
+                  className={`toggler ${billingCycle === 'yearly' ? 'toggler--is-active' : ''} fw-bold`}
+                  id="filt-yearly"
+                  onClick={() => setBillingCycle('yearly')}
+                >
+                  YEARLY<span className="d-none d-sm-inline"> BILLING</span>
+                </button>
               </div>
             </div>
-            <span className="badge ms-3" style={{ backgroundColor: '#E8F0FE', color: '#456FF8', borderRadius: '4px', padding: '6px 10px', fontSize: '11px', letterSpacing: '0.5px' }}>SAVE 20%</span>
+            <span className="pricing-save-badge ms-2 ms-sm-3">SAVE 20%</span>
           </div>
         </div>
       </div>
-      <div id="monthly" className="wrapper-full">
+      <div id="monthly" className={`wrapper-full ${billingCycle === 'yearly' ? 'hide' : ''}`}>
         <div className="row gy-4 justify-content-center align-items-center">
 
           {/* Starter Plan */}
@@ -186,7 +270,7 @@ Price Area
 
         </div>
       </div>
-      <div id="yearly" className="wrapper-full hide">
+      <div id="yearly" className={`wrapper-full ${billingCycle === 'monthly' ? 'hide' : ''}`}>
         <div className="row gy-4 justify-content-center align-items-center">
 
           {/* Starter Plan */}
@@ -269,7 +353,7 @@ Price Area
         </div>
       </div>
     </div>
-  <div className="shape-mockup d-none d-xxl-block movingX" data-top="20%" data-right="10%"><img src="assets/img/shape/element-4.png" alt /></div>
+  <div className="shape-mockup d-none d-xxl-block movingX" data-top="20%" data-right="10%"><img src="assets/img/shape/element-4.png" alt="" /></div>
   </section>
   {/*==============================
 Cta Area  
@@ -289,7 +373,7 @@ Cta Area
               <p className="box-text text-white-50 mt-3 mx-auto" style={{ fontSize: '1.2rem', maxWidth: '600px' }}>Join thousands of companies already using our AI platform to drive innovation and growth.</p>
             </div>
             <div className="btn-group justify-content-center gap-3 mb-4 d-flex flex-wrap">
-              <a href="/contact" className="d-inline-flex align-items-center justify-content-center text-decoration-none" style={{ background: '#22C55E', color: '#fff', border: 'none', borderRadius: '50px', padding: '16px 40px', fontWeight: '800', boxShadow: '0 10px 20px rgba(34,197,94,0.3)', transition: 'all 0.3s ease' }} onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}>Start Free Trial <i className="fas fa-arrow-right ms-2" /></a>
+              <a href="/contact" className="d-inline-flex align-items-center justify-content-center text-decoration-none" style={{ background: '#22C55E', color: '#fff', border: 'none', borderRadius: '50px', padding: '16px 40px', fontWeight: '800', boxShadow: 'none', transition: 'all 0.3s ease' }} onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}>Start Free Trial <i className="fas fa-arrow-right ms-2" /></a>
               <a href="/contact" className="d-inline-flex align-items-center justify-content-center text-decoration-none" style={{ background: 'transparent', color: '#fff', border: '2px solid rgba(255,255,255,0.3)', borderRadius: '50px', padding: '14px 40px', fontWeight: '800', transition: 'all 0.3s ease' }} onMouseOver={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#12263A'; }} onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#fff'; }}>Schedule Demo <i className="fas fa-arrow-right ms-2" /></a>
             </div>
             <ul className="cta-list d-flex justify-content-center flex-wrap gap-4 list-unstyled mb-0 text-white" style={{ fontSize: '0.95rem' }}>
@@ -347,7 +431,7 @@ Contact Area
                 </div>
                 <div className="form-btn col-12">
                   <p className="box-text">By sending this form I confirm that I have read and accept the&nbsp;Privacy Policy</p>
-                  <button className="d-inline-flex align-items-center justify-content-center text-decoration-none" style={{ background: '#22C55E', color: '#fff', border: 'none', borderRadius: '50px', padding: '16px 40px', fontWeight: '800', transition: 'all 0.3s ease', boxShadow: '0 10px 20px rgba(34,197,94,0.2)' }} onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 20px rgba(34,197,94,0.3)'; }} onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 20px rgba(34,197,94,0.2)'; }}>Send Message <i className="fas fa-arrow-right ms-2" /></button>
+                  <button className="d-inline-flex align-items-center justify-content-center text-decoration-none" style={{ background: '#22C55E', color: '#fff', border: 'none', borderRadius: '50px', padding: '16px 40px', fontWeight: '800', transition: 'all 0.3s ease', boxShadow: 'none' }} onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}>Send Message <i className="fas fa-arrow-right ms-2" /></button>
                 </div>
               </div>
               <p className="form-messages mb-0 mt-3" />

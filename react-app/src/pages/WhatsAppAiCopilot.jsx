@@ -130,16 +130,18 @@ const WhatsAppAiCopilot = () => {
       <div className="row align-items-center gy-5">
         
         {/* Left Column: Text & Features */}
-        <div className="col-lg-5 pe-lg-5">
-          <div style={{ display: 'inline-block', padding: '6px 16px', background: '#F0FDF4', color: '#166534', borderRadius: '30px', fontWeight: '800', fontSize: '11px', letterSpacing: '1px', marginBottom: '20px', border: '1px solid rgba(34,197,94,0.2)' }}>GROWTH TOOLS</div>
-          <h2 className="mb-4" style={{ color: '#12263A', fontWeight: '800', fontSize: '2.75rem', lineHeight: '1.2' }}>Why High-Growth Teams Use This Tool</h2>
-          <p className="mb-5" style={{ color: '#57534E', fontSize: '1.1rem', lineHeight: '1.7' }}>
+        <div className="col-lg-5 pe-lg-5 text-center text-lg-start">
+          <div className="d-flex justify-content-center justify-content-lg-start mb-3">
+            <div style={{ display: 'inline-block', padding: '6px 16px', background: '#F0FDF4', color: '#166534', borderRadius: '30px', fontWeight: '800', fontSize: '11px', letterSpacing: '1px', border: '1px solid rgba(34,197,94,0.2)' }}>GROWTH TOOLS</div>
+          </div>
+          <h2 className="mb-4" style={{ color: '#12263A', fontWeight: '800', fontSize: 'clamp(2rem, 5vw, 2.75rem)', lineHeight: '1.2' }}>Why High-Growth Teams Use This Tool</h2>
+          <p className="mb-5 mx-auto ms-lg-0" style={{ color: '#57534E', fontSize: '1.1rem', lineHeight: '1.7', maxWidth: '580px' }}>
             Scale your customer support without adding heads. Deploy AI copilot agents trained on your business profiles, service listings, and FAQs. Draft responses to common customer questions instantly, schedule bookings, and auto-reply to Google Business reviews to boost SEO.
           </p>
 
-          <div className="d-flex flex-column gap-4">
+          <div className="d-flex flex-column gap-4 align-items-center align-items-lg-stretch">
             {/* Feature 1 */}
-            <div className="d-flex align-items-start gap-3">
+            <div className="d-flex flex-column flex-sm-row align-items-center align-items-sm-start text-center text-sm-start gap-3 w-100" style={{ maxWidth: '480px' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fff', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 10px 20px rgba(34,197,94,0.1)' }}>
                 <i className="fal fa-clock fs-5"></i>
               </div>
@@ -150,7 +152,7 @@ const WhatsAppAiCopilot = () => {
             </div>
             
             {/* Feature 2 */}
-            <div className="d-flex align-items-start gap-3">
+            <div className="d-flex flex-column flex-sm-row align-items-center align-items-sm-start text-center text-sm-start gap-3 w-100" style={{ maxWidth: '480px' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fff', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 10px 20px rgba(34,197,94,0.1)' }}>
                 <i className="fal fa-brain fs-5"></i>
               </div>
@@ -161,7 +163,7 @@ const WhatsAppAiCopilot = () => {
             </div>
 
             {/* Feature 3 */}
-            <div className="d-flex align-items-start gap-3">
+            <div className="d-flex flex-column flex-sm-row align-items-center align-items-sm-start text-center text-sm-start gap-3 w-100" style={{ maxWidth: '480px' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fff', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 10px 20px rgba(34,197,94,0.1)' }}>
                 <i className="fal fa-user-headset fs-5"></i>
               </div>
@@ -231,13 +233,13 @@ const WhatsAppAiCopilot = () => {
                       <button className="btn btn-sm" style={{ background: '#fff', color: '#166534', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '8px', padding: '8px 16px', fontWeight: '700', fontSize: '0.85rem', transition: 'all 0.3s ease' }} onMouseOver={(e) => { e.currentTarget.style.background='#F0FDF4'; }} onMouseOut={(e) => { e.currentTarget.style.background='#fff'; }}>
                         <i className="fal fa-pen me-1"></i> Edit
                       </button>
-                      <button className="btn btn-sm" style={{ background: '#22C55E', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 20px', fontWeight: '800', fontSize: '0.85rem', boxShadow: '0 5px 15px rgba(34,197,94,0.3)', transition: 'all 0.3s ease' }} onMouseOver={(e) => { e.currentTarget.style.transform='translateY(-2px)'; }} onMouseOut={(e) => { e.currentTarget.style.transform='translateY(0)'; }}>
+                      <button className="btn btn-sm" style={{ background: '#22C55E', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 20px', fontWeight: '800', fontSize: '0.85rem', boxShadow: 'none', transition: 'all 0.3s ease' }} onMouseOver={(e) => { e.currentTarget.style.transform='translateY(-2px)'; }} onMouseOut={(e) => { e.currentTarget.style.transform='translateY(0)'; }}>
                         <i className="fas fa-paper-plane me-1"></i> Send
                       </button>
                    </div>
                  </div>
               </div>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #22C55E, #166534)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 5px 15px rgba(34,197,94,0.3)' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #22C55E, #166534)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                  <i className="fas fa-robot text-white fs-6"></i>
               </div>
             </div>
@@ -261,9 +263,9 @@ const WhatsAppAiCopilot = () => {
       </p>
       
       <div className="d-flex justify-content-center gap-4 flex-wrap">
-        <a href="/contact" className="th-btn2" style={{ background: '#22C55E', color: '#fff', border: 'none', padding: '16px 40px', fontWeight: '800', borderRadius: '50px', transition: 'all 0.3s ease' }}
-           onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 20px rgba(34,197,94,0.2)'; }}
-           onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
+        <a href="/contact" className="th-btn2" style={{ background: '#22C55E', color: '#fff', border: 'none', padding: '16px 40px', fontWeight: '800', borderRadius: '50px', transition: 'all 0.3s ease', boxShadow: 'none' }}
+           onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; }}
+           onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}>
            START FREE TRIAL <i className="fal fa-arrow-right ms-2"></i>
         </a>
         <a href="/contact" className="th-btn2" style={{ background: '#fff', color: '#12263A', border: '1px solid #E2E8F0', padding: '16px 40px', fontWeight: '700', borderRadius: '50px', transition: 'all 0.3s ease' }}

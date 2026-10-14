@@ -22,7 +22,7 @@ When creating new pages or components for the Talkinexx project, strictly adhere
 - **Primary Buttons**: 
   - Background: `#22C55E`
   - Text Color: `#fff`
-  - Hover State: Add `transform: translateY(-3px)` and a subtle matching colored shadow `boxShadow: 0 10px 20px rgba(34,197,94,0.2)`.
+  - Hover State: Add `transform: translateY(-3px)`. Do NOT add any glow effect or colored drop shadow (use `box-shadow: none`).
 - **Secondary (Outline) Buttons**:
   - Background: `#fff`
   - Text Color: `#12263A`

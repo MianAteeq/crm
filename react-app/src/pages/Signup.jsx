@@ -64,13 +64,23 @@ const Signup = () => {
 
     return (
         <Layout>
+            <style>{`
+                @media (max-width: 575px) {
+                    .login-card {
+                        padding: 35px 20px !important;
+                    }
+                    .login-section {
+                        padding: 90px 0 50px 0 !important;
+                    }
+                }
+            `}</style>
             <section className="login-section d-flex align-items-center justify-content-center" style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #F0FDF4 0%, #E8F0FE 100%)', padding: '120px 0' }}>
                 <div className="container">
                     <div className="row justify-content-center">
                         <div className="col-lg-6 col-md-8 col-sm-10">
                             
                             <div className="text-center mb-5">
-                                <h1 style={{ color: '#12263A', fontWeight: '800', fontSize: '3rem', letterSpacing: '-1px' }}>Join the future</h1>
+                                <h1 style={{ color: '#12263A', fontWeight: '800', fontSize: 'clamp(2rem, 5vw, 3rem)', letterSpacing: '-1px' }}>Join the future</h1>
                                 <p style={{ color: '#64748B', fontWeight: '700', fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', marginTop: '10px' }}>
                                     Launch your whatsapp engine in minutes
                                 </p>
@@ -79,8 +89,8 @@ const Signup = () => {
                             <div className="login-card position-relative" style={{ background: '#fff', borderRadius: '24px', padding: '50px 40px', boxShadow: '0 25px 50px rgba(18, 38, 58, 0.08)' }}>
                                 
                                 {/* Top overlapping pill */}
-                                <div className="position-absolute top-0 start-50 translate-middle" style={{ zIndex: 1 }}>
-                                    <span className="d-inline-block fw-bold" style={{ background: '#22C55E', color: '#fff', padding: '8px 24px', borderRadius: '30px', fontSize: '10px', letterSpacing: '1px', textTransform: 'uppercase', boxShadow: '0 10px 20px rgba(34,197,94,0.3)' }}>
+                                <div className="position-absolute top-0 start-50 translate-middle text-center" style={{ zIndex: 1, width: 'max-content', maxWidth: '90%' }}>
+                                    <span className="d-inline-block fw-bold text-center" style={{ background: '#22C55E', color: '#fff', padding: '10px 30px', borderRadius: '30px', fontSize: '11px', letterSpacing: '1px', textTransform: 'uppercase', boxShadow: 'none', whiteSpace: 'nowrap', display: 'inline-block' }}>
                                         Create Free Account
                                     </span>
                                 </div>
@@ -150,11 +160,11 @@ const Signup = () => {
 
                                     <div className="text-center mb-4">
                                         <p style={{ fontSize: '11px', color: '#64748B', fontWeight: '500' }}>
-                                            By creating an account, you agree to our <a href="#" style={{ color: '#22C55E', fontWeight: '700', textDecoration: 'none' }}>Terms</a> and <a href="#" style={{ color: '#22C55E', fontWeight: '700', textDecoration: 'none' }}>Privacy Policy</a>.
+                                            By creating an account, you agree to our <a href="/terms" style={{ color: '#22C55E', fontWeight: '700', textDecoration: 'none' }}>Terms</a> and <a href="/privacy" style={{ color: '#22C55E', fontWeight: '700', textDecoration: 'none' }}>Privacy Policy</a>.
                                         </p>
                                     </div>
 
-                                    <button type="submit" disabled={loading} className="w-100 d-inline-flex align-items-center justify-content-center text-decoration-none" style={{ background: '#22C55E', color: '#fff', border: 'none', borderRadius: '50px', padding: '18px 40px', fontWeight: '800', transition: 'all 0.3s ease', boxShadow: '0 10px 20px rgba(34,197,94,0.3)', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '13px' }} onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}>
+                                    <button type="submit" disabled={loading} className="w-100 d-inline-flex align-items-center justify-content-center text-decoration-none" style={{ background: '#22C55E', color: '#fff', border: 'none', borderRadius: '50px', padding: '18px 40px', fontWeight: '800', transition: 'all 0.3s ease', boxShadow: 'none', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '13px' }} onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; }} onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}>
                                         {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'} <i className="fa-solid fa-arrow-right ms-2" />
                                     </button>
                                 </form>

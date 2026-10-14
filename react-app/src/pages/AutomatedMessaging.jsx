@@ -103,16 +103,18 @@ const AutomatedMessaging = () => {
       <div className="row align-items-center gy-5">
         
         {/* Left Column: Text & Features */}
-        <div className="col-lg-5 pe-lg-5">
-          <div style={{ display: 'inline-block', padding: '6px 16px', background: '#F0FDF4', color: '#166534', borderRadius: '30px', fontWeight: '800', fontSize: '11px', letterSpacing: '1px', marginBottom: '20px', border: '1px solid rgba(34,197,94,0.2)' }}>AUTOMATION TOOLS</div>
-          <h2 className="mb-4" style={{ color: '#12263A', fontWeight: '800', fontSize: '2.75rem', lineHeight: '1.2' }}>Why High-Growth Teams Use This Tool</h2>
-          <p className="mb-5" style={{ color: '#57534E', fontSize: '1.1rem', lineHeight: '1.7' }}>
+        <div className="col-lg-5 pe-lg-5 text-center text-lg-start">
+          <div className="d-flex justify-content-center justify-content-lg-start mb-3">
+            <div style={{ display: 'inline-block', padding: '6px 16px', background: '#F0FDF4', color: '#166534', borderRadius: '30px', fontWeight: '800', fontSize: '11px', letterSpacing: '1px', border: '1px solid rgba(34,197,94,0.2)' }}>AUTOMATION TOOLS</div>
+          </div>
+          <h2 className="mb-4" style={{ color: '#12263A', fontWeight: '800', fontSize: 'clamp(2rem, 5vw, 2.75rem)', lineHeight: '1.2' }}>Why High-Growth Teams Use This Tool</h2>
+          <p className="mb-5 mx-auto ms-lg-0" style={{ color: '#57534E', fontSize: '1.1rem', lineHeight: '1.7', maxWidth: '580px' }}>
             Deliver the perfect message at the perfect time without lifting a finger. Automatically send personalized birthday wishes with unique discounts, or trigger reminders (like filler touch-ups or subscription renewals) exactly when your client is ready to purchase again.
           </p>
 
-          <div className="d-flex flex-column gap-4">
+          <div className="d-flex flex-column gap-4 align-items-center align-items-lg-stretch">
             {/* Feature 1 */}
-            <div className="d-flex align-items-start gap-3">
+            <div className="d-flex flex-column flex-sm-row align-items-center align-items-sm-start text-center text-sm-start gap-3 w-100" style={{ maxWidth: '480px' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fff', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 10px 20px rgba(34,197,94,0.1)' }}>
                 <i className="fal fa-check-circle fs-5"></i>
               </div>
@@ -123,7 +125,7 @@ const AutomatedMessaging = () => {
             </div>
             
             {/* Feature 2 */}
-            <div className="d-flex align-items-start gap-3">
+            <div className="d-flex flex-column flex-sm-row align-items-center align-items-sm-start text-center text-sm-start gap-3 w-100" style={{ maxWidth: '480px' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fff', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 10px 20px rgba(34,197,94,0.1)' }}>
                 <i className="fal fa-shield-check fs-5"></i>
               </div>
@@ -134,7 +136,7 @@ const AutomatedMessaging = () => {
             </div>
 
             {/* Feature 3 */}
-            <div className="d-flex align-items-start gap-3">
+            <div className="d-flex flex-column flex-sm-row align-items-center align-items-sm-start text-center text-sm-start gap-3 w-100" style={{ maxWidth: '480px' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fff', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 10px 20px rgba(34,197,94,0.1)' }}>
                 <i className="fal fa-sync fs-5"></i>
               </div>

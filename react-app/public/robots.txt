@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /error
+
+# Host
+Host: https://talkinexx.com
+
+# Sitemaps
+Sitemap: https://talkinexx.com/sitemap.xml

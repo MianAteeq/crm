@@ -1,63 +1,46 @@
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Typography from './pages/Typography';
-import Testimonial from './pages/Testimonial';
-import Team from './pages/Team';
-import TeamDetails from './pages/TeamDetails';
-import Pricing from './pages/Pricing';
-import Integrations from './pages/Integrations';
-import Home from './pages/Home';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomeAiChatbot from './pages/HomeAiChatbot';
-import Features from './pages/Features';
-import Faq from './pages/Faq';
-import Error from './pages/Error';
-import Contact from './pages/Contact';
-import Cases from './pages/Cases';
-import CaseStudies from './pages/CaseStudies';
-import CaseStudiesDetails from './pages/CaseStudiesDetails';
-import CaseStudies2 from './pages/CaseStudies2';
-import Blog from './pages/Blog';
-import BlogDetails from './pages/BlogDetails';
-import About from './pages/About';
+import Pricing from './pages/Pricing';
 import WhatsappCampaigns from './pages/WhatsappCampaigns';
 import AutomatedMessaging from './pages/AutomatedMessaging';
 import WhatsAppAiCopilot from './pages/WhatsAppAiCopilot';
 import ContactListRetargeting from './pages/ContactListRetargeting';
 import WhatsAppAnalytics from './pages/WhatsAppAnalytics';
+import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import SEO from './components/SEO';
 
 function App() {
   return (
     <Router>
+      <SEO />
       <Routes>
-        <Route path="/typography" element={<Typography />} />
-        <Route path="/testimonial" element={<Testimonial />} />
-        <Route path="/team" element={<Team />} />
-        <Route path="/team-details" element={<TeamDetails />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/integrations" element={<Integrations />} />
-        <Route path="/home-1" element={<Home />} />
+        {/* Core Pages */}
         <Route path="/" element={<HomeAiChatbot />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+
+        {/* Services & Automation Solutions */}
         <Route path="/whatsapp-campaigns" element={<WhatsappCampaigns />} />
         <Route path="/automated-messaging" element={<AutomatedMessaging />} />
         <Route path="/whatsapp-ai-copilot" element={<WhatsAppAiCopilot />} />
         <Route path="/contact-list-retargeting" element={<ContactListRetargeting />} />
         <Route path="/whatsapp-analytics" element={<WhatsAppAnalytics />} />
-        <Route path="/features" element={<Features />} />
-        <Route path="/faq" element={<Faq />} />
-        <Route path="/error" element={<Error />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/cases" element={<Cases />} />
-        <Route path="/case-studies" element={<CaseStudies />} />
-        <Route path="/case-studies-details" element={<CaseStudiesDetails />} />
-        <Route path="/case-studies-2" element={<CaseStudies2 />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog-details" element={<BlogDetails />} />
-        <Route path="/about" element={<About />} />
+
+        {/* Legal & Compliance */}
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/terms-and-conditions" element={<Terms />} />
+
+        {/* Fallback Catch-All */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
