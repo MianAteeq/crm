@@ -24,6 +24,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { useBrandingStore } from '../../store/brandingStore';
 import { crmApi } from '../../services/crmApi';
+import logoImg from '../../assets/logo-2.png';
 
 const signupSchema = z.object({
   name: z.string().trim().min(2, 'Full name must be at least 2 characters'),
@@ -129,22 +130,12 @@ export default function SignupPage() {
 
         {/* Top: Logo Link */}
         <div className="relative z-10">
-          <Link to="/" className="inline-flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22C55E] rounded-xl p-1">
-            {websiteLogo ? (
-              <img 
-                src={websiteLogo} 
-                alt={websiteName || 'Talkinexx'} 
-                className="h-9 w-auto max-w-[160px] object-contain rounded-xl transition-transform duration-300 group-hover:scale-105" 
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#166534] to-[#22C55E] flex items-center justify-center shadow-lg shadow-[#166534]/30">
-                <Sparkles size={20} className="text-white" />
-              </div>
-            )}
-            <div>
-              <span className="text-xl font-black tracking-tight text-white leading-none block">{websiteName || 'Talkinexx'}</span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#22C55E]">Conversational CRM</span>
-            </div>
+          <Link to="/" className="inline-flex items-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22C55E] rounded-xl p-1">
+            <img 
+              src={websiteLogo || logoImg} 
+              alt={websiteName || 'Talkinexx'} 
+              className="h-10 md:h-11 w-auto max-w-[220px] object-contain shrink-0 transition-transform duration-300 group-hover:scale-105" 
+            />
           </Link>
         </div>
 

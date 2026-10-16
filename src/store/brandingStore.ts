@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { crmApi } from '../services/crmApi';
 import defaultLogo from '../assets/logo-2.png';
+import defaultFavicon from '../assets/fav-icon.png';
 
 export interface IntegrationLogoItem {
   id: string | number;
@@ -38,7 +39,7 @@ export const useBrandingStore = create<BrandingState>((set) => ({
   websiteName: 'Talkinexx',
   websiteTitle: 'Talkinexx - Conversational CRM & Marketing Platform',
   websiteLogo: defaultLogo,
-  websiteFavicon: null,
+  websiteFavicon: defaultFavicon,
   integrationTitle: DEFAULT_INTEGRATION_TITLE,
   integrationLogos: DEFAULT_INTEGRATION_LOGOS,
 
@@ -62,7 +63,7 @@ export const useBrandingStore = create<BrandingState>((set) => ({
           websiteName: data.website_name || 'Talkinexx',
           websiteTitle: data.website_title || 'Talkinexx - Conversational CRM & Marketing Platform',
           websiteLogo: data.website_logo || defaultLogo,
-          websiteFavicon: data.website_favicon || null,
+          websiteFavicon: data.website_favicon || defaultFavicon,
           integrationTitle: data.integration_title || DEFAULT_INTEGRATION_TITLE,
           integrationLogos: (Array.isArray(parsedLogos) && parsedLogos.length > 0) ? parsedLogos : DEFAULT_INTEGRATION_LOGOS,
         });
@@ -79,7 +80,8 @@ export const useBrandingStore = create<BrandingState>((set) => ({
           faviconLink.rel = 'icon';
           document.getElementsByTagName('head')[0].appendChild(faviconLink);
         }
-        faviconLink.href = data.website_favicon || '/favicon.ico';
+        faviconLink.type = 'image/png';
+        faviconLink.href = data.website_favicon || defaultFavicon;
       }
     } catch (error) {
       console.warn('Failed to load branding settings, using defaults.', error);

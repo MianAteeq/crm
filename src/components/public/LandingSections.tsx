@@ -35,7 +35,17 @@ import {
   PhoneCall,
   MousePointerClick,
   BellRing,
-  ChevronDown
+  ChevronDown,
+  CheckCheck,
+  Paperclip,
+  Smile,
+  Mic,
+  MoreVertical,
+  Activity,
+  Flame,
+  Radio,
+  Video,
+  Phone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { NavLink } from 'react-router-dom';
@@ -618,23 +628,24 @@ export function AIWorkflow() {
           {steps.map((s, idx) => {
             const Icon = s.icon;
             return (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-              className="flex flex-col items-center group bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md hover:border-purple-500/30 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className="w-14 h-14 bg-purple-500/10 border border-purple-500/30 text-purple-400 rounded-xl flex items-center justify-center shadow-inner group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 transition-all duration-300 relative">
-                <Icon size={24} strokeWidth={2} />
-                {/* Pulse dot (kept Emerald for WhatsApp vibe) */}
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
-              </div>
-              <h3 className="font-display font-[700] text-[16px] text-white mt-6 mb-2 tracking-tight text-center group-hover:text-purple-300 transition-colors">{s.title}</h3>
-              <p className="text-xs text-slate-400 leading-relaxed font-normal text-center">{s.desc}</p>
-            </motion.div>
-          )})}
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                className="flex flex-col items-center group bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md hover:border-purple-500/30 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1"
+              >
+                <div className="w-14 h-14 bg-purple-500/10 border border-purple-500/30 text-purple-400 rounded-xl flex items-center justify-center shadow-inner group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 transition-all duration-300 relative">
+                  <Icon size={24} strokeWidth={2} />
+                  {/* Pulse dot (kept Emerald for WhatsApp vibe) */}
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
+                </div>
+                <h3 className="font-display font-[700] text-[16px] text-white mt-6 mb-2 tracking-tight text-center group-hover:text-purple-300 transition-colors">{s.title}</h3>
+                <p className="text-xs text-slate-400 leading-relaxed font-normal text-center">{s.desc}</p>
+              </motion.div>
+            )
+          })}
         </div>
       </div>
     </section>
@@ -1171,8 +1182,8 @@ export function Testimonials() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
           {reviews.map((r, idx) => (
-            <motion.div 
-              key={r.author} 
+            <motion.div
+              key={r.author}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -1181,7 +1192,7 @@ export function Testimonials() {
             >
               {/* Subtle background gradient on hover */}
               <div className={`absolute inset-0 bg-gradient-to-br ${r.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-              
+
               {/* Massive decorative quote mark */}
               <div className="absolute -top-6 -left-6 text-slate-50 opacity-100 group-hover:text-indigo-50/80 transition-colors duration-500 pointer-events-none">
                 <svg width="180" height="180" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -1243,29 +1254,29 @@ export function Pricing() {
   }, []);
 
   const defaultPlans = [
-    { 
-      name: 'Starter', 
-      price: 0, 
+    {
+      name: 'Starter',
+      price: 0,
       desc: 'Perfect for small businesses starting out.',
-      features: ['1 WhatsApp Number', '100 AI Auto-Replies / mo', 'Basic WhatsApp Broadcasts', 'Standard Team Inbox'], 
-      highlighted: false, 
-      key: 'free' 
+      features: ['1 WhatsApp Number', '100 AI Auto-Replies / mo', 'Basic WhatsApp Broadcasts', 'Standard Team Inbox'],
+      highlighted: false,
+      key: 'free'
     },
-    { 
-      name: 'Business', 
-      price: 49, 
+    {
+      name: 'Business',
+      price: 49,
       desc: 'For high-growth teams scaling their reach.',
-      features: ['Official WhatsApp API', 'Unlimited AI Copilot Replies', 'Advanced Sequence Flows', 'Full CRM & Store Sync'], 
-      highlighted: true, 
-      key: 'pro' 
+      features: ['Official WhatsApp API', 'Unlimited AI Copilot Replies', 'Advanced Sequence Flows', 'Full CRM & Store Sync'],
+      highlighted: true,
+      key: 'pro'
     },
-    { 
-      name: 'Enterprise', 
-      price: 'Custom', 
+    {
+      name: 'Enterprise',
+      price: 'Custom',
       desc: 'Custom workflows and dedicated support.',
-      features: ['Unlimited WhatsApp Numbers', 'Meta Green Tick Assistance', 'Custom Interactive Flows', 'Dedicated Success Manager'], 
-      highlighted: false, 
-      key: 'enterprise' 
+      features: ['Unlimited WhatsApp Numbers', 'Meta Green Tick Assistance', 'Custom Interactive Flows', 'Dedicated Success Manager'],
+      highlighted: false,
+      key: 'enterprise'
     }
   ];
 
@@ -1340,7 +1351,7 @@ export function Pricing() {
                 ? "bg-white text-slate-900 border-2 border-[#166534] shadow-[0_20px_60px_rgba(22,101,52,0.12)] md:-translate-y-4 z-10"
                 : "bg-white text-slate-900 border border-slate-200/80 hover:border-[#bbf7d0] hover:shadow-xl hover:shadow-indigo-900/5 hover:-translate-y-2"
             )}>
-              
+
               {plan.highlighted && (
                 <div className="absolute top-6 right-6 bg-[#F0FDF4] text-[#166534] border border-[#bbf7d0] text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
                   <Sparkles size={12} className="text-[#166534]" /> Most Popular
@@ -1349,7 +1360,7 @@ export function Pricing() {
 
               <h3 className={cn("text-sm font-black uppercase tracking-[0.2em] mb-2", plan.highlighted ? "text-[#166534]" : "text-slate-500")}>{plan.name}</h3>
               <p className="text-slate-500 text-xs font-medium mb-6 min-h-[32px]">{plan.desc}</p>
-              
+
               <div className="flex items-baseline gap-2 mb-2">
                 <span className="text-5xl font-black tracking-tight text-slate-900">{getPriceLabel(plan)}</span>
                 {plan.price !== 'Custom' && <span className="text-sm font-medium text-slate-400">/mo</span>}
@@ -1369,7 +1380,7 @@ export function Pricing() {
                   </div>
                 ))}
               </div>
-              
+
               <NavLink
                 to={`/signup?plan=${plan.key}`}
                 className={cn(
@@ -1426,7 +1437,7 @@ export function FAQ() {
       <div className="absolute bottom-20 left-20 w-72 h-72 bg-indigo-200/50 rounded-full blur-[80px] pointer-events-none z-0" />
 
       <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-        
+
         {/* Left Content Area */}
         <div className="lg:col-span-5 space-y-8 sticky top-24">
           <div className="space-y-4">
@@ -1465,8 +1476,8 @@ export function FAQ() {
                 key={idx}
                 className={cn(
                   "border rounded-2xl overflow-hidden transition-all duration-300",
-                  isOpen 
-                    ? "bg-white border-[#bbf7d0] shadow-lg shadow-indigo-900/5" 
+                  isOpen
+                    ? "bg-white border-[#bbf7d0] shadow-lg shadow-indigo-900/5"
                     : "bg-white/60 border-slate-200/80 hover:bg-white hover:border-slate-300"
                 )}
               >
@@ -1812,7 +1823,7 @@ export function WhatsAppAutomation() {
 
       {/* ========== STATISTICS STRIP ========== */}
       <section className="py-20 px-6 bg-white relative overflow-hidden">
-        
+
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="bg-[#12263A] border border-slate-800/60 shadow-[0_20px_60px_rgba(0,0,0,0.15)] rounded-[2.5rem] p-10 md:p-14 relative overflow-hidden group">
             {/* Animated Background Glows */}

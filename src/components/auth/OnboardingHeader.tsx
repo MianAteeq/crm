@@ -4,13 +4,15 @@ import { Sparkles, LogOut, ShieldCheck, Mail } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useBrandingStore } from '../../store/brandingStore';
 
+import darkLogoImg from '../../assets/logo.png';
+
 interface OnboardingHeaderProps {
   showLogout?: boolean;
 }
 
 export default function OnboardingHeader({ showLogout = true }: OnboardingHeaderProps) {
   const { user, logout } = useAuthStore();
-  const { websiteName, websiteLogo } = useBrandingStore();
+  const { websiteName } = useBrandingStore();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -23,26 +25,12 @@ export default function OnboardingHeader({ showLogout = true }: OnboardingHeader
       <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         
         {/* Brand Logo & Platform Title */}
-        <Link to="/" className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] rounded-xl p-1">
-          {websiteLogo ? (
-            <img 
-              src={websiteLogo} 
-              alt={websiteName || 'Talkinexx'} 
-              className="h-8 w-auto max-w-[160px] object-contain rounded-lg shrink-0 transition-transform duration-300 group-hover:scale-105" 
-            />
-          ) : (
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#166534] to-[#22C55E] flex items-center justify-center shadow-sm shadow-[#166534]/20">
-              <Sparkles size={16} className="text-white" />
-            </div>
-          )}
-          <div className="flex flex-col">
-            <span className="text-base font-black tracking-tight text-[#12263A] leading-none">
-              {websiteName || 'Talkinexx'}
-            </span>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-[#166534] mt-0.5">
-              Onboarding Setup
-            </span>
-          </div>
+        <Link to="/" className="flex items-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] rounded-xl p-1">
+          <img 
+            src={darkLogoImg} 
+            alt={websiteName || 'Talkinexx'} 
+            className="h-8 md:h-9 w-auto max-w-[180px] object-contain shrink-0 transition-transform duration-300 group-hover:scale-105" 
+          />
         </Link>
 
         {/* User Context & Sign Out */}

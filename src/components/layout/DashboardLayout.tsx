@@ -40,6 +40,8 @@ import {
 import { cn } from '@/src/lib/utils';
 import { useAuthStore } from '../../store/authStore';
 import { useBrandingStore } from '../../store/brandingStore';
+import darkLogoImg from '../../assets/logo.png';
+import favIconImg from '../../assets/fav-icon.png';
 import { motion, AnimatePresence } from 'motion/react';
 import { crmApi } from '../../services/crmApi';
 import { whatsappApi } from '../../services/whatsappApi';
@@ -94,7 +96,7 @@ export function Sidebar({
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, user, updateProfile } = useAuthStore();
-  const { websiteName, websiteLogo } = useBrandingStore();
+  const { websiteName, websiteLogo, websiteFavicon } = useBrandingStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const isItemActive = (isActive: boolean, itemPath: string) => {
@@ -304,19 +306,19 @@ export function Sidebar({
 
         {/* 1. Logo Section */}
         <div className={cn("transition-all duration-300", isCollapsed ? "p-4 flex justify-center" : "px-6 pt-5 pb-3")}>
-          <div className={cn("flex items-center gap-3 cursor-pointer", isCollapsed ? "justify-center" : "")} onClick={() => navigate('/dashboard')}>
-            {websiteLogo ? (
-              <img src={websiteLogo} alt="Logo" className="w-9 h-9 object-contain rounded-xl shrink-0" />
+          <div className={cn("flex items-center cursor-pointer", isCollapsed ? "justify-center" : "")} onClick={() => navigate('/dashboard')}>
+            {isCollapsed ? (
+              <img
+                src={favIconImg}
+                alt="Logo"
+                className="w-8 h-8 object-contain rounded-xl shrink-0 hover:scale-105 transition-transform"
+              />
             ) : (
-              <div className="w-9 h-9 bg-gradient-to-br from-[#12263A] to-[#166534] text-white rounded-xl flex items-center justify-center shadow-sm shadow-[#12263A]/30 shrink-0">
-                <Cpu size={18} />
-              </div>
-            )}
-            {!isCollapsed && (
-              <div className="flex flex-col select-none max-w-[150px]">
-                <span className="text-base font-bold text-[#12263A] tracking-tight leading-none truncate">{websiteName}</span>
-                <span className="text-[11px] font-medium text-[#57534E] mt-0.5">Conversational CRM</span>
-              </div>
+              <img
+                src={darkLogoImg}
+                alt={websiteName || "Talkinexx"}
+                className="h-8 md:h-9 w-auto max-w-[190px] object-contain shrink-0 hover:opacity-90 transition-opacity"
+              />
             )}
           </div>
         </div>
