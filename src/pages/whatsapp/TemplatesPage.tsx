@@ -279,7 +279,7 @@ export default function TemplatesPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-20 px-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-               <span className="px-3 py-1 bg-indigo-500/10 text-indigo-500 text-[10px] font-black uppercase tracking-[0.2em] rounded-full border border-indigo-500/20">Resource Management</span>
+               <span className="px-3 py-1 bg-[#F0FDF4] text-[#166534] text-[10px] font-black uppercase tracking-[0.2em] rounded-full border border-[#bbf7d0]">Resource Management</span>
             </div>
             <h1 className="text-6xl font-black text-slate-950 tracking-tighter leading-none mb-4">Template Lab</h1>
             <p className="text-sm font-bold text-slate-400 uppercase tracking-[0.3em]">Configure Strategic Messaging Assets</p>
@@ -294,7 +294,7 @@ export default function TemplatesPage() {
                  isSyncing && "opacity-50 cursor-not-allowed"
                )}
              >
-               <RefreshCw size={16} className={cn("text-indigo-500", isSyncing && "animate-spin")} />
+               <RefreshCw size={16} className={cn("text-[#166534]", isSyncing && "animate-spin")} />
                {isSyncing ? 'Synchronizing Cluster...' : 'Sync from Meta'}
              </button>
              <button 
@@ -353,7 +353,7 @@ export default function TemplatesPage() {
                exit={{ opacity: 0, y: -10 }}
                className="px-8 flex items-center justify-center min-h-[400px] flex-col gap-4 text-center"
             >
-               <div className="w-20 h-20 bg-indigo-50 text-indigo-500 rounded-[2.5rem] flex items-center justify-center mb-4">
+               <div className="w-20 h-20 bg-[#F0FDF4] text-[#166534] rounded-[2.5rem] flex items-center justify-center mb-4">
                   <Tag size={32} strokeWidth={2.5} />
                </div>
                <h3 className="text-2xl font-black text-slate-950 tracking-tighter uppercase">Category Clustering</h3>
@@ -891,7 +891,7 @@ export default function TemplatesPage() {
                 <div className="flex-1 flex flex-col h-full bg-[#f8fafc] overflow-hidden relative">
                   {/* Subtle Background Elements */}
                   <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/4 pointer-events-none" />
-                  <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-500/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/4 pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#F0FDF4]0/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/4 pointer-events-none" />
 
                   {/* Header Bar */}
                   <div className="px-8 py-6 flex items-center justify-between shrink-0 z-20">

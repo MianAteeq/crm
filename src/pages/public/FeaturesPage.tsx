@@ -133,7 +133,7 @@ export default function FeaturesPage() {
               From WhatsApp Business API to AI Automation, CRM, Marketing Automation, Landing Pages, Analytics, and Social Media Management — everything is available in one intelligent platform.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              <NavLink to="/signup" className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-sm tracking-wide rounded-xl hover:scale-[1.02] transition-all text-center">
+              <NavLink to="/signup" className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-bold text-sm tracking-wide rounded-xl hover:scale-[1.02] transition-all text-center">
                 Start Free Trial
               </NavLink>
               <NavLink to="/contact" className="w-full sm:w-auto px-8 py-3.5 bg-white/10 border border-white/20 text-white font-bold text-sm tracking-wide rounded-xl hover:bg-white/20 transition-all text-center">
@@ -807,7 +807,7 @@ export default function FeaturesPage() {
               Launch targeted campaigns, automate chat replies, and centralize your sales workflows. Set up in less than 5 minutes.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-              <NavLink to="/signup" className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-sans font-semibold text-[15px] tracking-[0.3px] rounded-xl hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(99,102,241,0.4)] transition-all">
+              <NavLink to="/signup" className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-sans font-semibold text-[15px] tracking-[0.3px] rounded-xl hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(22,101,52,0.3)] transition-all">
                 Start Free Trial
               </NavLink>
               <NavLink to="/contact" className="w-full sm:w-auto px-8 py-4 bg-slate-900 border border-slate-800 text-slate-200 font-sans font-semibold text-[15px] tracking-[0.3px] rounded-xl hover:bg-slate-850 hover:text-white transition-all">

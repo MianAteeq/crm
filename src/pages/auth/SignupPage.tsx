@@ -4,20 +4,34 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import { MessageSquare, Mail, Lock, User, Eye, EyeOff, Loader2, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
+import { 
+  Mail, 
+  Lock, 
+  User, 
+  Eye, 
+  EyeOff, 
+  Loader2, 
+  ArrowRight, 
+  Sparkles, 
+  CheckCircle2, 
+  ShieldCheck, 
+  Compass, 
+  Bot, 
+  Users, 
+  Database,
+  ArrowLeft
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useBrandingStore } from '../../store/brandingStore';
 import { crmApi } from '../../services/crmApi';
-import Navbar from '../../components/public/Navbar';
-import Footer from '../../components/public/Footer';
 
 const signupSchema = z.object({
-  name: z.string().min(2, 'Name is too short'),
-  email: z.string().email('Invalid email address'),
+  name: z.string().trim().min(2, 'Full name must be at least 2 characters'),
+  email: z.string().trim().email('Please enter a valid work email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
+  message: "Passwords do not match",
   path: ["confirmPassword"],
 });
 
@@ -33,7 +47,8 @@ interface DbPlan {
 
 export default function SignupPage() {
   const { websiteName, websiteLogo } = useBrandingStore();
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const { signup, isLoading } = useAuthStore();
   const navigate = useNavigate();
@@ -47,9 +62,9 @@ export default function SignupPage() {
     async function loadPlans() {
       try {
         const res = await crmApi.getPublicPlans();
-        if (res.success) {
-          setPlans(res.plans || []);
-          const found = (res.plans || []).find((p: DbPlan) => p.key === selectedPlanKey);
+        if (res.success && res.plans) {
+          setPlans(res.plans);
+          const found = res.plans.find((p: DbPlan) => p.key === selectedPlanKey);
           if (found) {
             setActivePlan(found);
           }
@@ -63,185 +78,444 @@ export default function SignupPage() {
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
   });
 
   const password = watch('password', '');
-  const strength = password.length === 0 ? 0 : password.length < 6 ? 1 : 2;
+  const calculateStrength = () => {
+    if (!password) return 0;
+    let score = 0;
+    if (password.length >= 6) score++;
+    if (password.length >= 10) score++;
+    if (/[A-Z]/.test(password) && /[0-9]/.test(password)) score++;
+    return Math.min(score, 3);
+  };
+  const strength = calculateStrength();
 
   const onSubmit = async (data: SignupForm) => {
+    if (isLoading) return;
     setApiError(null);
     try {
       await signup(data.email, data.name, data.password, selectedPlanKey);
       navigate('/onboarding');
     } catch (error: any) {
-      console.error(error);
-      setApiError(error.response?.data?.message || error.message || 'Failed to create account. Please try again.');
+      console.error('Signup error:', error);
+      const message = 
+        error.response?.data?.message || 
+        error.response?.data?.error || 
+        (error.response?.data?.errors ? Object.values(error.response.data.errors).flat().join(', ') : null) ||
+        error.message || 
+        'Unable to create account. Please verify your details and try again.';
+      setApiError(message);
     }
   };
 
   return (
-    <div className="bg-white min-h-screen flex flex-col justify-between selection:bg-indigo-500/20 selection:text-indigo-900 font-sans">
-      <Navbar />
+    <div className="min-h-screen bg-[#FAFAF9] font-sans selection:bg-[#F0FDF4] selection:text-[#166534] flex flex-col lg:flex-row">
       
-      <div className="flex-1 flex items-center justify-center p-6 pt-32 pb-24 bg-slate-50 relative overflow-hidden">
-        {/* Decorative Background Elements */}
-        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-indigo-400/20 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-purple-400/20 rounded-full blur-[100px] pointer-events-none" />
-        
-        <div className="w-full max-w-[440px] space-y-8 relative z-10">
-          <div className="text-center">
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-3">Join the future</h1>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest px-10">Launch your WhatsApp engine in minutes</p>
+      {/* ============================================================== */}
+      {/* LEFT PANEL: PRODUCT VALUE & ENTERPRISE CAPABILITIES (DESKTOP)   */}
+      {/* ============================================================== */}
+      <aside className="relative hidden lg:flex lg:w-5/12 xl:w-5/12 bg-[#12263A] text-white flex-col justify-between p-10 xl:p-14 overflow-hidden border-r border-white/5">
+        {/* Subtle Ambient Tech Glows */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#166534]/25 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#22C55E]/15 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+
+        {/* Top: Logo Link */}
+        <div className="relative z-10">
+          <Link to="/" className="inline-flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22C55E] rounded-xl p-1">
+            {websiteLogo ? (
+              <img 
+                src={websiteLogo} 
+                alt={websiteName || 'Talkinexx'} 
+                className="h-9 w-auto max-w-[160px] object-contain rounded-xl transition-transform duration-300 group-hover:scale-105" 
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#166534] to-[#22C55E] flex items-center justify-center shadow-lg shadow-[#166534]/30">
+                <Sparkles size={20} className="text-white" />
+              </div>
+            )}
+            <div>
+              <span className="text-xl font-black tracking-tight text-white leading-none block">{websiteName || 'Talkinexx'}</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#22C55E]">Conversational CRM</span>
+            </div>
+          </Link>
+        </div>
+
+        {/* Middle: Clear Product Value Proposition */}
+        <div className="relative z-10 my-auto py-8 space-y-8">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/10 text-xs font-semibold text-[#F0FDF4]">
+              <Sparkles size={13} className="text-[#22C55E]" />
+              <span>All-In-One Revenue Operations</span>
+            </div>
+            <h2 className="text-3xl xl:text-4xl font-extrabold tracking-tight leading-tight text-white">
+              Discover leads, automate campaigns, and manage customer conversations.
+            </h2>
+            <p className="text-stone-300 text-sm leading-relaxed max-w-md">
+              A unified platform designed for modern sales teams to prospect, reach decision-makers, and track deal stages with automated precision.
+            </p>
           </div>
 
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative group"
+          {/* Genuine Product Feature Highlights */}
+          <div className="space-y-4 pt-1">
+            <div className="flex items-start gap-3.5">
+              <div className="w-9 h-9 rounded-xl bg-[#166534]/40 border border-[#22C55E]/30 flex items-center justify-center shrink-0 mt-0.5 text-[#22C55E]">
+                <Compass size={18} />
+              </div>
+              <div>
+                <h3 className="text-xs font-bold text-white">Google Places & Website Scraper</h3>
+                <p className="text-[11px] text-stone-300 mt-0.5 leading-relaxed">Extract public company profiles, normalize verified addresses, and inspect contact pages.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3.5">
+              <div className="w-9 h-9 rounded-xl bg-[#166534]/40 border border-[#22C55E]/30 flex items-center justify-center shrink-0 mt-0.5 text-[#22C55E]">
+                <Bot size={18} />
+              </div>
+              <div>
+                <h3 className="text-xs font-bold text-white">AI Email Marketing Agent</h3>
+                <p className="text-[11px] text-stone-300 mt-0.5 leading-relaxed">Orchestrate personalized B2B outreach with verified sending domains, DKIM, and safety limits.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3.5">
+              <div className="w-9 h-9 rounded-xl bg-[#166534]/40 border border-[#22C55E]/30 flex items-center justify-center shrink-0 mt-0.5 text-[#22C55E]">
+                <Users size={18} />
+              </div>
+              <div>
+                <h3 className="text-xs font-bold text-white">Centralized Audience Management</h3>
+                <p className="text-[11px] text-stone-300 mt-0.5 leading-relaxed">Manage contacts, tags, custom attributes, and multi-channel message histories in one place.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Transparent Security & Trust Assurance */}
+          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4.5 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-bold text-white">
+              <ShieldCheck size={16} className="text-[#22C55E]" />
+              <span>Enterprise Privacy & Platform Security</span>
+            </div>
+            <p className="text-[11px] text-stone-300 leading-relaxed">
+              Every organization receives dedicated tenant isolation, automated encryption at rest and in transit, and DNS ownership validation before sending.
+            </p>
+          </div>
+        </div>
+
+        {/* Bottom Capabilities Pill Bar */}
+        <div className="relative z-10 pt-6 border-t border-white/10 grid grid-cols-3 gap-4 text-center">
+          <div>
+            <p className="text-xs font-bold text-white">Verified</p>
+            <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold mt-0.5">Domain DNS</p>
+          </div>
+          <div>
+            <p className="text-xs font-bold text-[#22C55E]">Isolated</p>
+            <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold mt-0.5">Tenant Data</p>
+          </div>
+          <div>
+            <p className="text-xs font-bold text-white">Built-In</p>
+            <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold mt-0.5">Lead Scraper</p>
+          </div>
+        </div>
+      </aside>
+
+      {/* ============================================================== */}
+      {/* RIGHT PANEL: REGISTRATION FORM                                 */}
+      {/* ============================================================== */}
+      <main className="flex-1 flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 overflow-y-auto">
+        
+        {/* Top Navigation */}
+        <div className="flex items-center justify-between pb-6 sm:pb-8">
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 text-xs font-bold text-[#57534E] hover:text-[#12263A] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] rounded-lg p-1"
           >
-            {/* Background Glow */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-[3rem] blur-xl opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+            <ArrowLeft size={16} />
+            <span>Back to Home</span>
+          </Link>
 
-            <div className="bg-white/90 backdrop-blur-xl border border-slate-200/60 p-10 rounded-[2.5rem] shadow-2xl relative">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-6 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-[9px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg whitespace-nowrap">
-                Create Free Account
+          <div className="text-xs font-medium text-[#57534E]">
+            Already have an account?{' '}
+            <Link 
+              to="/login" 
+              className="font-bold text-[#166534] hover:text-[#12263A] hover:underline ml-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] rounded"
+            >
+              Sign In
+            </Link>
+          </div>
+        </div>
+
+        {/* Form Container */}
+        <div className="max-w-[460px] w-full mx-auto my-auto space-y-6">
+          
+          {/* Header */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 rounded-full text-[11px] font-bold">
+                <Sparkles size={12} className="text-[#22C55E]" />
+                {activePlan ? `Selected: ${activePlan.name} Trial` : '14-Day Free Trial • No Credit Card'}
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#12263A] tracking-tight">
+              Create your account
+            </h1>
+            <p className="text-xs sm:text-sm font-medium text-[#57534E]">
+              Get started with your dedicated CRM and automated lead generation tools.
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+            
+            {/* Full Name Field */}
+            <div className="space-y-1.5">
+              <label htmlFor="name-input" className="block text-[11px] font-bold text-[#57534E] uppercase tracking-wider pl-1">
+                Full Name <span className="text-red-500" aria-hidden="true">*</span>
+              </label>
+              <div className="relative group/input">
+                <User 
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors pointer-events-none" 
+                  size={18} 
+                  aria-hidden="true"
+                />
+                <input 
+                  id="name-input"
+                  {...register('name')}
+                  type="text"
+                  autoComplete="name"
+                  placeholder="Your full name"
+                  aria-invalid={Boolean(errors.name)}
+                  aria-describedby={errors.name ? 'name-error' : undefined}
+                  className={`w-full h-12 bg-white border rounded-xl p-3.5 pl-11 text-sm font-semibold text-[#12263A] placeholder:text-stone-400 focus:outline-none transition-all ${
+                    errors.name 
+                      ? 'border-rose-300 bg-rose-50/40 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10' 
+                      : 'border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/15'
+                  }`}
+                />
               </div>
+              {errors.name && (
+                <p id="name-error" className="text-[11px] font-bold text-rose-600 pl-1 animate-fade-in" role="alert">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
-              <div className="space-y-2.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Full Name</label>
+            {/* Work Email Field */}
+            <div className="space-y-1.5">
+              <label htmlFor="email-input" className="block text-[11px] font-bold text-[#57534E] uppercase tracking-wider pl-1">
+                Work Email <span className="text-red-500" aria-hidden="true">*</span>
+              </label>
+              <div className="relative group/input">
+                <Mail 
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors pointer-events-none" 
+                  size={18} 
+                  aria-hidden="true"
+                />
+                <input 
+                  id="email-input"
+                  {...register('email')}
+                  type="email"
+                  autoComplete="email"
+                  placeholder="name@company.com"
+                  aria-invalid={Boolean(errors.email)}
+                  aria-describedby={errors.email ? 'email-error' : undefined}
+                  className={`w-full h-12 bg-white border rounded-xl p-3.5 pl-11 text-sm font-semibold text-[#12263A] placeholder:text-stone-400 focus:outline-none transition-all ${
+                    errors.email 
+                      ? 'border-rose-300 bg-rose-50/40 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10' 
+                      : 'border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/15'
+                  }`}
+                />
+              </div>
+              {errors.email && (
+                <p id="email-error" className="text-[11px] font-bold text-rose-600 pl-1 animate-fade-in" role="alert">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            {/* Password & Confirm Password Inputs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              
+              {/* Password */}
+              <div className="space-y-1.5">
+                <label htmlFor="password-input" className="block text-[11px] font-bold text-[#57534E] uppercase tracking-wider pl-1">
+                  Password <span className="text-red-500" aria-hidden="true">*</span>
+                </label>
                 <div className="relative group/input">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
-                  <input 
-                    {...register('name')}
-                    placeholder="Ali Ahmad"
-                    className={`w-full h-14 bg-slate-50/50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
-                      errors.name ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white'
-                    }`}
+                  <Lock 
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors pointer-events-none" 
+                    size={17} 
+                    aria-hidden="true"
                   />
-                </div>
-                {errors.name && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.name.message}</p>}
-              </div>
-
-              <div className="space-y-2.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Work Email</label>
-                <div className="relative group/input">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
                   <input 
-                    {...register('email')}
-                    type="email"
-                    placeholder="name@company.com"
-                    className={`w-full h-14 bg-slate-50/50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
-                      errors.email ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white'
-                    }`}
-                  />
-                </div>
-                {errors.email && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.email.message}</p>}
-              </div>
-
-              <div className="space-y-2.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Password</label>
-                <div className="relative group/input">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
-                  <input 
+                    id="password-input"
                     {...register('password')}
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    className={`w-full h-14 bg-slate-50/50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
-                      errors.password ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white'
+                    autoComplete="new-password"
+                    placeholder="Min. 6 chars"
+                    aria-invalid={Boolean(errors.password)}
+                    aria-describedby={errors.password ? 'password-error' : undefined}
+                    className={`w-full h-12 bg-white border rounded-xl p-3.5 pl-11 pr-10 text-sm font-semibold text-[#12263A] placeholder:text-stone-400 focus:outline-none transition-all ${
+                      errors.password 
+                        ? 'border-rose-300 bg-rose-50/40 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10' 
+                        : 'border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/15'
                     }`}
                   />
                   <button 
                     type="button" 
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 transition-colors"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-[#12263A] transition-colors cursor-pointer p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534]"
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                {/* Strength indicator */}
-                <div className="flex gap-1 mt-1 px-1">
-                   {[1, 2, 3].map((s) => (
-                      <div key={s} className="h-1 flex-1 rounded-full bg-slate-100 overflow-hidden">
-                         <div className={`h-full transition-all duration-500 ${
-                           strength >= s ? (strength === 2 ? 'bg-indigo-600' : 'bg-amber-500') : ''
-                         }`} />
-                      </div>
-                   ))}
-                </div>
-                {errors.password && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.password.message}</p>}
               </div>
 
-              <div className="space-y-2.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Confirm Password</label>
+              {/* Confirm Password */}
+              <div className="space-y-1.5">
+                <label htmlFor="confirm-password-input" className="block text-[11px] font-bold text-[#57534E] uppercase tracking-wider pl-1">
+                  Confirm Password <span className="text-red-500" aria-hidden="true">*</span>
+                </label>
                 <div className="relative group/input">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                  <Lock 
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors pointer-events-none" 
+                    size={17} 
+                    aria-hidden="true"
+                  />
                   <input 
+                    id="confirm-password-input"
                     {...register('confirmPassword')}
-                    type="password"
-                    placeholder="••••••••"
-                    className={`w-full h-14 bg-slate-50/50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
-                      errors.confirmPassword ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white'
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    placeholder="Repeat password"
+                    aria-invalid={Boolean(errors.confirmPassword)}
+                    aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
+                    className={`w-full h-12 bg-white border rounded-xl p-3.5 pl-11 pr-10 text-sm font-semibold text-[#12263A] placeholder:text-stone-400 focus:outline-none transition-all ${
+                      errors.confirmPassword 
+                        ? 'border-rose-300 bg-rose-50/40 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10' 
+                        : 'border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/15'
                     }`}
                   />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-[#12263A] transition-colors cursor-pointer p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534]"
+                  >
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                 </div>
-                {errors.confirmPassword && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.confirmPassword.message}</p>}
               </div>
-
-              <p className="text-[10px] font-semibold text-slate-500 leading-normal text-center px-4 pt-2">
-                By creating an account, you agree to our <Link to="/terms" className="text-indigo-600 font-bold hover:underline">Terms</Link> and <Link to="/privacy" className="text-indigo-600 font-bold hover:underline">Privacy Policy</Link>.
-              </p>
-
-              {apiError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-center mt-4">
-                  <p className="text-[11px] font-bold text-rose-600">{apiError}</p>
-                </div>
-              )}
-
-              <motion.button 
-                type="submit" 
-                disabled={isLoading}
-                whileHover={{ scale: isLoading ? 1 : 1.02 }}
-                whileTap={{ scale: isLoading ? 1 : 0.98 }}
-                className="w-full h-14 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 transition-all shadow-xl shadow-indigo-600/25 flex items-center justify-center gap-3 mt-8 cursor-pointer relative overflow-hidden"
-              >
-                <AnimatePresence mode="wait">
-                  {isLoading ? (
-                    <motion.div
-                      key="loading"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="flex items-center gap-2"
-                    >
-                      <Loader2 size={16} className="animate-spin" />
-                      <span>Creating Account...</span>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="idle"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="flex items-center gap-2"
-                    >
-                      <span>Create Account</span>
-                      <ArrowRight size={16} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.button>
-            </form>
             </div>
-          </motion.div>
 
-          <p className="text-center text-[12px] font-semibold text-slate-500 pt-4">
-            Already have an account? <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-bold ml-1">Login here</Link>
-          </p>
+            {/* Password Strength Indicator */}
+            {password.length > 0 && (
+              <div className="space-y-1 pt-1" aria-live="polite">
+                <div className="flex gap-1.5">
+                  {[1, 2, 3].map((level) => (
+                    <div 
+                      key={level} 
+                      className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                        strength >= level
+                          ? strength === 3 
+                            ? 'bg-[#166534]' 
+                            : strength === 2 
+                              ? 'bg-[#22C55E]' 
+                              : 'bg-amber-500'
+                          : 'bg-stone-200'
+                      }`} 
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center justify-between text-[11px] font-semibold text-[#57534E] px-0.5">
+                  <span>
+                    Password Strength:{' '}
+                    <strong className={strength === 3 ? 'text-[#166534]' : strength === 2 ? 'text-emerald-600' : 'text-amber-600'}>
+                      {strength === 3 ? 'Strong' : strength === 2 ? 'Medium' : 'Weak'}
+                    </strong>
+                  </span>
+                  <span>Min. 6 chars with letters & numbers</span>
+                </div>
+              </div>
+            )}
+
+            {errors.password && (
+              <p id="password-error" className="text-[11px] font-bold text-rose-600 pl-1" role="alert">{errors.password.message}</p>
+            )}
+            {errors.confirmPassword && (
+              <p id="confirm-password-error" className="text-[11px] font-bold text-rose-600 pl-1" role="alert">{errors.confirmPassword.message}</p>
+            )}
+
+            {/* API Error Notification */}
+            {apiError && (
+              <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-left" role="alert">
+                <p className="text-xs font-bold text-rose-700 leading-snug">{apiError}</p>
+              </div>
+            )}
+
+            {/* Terms and Privacy Policy Note */}
+            <p className="text-[11px] font-medium text-[#57534E] leading-relaxed pt-1">
+              By creating an account, you agree to our{' '}
+              <Link to="/terms" className="text-[#166534] font-bold hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-[#166534] rounded">Terms of Service</Link>{' '}
+              and{' '}
+              <Link to="/privacy" className="text-[#166534] font-bold hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-[#166534] rounded">Privacy Policy</Link>.
+            </p>
+
+            {/* Submit Action Button */}
+            <button 
+              type="submit" 
+              disabled={isLoading}
+              className="w-full h-12 bg-[#166534] hover:bg-[#14532d] active:bg-[#0f3d21] text-white text-xs font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-[#166534]/20 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] focus-visible:ring-offset-2"
+            >
+              <AnimatePresence mode="wait">
+                {isLoading ? (
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Creating Your Account...</span>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="idle"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <span>Create Free Account</span>
+                    <ArrowRight size={15} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </button>
+          </form>
         </div>
-      </div>
-      
-      <Footer />
+
+        {/* Security & Verification Guarantees */}
+        <footer className="pt-6 mt-8 border-t border-stone-200/80 flex flex-wrap items-center justify-center gap-6 text-[11px] font-bold text-[#57534E]">
+          <span className="flex items-center gap-1.5">
+            <ShieldCheck size={14} className="text-[#166534]" /> 256-Bit SSL Encryption
+          </span>
+          <span className="flex items-center gap-1.5">
+            <CheckCircle2 size={14} className="text-[#166534]" /> Dedicated Tenant Isolation
+          </span>
+          <span className="flex items-center gap-1.5">
+            <CheckCircle2 size={14} className="text-[#166534]" /> No Credit Card Required
+          </span>
+        </footer>
+      </main>
     </div>
   );
 }

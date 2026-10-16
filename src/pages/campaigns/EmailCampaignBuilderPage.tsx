@@ -166,8 +166,8 @@ export const PROFESSIONAL_FRAMES: EmailFrame[] = [
     id: 'saas_indigo',
     name: 'Tech & SaaS',
     badge: 'Indigo Gradient',
-    accentBg: 'bg-indigo-600',
-    accentBorder: 'border-indigo-500',
+    accentBg: 'bg-[#166534]',
+    accentBorder: 'border-[#166534]',
     description: 'Vibrant indigo header tailored for modern software, agencies, and automation companies.',
     defaultSubject: 'Quick idea for {{business_name}}',
     defaultBody: `<p style="margin: 0 0 16px 0;">Hi {{first_name | default: "there"}},</p>
@@ -993,7 +993,7 @@ export default function EmailCampaignBuilderPage() {
           <button
             onClick={() => handleLaunchCampaign(true)}
             disabled={isLaunching}
-            className="px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded-xl border border-slate-200 transition-all"
+            className="h-10 px-4.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-[#57534E] hover:text-[#166534] hover:bg-[#F0FDF4] hover:border-[#bbf7d0] transition-all shadow-xs active:scale-95 cursor-pointer disabled:opacity-50"
           >
             Save as Draft
           </button>
@@ -1035,7 +1035,7 @@ export default function EmailCampaignBuilderPage() {
                 onClick={() => setCurrentStep(step.id)}
                 className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl transition-all whitespace-nowrap ${
                   isActive 
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' 
+                    ? 'bg-[#166534] text-white shadow-md shadow-[#166534]/20' 
                     : isCompleted 
                     ? 'bg-slate-50 text-slate-900 hover:bg-slate-100' 
                     : 'text-slate-400 hover:text-slate-600'
@@ -1069,7 +1069,7 @@ export default function EmailCampaignBuilderPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. October Outreach, Q4 Dental Clinics Follow-up"
-                className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium text-slate-900"
+                className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534] font-medium text-slate-900"
               />
             </div>
 
@@ -1084,7 +1084,7 @@ export default function EmailCampaignBuilderPage() {
                 <button
                   type="button"
                   onClick={() => navigate('/settings/email?tab=domains')}
-                  className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                  className="text-[11px] font-bold text-[#166534] hover:text-[#12263A] flex items-center gap-1"
                 >
                   Manage Domains &rarr;
                 </button>
@@ -1133,7 +1133,7 @@ export default function EmailCampaignBuilderPage() {
                       <button 
                         type="button" 
                         onClick={() => navigate('/settings/email?tab=domains')}
-                        className="text-indigo-600 underline font-semibold ml-1"
+                        className="text-[#166534] underline font-semibold ml-1"
                       >
                         Fix Verification
                       </button>
@@ -1186,7 +1186,7 @@ export default function EmailCampaignBuilderPage() {
                   onClick={() => setAudienceType('all')}
                   className={`p-4 rounded-xl border text-left transition-all ${
                     audienceType === 'all' 
-                      ? 'border-indigo-600 bg-indigo-50/30 ring-2 ring-indigo-600/10' 
+                      ? 'border-[#166534] bg-[#F0FDF4]/30 ring-2 ring-indigo-600/10' 
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
@@ -1199,7 +1199,7 @@ export default function EmailCampaignBuilderPage() {
                   onClick={() => setAudienceType('filtered')}
                   className={`p-4 rounded-xl border text-left transition-all ${
                     audienceType === 'filtered' 
-                      ? 'border-indigo-600 bg-indigo-50/30 ring-2 ring-indigo-600/10' 
+                      ? 'border-[#166534] bg-[#F0FDF4]/30 ring-2 ring-indigo-600/10' 
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
@@ -1212,7 +1212,7 @@ export default function EmailCampaignBuilderPage() {
             {audienceType === 'filtered' && (
               <div className="p-5 rounded-2xl bg-slate-50/70 border border-slate-200 space-y-4">
                 <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                  <Filter size={14} className="text-indigo-600" />
+                  <Filter size={14} className="text-[#166534]" />
                   Audience Filters (Scraper & CRM Leads)
                 </h3>
 
@@ -1301,7 +1301,7 @@ export default function EmailCampaignBuilderPage() {
                             }}
                             className={`w-10 h-9 rounded-xl font-bold text-xs border transition-all ${
                               isSelected 
-                                ? 'bg-indigo-600 text-white border-indigo-600' 
+                                ? 'bg-[#166534] text-white border-[#166534]' 
                                 : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
                             }`}
                           >
@@ -1319,7 +1319,7 @@ export default function EmailCampaignBuilderPage() {
                         type="checkbox"
                         checked={websiteAvailable}
                         onChange={(e) => setWebsiteAvailable(e.target.checked)}
-                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                        className="rounded border-slate-300 text-[#166534] focus:ring-[#22C55E]"
                       />
                       Website Available Only
                     </label>
@@ -1340,7 +1340,7 @@ export default function EmailCampaignBuilderPage() {
                 type="button"
                 onClick={runAudienceEstimate}
                 disabled={isEstimating}
-                className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-700"
+                className="flex items-center gap-1.5 text-xs font-bold text-[#166534] hover:text-[#14532d]"
               >
                 <RefreshCw size={12} className={isEstimating ? 'animate-spin' : ''} />
                 Refresh Count
@@ -1395,7 +1395,7 @@ export default function EmailCampaignBuilderPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                    <Layout size={16} className="text-indigo-600" />
+                    <Layout size={16} className="text-[#166534]" />
                     Select Professional Template Style
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -1415,7 +1415,7 @@ export default function EmailCampaignBuilderPage() {
                       onClick={() => handleSelectFrame(frame.id)}
                       className={`p-3.5 rounded-xl border text-left transition-all ${
                         isSelected 
-                          ? 'border-indigo-600 bg-indigo-50/40 ring-2 ring-indigo-600/10 shadow-xs' 
+                          ? 'border-[#166534] bg-[#F0FDF4]/40 ring-2 ring-indigo-600/10 shadow-xs' 
                           : 'border-slate-200 hover:border-slate-300 bg-white'
                       }`}
                     >
@@ -1484,7 +1484,7 @@ export default function EmailCampaignBuilderPage() {
 
               <div className="flex flex-wrap items-center gap-1.5 pt-1">
                 <span className="text-[11px] font-bold text-slate-500 mr-1 flex items-center gap-1">
-                  <Plus size={12} className="text-indigo-600" /> Insert in Subject:
+                  <Plus size={12} className="text-[#166534]" /> Insert in Subject:
                 </span>
                 {[
                   { label: '+ Name', tag: '{{first_name | default: "there"}}' },
@@ -1494,7 +1494,7 @@ export default function EmailCampaignBuilderPage() {
                     key={idx}
                     type="button"
                     onClick={() => insertTagIntoSubject(p.tag)}
-                    className="px-2.5 py-0.5 rounded-lg bg-white border border-slate-200 hover:border-indigo-500 text-[11px] font-semibold text-slate-700 shadow-2xs"
+                    className="px-2.5 py-0.5 rounded-lg bg-white border border-slate-200 hover:border-[#166534] text-[11px] font-semibold text-slate-700 shadow-2xs"
                   >
                     {p.label}
                   </button>
@@ -1626,9 +1626,9 @@ export default function EmailCampaignBuilderPage() {
                     type="button"
                     onMouseDown={() => saveVisualEditorSelection()}
                     onClick={handleOpenButtonModal}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-200 hover:border-indigo-500 text-xs font-bold text-slate-700 shadow-2xs transition-all hover:bg-slate-50"
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-200 hover:border-[#166534] text-xs font-bold text-slate-700 shadow-2xs transition-all hover:bg-slate-50"
                   >
-                    <MousePointerClick size={14} className="text-indigo-600" />
+                    <MousePointerClick size={14} className="text-[#166534]" />
                     <span>+ Add Button</span>
                   </button>
                 </div>
@@ -1644,7 +1644,7 @@ export default function EmailCampaignBuilderPage() {
                       type="button"
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => insertTagIntoBody(item.tag)}
-                      className="px-2 py-0.5 rounded bg-white border border-slate-200 hover:border-indigo-500 font-medium text-indigo-700"
+                      className="px-2 py-0.5 rounded bg-white border border-slate-200 hover:border-[#166534] font-medium text-[#14532d]"
                     >
                       + {item.label}
                     </button>
@@ -1669,12 +1669,12 @@ export default function EmailCampaignBuilderPage() {
 
                   {/* 2. EDITABLE BODY (THE ONLY PART THE USER CHANGES!) */}
                   <div className="p-6 sm:p-8 bg-white relative">
-                    <div className="mb-2 flex items-center justify-between text-[11px] text-indigo-700 font-bold bg-indigo-50/80 px-3 py-1 rounded-lg border border-indigo-100 select-none">
+                    <div className="mb-2 flex items-center justify-between text-[11px] text-[#14532d] font-bold bg-[#F0FDF4]/80 px-3 py-1 rounded-lg border border-[#bbf7d0] select-none">
                       <span className="flex items-center gap-1.5">
                         <Type size={13} />
                         Your Message Body (Click below to edit freely)
                       </span>
-                      <span className="text-indigo-400 font-normal">Auto-formats for Gmail & Outlook</span>
+                      <span className="text-[#22C55E] font-normal">Auto-formats for Gmail & Outlook</span>
                     </div>
 
                     <div
@@ -1717,7 +1717,7 @@ export default function EmailCampaignBuilderPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                  <Sparkles size={20} className="text-indigo-600" />
+                  <Sparkles size={20} className="text-[#166534]" />
                   Personalization Simulator
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -1730,17 +1730,17 @@ export default function EmailCampaignBuilderPage() {
                   <CheckCheck size={14} className="text-emerald-600" />
                   {detectedMergeTags.length} Personalized Fields
                 </span>
-                <span className="px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-bold flex items-center gap-1.5">
-                  <ShieldCheck size={14} className="text-indigo-600" />
+                <span className="px-3 py-1.5 rounded-xl bg-[#F0FDF4] border border-[#bbf7d0] text-[#12263A] text-xs font-bold flex items-center gap-1.5">
+                  <ShieldCheck size={14} className="text-[#166534]" />
                   {activeFrame.name} Frame Active
                 </span>
               </div>
             </div>
 
             {/* Recipient Picker */}
-            <div className="space-y-2 p-5 rounded-2xl bg-gradient-to-r from-slate-50 via-indigo-50/30 to-slate-50 border border-slate-200">
+            <div className="space-y-2 p-5 rounded-2xl bg-gradient-to-r from-slate-50 via-[#F0FDF4]/50 to-slate-50 border border-slate-200">
               <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                <Users size={14} className="text-indigo-600" />
+                <Users size={14} className="text-[#166534]" />
                 Select a Recipient to Test:
               </span>
 
@@ -1755,7 +1755,7 @@ export default function EmailCampaignBuilderPage() {
                       onClick={() => setSelectedSampleIndex(idx)}
                       className={`p-3 rounded-xl border text-left transition-all ${
                         isSelected 
-                          ? 'border-indigo-600 bg-white ring-2 ring-indigo-600/10 shadow-sm' 
+                          ? 'border-[#166534] bg-white ring-2 ring-indigo-600/10 shadow-sm' 
                           : 'border-slate-200 bg-white/70 hover:border-slate-300 hover:bg-white'
                       }`}
                     >
@@ -1764,7 +1764,7 @@ export default function EmailCampaignBuilderPage() {
                           {contact.name || (isEdgeCase ? '⚠️ Incomplete Info Test' : 'Unnamed Contact')}
                         </span>
                         {contact.lead_quality_grade && (
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-indigo-100 text-indigo-700">
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-[#dcfce7] text-[#14532d]">
                             Grade {contact.lead_quality_grade}
                           </span>
                         )}
@@ -1786,7 +1786,7 @@ export default function EmailCampaignBuilderPage() {
               <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <Eye size={14} className="text-indigo-600" />
+                    <Eye size={14} className="text-[#166534]" />
                     How Your Recipient Sees It:
                   </span>
                   
@@ -1795,7 +1795,7 @@ export default function EmailCampaignBuilderPage() {
                       type="checkbox"
                       checked={highlightVariables}
                       onChange={(e) => setHighlightVariables(e.target.checked)}
-                      className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      className="rounded border-slate-300 text-[#166534] focus:ring-[#22C55E]"
                     />
                     Highlight Personalized Words
                   </label>
@@ -1806,7 +1806,7 @@ export default function EmailCampaignBuilderPage() {
                     type="button"
                     onClick={() => setPreviewDevice('desktop')}
                     className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                      previewDevice === 'desktop' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                      previewDevice === 'desktop' ? 'bg-[#166534] text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
                     }`}
                   >
                     <Monitor size={13} />
@@ -1816,7 +1816,7 @@ export default function EmailCampaignBuilderPage() {
                     type="button"
                     onClick={() => setPreviewDevice('mobile')}
                     className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                      previewDevice === 'mobile' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                      previewDevice === 'mobile' ? 'bg-[#166534] text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
                     }`}
                   >
                     <Smartphone size={13} />
@@ -1905,7 +1905,7 @@ export default function EmailCampaignBuilderPage() {
             {/* Send Live Test Email */}
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 h-fit">
               <h3 className="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                <Send size={16} className="text-indigo-600" />
+                <Send size={16} className="text-[#166534]" />
                 Send a Live Test Email
               </h3>
               <p className="text-xs text-slate-500">
@@ -1921,7 +1921,7 @@ export default function EmailCampaignBuilderPage() {
                   value={testEmailAddress}
                   onChange={(e) => setTestEmailAddress(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20"
                 />
               </div>
 
@@ -1994,7 +1994,7 @@ export default function EmailCampaignBuilderPage() {
                   onClick={() => setSendOption('now')}
                   className={`p-4 rounded-xl border text-left transition-all ${
                     sendOption === 'now' 
-                      ? 'border-indigo-600 bg-indigo-50/30 ring-2 ring-indigo-600/10' 
+                      ? 'border-[#166534] bg-[#F0FDF4]/30 ring-2 ring-indigo-600/10' 
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
@@ -2007,7 +2007,7 @@ export default function EmailCampaignBuilderPage() {
                   onClick={() => setSendOption('schedule')}
                   className={`p-4 rounded-xl border text-left transition-all ${
                     sendOption === 'schedule' 
-                      ? 'border-indigo-600 bg-indigo-50/30 ring-2 ring-indigo-600/10' 
+                      ? 'border-[#166534] bg-[#F0FDF4]/30 ring-2 ring-indigo-600/10' 
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
@@ -2050,7 +2050,7 @@ export default function EmailCampaignBuilderPage() {
           type="button"
           onClick={prevStep}
           disabled={currentStepIdx === 0}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all ${
+          className={`flex items-center gap-2 h-10 px-5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-700 hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] transition-all shadow-xs active:scale-95 cursor-pointer ${
             currentStepIdx === 0 ? 'opacity-40 cursor-not-allowed' : ''
           }`}
         >
@@ -2062,7 +2062,7 @@ export default function EmailCampaignBuilderPage() {
           <button
             type="button"
             onClick={nextStep}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all shadow-md shadow-slate-900/10"
+            className="flex items-center gap-2 h-10 px-6 rounded-xl bg-[#166534] text-white text-xs sm:text-sm font-semibold hover:bg-[#14532d] transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer"
           >
             Continue
             <ArrowRight size={16} />
@@ -2072,7 +2072,7 @@ export default function EmailCampaignBuilderPage() {
             type="button"
             onClick={() => handleLaunchCampaign(false)}
             disabled={isLaunching}
-            className="flex items-center gap-2 px-8 py-3 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20"
+            className="flex items-center gap-2 h-10 px-8 rounded-xl bg-[#166534] text-white text-xs sm:text-sm font-semibold hover:bg-[#14532d] transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer disabled:opacity-50"
           >
             {isLaunching ? (
               <RefreshCw size={16} className="animate-spin" />
@@ -2090,7 +2090,7 @@ export default function EmailCampaignBuilderPage() {
       {isAiModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-purple-50 via-indigo-50/50 to-white">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-[#F0FDF4] via-[#FAFAF9] to-white">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center shadow-lg shadow-purple-600/30">
                   <Sparkles size={20} />
@@ -2213,9 +2213,9 @@ export default function EmailCampaignBuilderPage() {
       {isButtonModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full flex flex-col overflow-hidden">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-indigo-50/70 via-blue-50/50 to-white">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-[#F0FDF4] via-[#FAFAF9] to-white">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30">
+                <div className="w-10 h-10 rounded-2xl bg-[#166534] text-white flex items-center justify-center shadow-lg shadow-[#166534]/20">
                   <MousePointerClick size={20} />
                 </div>
                 <div>
@@ -2245,7 +2245,7 @@ export default function EmailCampaignBuilderPage() {
                   value={buttonText}
                   onChange={(e) => setButtonText(e.target.value)}
                   placeholder="e.g. Schedule a 10-Minute Call"
-                  className="w-full px-3.5 py-2.5 text-xs font-medium rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 text-xs font-medium rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534]"
                 />
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   <span className="text-[10px] text-slate-400 font-bold uppercase py-0.5">Presets:</span>
@@ -2260,7 +2260,7 @@ export default function EmailCampaignBuilderPage() {
                       key={preset}
                       type="button"
                       onClick={() => setButtonText(preset)}
-                      className="px-2 py-0.5 text-[10px] rounded-md bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 font-medium transition-all"
+                      className="px-2 py-0.5 text-[10px] rounded-md bg-slate-100 hover:bg-[#F0FDF4] hover:text-[#166534] text-slate-600 font-medium transition-all"
                     >
                       {preset}
                     </button>
@@ -2280,7 +2280,7 @@ export default function EmailCampaignBuilderPage() {
                     value={buttonUrl}
                     onChange={(e) => setButtonUrl(e.target.value)}
                     placeholder="https://calendly.com/your-name/meeting"
-                    className="w-full pl-10 pr-3.5 py-2.5 text-xs font-medium rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs font-medium rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534]"
                   />
                 </div>
               </div>
@@ -2377,7 +2377,7 @@ export default function EmailCampaignBuilderPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-600/20 flex items-center gap-1.5"
+                  className="px-5 py-2.5 rounded-xl bg-[#166534] text-white text-xs font-bold hover:bg-[#14532d] transition-all shadow-md shadow-[#166534]/20 flex items-center gap-1.5"
                 >
                   <Plus size={14} />
                   <span>Insert Button</span>

@@ -1,5 +1,5 @@
 import { ReactNode, useState, useEffect, useRef, ChangeEvent } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Layout as LayoutIcon,
@@ -71,12 +71,12 @@ const menuItems = [
 ];
 
 const GRADIENTS = {
-  royal: "from-indigo-500 to-purple-600 shadow-indigo-500/20 bg-gradient-to-br text-white",
-  neon: "from-pink-500 to-rose-600 shadow-rose-500/20 bg-gradient-to-br text-white",
-  flare: "from-amber-500 to-orange-500 shadow-orange-500/20 bg-gradient-to-br text-white",
-  ocean: "from-blue-600 to-cyan-500 shadow-blue-500/20 bg-gradient-to-br text-white",
-  emerald: "from-emerald-500 to-teal-600 shadow-emerald-500/20 bg-gradient-to-br text-white",
-  charcoal: "from-slate-700 to-zinc-900 shadow-slate-500/10 bg-gradient-to-br text-white",
+  royal: "from-slate-800 to-[#12263A] shadow-[#12263A]/20 bg-gradient-to-br text-white",
+  forest: "from-[#12263A] to-[#166534] shadow-[#166534]/20 bg-gradient-to-br text-white",
+  emerald: "from-[#166534] to-[#22C55E] shadow-[#22C55E]/20 bg-gradient-to-br text-white",
+  ocean: "from-[#1c3650] to-[#12263A] shadow-[#12263A]/20 bg-gradient-to-br text-white",
+  stone: "from-[#57534E] to-[#292524] shadow-[#57534E]/20 bg-gradient-to-br text-white",
+  charcoal: "from-[#12263A] to-slate-900 shadow-slate-900/10 bg-gradient-to-br text-white",
 };
 
 const isImageAvatar = (avatarStr?: string) => {
@@ -92,9 +92,18 @@ export function Sidebar({
   setIsCollapsed?: (v: boolean) => void;
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout, user, updateProfile } = useAuthStore();
   const { websiteName, websiteLogo } = useBrandingStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const isItemActive = (isActive: boolean, itemPath: string) => {
+    if (!isActive) return false;
+    if (itemPath === '/email-campaigns' && location.pathname.startsWith('/email-campaigns/ai-agent')) {
+      return false;
+    }
+    return true;
+  };
 
   // Profile modal state
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -294,36 +303,36 @@ export function Sidebar({
         </button>
 
         {/* 1. Logo Section */}
-        <div className={cn("transition-all duration-300", isCollapsed ? "p-4 flex justify-center" : "px-6 pt-7 pb-5")}>
+        <div className={cn("transition-all duration-300", isCollapsed ? "p-4 flex justify-center" : "px-6 pt-5 pb-3")}>
           <div className={cn("flex items-center gap-3 cursor-pointer", isCollapsed ? "justify-center" : "")} onClick={() => navigate('/dashboard')}>
             {websiteLogo ? (
-              <img src={websiteLogo} alt="Logo" className="w-10 h-10 object-contain rounded-xl shrink-0" />
+              <img src={websiteLogo} alt="Logo" className="w-9 h-9 object-contain rounded-xl shrink-0" />
             ) : (
-              <div className="w-10 h-10 bg-gradient-to-br from-[#6D4AFF] to-[#8B5CF6] text-white rounded-xl flex items-center justify-center shadow-sm shadow-[#6D4AFF]/30 shrink-0">
-                <Cpu size={20} />
+              <div className="w-9 h-9 bg-gradient-to-br from-[#12263A] to-[#166534] text-white rounded-xl flex items-center justify-center shadow-sm shadow-[#12263A]/30 shrink-0">
+                <Cpu size={18} />
               </div>
             )}
             {!isCollapsed && (
               <div className="flex flex-col select-none max-w-[150px]">
-                <span className="text-lg font-bold text-slate-900 tracking-tight leading-none truncate">{websiteName}</span>
-                <span className="text-xs font-medium text-slate-400 mt-1">WhatsApp CRM</span>
+                <span className="text-base font-bold text-[#12263A] tracking-tight leading-none truncate">{websiteName}</span>
+                <span className="text-[11px] font-medium text-[#57534E] mt-0.5">Conversational CRM</span>
               </div>
             )}
           </div>
         </div>
 
         {/* 2. User / workspace card */}
-        <div className={cn("px-4 mb-3 select-none", isCollapsed ? "flex justify-center" : "")}>
+        <div className={cn("px-4 mb-2 select-none", isCollapsed ? "flex justify-center" : "")}>
           <div
             onClick={() => setIsProfileModalOpen(true)}
             className={cn(
-              "bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center cursor-pointer group transition-all duration-200 rounded-xl",
-              isCollapsed ? "p-2 justify-center w-12 h-12" : "p-2.5 gap-3 w-full"
+              "bg-slate-50 hover:bg-[#F0FDF4] border border-slate-200 hover:border-[#bbf7d0] flex items-center cursor-pointer group transition-all duration-200 rounded-xl",
+              isCollapsed ? "p-2 justify-center w-11 h-11" : "p-2 gap-2.5 w-full"
             )}
           >
             <div className={cn(
               "rounded-lg flex items-center justify-center font-bold transition-all duration-200 shrink-0 relative overflow-hidden",
-              isCollapsed ? "w-8 h-8 text-sm" : "w-9 h-9 text-sm",
+              isCollapsed ? "w-7 h-7 text-xs" : "w-8 h-8 text-xs",
               isImageAvatar(user?.avatar) ? "bg-slate-100" : GRADIENTS[(user?.avatar as keyof typeof GRADIENTS) || 'royal']
             )}>
               {isImageAvatar(user?.avatar) ? (
@@ -331,27 +340,27 @@ export function Sidebar({
               ) : (
                 user?.name ? user.name.substring(0, 1).toUpperCase() : 'A'
               )}
-              <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white" />
+              <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full border-2 border-white" />
             </div>
             {!isCollapsed && (
               <div className="flex-1 min-w-0 text-left">
-                <p className="text-sm font-semibold text-slate-900 truncate leading-tight">{businessName || 'Workspace'}</p>
-                <p className="text-xs text-slate-400 font-medium truncate mt-0.5">{name || 'View profile'}</p>
+                <p className="text-xs font-bold text-slate-900 truncate leading-tight group-hover:text-[#166534] transition-colors">{businessName || 'Workspace'}</p>
+                <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">{name || 'View profile'}</p>
               </div>
             )}
-            {!isCollapsed && <ChevronDown size={14} className="text-slate-400 group-hover:text-slate-600 transition-colors shrink-0" />}
+            {!isCollapsed && <ChevronDown size={13} className="text-slate-400 group-hover:text-[#166534] transition-colors shrink-0" />}
           </div>
         </div>
 
         {/* 3. Navigation */}
-        <div className="flex-1 px-3 overflow-y-auto custom-scrollbar">
-          <div className="space-y-5 py-2">
+        <div className="flex-1 px-3 overflow-y-auto custom-scrollbar flex flex-col justify-between">
+          <div className="space-y-3.5 py-1">
             {menuItems.map((group) => (
-              <div key={group.group} className="space-y-1">
+              <div key={group.group} className="space-y-0.5">
                 {!isCollapsed ? (
-                  <p className="px-3 mb-1 text-xs font-semibold text-slate-400 tracking-wide select-none">{group.group}</p>
+                  <p className="px-3 mb-1 text-[11px] font-bold uppercase tracking-wider text-[#57534E]/70 select-none">{group.group}</p>
                 ) : (
-                  <div className="w-full h-px bg-slate-100 my-3" />
+                  <div className="w-full h-px bg-[#e7e5e4] my-2" />
                 )}
                 <nav className="space-y-0.5">
                   {group.items.map((item) => (
@@ -359,57 +368,63 @@ export function Sidebar({
                       key={item.label}
                       to={item.path}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={({ isActive }) => cn(
-                        "flex items-center rounded-xl text-sm font-medium transition-all duration-200 group relative cursor-pointer",
-                        isCollapsed ? "p-2.5 justify-center" : "px-3 py-2.5 gap-3",
-                        isActive
-                          ? "bg-gradient-to-r from-[#6D4AFF] to-[#8B5CF6] text-white font-semibold shadow-sm shadow-[#6D4AFF]/30"
-                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                      )}
+                      className={({ isActive }) => {
+                        const active = isItemActive(isActive, item.path);
+                        return cn(
+                          "flex items-center rounded-xl text-xs sm:text-[13px] font-semibold transition-all duration-200 group relative cursor-pointer",
+                          isCollapsed ? "p-2 justify-center" : "px-3 py-2 gap-2.5",
+                          active
+                            ? "bg-[#166534] text-white shadow-sm shadow-[#166534]/25"
+                            : "text-[#57534E] hover:text-[#12263A] hover:bg-[#F0FDF4]"
+                        );
+                      }}
                     >
-                      {({ isActive }) => (
-                        <>
-                          <item.icon size={18} strokeWidth={2} className={cn("shrink-0 transition-colors", isActive ? "text-white" : "text-slate-400 group-hover:text-slate-600")} />
+                      {({ isActive }) => {
+                        const active = isItemActive(isActive, item.path);
+                        return (
+                          <>
+                            <item.icon size={17} strokeWidth={2} className={cn("shrink-0 transition-colors", active ? "text-white" : "text-[#57534E]/75 group-hover:text-[#12263A]")} />
 
-                          {!isCollapsed && (
-                            <span className="flex-1">{item.label}</span>
-                          )}
+                            {!isCollapsed && (
+                              <span className="flex-1">{item.label}</span>
+                            )}
 
-                          {/* Hover Tooltips for Collapsed state */}
-                          {isCollapsed && (
-                            <div className="absolute left-[64px] top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-slate-900 text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]">
-                              {item.label}
-                            </div>
-                          )}
-                        </>
-                      )}
+                            {/* Hover Tooltips for Collapsed state */}
+                            {isCollapsed && (
+                              <div className="absolute left-[64px] top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-[#12263A] text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]">
+                                {item.label}
+                              </div>
+                            )}
+                          </>
+                        );
+                      }}
                     </NavLink>
                   ))}
                 </nav>
               </div>
             ))}
             {user?.role === 'superadmin' && (
-              <div className="space-y-1 pt-2">
+              <div className="space-y-0.5 pt-1">
                 {!isCollapsed ? (
-                  <p className="px-3 mb-1 text-xs font-semibold text-indigo-650 tracking-wide select-none">System Controller</p>
+                  <p className="px-3 mb-1 text-[11px] font-bold uppercase tracking-wider text-[#166534] select-none">Administration</p>
                 ) : (
-                  <div className="w-full h-px bg-slate-100 my-3" />
+                  <div className="w-full h-px bg-[#e7e5e4] my-2" />
                 )}
                 <nav className="space-y-0.5">
                   <NavLink
                     to="/admin"
                     className={({ isActive }) => cn(
-                      "flex items-center rounded-xl text-sm font-medium transition-all duration-200 group relative cursor-pointer",
-                      isCollapsed ? "p-2.5 justify-center" : "px-3 py-2.5 gap-3",
+                      "flex items-center rounded-xl text-xs sm:text-[13px] font-semibold transition-all duration-200 group relative cursor-pointer",
+                      isCollapsed ? "p-2 justify-center" : "px-3 py-2 gap-2.5",
                       isActive
-                        ? "bg-gradient-to-r from-[#6D4AFF] to-[#8B5CF6] text-white font-semibold shadow-sm"
-                        : "text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50"
+                        ? "bg-[#166534] text-white shadow-sm shadow-[#166534]/25"
+                        : "text-[#12263A] hover:text-[#166534] hover:bg-[#F0FDF4]"
                     )}
                   >
-                    <Cpu size={18} strokeWidth={2} className="shrink-0 text-indigo-500 group-hover:text-indigo-650" />
+                    <Cpu size={17} strokeWidth={2} className="shrink-0 text-[#166534] group-hover:text-[#14532d]" />
                     {!isCollapsed && <span className="flex-1">Admin Panel</span>}
                     {isCollapsed && (
-                      <div className="absolute left-[64px] top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-slate-900 text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]">
+                      <div className="absolute left-[64px] top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-[#12263A] text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]">
                         Admin Panel
                       </div>
                     )}
@@ -418,45 +433,48 @@ export function Sidebar({
               </div>
             )}
           </div>
+
+          {/* Support & Resource Card inside scroll stream */}
+          {!isCollapsed && (
+            <div className="pt-4 pb-2">
+              <div className="bg-[#FAFAF9] border border-[#e7e5e4] rounded-xl p-3 flex items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-[#F0FDF4] text-[#166534] flex items-center justify-center shrink-0 border border-[#bbf7d0]">
+                    <FileText size={14} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-[#12263A] truncate">Help & Docs</p>
+                    <p className="text-[10px] text-[#57534E] truncate">Guides & resources</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate('/resources')}
+                  className="h-7 px-3 text-[11px] font-bold text-[#166534] hover:text-[#14532d] bg-white hover:bg-[#F0FDF4] border border-slate-200 hover:border-[#bbf7d0] rounded-lg transition-all shadow-xs active:scale-95 cursor-pointer shrink-0"
+                >
+                  View
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* 4. Health Score Card */}
-        {!isCollapsed && (
-          <div className="px-4 pb-1">
-            <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-2xl p-4">
-              <div className="flex items-center justify-between mb-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <ShieldCheck size={15} />
-                  </div>
-                  <span className="text-xs font-semibold text-slate-700">Health Score</span>
-                </div>
-                <span className="text-sm font-bold text-slate-900">92%</span>
-              </div>
-              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#8B5CF6]" style={{ width: '92%' }} />
-              </div>
-              <p className="text-[11px] font-medium text-emerald-600 mt-2">Excellent</p>
-            </div>
-          </div>
-        )}
-
-        {/* 5. Bottom sign out area */}
-        <div className="border-t border-slate-200 p-3 mt-2">
+        {/* 4. Bottom sign out area */}
+        <div className="border-t border-slate-200 p-2.5">
           {!isCollapsed ? (
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer"
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50/80 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer active:scale-98"
             >
-              <LogOut size={18} strokeWidth={2} className="shrink-0" />
+              <LogOut size={16} strokeWidth={2} className="shrink-0" />
               Sign Out
             </button>
           ) : (
             <button
               onClick={handleLogout}
-              className="w-10 h-10 mx-auto flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer group relative"
+              className="w-9 h-9 mx-auto flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all cursor-pointer group relative active:scale-90"
             >
-              <LogOut size={18} strokeWidth={2} />
+              <LogOut size={16} strokeWidth={2} />
               <div className="absolute left-[52px] top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-slate-900 text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]">
                 Sign Out
               </div>
@@ -658,7 +676,7 @@ export function Sidebar({
                     <button
                       type="button"
                       onClick={() => setShowPasswordFields(!showPasswordFields)}
-                      className="flex items-center justify-between w-full text-left text-xs font-black text-[#6D4AFF] hover:text-[#8B5CF6] uppercase tracking-widest cursor-pointer hover:underline"
+                      className="flex items-center justify-between w-full text-left text-xs font-black text-[#166534] hover:text-[#14532d] uppercase tracking-widest cursor-pointer hover:underline"
                     >
                       <span>🔒 Change Password</span>
                       <span>{showPasswordFields ? 'Hide' : 'Show'}</span>
@@ -962,15 +980,15 @@ export function Header() {
 
       <div className="flex items-center gap-6 flex-1 relative z-50">
         <div className="relative max-w-xl w-full hidden md:block group">
-          <Sparkles size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6D4AFF] transition-all" strokeWidth={2.2}/>
+          <Sparkles size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#166534] transition-all" strokeWidth={2.2}/>
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setIsFocused(true)}
-            placeholder="Ask AI anything about contacts, campaigns, or conversations..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-full py-2.5 pl-11 pr-12 text-[13px] font-medium text-slate-900 focus:outline-none focus:bg-white focus:border-[#6D4AFF] focus:ring-4 focus:ring-[#6D4AFF]/10 shadow-sm transition-all placeholder:text-slate-400"
+            placeholder="Search contacts, campaigns, or ask a question..."
+            className="w-full bg-[#FAFAF9] border border-[#e7e5e4] rounded-full py-2.5 pl-11 pr-12 text-[13px] font-medium text-[#12263A] focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 shadow-sm transition-all placeholder:text-[#57534E]/60"
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-white px-2 py-1 rounded-lg text-[10px] font-semibold text-slate-400 border border-slate-200 pointer-events-none">
             <Command size={10} strokeWidth={3} className="-mt-0.5" />
@@ -1040,28 +1058,28 @@ export function Header() {
                       </div>
 
                       <div>
-                        <p className="px-2 mb-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">🧭 SYSTEM SHORTCUTS</p>
+                        <p className="px-2 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wide">Quick Navigation</p>
                         <div className="space-y-1">
                           <button 
                             onClick={() => handleSelectResult('/dashboard')}
-                            className="w-full flex items-center justify-between p-2 rounded-lg text-slate-600 hover:text-indigo-950 text-[11px] font-semibold hover:bg-slate-50 transition-all"
+                            className="w-full flex items-center justify-between p-2 rounded-lg text-slate-600 hover:text-indigo-950 text-xs font-medium hover:bg-slate-50 transition-all"
                           >
-                            <span className="flex items-center gap-2"><Compass size={14} /> Insights Center</span>
-                            <span className="text-[9px] tracking-widest text-slate-300">GO/INSIGHTS</span>
+                            <span className="flex items-center gap-2"><Compass size={14} /> Dashboard Overview</span>
+                            <span className="text-[10px] text-slate-400">Jump to</span>
                           </button>
                           <button 
                             onClick={() => handleSelectResult('/contacts')}
-                            className="w-full flex items-center justify-between p-2 rounded-lg text-slate-600 hover:text-indigo-950 text-[11px] font-semibold hover:bg-slate-50 transition-all"
+                            className="w-full flex items-center justify-between p-2 rounded-lg text-slate-600 hover:text-indigo-950 text-xs font-medium hover:bg-slate-50 transition-all"
                           >
-                            <span className="flex items-center gap-2"><Users size={14} /> CRM Audience Database</span>
-                            <span className="text-[9px] tracking-widest text-slate-300">GO/CONTACTS</span>
+                            <span className="flex items-center gap-2"><Users size={14} /> Contacts</span>
+                            <span className="text-[10px] text-slate-400">Jump to</span>
                           </button>
                           <button 
                             onClick={() => handleSelectResult('/campaigns')}
-                            className="w-full flex items-center justify-between p-2 rounded-lg text-slate-600 hover:text-indigo-950 text-[11px] font-semibold hover:bg-slate-50 transition-all"
+                            className="w-full flex items-center justify-between p-2 rounded-lg text-slate-600 hover:text-indigo-950 text-xs font-medium hover:bg-slate-50 transition-all"
                           >
-                            <span className="flex items-center gap-2"><Send size={14} /> Engagement Campaigns</span>
-                            <span className="text-[9px] tracking-widest text-slate-300">GO/CAMPAIGNS</span>
+                            <span className="flex items-center gap-2"><Send size={14} /> Campaigns</span>
+                            <span className="text-[10px] text-slate-400">Jump to</span>
                           </button>
                         </div>
                       </div>
@@ -1186,11 +1204,15 @@ export function Header() {
                       {/* Not Found state */}
                       {!hasResults && (
                         <div className="py-8 px-4 text-center">
-                          <p className="text-[11px] font-bold text-slate-500">No indexing matches found for "{query}"</p>
-                          <p className="text-[9px] font-black text-indigo-500 uppercase tracking-widest mt-1.5 hover:underline cursor-pointer flex items-center justify-center gap-1.5" onClick={() => handleSelectResult('/contacts', query)}>
-                            <span>Force Search in CRM Contacts</span>
-                            <ChevronRight size={10} />
-                          </p>
+                          <p className="text-xs font-medium text-slate-500">No results found for "{query}"</p>
+                          <button
+                            type="button"
+                            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 mt-2 hover:underline cursor-pointer inline-flex items-center gap-1"
+                            onClick={() => handleSelectResult('/contacts', query)}
+                          >
+                            <span>Search Contacts for "{query}"</span>
+                            <ChevronRight size={12} />
+                          </button>
                         </div>
                       )}
                     </div>
@@ -1234,13 +1256,13 @@ export function Header() {
             className={cn(
               "relative w-10 h-10 flex items-center justify-center rounded-xl transition-all group cursor-pointer",
               showNotifications
-                ? "bg-[#6D4AFF]/10 text-[#6D4AFF] border border-[#6D4AFF]/20"
-                : "text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent"
+                ? "bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30"
+                : "text-[#57534E] hover:text-[#12263A] hover:bg-[#FAFAF9] border border-transparent"
             )}
           >
             <Bell size={19} strokeWidth={2.2} />
             {unreadCount > 0 && (
-              <span className="absolute top-2 right-2 min-w-[16px] h-4 px-1 flex items-center justify-center bg-rose-500 text-white text-[9px] font-bold rounded-full border-2 border-white">
+              <span className="absolute top-2 right-2 min-w-[16px] h-4 px-1 flex items-center justify-center bg-[#22C55E] text-white text-[9px] font-bold rounded-full border-2 border-white">
                 {unreadCount}
               </span>
             )}
@@ -1253,14 +1275,14 @@ export function Header() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 15, scale: 0.95 }}
                 transition={{ duration: 0.18, ease: "easeOut" }}
-                className="absolute right-0 mt-3 w-96 bg-white border border-slate-250/95 rounded-2xl shadow-floating overflow-hidden z-50 flex flex-col"
+                className="absolute right-0 mt-3 w-96 bg-white border border-[#e7e5e4] rounded-2xl shadow-floating overflow-hidden z-50 flex flex-col"
               >
                 {/* Header */}
-                <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                <div className="px-5 py-3.5 border-b border-[#e7e5e4] bg-white flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-black text-slate-800 uppercase tracking-wider">Alert Center</span>
+                    <span className="text-xs font-bold text-[#12263A]">Notifications</span>
                     {unreadCount > 0 && (
-                      <span className="bg-indigo-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full leading-none">
+                      <span className="bg-[#166534] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
                         {unreadCount}
                       </span>
                     )}
@@ -1268,22 +1290,22 @@ export function Header() {
                   {unreadCount > 0 && (
                     <button 
                       onClick={markAllAsRead}
-                      className="text-[9.5px] font-black text-indigo-600 hover:text-indigo-900 uppercase tracking-widest transition-colors cursor-pointer"
+                      className="text-xs font-semibold text-[#166534] hover:text-[#14532d] transition-colors cursor-pointer"
                     >
-                      Mark all read
+                      Mark all as read
                     </button>
                   )}
                 </div>
 
                 {/* Notifications List */}
-                <div className="max-h-[360px] overflow-y-auto custom-scrollbar divide-y divide-slate-100">
+                <div className="max-h-[360px] overflow-y-auto custom-scrollbar divide-y divide-[#e7e5e4]">
                   {notifications.length === 0 ? (
                     <div className="py-12 px-6 text-center select-none">
-                      <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto mb-3 border border-emerald-100">
-                        <CheckCircle2 size={16} strokeWidth={2.5} />
+                      <div className="w-10 h-10 rounded-full bg-[#F0FDF4] text-[#166534] flex items-center justify-center mx-auto mb-3 border border-[#22C55E]/20">
+                        <CheckCircle2 size={18} strokeWidth={2} />
                       </div>
-                      <p className="text-[11px] font-bold text-slate-900">All Core Systems Nominal</p>
-                      <p className="text-[9.5px] font-semibold text-slate-400 mt-1 uppercase tracking-wide">No pending action items or alerts</p>
+                      <p className="text-xs font-semibold text-[#12263A]">You're all caught up</p>
+                      <p className="text-[11px] text-[#57534E] mt-1">No new notifications right now</p>
                     </div>
                   ) : (
                     notifications.map((n) => {
@@ -1296,17 +1318,17 @@ export function Header() {
                           key={n.id}
                           onClick={() => handleNotificationClick(n.id)}
                           className={cn(
-                            "p-4 flex items-start gap-3.5 transition-all cursor-pointer group hover:bg-slate-50 relative",
-                            n.unread ? "bg-indigo-50/15" : ""
+                            "p-4 flex items-start gap-3.5 transition-all cursor-pointer group hover:bg-[#FAFAF9] relative",
+                            n.unread ? "bg-[#F0FDF4]" : ""
                           )}
                         >
                           {/* Left icon wrapper */}
                           <div className={cn(
                             "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border",
-                            n.category === 'campaign' && "bg-indigo-500/5 text-indigo-600 border-indigo-500/10",
-                            n.category === 'whatsapp' && "bg-amber-500/5 text-amber-600 border-amber-500/10",
-                            n.category === 'inbox' && "bg-rose-500/5 text-rose-600 border-rose-500/10",
-                            n.category === 'system' && "bg-emerald-500/5 text-emerald-600 border-emerald-500/10"
+                            n.category === 'campaign' && "bg-[#F0FDF4] text-[#166534] border-[#166534]/15",
+                            n.category === 'whatsapp' && "bg-emerald-50 text-emerald-700 border-emerald-200/40",
+                            n.category === 'inbox' && "bg-[#FAFAF9] text-[#12263A] border-[#12263A]/15",
+                            n.category === 'system' && "bg-[#F0FDF4] text-[#22C55E] border-[#22C55E]/20"
                           )}>
                             <Icon size={14} strokeWidth={2.5} />
                           </div>
@@ -1339,27 +1361,6 @@ export function Header() {
                       );
                     })
                   )}
-                </div>
-
-                {/* Simulator Footer */}
-                <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
-                  <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-wider">Interactive Sandbox Alert</span>
-                  <button
-                    onClick={() => {
-                      const id = Date.now();
-                      const mockAlerts = [
-                        { id, title: 'Inbound WhatsApp Reply', desc: 'New system event: incoming broadcast query from lead +33 605 2921.', category: 'inbox', time: 'Just now', unread: true },
-                        { id, title: 'Network Backup Triggered', desc: 'Secure database backup accomplished on high frequency node.', category: 'system', time: 'Just now', unread: true },
-                        { id, title: 'High Peak Engagement', desc: 'Real-time campaign open rate exceeded target matrix.', category: 'campaign', time: 'Just now', unread: true }
-                      ];
-                      const selectedAlert = mockAlerts[Math.floor(Math.random() * mockAlerts.length)];
-                      setNotifications(prev => [selectedAlert, ...prev]);
-                    }}
-                    className="flex items-center gap-1 bg-white border border-slate-200 hover:border-indigo-200 hover:bg-indigo-50/30 text-slate-500 hover:text-indigo-600 px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer shadow-sm"
-                  >
-                    <Plus size={9} strokeWidth={3} />
-                    <span>Trigger Mock Alert</span>
-                  </button>
                 </div>
               </motion.div>
             )}
@@ -1454,7 +1455,7 @@ export function Layout({ children }: { children?: ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 selection:bg-[#6D4AFF] selection:text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#FAFAF9] text-[#12263A] selection:bg-[#F0FDF4] selection:text-[#166534] overflow-x-hidden">
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={toggleCollapsed} />
       <div className={cn(
         "flex flex-col min-h-screen transition-all duration-300 ease-in-out",

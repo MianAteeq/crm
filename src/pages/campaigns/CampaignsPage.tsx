@@ -300,12 +300,12 @@ export default function CampaignsPage() {
     <div className="space-y-12 min-h-screen pb-20">
       {/* Premium Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 relative">
-        <div className="absolute -top-20 -left-20 w-64 h-64 bg-indigo-500/5 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-[#166534]/5 blur-[100px] rounded-full pointer-events-none" />
         
         <div className="relative z-10">
            <div className="flex items-center gap-3 mb-4">
-              <div className="px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-full">
-                 <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest flex items-center gap-1.5">
+              <div className="px-3 py-1 bg-[#F0FDF4] border border-[#bbf7d0] rounded-full">
+                 <span className="text-[10px] font-black text-[#166534] uppercase tracking-widest flex items-center gap-1.5">
                     <Sparkles size={10} />
                     Campaign Manager
                  </span>
@@ -313,14 +313,14 @@ export default function CampaignsPage() {
               <button 
                 onClick={loadCampaignsAndStats}
                 disabled={isLoading}
-                className="p-1.5 border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 rounded-lg shadow-sm transition-all disabled:opacity-40"
+                className="w-8 h-8 border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-slate-500 hover:text-[#166534] rounded-lg shadow-xs transition-all disabled:opacity-40 flex items-center justify-center cursor-pointer active:scale-90"
                 title="Refresh List"
               >
                 <RefreshCw size={12} className={cn("stroke-[2.5px]", isLoading && "animate-spin")} />
               </button>
            </div>
            <h1 className="text-5xl font-black text-slate-900 tracking-tighter leading-none mb-4">
-             Orchestrate <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Impact.</span>
+             Orchestrate <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#12263A] to-[#166534]">Impact.</span>
            </h1>
            <p className="text-slate-500 font-medium text-lg max-w-xl leading-relaxed">
              Design, deploy, and analyze high-conversion WhatsApp campaigns with absolute precision.
@@ -329,7 +329,7 @@ export default function CampaignsPage() {
 
         <button 
           onClick={() => navigate('/campaigns/create')}
-          className="btn-premium-gradient px-8 py-5 group relative z-10"
+          className="h-11 px-6 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white font-semibold text-sm transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 flex items-center gap-2 cursor-pointer relative z-10"
         >
           <Plus size={18} strokeWidth={2.5} />
           Create New Campaign
@@ -376,7 +376,7 @@ export default function CampaignsPage() {
           >
              <div className={cn(
                 "absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity duration-500",
-                stat.color === 'indigo' ? "text-indigo-600" : stat.color === 'blue' ? "text-blue-600" : "text-emerald-600"
+                stat.color === 'indigo' ? "text-[#166534]" : stat.color === 'blue' ? "text-blue-600" : "text-emerald-600"
              )}>
                 <stat.icon size={80} />
              </div>
@@ -385,7 +385,7 @@ export default function CampaignsPage() {
                 <div className="flex items-center justify-between mb-6">
                    <div className={cn(
                      "w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-500",
-                     stat.color === 'indigo' ? "bg-indigo-50 border-indigo-100 text-indigo-600" : 
+                     stat.color === 'indigo' ? "bg-indigo-50 border-indigo-100 text-[#166534]" : 
                      stat.color === 'blue' ? "bg-blue-50 border-blue-100 text-blue-600" : 
                      "bg-emerald-50 border-emerald-100 text-emerald-600"
                    )}>
@@ -480,7 +480,7 @@ export default function CampaignsPage() {
       <AnimatePresence mode="wait">
         {isLoading ? (
           <div className="py-24 flex flex-col items-center justify-center gap-4">
-             <Loader2 size={36} className="animate-spin text-indigo-600 stroke-[2.5px]" />
+             <Loader2 size={36} className="animate-spin text-[#166534] stroke-[2.5px]" />
              <p className="text-xs font-black uppercase tracking-widest text-slate-400">Downloading Target Stream Configurations...</p>
           </div>
         ) : filteredCampaigns.length > 0 ? (

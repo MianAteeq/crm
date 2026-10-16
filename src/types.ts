@@ -158,6 +158,8 @@ export interface User {
   onboardingStep: number;
   tenantId?: string;
   role?: string;
+  emailVerified?: boolean;
+  email_verified_at?: string | null;
 }
 
 export interface WhatsAppSettings {

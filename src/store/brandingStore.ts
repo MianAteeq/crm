@@ -10,9 +10,9 @@ interface BrandingState {
 }
 
 export const useBrandingStore = create<BrandingState>((set) => ({
-  websiteName: 'Fission Monster',
-  websiteTitle: 'Fission Monster - Premium WhatsApp Automation Platform',
-  websiteLogo: 'https://fissionmonster.com/static/img/fm-icon.png',
+  websiteName: 'Talkinexx',
+  websiteTitle: 'Talkinexx - Conversational CRM & Marketing Platform',
+  websiteLogo: null,
   websiteFavicon: null,
 
   loadBranding: async () => {
@@ -20,9 +20,9 @@ export const useBrandingStore = create<BrandingState>((set) => ({
       const data = await crmApi.getBranding();
       if (data && data.success) {
         set({
-          websiteName: data.website_name || 'Fission Monster',
-          websiteTitle: data.website_title || 'Fission Monster - Premium WhatsApp Automation Platform',
-          websiteLogo: data.website_logo || 'https://fissionmonster.com/static/img/fm-icon.png',
+          websiteName: data.website_name || 'Talkinexx',
+          websiteTitle: data.website_title || 'Talkinexx - Conversational CRM & Marketing Platform',
+          websiteLogo: data.website_logo || null,
           websiteFavicon: data.website_favicon,
         });
 

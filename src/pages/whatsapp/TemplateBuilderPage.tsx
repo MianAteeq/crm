@@ -309,7 +309,7 @@ export default function TemplateBuilderPage() {
                   "px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border",
                   isEditing 
                     ? "bg-amber-500/10 text-amber-700 border-amber-200/60" 
-                    : "bg-indigo-500/10 text-indigo-700 border-indigo-200/60"
+                    : "bg-[#F0FDF4] text-[#166534] border-[#bbf7d0]"
                 )}>
                   {isEditing ? 'Editing' : 'Draft'}
                 </span>
@@ -338,7 +338,7 @@ export default function TemplateBuilderPage() {
                 "relative px-6 h-10 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-[0.98] text-white flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50",
                 isEditing
                   ? "bg-slate-900 hover:bg-slate-800 shadow-slate-900/10"
-                  : "bg-gradient-to-r from-indigo-600 to-indigo-700 hover:shadow-lg hover:shadow-indigo-500/20"
+                  : "bg-gradient-to-r from-[#12263A] to-[#166534] hover:shadow-lg hover:shadow-[#166534]/20"
               )}
             >
               {isPublishing ? <Loader2 size={14} className="animate-spin text-white" /> : (isEditing ? <CheckCircle2 size={14} className="stroke-[3px]" /> : <Rocket size={14} className="stroke-[2.5px]" />)}

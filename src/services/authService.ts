@@ -55,6 +55,42 @@ export class AuthService {
     }
   }
 
+  static async verifyEmail(email: string, code?: string): Promise<any> {
+    try {
+      const response = await apiClient.post(
+        '/email/verify',
+        { email, code },
+        {
+          headers: {
+            'X-Skip-Toast': 'true',
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('[AUTH] Email verification error:', error);
+      throw error;
+    }
+  }
+
+  static async resendVerification(email: string): Promise<any> {
+    try {
+      const response = await apiClient.post(
+        '/email/resend-verification',
+        { email },
+        {
+          headers: {
+            'X-Skip-Toast': 'true',
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('[AUTH] Resend verification error:', error);
+      throw error;
+    }
+  }
+
   static setToken(token: string) {
     localStorage.setItem('auth_token', token);
   }

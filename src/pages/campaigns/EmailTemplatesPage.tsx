@@ -274,7 +274,7 @@ export default function EmailTemplatesPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/20">
+            <div className="w-10 h-10 rounded-xl bg-[#166534] text-white flex items-center justify-center shadow-lg shadow-[#166534]/20">
               <FileText size={20} />
             </div>
             <div>
@@ -288,7 +288,7 @@ export default function EmailTemplatesPage() {
 
         <button
           onClick={() => openCreateModal()}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-600/20"
+          className="h-10 px-5 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white text-xs sm:text-sm font-semibold transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 flex items-center gap-2 cursor-pointer"
         >
           <Plus size={16} />
           Create New Template
@@ -299,7 +299,7 @@ export default function EmailTemplatesPage() {
       <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-50 via-indigo-50/40 to-slate-50 border border-slate-200 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-            <Layout size={14} className="text-indigo-600" />
+            <Layout size={14} className="text-[#166534]" />
             Start with a Professional Framed Layout:
           </span>
           <span className="text-[11px] text-slate-400">Header & Footer included automatically</span>
@@ -310,11 +310,11 @@ export default function EmailTemplatesPage() {
             <button
               key={frame.id}
               onClick={() => openCreateModal(frame.id)}
-              className="p-3 bg-white rounded-xl border border-slate-200 hover:border-indigo-500 hover:shadow-sm text-left transition-all group"
+              className="p-3 bg-white rounded-xl border border-slate-200 hover:border-[#166534] hover:shadow-sm text-left transition-all group"
             >
               <div className="flex items-center justify-between">
                 <span className={`w-3 h-3 rounded-full ${frame.accentBg}`} />
-                <span className="text-[9px] font-bold text-indigo-600 group-hover:underline">+ Use</span>
+                <span className="text-[9px] font-bold text-[#166534] group-hover:underline">+ Use</span>
               </div>
               <p className="font-bold text-xs text-slate-900 mt-2">{frame.name}</p>
               <p className="text-[10px] text-slate-500 mt-0.5 line-clamp-1">{frame.badge}</p>
@@ -332,8 +332,8 @@ export default function EmailTemplatesPage() {
               onClick={() => setSelectedCategory(cat)}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                 selectedCategory === cat
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'bg-[#166534] text-white shadow-xs'
+                  : 'text-[#57534E] hover:text-[#12263A] hover:bg-[#F0FDF4]'
               }`}
             >
               {cat}
@@ -349,7 +349,7 @@ export default function EmailTemplatesPage() {
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && fetchTemplates()}
             placeholder="Search templates..."
-            className="w-full pl-10 pr-4 py-2 text-xs font-medium rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+            className="w-full pl-10 pr-4 py-2 text-xs font-medium rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534] transition-all"
           />
         </div>
       </div>
@@ -357,12 +357,12 @@ export default function EmailTemplatesPage() {
       {/* Template Grid */}
       {isLoading ? (
         <div className="p-16 flex flex-col items-center justify-center gap-3 text-slate-400 bg-white rounded-2xl border border-slate-200">
-          <RefreshCw size={24} className="animate-spin text-indigo-600" />
+          <RefreshCw size={24} className="animate-spin text-[#166534]" />
           <p className="text-xs font-semibold uppercase tracking-wider">Loading templates...</p>
         </div>
       ) : templates.length === 0 ? (
         <div className="p-16 text-center space-y-4 bg-white rounded-2xl border border-slate-200">
-          <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-2xl bg-[#F0FDF4] text-[#166534] flex items-center justify-center mx-auto">
             <FileText size={28} />
           </div>
           <div>
@@ -373,7 +373,7 @@ export default function EmailTemplatesPage() {
           </div>
           <button
             onClick={() => openCreateModal()}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-600/20"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#166534] text-white text-xs font-semibold hover:bg-[#14532d] transition-all shadow-md shadow-[#166534]/20"
           >
             <Plus size={14} />
             Create First Template
@@ -388,14 +388,14 @@ export default function EmailTemplatesPage() {
             >
               <div className="p-6 space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100">
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#F0FDF4] text-[#14532d] border border-[#bbf7d0]">
                     {template.category}
                   </span>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => setPreviewTemplate(template)}
                       title="Preview"
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-50 transition-colors"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-[#166534] hover:bg-slate-50 transition-colors"
                     >
                       <Eye size={15} />
                     </button>
@@ -425,7 +425,7 @@ export default function EmailTemplatesPage() {
 
                 <div>
                   <h3 className="text-base font-bold text-slate-900 tracking-tight">{template.name}</h3>
-                  <p className="text-xs text-indigo-600 font-medium mt-1 truncate">
+                  <p className="text-xs text-[#166534] font-medium mt-1 truncate">
                     Subject: {template.subject}
                   </p>
                 </div>
@@ -460,7 +460,7 @@ export default function EmailTemplatesPage() {
                 </button>
                 <button
                   onClick={() => navigate(`/email-campaigns/create?templateId=${template.id}`)}
-                  className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-700"
+                  className="flex items-center gap-1.5 text-xs font-bold text-[#166534] hover:text-[#14532d]"
                 >
                   Use in Campaign
                   <Send size={12} />
@@ -479,7 +479,7 @@ export default function EmailTemplatesPage() {
             <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div>
                 <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <Layout size={18} className="text-indigo-600" />
+                  <Layout size={18} className="text-[#166534]" />
                   {editingTemplate ? 'Edit Email Template' : 'Create Framed Email Template'}
                 </h3>
                 <p className="text-xs text-slate-500">
@@ -512,7 +512,7 @@ export default function EmailTemplatesPage() {
                         onClick={() => handleSelectFrame(frame.id)}
                         className={`p-2.5 rounded-xl border text-left transition-all ${
                           isSelected 
-                            ? 'border-indigo-600 bg-indigo-50/50 ring-2 ring-indigo-600/10' 
+                            ? 'border-[#166534] bg-[#F0FDF4]/50 ring-2 ring-indigo-600/10' 
                             : 'border-slate-200 hover:border-slate-300 bg-white'
                         }`}
                       >
@@ -534,7 +534,7 @@ export default function EmailTemplatesPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Modern Executive Outreach"
-                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#22C55E]/20"
                     required
                   />
                 </div>
@@ -544,7 +544,7 @@ export default function EmailTemplatesPage() {
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-[#22C55E]/20"
                   >
                     {CATEGORIES.filter(c => c !== 'All').map(cat => (
                       <option key={cat} value={cat}>{cat}</option>
@@ -567,7 +567,7 @@ export default function EmailTemplatesPage() {
                         key={idx}
                         type="button"
                         onClick={() => setSubject(prev => `${prev} ${item.tag}`.trim())}
-                        className="px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 font-medium transition-colors"
+                        className="px-2 py-0.5 rounded bg-slate-100 hover:bg-[#F0FDF4] hover:text-[#166534] text-slate-700 font-medium transition-colors"
                       >
                         + {item.label}
                       </button>
@@ -579,7 +579,7 @@ export default function EmailTemplatesPage() {
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   placeholder="e.g. Quick question regarding {{business_name}}"
-                  className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 font-medium text-slate-900 focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 font-medium text-slate-900 focus:ring-2 focus:ring-[#22C55E]/20"
                   required
                 />
               </div>
@@ -701,9 +701,9 @@ export default function EmailTemplatesPage() {
                       type="button"
                       onMouseDown={() => saveVisualEditorSelection()}
                       onClick={handleOpenButtonModal}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-indigo-500 text-xs font-bold text-slate-700 transition-all hover:bg-slate-50"
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-[#166534] text-xs font-bold text-slate-700 transition-all hover:bg-slate-50"
                     >
-                      <MousePointerClick size={13} className="text-indigo-600" />
+                      <MousePointerClick size={13} className="text-[#166534]" />
                       <span>+ Add Button</span>
                     </button>
                   </div>
@@ -761,7 +761,7 @@ export default function EmailTemplatesPage() {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-6 py-2.5 text-xs font-bold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-600/20"
+                  className="px-6 py-2.5 text-xs font-bold bg-[#166534] text-white rounded-xl hover:bg-[#14532d] shadow-md shadow-[#166534]/20"
                 >
                   {isSaving ? 'Saving...' : 'Save Template'}
                 </button>
@@ -788,14 +788,14 @@ export default function EmailTemplatesPage() {
                   <button
                     type="button"
                     onClick={() => setPreviewDevice('desktop')}
-                    className={`p-1.5 rounded-lg text-xs font-bold ${previewDevice === 'desktop' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}
+                    className={`p-1.5 rounded-lg text-xs font-bold ${previewDevice === 'desktop' ? 'bg-[#166534] text-white' : 'text-slate-500'}`}
                   >
                     <Monitor size={14} />
                   </button>
                   <button
                     type="button"
                     onClick={() => setPreviewDevice('mobile')}
-                    className={`p-1.5 rounded-lg text-xs font-bold ${previewDevice === 'mobile' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}
+                    className={`p-1.5 rounded-lg text-xs font-bold ${previewDevice === 'mobile' ? 'bg-[#166534] text-white' : 'text-slate-500'}`}
                   >
                     <Smartphone size={14} />
                   </button>
@@ -842,7 +842,7 @@ export default function EmailTemplatesPage() {
                   setPreviewTemplate(null);
                   navigate(`/email-campaigns/create?templateId=${id}`);
                 }}
-                className="flex items-center gap-2 px-5 py-2 text-xs font-bold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-600/20"
+                className="flex items-center gap-2 px-5 py-2 text-xs font-bold bg-[#166534] text-white rounded-xl hover:bg-[#14532d] shadow-md shadow-[#166534]/20"
               >
                 Use in Campaign
                 <Send size={13} />
@@ -856,9 +856,9 @@ export default function EmailTemplatesPage() {
       {isButtonModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full flex flex-col overflow-hidden">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-indigo-50/70 via-blue-50/50 to-white">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-[#F0FDF4] via-[#FAFAF9] to-white">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30">
+                <div className="w-10 h-10 rounded-2xl bg-[#166534] text-white flex items-center justify-center shadow-lg shadow-[#166534]/20">
                   <MousePointerClick size={20} />
                 </div>
                 <div>
@@ -888,7 +888,7 @@ export default function EmailTemplatesPage() {
                   value={buttonText}
                   onChange={(e) => setButtonText(e.target.value)}
                   placeholder="e.g. Schedule a 10-Minute Call"
-                  className="w-full px-3.5 py-2.5 text-xs font-medium rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 text-xs font-medium rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534]"
                 />
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   <span className="text-[10px] text-slate-400 font-bold uppercase py-0.5">Presets:</span>
@@ -903,7 +903,7 @@ export default function EmailTemplatesPage() {
                       key={preset}
                       type="button"
                       onClick={() => setButtonText(preset)}
-                      className="px-2 py-0.5 text-[10px] rounded-md bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 font-medium transition-all"
+                      className="px-2 py-0.5 text-[10px] rounded-md bg-slate-100 hover:bg-[#F0FDF4] hover:text-[#166534] text-slate-600 font-medium transition-all"
                     >
                       {preset}
                     </button>
@@ -923,7 +923,7 @@ export default function EmailTemplatesPage() {
                     value={buttonUrl}
                     onChange={(e) => setButtonUrl(e.target.value)}
                     placeholder="https://calendly.com/your-name/meeting"
-                    className="w-full pl-10 pr-3.5 py-2.5 text-xs font-medium rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs font-medium rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534]"
                   />
                 </div>
               </div>
@@ -1020,7 +1020,7 @@ export default function EmailTemplatesPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-600/20 flex items-center gap-1.5"
+                  className="px-5 py-2.5 rounded-xl bg-[#166534] text-white text-xs font-bold hover:bg-[#14532d] transition-all shadow-md shadow-[#166534]/20 flex items-center gap-1.5"
                 >
                   <Plus size={14} />
                   <span>Insert Button</span>

@@ -30,10 +30,10 @@ export function WhatsAppDashboardWidgets({ stats, isLoading = false }: WhatsAppD
       value: stats?.totalConversations || 0,
       trend: stats?.conversationsTrend,
       icon: MessageSquare,
-      gradient: 'from-blue-500 to-blue-600',
-      lightBg: 'bg-blue-50 dark:bg-blue-900/20',
-      darkBorder: 'border-blue-200 dark:border-blue-800',
-      iconColor: 'text-blue-600 dark:text-blue-400'
+      gradient: 'from-[#12263A] to-[#166534]',
+      lightBg: 'bg-[#F0FDF4]',
+      border: 'border-[#25D366]/20',
+      iconColor: 'text-[#166534]'
     },
     {
       id: 'sent',
@@ -41,20 +41,20 @@ export function WhatsAppDashboardWidgets({ stats, isLoading = false }: WhatsAppD
       value: stats?.messagesSentToday || 0,
       trend: stats?.messagesTrend,
       icon: Send,
-      gradient: 'from-emerald-500 to-emerald-600',
-      lightBg: 'bg-emerald-50 dark:bg-emerald-900/20',
-      darkBorder: 'border-emerald-200 dark:border-emerald-800',
-      iconColor: 'text-emerald-600 dark:text-emerald-400'
+      gradient: 'from-[#25D366] to-[#166534]',
+      lightBg: 'bg-[#F0FDF4]',
+      border: 'border-[#25D366]/20',
+      iconColor: 'text-[#25D366]'
     },
     {
       id: 'received',
       label: 'Messages Received Today',
       value: stats?.messagesReceivedToday || 0,
       icon: Inbox,
-      gradient: 'from-purple-500 to-purple-600',
-      lightBg: 'bg-purple-50 dark:bg-purple-900/20',
-      darkBorder: 'border-purple-200 dark:border-purple-800',
-      iconColor: 'text-purple-600 dark:text-purple-400'
+      gradient: 'from-blue-600 to-indigo-600',
+      lightBg: 'bg-[#EFF6FF]',
+      border: 'border-[#BFDBFE]',
+      iconColor: 'text-[#1D4ED8]'
     },
     {
       id: 'active',
@@ -62,22 +62,22 @@ export function WhatsAppDashboardWidgets({ stats, isLoading = false }: WhatsAppD
       value: stats?.activeChats || 0,
       icon: Activity,
       gradient: 'from-amber-500 to-amber-600',
-      lightBg: 'bg-amber-50 dark:bg-amber-900/20',
-      darkBorder: 'border-amber-200 dark:border-amber-800',
-      iconColor: 'text-amber-600 dark:text-amber-400'
+      lightBg: 'bg-amber-50',
+      border: 'border-amber-200',
+      iconColor: 'text-amber-600'
     }
   ];
 
   const getTrendIcon = (trend?: 'up' | 'down' | 'neutral') => {
-    if (trend === 'up') return <TrendingUp className="w-4 h-4 text-emerald-500" />;
+    if (trend === 'up') return <TrendingUp className="w-4 h-4 text-[#25D366]" />;
     if (trend === 'down') return <TrendingDown className="w-4 h-4 text-red-500" />;
-    return <Minus className="w-4 h-4 text-slate-400" />;
+    return <Minus className="w-4 h-4 text-[#64748B]" />;
   };
 
   const getTrendColor = (trend?: 'up' | 'down' | 'neutral') => {
-    if (trend === 'up') return 'text-emerald-600 dark:text-emerald-400';
-    if (trend === 'down') return 'text-red-600 dark:text-red-400';
-    return 'text-slate-500 dark:text-slate-400';
+    if (trend === 'up') return 'text-[#166534]';
+    if (trend === 'down') return 'text-red-600';
+    return 'text-[#64748B]';
   };
 
   if (isLoading) {
@@ -86,14 +86,14 @@ export function WhatsAppDashboardWidgets({ stats, isLoading = false }: WhatsAppD
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 animate-pulse"
+            className="bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] p-6 animate-pulse"
           >
             <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-xl" />
-              <div className="w-16 h-6 bg-slate-200 dark:bg-slate-700 rounded" />
+              <div className="w-12 h-12 bg-slate-100 rounded-xl" />
+              <div className="w-16 h-6 bg-slate-100 rounded" />
             </div>
-            <div className="w-24 h-8 bg-slate-200 dark:bg-slate-700 rounded mb-2" />
-            <div className="w-32 h-4 bg-slate-200 dark:bg-slate-700 rounded" />
+            <div className="w-24 h-8 bg-slate-100 rounded mb-2" />
+            <div className="w-32 h-4 bg-slate-100 rounded" />
           </div>
         ))}
       </div>
@@ -109,18 +109,17 @@ export function WhatsAppDashboardWidgets({ stats, isLoading = false }: WhatsAppD
             key={widget.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            whileHover={{ y: -4, transition: { duration: 0.2 } }}
-            className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group"
+            transition={{ delay: index * 0.08 }}
+            whileHover={{ y: -3, transition: { duration: 0.2 } }}
+            className="bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group"
           >
             <div className="p-6">
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
                 <div className={cn(
-                  'w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110',
+                  'w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105 border shadow-xs',
                   widget.lightBg,
-                  'border',
-                  widget.darkBorder
+                  widget.border
                 )}>
                   <Icon className={cn('w-6 h-6', widget.iconColor)} />
                 </div>
@@ -137,7 +136,7 @@ export function WhatsAppDashboardWidgets({ stats, isLoading = false }: WhatsAppD
                   key={widget.value}
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className="text-3xl font-bold text-slate-900 dark:text-white font-mono"
+                  className="text-3xl font-bold text-[#12263A] font-mono tracking-tight"
                 >
                   {widget.value.toLocaleString()}
                 </motion.div>
@@ -145,11 +144,11 @@ export function WhatsAppDashboardWidgets({ stats, isLoading = false }: WhatsAppD
 
               {/* Label */}
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                <p className="text-sm font-semibold text-[#64748B]">
                   {widget.label}
                 </p>
                 {widget.trend && (
-                  <span className={cn('text-xs font-medium', getTrendColor(widget.trend))}>
+                  <span className={cn('text-xs font-bold', getTrendColor(widget.trend))}>
                     {widget.trend === 'up' ? '+5.2%' : widget.trend === 'down' ? '-2.1%' : '0%'}
                   </span>
                 )}
@@ -157,28 +156,25 @@ export function WhatsAppDashboardWidgets({ stats, isLoading = false }: WhatsAppD
 
               {/* Progress Bar (for conversations only) */}
               {widget.id === 'conversations' && stats && (
-                <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2">
+                <div className="mt-4 pt-4 border-t border-[#E2E8F0]">
+                  <div className="flex items-center justify-between text-xs text-[#64748B] mb-2 font-medium">
                     <span>Capacity</span>
-                    <span>{capacityPct}%</span>
+                    <span className="font-semibold text-[#12263A]">{capacityPct}%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                  <div className="w-full h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${capacityPct}%` }}
                       transition={{ duration: 1, ease: 'easeOut' }}
-                      className={cn('h-full rounded-full bg-gradient-to-r', widget.gradient)}
+                      className="h-full rounded-full bg-[#25D366]"
                     />
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Hover Effect Border */}
-            <div className={cn(
-              'h-1 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300',
-              widget.gradient
-            )} />
+            {/* Hover Bottom Accent */}
+            <div className="h-0.5 bg-[#25D366] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </motion.div>
         );
       })}

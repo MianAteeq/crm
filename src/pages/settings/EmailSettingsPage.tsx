@@ -11,7 +11,7 @@ export default function EmailSettingsPage() {
       {/* Top Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/20">
+          <div className="w-10 h-10 rounded-xl bg-[#166534] text-white flex items-center justify-center shadow-lg shadow-[#166534]/20">
             <Globe size={20} />
           </div>
           <div>

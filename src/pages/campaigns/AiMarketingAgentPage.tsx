@@ -476,66 +476,70 @@ export default function AiMarketingAgentPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-radial from-purple-500/20 to-transparent pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-medium text-indigo-200 border border-white/10">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>AI Engine</span>
-              <span className="text-white/40">•</span>
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
-              <span>Verified Delivery Pipeline</span>
+      {/* Page Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-2">
+        <div className="flex items-start sm:items-center gap-4">
+          <div className="w-12 h-12 bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 rounded-2xl flex items-center justify-center shadow-xs shrink-0">
+            <Sparkles size={24} strokeWidth={2} className="text-[#166534]" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#12263A] tracking-tight">
+                AI Email Marketing Agent
+              </h1>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
+                AI Engine • Verified Delivery Pipeline
+              </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">AI Email Marketing Agent</h1>
-            <p className="text-indigo-200 text-sm sm:text-base max-w-2xl">
+            <p className="text-xs sm:text-sm font-medium text-[#57534E] max-w-2xl leading-relaxed">
               Type a marketing objective. The AI agent inspects your CRM audience, selects verified domains, crafts personalized emails, checks safety limits, and delivers campaigns.
             </p>
           </div>
+        </div>
 
-          <div className="flex items-center gap-2 bg-black/20 p-1.5 rounded-xl border border-white/10 self-start md:self-auto">
-            <button
-              onClick={() => setActiveTab('console')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                activeTab === 'console'
-                  ? 'bg-white text-indigo-900 shadow-sm'
-                  : 'text-white/80 hover:text-white'
-              }`}
-            >
-              Agent Console
-            </button>
-            <button
-              onClick={() => setActiveTab('history')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                activeTab === 'history'
-                  ? 'bg-white text-indigo-900 shadow-sm'
-                  : 'text-white/80 hover:text-white'
-              }`}
-            >
-              Run History
-            </button>
-            <button
-              onClick={() => setActiveTab('knowledge')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                activeTab === 'knowledge'
-                  ? 'bg-white text-indigo-900 shadow-sm'
-                  : 'text-white/80 hover:text-white'
-              }`}
-            >
-              Knowledge & Services
-            </button>
-            <button
-              onClick={() => setActiveTab('settings')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                activeTab === 'settings'
-                  ? 'bg-white text-indigo-900 shadow-sm'
-                  : 'text-white/80 hover:text-white'
-              }`}
-            >
-              Safety Limits
-            </button>
-          </div>
+        {/* Tab Switcher Pills */}
+        <div className="flex items-center gap-1 bg-stone-100 p-1.5 rounded-2xl border border-stone-200/80 self-start lg:self-center shadow-xs">
+          <button
+            onClick={() => setActiveTab('console')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'console'
+                ? 'bg-[#166534] text-white shadow-xs'
+                : 'text-[#57534E] hover:text-[#12263A] hover:bg-stone-200/50'
+            }`}
+          >
+            Agent Console
+          </button>
+          <button
+            onClick={() => setActiveTab('history')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'history'
+                ? 'bg-[#166534] text-white shadow-xs'
+                : 'text-[#57534E] hover:text-[#12263A] hover:bg-stone-200/50'
+            }`}
+          >
+            Run History
+          </button>
+          <button
+            onClick={() => setActiveTab('knowledge')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'knowledge'
+                ? 'bg-[#166534] text-white shadow-xs'
+                : 'text-[#57534E] hover:text-[#12263A] hover:bg-stone-200/50'
+            }`}
+          >
+            Knowledge & Services
+          </button>
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'settings'
+                ? 'bg-[#166534] text-white shadow-xs'
+                : 'text-[#57534E] hover:text-[#12263A] hover:bg-stone-200/50'
+            }`}
+          >
+            Safety Limits
+          </button>
         </div>
       </div>
 
@@ -543,14 +547,14 @@ export default function AiMarketingAgentPage() {
       {activeTab === 'console' && (
         <div className="space-y-6">
           {/* Natural Language Prompt Input */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-semibold text-slate-800 flex items-center gap-2">
-                <Bot className="w-4 h-4 text-indigo-600" />
+              <label className="text-sm font-semibold text-[#12263A] flex items-center gap-2">
+                <Bot className="w-4 h-4 text-[#166534]" />
                 What marketing campaign would you like me to create?
               </label>
-              <span className="text-xs text-slate-400">
-                Mode: <strong className="text-indigo-600 uppercase font-semibold">{knowledge?.approval_mode || 'Approval'}</strong>
+              <span className="text-xs text-[#57534E]">
+                Mode: <strong className="text-[#166534] uppercase font-semibold">{knowledge?.approval_mode || 'Approval'}</strong>
               </span>
             </div>
 
@@ -561,13 +565,13 @@ export default function AiMarketingAgentPage() {
                 placeholder="Example: Send an email to real estate businesses about our AI chatbot service..."
                 rows={3}
                 disabled={isPlanning}
-                className="w-full rounded-xl border border-slate-200 p-4 pr-32 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm resize-none"
+                className="w-full rounded-xl border border-stone-200 p-4 pr-32 text-[#12263A] placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534] text-sm resize-none bg-[#FAFAF9]"
               />
               <div className="absolute right-3 bottom-4 flex items-center gap-2">
                 <button
                   type="submit"
                   disabled={isPlanning || !prompt.trim()}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#12263A] hover:bg-[#166534] text-white rounded-lg text-xs font-semibold shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {isPlanning ? (
                     <>
@@ -576,7 +580,7 @@ export default function AiMarketingAgentPage() {
                     </>
                   ) : (
                     <>
-                      <Sparkles className="w-3.5 h-3.5" />
+                      <Sparkles className="w-3.5 h-3.5 text-[#22C55E]" />
                       Create Campaign
                     </>
                   )}
@@ -595,7 +599,7 @@ export default function AiMarketingAgentPage() {
                     setPrompt(p);
                     handlePlanCampaign(undefined, p);
                   }}
-                  className="px-3 py-1 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 text-slate-600 rounded-lg text-xs border border-slate-200/80 transition-colors text-left"
+                  className="px-3 py-1 bg-[#FAFAF9] hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#166534]/30 text-[#57534E] rounded-lg text-xs border border-stone-200/80 transition-colors text-left"
                 >
                   {p}
                 </button>
@@ -605,13 +609,13 @@ export default function AiMarketingAgentPage() {
 
           {/* Active Plan / Loading State */}
           {isPlanning && (
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center space-y-4">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 animate-pulse">
-                <Sparkles className="w-6 h-6 animate-spin" />
+            <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-8 text-center space-y-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 animate-pulse">
+                <Sparkles className="w-6 h-6 animate-spin text-[#22C55E]" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-semibold text-slate-800">AI Agent Orchestrator Running</h3>
-                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                <h3 className="text-base font-semibold text-[#12263A]">AI Agent Orchestrator Running</h3>
+                <p className="text-xs text-[#57534E] max-w-md mx-auto">
                   Understanding intent • Filtering CRM categories • Checking sending domain • Generating B2B copy with AI...
                 </p>
               </div>
@@ -630,17 +634,17 @@ export default function AiMarketingAgentPage() {
 
               {/* Structured Campaign Plan & PROPER EMAIL TEMPLATE */}
               {plan && currentRun.status === 'awaiting_approval' ? (
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6 w-full">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 space-y-6 w-full">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
                     <div>
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-indigo-50 text-indigo-700 rounded-md text-xs font-semibold mb-1">
-                        <Sparkles className="w-3 h-3" />
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 rounded-md text-xs font-semibold mb-1">
+                        <Sparkles className="w-3 h-3 text-[#22C55E]" />
                         AI CAMPAIGN PLAN
                       </div>
-                      <h2 className="text-lg font-bold text-slate-900">{plan.campaign_name}</h2>
+                      <h2 className="text-lg font-bold text-[#12263A]">{plan.campaign_name}</h2>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-500">Status:</span>
+                      <span className="text-xs text-[#57534E]">Status:</span>
                       <span className="px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-xs font-semibold">
                         Ready for Review
                       </span>

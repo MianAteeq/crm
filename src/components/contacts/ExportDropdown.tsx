@@ -24,9 +24,9 @@ export default function ExportDropdown({ onExport }: ExportDropdownProps) {
     <div className="relative" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm"
+        className="h-10 px-4 bg-white border border-slate-200 hover:border-[#bbf7d0] rounded-xl text-xs sm:text-sm font-semibold text-[#57534E] hover:text-[#166534] hover:bg-[#F0FDF4] transition-all shadow-xs active:scale-95 flex items-center gap-2 cursor-pointer"
       >
-        <Download size={14} />
+        <Download size={15} />
         <span>Export</span>
         <ChevronDown size={14} className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
       </button>

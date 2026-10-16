@@ -94,7 +94,7 @@ export function PrivacyPage() {
             <div className="space-y-4">
               <h2 className="text-xl font-bold text-slate-900 tracking-tight">7. Contact Information</h2>
               <p className="text-slate-500 text-sm leading-[1.8]">
-                For questions regarding data processing policies, deletion requests, or integration security compliance details, please submit an inquiry to our support center at <a href="mailto:support@throbtech.com" className="text-indigo-650 font-bold hover:underline">support@throbtech.com</a>.
+                For questions regarding data processing policies, deletion requests, or integration security compliance details, please submit an inquiry to our support center at <a href="mailto:support@talkinexx.com" className="text-indigo-650 font-bold hover:underline">support@talkinexx.com</a>.
               </p>
             </div>
 

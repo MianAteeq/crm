@@ -302,7 +302,7 @@ export default function AdminSettings() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <Loader2 size={32} className="animate-spin text-indigo-650" />
+        <Loader2 size={32} className="animate-spin text-[#166534]" />
         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Querying SaaS settings...</p>
       </div>
     );
@@ -312,13 +312,13 @@ export default function AdminSettings() {
     <div className="space-y-8 animate-fade-in max-w-7xl pb-16">
       {/* Header section with atmospheric mesh pattern */}
       <div className="relative overflow-hidden bg-slate-900 text-white p-8 rounded-3xl border border-slate-800 shadow-xl">
-        <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-1/4 -mb-16 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl" />
+        <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-[#166534]/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-1/4 -mb-16 w-48 h-48 bg-[#166534]/10 rounded-full blur-2xl" />
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <div className="flex items-center gap-2.5 text-xs text-indigo-400 font-bold tracking-widest uppercase mb-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+            <div className="flex items-center gap-2.5 text-xs text-[#22C55E] font-bold tracking-widest uppercase mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
               <span>Gateway Administrator</span>
             </div>
             <h1 className="text-2xl font-black tracking-tight text-white">SaaS Settings Management</h1>
@@ -327,7 +327,7 @@ export default function AdminSettings() {
             </p>
           </div>
           <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2.5 rounded-2xl shrink-0 backdrop-blur-md">
-            <ShieldCheck size={16} className="text-indigo-400" />
+            <ShieldCheck size={16} className="text-[#22C55E]" />
             <div className="text-left select-none">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Gate Status</p>
               <p className="text-xs font-black text-white leading-none mt-0.5 uppercase tracking-wide">
@@ -349,7 +349,7 @@ export default function AdminSettings() {
             placeholder="Search key or value..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200/60 rounded-xl py-2.5 pl-10 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+            className="w-full bg-slate-50 border border-slate-200/60 rounded-xl py-2.5 pl-10 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
           />
         </div>
 
@@ -368,8 +368,8 @@ export default function AdminSettings() {
                 onClick={() => setActiveTab(tab.id as TabType)}
                 className={`px-3.5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
                   activeTab === tab.id
-                    ? 'bg-indigo-650 text-white shadow-md shadow-indigo-600/10'
-                    : 'bg-slate-50 border border-slate-200/85 text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                    ? 'bg-[#166534] text-white shadow-md shadow-[#166534]/15'
+                    : 'bg-slate-50 hover:bg-[#F0FDF4] border border-slate-200/80 text-slate-600 hover:text-[#166534] hover:border-[#bbf7d0]'
                 }`}
               >
                 <tab.icon size={13} />
@@ -431,7 +431,7 @@ export default function AdminSettings() {
                         type="text"
                         value={values[item.key] || ''}
                         onChange={(e) => handleFieldChange(item.key, e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                       />
                     </div>
                   ))}
@@ -441,7 +441,7 @@ export default function AdminSettings() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-md active:scale-95 flex items-center gap-2 cursor-pointer text-white"
+                    className="px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] text-xs font-bold text-white rounded-xl transition-all flex items-center gap-2 shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer disabled:opacity-50"
                   >
                     {saving && <Loader2 size={13} className="animate-spin" />}
                     <span>Save Configurations</span>
@@ -458,7 +458,7 @@ export default function AdminSettings() {
             {activeTab === 'general' && (
               <form onSubmit={handleSave} className="space-y-6">
                 <div className="flex items-center gap-3">
-                  <span className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-650 border border-indigo-100/50 shadow-inner">
+                  <span className="w-10 h-10 rounded-2xl bg-[#F0FDF4] flex items-center justify-center text-[#166534] border border-[#bbf7d0]/50 shadow-inner">
                     <Globe size={18} />
                   </span>
                   <div>
@@ -517,7 +517,7 @@ export default function AdminSettings() {
                       type="text"
                       value={values['general.website_name'] || ''}
                       onChange={(e) => handleFieldChange('general.website_name', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -526,7 +526,7 @@ export default function AdminSettings() {
                       type="text"
                       value={values['general.website_title'] || ''}
                       onChange={(e) => handleFieldChange('general.website_title', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                     />
                   </div>
                 </div>
@@ -537,7 +537,7 @@ export default function AdminSettings() {
                     rows={3}
                     value={values['general.website_description'] || ''}
                     onChange={(e) => handleFieldChange('general.website_description', e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                   />
                 </div>
 
@@ -547,7 +547,7 @@ export default function AdminSettings() {
                     <select
                       value={values['general.timezone'] || 'UTC'}
                       onChange={(e) => handleFieldChange('general.timezone', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-sans"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
                     >
                       {ALL_TIMEZONES.map(tz => (
                         <option key={tz} value={tz}>{tz}</option>
@@ -559,7 +559,7 @@ export default function AdminSettings() {
                     <select
                       value={values['general.date_format'] || 'Y-m-d'}
                       onChange={(e) => handleFieldChange('general.date_format', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-mono"
                     >
                       <option value="Y-m-d">YYYY-MM-DD (e.g. 2026-06-22)</option>
                       <option value="d-m-Y">DD-MM-YYYY (e.g. 22-06-2026)</option>
@@ -572,7 +572,7 @@ export default function AdminSettings() {
                     <select
                       value={values['general.website_language'] || 'en'}
                       onChange={(e) => handleFieldChange('general.website_language', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-sans"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
                     >
                       <option value="en">English (US)</option>
                       <option value="es">Español (ES)</option>
@@ -588,7 +588,7 @@ export default function AdminSettings() {
                     <select
                       value={values['general.currency_code'] || 'USD'}
                       onChange={(e) => handleFieldChange('general.currency_code', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-sans"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
                     >
                       <option value="PKR">PKR (Rs.)</option>
                       <option value="SAR">SAR (ر.س)</option>
@@ -601,7 +601,7 @@ export default function AdminSettings() {
                       type="text"
                       value={values['general.footer_copyright'] || ''}
                       onChange={(e) => handleFieldChange('general.footer_copyright', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                     />
                   </div>
                 </div>
@@ -610,7 +610,7 @@ export default function AdminSettings() {
                 <div className="bg-slate-50 border border-slate-150 rounded-2xl p-5 flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#166534]" />
                       <p className="text-xs font-extrabold text-slate-900">System Maintenance Mode</p>
                     </div>
                     <p className="text-[10px] text-slate-450 mt-0.5 leading-relaxed">
@@ -621,7 +621,7 @@ export default function AdminSettings() {
                     type="button"
                     onClick={() => handleFieldChange('general.maintenance_mode', values['general.maintenance_mode'] === 'true' ? 'false' : 'true')}
                     className={`relative inline-flex h-6.5 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                      values['general.maintenance_mode'] === 'true' ? 'bg-indigo-650' : 'bg-slate-250'
+                      values['general.maintenance_mode'] === 'true' ? 'bg-[#166534]' : 'bg-slate-250'
                     }`}
                   >
                     <span
@@ -649,7 +649,7 @@ export default function AdminSettings() {
                   <button
                     type="submit"
                     disabled={saving || saveStatus === 'success'}
-                    className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-xs font-black uppercase tracking-widest text-white rounded-xl shadow-lg active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                    className="px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] text-xs font-bold text-white rounded-xl transition-all flex items-center gap-2 shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer disabled:opacity-50"
                   >
                     {saving && <Loader2 size={13} className="animate-spin text-white" />}
                     <span>Save general changes</span>
@@ -662,7 +662,7 @@ export default function AdminSettings() {
             {activeTab === 'contact' && (
               <form onSubmit={handleSave} className="space-y-6">
                 <div className="flex items-center gap-3">
-                  <span className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-650 border border-indigo-100/50 shadow-inner">
+                  <span className="w-10 h-10 rounded-2xl bg-[#F0FDF4] flex items-center justify-center text-[#166534] border border-[#bbf7d0]/50 shadow-inner">
                     <Mail size={18} />
                   </span>
                   <div>
@@ -679,7 +679,7 @@ export default function AdminSettings() {
                       type="text"
                       value={values['contact.company_name'] || ''}
                       onChange={(e) => handleFieldChange('contact.company_name', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -688,7 +688,7 @@ export default function AdminSettings() {
                       type="email"
                       value={values['contact.contact_email'] || ''}
                       onChange={(e) => handleFieldChange('contact.contact_email', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-mono"
                     />
                   </div>
                 </div>
@@ -700,7 +700,7 @@ export default function AdminSettings() {
                       type="email"
                       value={values['contact.support_email'] || ''}
                       onChange={(e) => handleFieldChange('contact.support_email', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-mono"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -711,7 +711,7 @@ export default function AdminSettings() {
                         type="text"
                         value={values['contact.phone_number'] || ''}
                         onChange={(e) => handleFieldChange('contact.phone_number', e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                       />
                     </div>
                   </div>
@@ -723,7 +723,7 @@ export default function AdminSettings() {
                         type="text"
                         value={values['contact.whatsapp_number'] || ''}
                         onChange={(e) => handleFieldChange('contact.whatsapp_number', e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                       />
                     </div>
                   </div>
@@ -738,7 +738,7 @@ export default function AdminSettings() {
                         rows={3}
                         value={values['contact.physical_address'] || ''}
                         onChange={(e) => handleFieldChange('contact.physical_address', e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                       />
                     </div>
                   </div>
@@ -748,7 +748,7 @@ export default function AdminSettings() {
                       rows={3}
                       value={values['contact.google_maps_embed'] || ''}
                       onChange={(e) => handleFieldChange('contact.google_maps_embed', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-mono"
                     />
                   </div>
                 </div>
@@ -769,7 +769,7 @@ export default function AdminSettings() {
                         type="text"
                         value={values['social.facebook'] || ''}
                         onChange={(e) => handleFieldChange('social.facebook', e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-sans"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
                       />
                     </div>
                   </div>
@@ -783,7 +783,7 @@ export default function AdminSettings() {
                         type="text"
                         value={values['social.instagram'] || ''}
                         onChange={(e) => handleFieldChange('social.instagram', e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-sans"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
                       />
                     </div>
                   </div>
@@ -797,7 +797,7 @@ export default function AdminSettings() {
                         type="text"
                         value={values['social.linkedin'] || ''}
                         onChange={(e) => handleFieldChange('social.linkedin', e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-sans"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
                       />
                     </div>
                   </div>
@@ -811,7 +811,7 @@ export default function AdminSettings() {
                         type="text"
                         value={values['social.twitter'] || ''}
                         onChange={(e) => handleFieldChange('social.twitter', e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-sans"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
                       />
                     </div>
                   </div>
@@ -825,7 +825,7 @@ export default function AdminSettings() {
                         type="text"
                         value={values['social.youtube'] || ''}
                         onChange={(e) => handleFieldChange('social.youtube', e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-sans"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
                       />
                     </div>
                   </div>
@@ -839,7 +839,7 @@ export default function AdminSettings() {
                         type="text"
                         value={values['social.tiktok'] || ''}
                         onChange={(e) => handleFieldChange('social.tiktok', e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-sans"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
                       />
                     </div>
                   </div>
@@ -857,7 +857,7 @@ export default function AdminSettings() {
                   <button
                     type="submit"
                     disabled={saving || saveStatus === 'success'}
-                    className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-xs font-black uppercase tracking-widest text-white rounded-xl shadow-lg active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                    className="px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] text-xs font-bold text-white rounded-xl transition-all flex items-center gap-2 shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer disabled:opacity-50"
                   >
                     {saving && <Loader2 size={13} className="animate-spin text-white" />}
                     <span>Save Contact Changes</span>
@@ -871,7 +871,7 @@ export default function AdminSettings() {
               <form onSubmit={handleSave} className="space-y-6">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <span className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-650 border border-indigo-100/50 shadow-inner">
+                    <span className="w-10 h-10 rounded-2xl bg-[#F0FDF4] flex items-center justify-center text-[#166534] border border-[#bbf7d0]/50 shadow-inner">
                       <Send size={18} />
                     </span>
                     <div>
@@ -882,7 +882,7 @@ export default function AdminSettings() {
                   <button
                     type="button"
                     onClick={() => setIsSmtpModalOpen(true)}
-                    className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all hover:shadow-indigo-600/10 cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+                    className="px-4 py-2.5 bg-[#166534] hover:bg-[#14532d] text-white rounded-xl text-xs font-bold transition-all hover:shadow-[#166534]/15 cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
                   >
                     <Send size={13} />
                     <span>Send Test Email</span>
@@ -897,7 +897,7 @@ export default function AdminSettings() {
                       type="text"
                       value={values['email.smtp_host'] || ''}
                       onChange={(e) => handleFieldChange('email.smtp_host', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-mono"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -906,7 +906,7 @@ export default function AdminSettings() {
                       type="text"
                       value={values['email.smtp_port'] || ''}
                       onChange={(e) => handleFieldChange('email.smtp_port', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-mono"
                     />
                   </div>
                 </div>
@@ -918,7 +918,7 @@ export default function AdminSettings() {
                       type="text"
                       value={values['email.smtp_username'] || ''}
                       onChange={(e) => handleFieldChange('email.smtp_username', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-mono"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -929,7 +929,7 @@ export default function AdminSettings() {
                         type="password"
                         value={values['email.smtp_password'] || ''}
                         onChange={(e) => handleFieldChange('email.smtp_password', e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-mono"
                       />
                     </div>
                   </div>
@@ -938,7 +938,7 @@ export default function AdminSettings() {
                     <select
                       value={values['email.smtp_encryption'] || 'tls'}
                       onChange={(e) => handleFieldChange('email.smtp_encryption', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-sans"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
                     >
                       <option value="tls">TLS Protocol</option>
                       <option value="ssl">SSL Protocol</option>
@@ -954,7 +954,7 @@ export default function AdminSettings() {
                       type="text"
                       value={values['email.sender_name'] || ''}
                       onChange={(e) => handleFieldChange('email.sender_name', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -963,7 +963,7 @@ export default function AdminSettings() {
                       type="email"
                       value={values['email.sender_email'] || ''}
                       onChange={(e) => handleFieldChange('email.sender_email', e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-mono"
                     />
                   </div>
                 </div>
@@ -980,7 +980,7 @@ export default function AdminSettings() {
                   <button
                     type="submit"
                     disabled={saving || saveStatus === 'success'}
-                    className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-xs font-black uppercase tracking-widest text-white rounded-xl shadow-lg active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                    className="px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] text-xs font-bold text-white rounded-xl transition-all flex items-center gap-2 shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer disabled:opacity-50"
                   >
                     {saving && <Loader2 size={13} className="animate-spin text-white" />}
                     <span>Save SMTP Changes</span>
@@ -993,7 +993,7 @@ export default function AdminSettings() {
             {activeTab === 'diagnostics' && (
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
-                  <span className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-650 border border-indigo-100/50 shadow-inner">
+                  <span className="w-10 h-10 rounded-2xl bg-[#F0FDF4] flex items-center justify-center text-[#166534] border border-[#bbf7d0]/50 shadow-inner">
                     <Activity size={18} />
                   </span>
                   <div>
@@ -1088,7 +1088,7 @@ export default function AdminSettings() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <span className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-650 border border-indigo-100/50 shadow-inner">
+                    <span className="w-10 h-10 rounded-2xl bg-[#F0FDF4] flex items-center justify-center text-[#166534] border border-[#bbf7d0]/50 shadow-inner">
                       <FileClock size={18} />
                     </span>
                     <div>
@@ -1109,7 +1109,7 @@ export default function AdminSettings() {
 
                 {loadingAudit && auditLogs.length === 0 ? (
                   <div className="py-16 text-center flex flex-col items-center gap-2">
-                    <Loader2 size={24} className="animate-spin text-indigo-650" />
+                    <Loader2 size={24} className="animate-spin text-[#166534]" />
                     <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Reading change logs ledger...</p>
                   </div>
                 ) : errorAudit ? (
@@ -1137,7 +1137,7 @@ export default function AdminSettings() {
                               <tr key={log.id} className="hover:bg-slate-50/30 transition-colors text-xs font-medium">
                                 <td className="py-4.5 px-6">
                                   <div className="flex items-center gap-2.5">
-                                    <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-extrabold text-[10px]">
+                                    <div className="w-7 h-7 rounded-lg bg-[#F0FDF4] text-[#166534] flex items-center justify-center font-extrabold text-[10px]">
                                       <User size={13} />
                                     </div>
                                     <div>
@@ -1146,7 +1146,7 @@ export default function AdminSettings() {
                                     </div>
                                   </div>
                                 </td>
-                                <td className="py-4.5 px-6 font-mono text-[10px] text-indigo-650">
+                                <td className="py-4.5 px-6 font-mono text-[10px] text-[#166534]">
                                   <span className="px-2 py-0.5 rounded bg-slate-50 border border-slate-100">
                                     {log.key}
                                   </span>
@@ -1244,7 +1244,7 @@ export default function AdminSettings() {
               <form onSubmit={handleSendTestSmtp} className="flex flex-col">
                 <div className="bg-slate-55 border-b border-slate-100 p-5 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <span className="w-8.5 h-8.5 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-650">
+                    <span className="w-8.5 h-8.5 rounded-xl bg-[#166534]/10 flex items-center justify-center text-[#166534]">
                       <Send size={14} />
                     </span>
                     <div>
@@ -1271,7 +1271,7 @@ export default function AdminSettings() {
                       value={testRecipient}
                       onChange={(e) => setTestRecipient(e.target.value)}
                       placeholder="recipient@example.com"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                     />
                   </div>
                   
@@ -1295,14 +1295,14 @@ export default function AdminSettings() {
                       type="button"
                       onClick={() => setIsSmtpModalOpen(false)}
                       disabled={smtpTesting}
-                      className="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-650 rounded-xl transition-all cursor-pointer"
+                      className="px-4.5 py-2.5 border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-xs font-bold text-[#57534E] hover:text-[#166534] rounded-xl transition-all cursor-pointer shadow-xs active:scale-95"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={smtpTesting || smtpStatus === 'success'}
-                      className="px-4 py-2 bg-indigo-650 hover:bg-indigo-750 text-xs font-bold text-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer hover:shadow-indigo-600/10"
+                      className="px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] text-xs font-bold text-white rounded-xl transition-all flex items-center gap-2 shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer disabled:opacity-50"
                     >
                       {smtpTesting && <Loader2 size={13} className="animate-spin text-white" />}
                       <span>Dispatch Test</span>

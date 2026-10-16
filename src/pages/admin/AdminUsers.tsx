@@ -170,7 +170,7 @@ export default function AdminUsers() {
       case 'superadmin':
         return 'from-rose-500 to-orange-500 text-white';
       case 'admin':
-        return 'from-violet-500 to-indigo-500 text-white';
+        return 'from-[#12263A] to-[#166534] text-white';
       case 'agent':
         return 'from-blue-500 to-cyan-500 text-white';
       default:
@@ -182,13 +182,13 @@ export default function AdminUsers() {
     <div className="space-y-8 animate-fade-in pb-12">
       {/* Header section with ambient light effect */}
       <div className="relative overflow-hidden bg-slate-900 text-white p-8 rounded-3xl border border-slate-800 shadow-xl">
-        <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-1/3 -mb-16 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl" />
+        <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-[#166534]/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-1/3 -mb-16 w-48 h-48 bg-[#166534]/10 rounded-full blur-2xl" />
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <div className="flex items-center gap-2.5 text-xs text-indigo-400 font-bold tracking-widest uppercase mb-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+            <div className="flex items-center gap-2.5 text-xs text-[#22C55E] font-bold tracking-widest uppercase mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
               <span>Identity Orchestrator</span>
             </div>
             <h1 className="text-2xl font-black tracking-tight text-white">System Users Directory</h1>
@@ -197,7 +197,7 @@ export default function AdminUsers() {
             </p>
           </div>
           <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2.5 rounded-2xl shrink-0 backdrop-blur-md">
-            <Users size={16} className="text-indigo-400" />
+            <Users size={16} className="text-[#22C55E]" />
             <div className="text-left">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Registers</p>
               <p className="text-sm font-black text-white leading-none mt-0.5">
@@ -217,7 +217,7 @@ export default function AdminUsers() {
             placeholder="Search users by name or email..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full bg-slate-50 border border-slate-200/60 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+            className="w-full bg-slate-50 border border-slate-200/60 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
           />
         </div>
         {search && (
@@ -234,7 +234,7 @@ export default function AdminUsers() {
       <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm">
         {loading && users.length === 0 ? (
           <div className="py-24 text-center flex flex-col items-center gap-3">
-            <Loader2 size={28} className="animate-spin text-indigo-650" />
+            <Loader2 size={28} className="animate-spin text-[#166534]" />
             <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Quarrying user catalog...</p>
           </div>
         ) : error ? (
@@ -274,7 +274,7 @@ export default function AdminUsers() {
                           {user.name.substring(0, 2).toUpperCase()}
                         </div>
                         <div>
-                          <p className="font-extrabold text-slate-900 leading-none group-hover:text-indigo-650 transition-colors">{user.name}</p>
+                          <p className="font-extrabold text-slate-900 leading-none group-hover:text-[#166534] transition-colors">{user.name}</p>
                           <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-450 font-semibold">
                             <Mail size={11} className="text-slate-400" />
                             <span>{user.email}</span>
@@ -285,7 +285,7 @@ export default function AdminUsers() {
                     <td className="py-4.5 px-6">
                       {user.tenant ? (
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-650 shrink-0">
+                          <div className="w-6 h-6 rounded-lg bg-[#F0FDF4] flex items-center justify-center text-[#166534] shrink-0">
                             <Building size={12} />
                           </div>
                           <span className="font-extrabold text-slate-800 tracking-tight">{user.tenant.name}</span>
@@ -324,13 +324,13 @@ export default function AdminUsers() {
                       <div className="flex items-center justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => handleOpenEdit(user)}
-                          className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 hover:bg-indigo-50 hover:border-indigo-200 text-slate-500 hover:text-indigo-650 flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-90"
+                          className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-slate-500 hover:text-[#166534] flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-90"
                         >
                           <Edit2 size={13} />
                         </button>
                         <button
                           onClick={() => setDeletingUser(user)}
-                          className="w-8 h-8 rounded-lg bg-red-50/50 border border-red-100 hover:bg-red-500 hover:border-red-500 text-red-500 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-90"
+                          className="w-8 h-8 rounded-lg bg-rose-50/60 border border-rose-100 hover:bg-rose-600 hover:border-rose-600 text-rose-500 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-90"
                         >
                           <Trash2 size={13} />
                         </button>
@@ -353,14 +353,14 @@ export default function AdminUsers() {
               <button
                 disabled={page === 1}
                 onClick={() => setPage(prev => Math.max(prev - 1, 1))}
-                className="w-8.5 h-8.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-slate-650 transition-all active:scale-95"
+                className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-slate-600 transition-all active:scale-95 shadow-xs"
               >
                 <ChevronLeft size={15} />
               </button>
               <button
                 disabled={page === lastPage}
                 onClick={() => setPage(prev => Math.min(prev + 1, lastPage))}
-                className="w-8.5 h-8.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-slate-650 transition-all active:scale-95"
+                className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-slate-600 transition-all active:scale-95 shadow-xs"
               >
                 <ChevronRight size={15} />
               </button>
@@ -391,7 +391,7 @@ export default function AdminUsers() {
               <form onSubmit={handleSaveEdit} className="flex flex-col">
                 <div className="bg-slate-55 border-b border-slate-100 p-6 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-650">
+                    <span className="w-9 h-9 rounded-xl bg-[#166534]/10 flex items-center justify-center text-[#166534]">
                       <Edit2 size={15} />
                     </span>
                     <div>
@@ -418,7 +418,7 @@ export default function AdminUsers() {
                       required
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                     />
                   </div>
 
@@ -428,7 +428,7 @@ export default function AdminUsers() {
                     <select
                       value={editRole}
                       onChange={(e) => setEditRole(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-sans"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
                     >
                       <option value="superadmin">Super Admin (Cross-Tenant Controller)</option>
                       <option value="admin">Workspace Admin (Tenant Administrator)</option>
@@ -443,7 +443,7 @@ export default function AdminUsers() {
                     <select
                       value={editStatus}
                       onChange={(e) => setEditStatus(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-sans"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
                     >
                       <option value="active">Active (Access Allowed)</option>
                       <option value="blocked">Blocked (Access Revoked / Suspended)</option>
@@ -452,7 +452,7 @@ export default function AdminUsers() {
 
                   {/* Password Reset Section */}
                   <div className="border-t border-slate-100 pt-4.5 space-y-2">
-                    <label className="block text-xs font-extrabold text-[#6D4AFF] uppercase tracking-wider flex items-center gap-1.5 select-none">
+                    <label className="block text-xs font-extrabold text-[#166534] uppercase tracking-wider flex items-center gap-1.5 select-none">
                       <KeyRound size={13} />
                       <span>Security Credentials Reset</span>
                     </label>
@@ -464,7 +464,7 @@ export default function AdminUsers() {
                         placeholder="Enter secure new passphrase (min. 6 chars)"
                         value={editPassword}
                         onChange={(e) => setEditPassword(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                       />
                     </div>
                   </div>
@@ -488,14 +488,14 @@ export default function AdminUsers() {
                       type="button"
                       onClick={() => setEditingUser(null)}
                       disabled={saving}
-                      className="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-650 rounded-xl transition-all cursor-pointer"
+                      className="px-4.5 py-2.5 border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-xs font-bold text-[#57534E] hover:text-[#166534] rounded-xl transition-all cursor-pointer shadow-xs active:scale-95"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={saving || saveStatus === 'success'}
-                      className="px-4 py-2 bg-indigo-650 hover:bg-indigo-750 text-xs font-bold text-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm hover:shadow-indigo-600/10 active:scale-95 cursor-pointer"
+                      className="px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] text-xs font-bold text-white rounded-xl transition-all flex items-center gap-2 shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer disabled:opacity-50"
                     >
                       {saving && <Loader2 size={13} className="animate-spin text-white" />}
                       <span>Save Changes</span>
@@ -544,7 +544,7 @@ export default function AdminUsers() {
                   type="button"
                   onClick={() => setDeletingUser(null)}
                   disabled={deleting}
-                  className="flex-1 py-2.5 border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-650 rounded-xl transition-all cursor-pointer"
+                  className="flex-1 py-2.5 border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-600 rounded-xl transition-all cursor-pointer"
                 >
                   Keep Account
                 </button>
@@ -552,7 +552,7 @@ export default function AdminUsers() {
                   type="button"
                   onClick={handleDeleteUser}
                   disabled={deleting}
-                  className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-xs font-bold text-white rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-rose-600/10 active:scale-95 cursor-pointer"
+                  className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-xs font-bold text-white rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm hover:shadow-rose-600/15 active:scale-95 cursor-pointer disabled:opacity-50"
                 >
                   {deleting && <Loader2 size={13} className="animate-spin text-white" />}
                   <span>Revoke User</span>

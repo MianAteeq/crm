@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Loader2, CheckCircle2, AlertTriangle, Phone } from 'lucide-react';
 import { facebookSDK } from '../../lib/facebook-sdk';
+import { WhatsAppIcon } from './WhatsAppStatusCard';
 
 interface EmbeddedSignupModalProps {
   isOpen: boolean;
@@ -140,7 +141,6 @@ export function EmbeddedSignupModal({
     }
   };
 
-
   const handleRetry = () => {
     setErrorMessage('');
     initializeAndLaunch();
@@ -151,7 +151,7 @@ export function EmbeddedSignupModal({
       case 'initializing':
         return {
           icon: Loader2,
-          iconClass: 'text-blue-500 animate-spin',
+          iconClass: 'text-[#1D4ED8] animate-spin',
           title: 'Initializing Connection',
           description: 'Setting up Meta authentication...',
           showProgress: true
@@ -159,7 +159,7 @@ export function EmbeddedSignupModal({
       case 'authenticating':
         return {
           icon: Phone,
-          iconClass: 'text-[#6D4AFF] animate-pulse',
+          iconClass: 'text-[#25D366] animate-pulse',
           title: 'Authenticate with Meta',
           description: 'Please complete the authentication in the popup window',
           showProgress: true
@@ -167,7 +167,7 @@ export function EmbeddedSignupModal({
       case 'processing':
         return {
           icon: Loader2,
-          iconClass: 'text-[#6D4AFF] animate-spin',
+          iconClass: 'text-[#25D366] animate-spin',
           title: 'Processing Connection',
           description: 'Connecting your WhatsApp Business Account...',
           showProgress: true
@@ -175,7 +175,7 @@ export function EmbeddedSignupModal({
       case 'success':
         return {
           icon: CheckCircle2,
-          iconClass: 'text-emerald-500',
+          iconClass: 'text-[#25D366]',
           title: 'Successfully Connected!',
           description: 'Your WhatsApp Business Account is now connected',
           showProgress: false
@@ -191,7 +191,7 @@ export function EmbeddedSignupModal({
       default:
         return {
           icon: Phone,
-          iconClass: 'text-slate-500',
+          iconClass: 'text-[#64748B]',
           title: 'Connect WhatsApp',
           description: 'Initializing...',
           showProgress: false
@@ -213,28 +213,28 @@ export function EmbeddedSignupModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={canClose ? onClose : undefined}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4"
           >
             {/* Modal */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              exit={{ opacity: 0, scale: 0.95, y: 16 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 dark:border-slate-700"
+              className="bg-[#FFFFFF] rounded-2xl shadow-xl max-w-md w-full overflow-hidden border border-[#E2E8F0]"
             >
               {/* Header */}
-              <div className="relative p-6 border-b border-slate-200 dark:border-slate-700">
+              <div className="relative p-5 sm:p-6 border-b border-[#E2E8F0]">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-[#6D4AFF] to-[#8B5CF6] rounded-xl flex items-center justify-center shadow-lg shadow-[#6D4AFF]/20">
-                      <Phone className="w-5 h-5 text-white" />
+                    <div className="w-10 h-10 bg-[#F0FDF4] border border-[#25D366]/20 rounded-xl flex items-center justify-center text-[#25D366] shrink-0 shadow-xs">
+                      <WhatsAppIcon className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                      <h3 className="text-base font-bold text-[#12263A]">
                         WhatsApp Business
                       </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <p className="text-xs text-[#64748B]">
                         Meta Cloud API
                       </p>
                     </div>
@@ -242,25 +242,25 @@ export function EmbeddedSignupModal({
                   {canClose && (
                     <button
                       onClick={onClose}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:text-[#12263A] hover:bg-[#F1F5F9] transition-colors"
                     >
-                      <X className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+                      <X className="w-4 h-4" />
                     </button>
                   )}
                 </div>
               </div>
 
               {/* Body */}
-              <div className="p-8">
+              <div className="p-6 sm:p-8">
                 <div className="text-center">
                   {/* Icon */}
                   <motion.div
                     key={state}
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="w-20 h-20 mx-auto mb-6 bg-slate-100 dark:bg-slate-900 rounded-2xl flex items-center justify-center"
+                    className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-5 bg-[#F0FDF4] border border-[#25D366]/20 rounded-2xl flex items-center justify-center shadow-xs"
                   >
-                    <StateIcon className={`w-10 h-10 ${stateConfig.iconClass}`} />
+                    <StateIcon className={`w-8 h-8 sm:w-10 sm:h-10 ${stateConfig.iconClass}`} />
                   </motion.div>
 
                   {/* Title & Description */}
@@ -270,10 +270,10 @@ export function EmbeddedSignupModal({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
                   >
-                    <h4 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+                    <h4 className="text-lg sm:text-xl font-bold text-[#12263A] mb-1.5">
                       {stateConfig.title}
                     </h4>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                    <p className="text-sm text-[#64748B] leading-relaxed max-w-sm mx-auto">
                       {stateConfig.description}
                     </p>
                   </motion.div>
@@ -284,17 +284,17 @@ export function EmbeddedSignupModal({
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
-                      className="mt-8"
+                      className="mt-6"
                     >
-                      <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                      <div className="w-full h-2 bg-[#F1F5F9] rounded-full overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${progress}%` }}
                           transition={{ duration: 0.5, ease: 'easeOut' }}
-                          className="h-full bg-gradient-to-r from-[#6D4AFF] to-[#8B5CF6] rounded-full"
+                          className="h-full bg-[#25D366] rounded-full"
                         />
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                      <p className="text-xs font-semibold text-[#64748B] mt-2">
                         {progress}% Complete
                       </p>
                     </motion.div>
@@ -310,13 +310,13 @@ export function EmbeddedSignupModal({
                     >
                       <button
                         onClick={onClose}
-                        className="btn-premium-secondary flex-1"
+                        className="flex-1 h-10 px-4 rounded-xl font-semibold text-xs sm:text-sm text-[#12263A] hover:text-[#166534] bg-white hover:bg-[#F8FAFC] border border-[#E2E8F0] hover:border-[#CBD5E1] shadow-xs transition-colors"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={handleRetry}
-                        className="btn-premium-gradient flex-1"
+                        className="flex-1 h-10 px-4 rounded-xl font-semibold text-xs sm:text-sm text-white bg-[#25D366] hover:bg-[#20bd5a] shadow-sm transition-colors"
                       >
                         Try Again
                       </button>
@@ -329,10 +329,10 @@ export function EmbeddedSignupModal({
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.3 }}
-                      className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl"
+                      className="mt-6 p-3.5 bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl text-left"
                     >
-                      <p className="text-xs text-blue-700 dark:text-blue-300">
-                        💡 If the popup window doesn't appear, please check if popups are blocked in your browser.
+                      <p className="text-xs text-[#1D4ED8] leading-relaxed">
+                        <span className="font-semibold">Note:</span> If the popup window doesn't appear, please check if popups are blocked in your browser.
                       </p>
                     </motion.div>
                   )}

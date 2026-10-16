@@ -116,7 +116,7 @@ export default function InboxPageEnhanced() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-md px-6"
             >
-              <div className="w-24 h-24 bg-gradient-to-br from-[#6D4AFF] to-[#8B5CF6] rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-[#6D4AFF]/20">
+              <div className="w-24 h-24 bg-gradient-to-br from-[#12263A] to-[#166534] rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-[#12263A]/20">
                 <Info className="w-12 h-12 text-white" />
               </div>
               <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-3">

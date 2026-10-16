@@ -53,14 +53,14 @@ export default function FilterBar({
       <div className="flex flex-col lg:flex-row items-center gap-3">
         {/* Search input */}
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={16} />
           <input 
             type="text"
             placeholder="Search contacts, business, phone, email..."
             value={searchQuery}
             onKeyDown={(e) => e.key === 'Enter' && onApplyFilters()}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-11 pr-4 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-400 transition-all placeholder:text-slate-400"
+            className="w-full bg-[#FAFAF9] border border-stone-200 rounded-xl py-2.5 pl-11 pr-4 text-xs font-medium text-[#12263A] focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534] focus:bg-white transition-all placeholder:text-stone-400"
           />
         </div>
 
@@ -70,15 +70,15 @@ export default function FilterBar({
             <select 
               value={selectedCategory}
               onChange={(e) => onCategoryChange(e.target.value)}
-              className="w-full appearance-none bg-white border border-slate-200 rounded-xl py-2.5 pl-9 pr-8 text-xs font-bold text-slate-700 cursor-pointer focus:outline-none hover:border-slate-400 transition-all"
+              className="w-full appearance-none bg-white border border-stone-200 rounded-xl py-2.5 pl-9 pr-8 text-xs font-bold text-[#12263A] cursor-pointer focus:outline-none hover:border-[#166534]/50 transition-all"
             >
               <option value="">All Categories</option>
               {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
-            <Layers className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+            <Layers className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={14} />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" size={14} />
           </div>
         )}
 
@@ -88,7 +88,7 @@ export default function FilterBar({
             <select 
               value={selectedEmailStatus}
               onChange={(e) => onEmailStatusChange(e.target.value)}
-              className="w-full appearance-none bg-white border border-slate-200 rounded-xl py-2.5 pl-9 pr-8 text-xs font-bold text-slate-700 cursor-pointer focus:outline-none hover:border-slate-400 transition-all"
+              className="w-full appearance-none bg-white border border-stone-200 rounded-xl py-2.5 pl-9 pr-8 text-xs font-bold text-[#12263A] cursor-pointer focus:outline-none hover:border-[#166534]/50 transition-all"
             >
               <option value="">Email: All</option>
               <option value="never_sent">Never Sent</option>
@@ -98,8 +98,8 @@ export default function FilterBar({
               <option value="failed">Failed</option>
               <option value="unsubscribed">Unsubscribed</option>
             </select>
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={14} />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" size={14} />
           </div>
         )}
 
@@ -108,21 +108,21 @@ export default function FilterBar({
           <select 
             value={selectedTag}
             onChange={(e) => onTagChange(e.target.value)}
-            className="w-full appearance-none bg-white border border-slate-200 rounded-xl py-2.5 pl-9 pr-8 text-xs font-bold text-slate-700 cursor-pointer focus:outline-none hover:border-slate-400 transition-all"
+            className="w-full appearance-none bg-white border border-stone-200 rounded-xl py-2.5 pl-9 pr-8 text-xs font-bold text-[#12263A] cursor-pointer focus:outline-none hover:border-[#166534]/50 transition-all"
           >
             <option value="">All Tags</option>
             {tags.map(tag => (
               <option key={tag.id} value={tag.id}>{tag.name}</option>
             ))}
           </select>
-          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={14} />
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" size={14} />
         </div>
 
         {/* Filter Button */}
         <button 
           onClick={onApplyFilters}
-          className="flex items-center gap-2 bg-black text-white rounded-xl py-2.5 px-4 text-xs font-bold transition-all shadow-md shadow-black/20 hover:bg-slate-900 whitespace-nowrap cursor-pointer"
+          className="flex items-center gap-2 bg-[#12263A] text-white rounded-xl py-2.5 px-4 text-xs font-bold transition-all shadow-sm hover:bg-[#166534] whitespace-nowrap cursor-pointer"
         >
           <Search size={14} />
           <span>Filter</span>
@@ -132,7 +132,7 @@ export default function FilterBar({
         <button 
           onClick={() => setShowAdvanced(!showAdvanced)}
           className={`flex items-center gap-2 rounded-xl py-2.5 px-4 text-xs font-bold transition-all border whitespace-nowrap cursor-pointer ${
-            showAdvanced ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-400'
+            showAdvanced ? 'bg-[#166534] text-white border-[#166534] shadow-sm' : 'bg-white border-stone-200 text-[#57534E] hover:border-[#166534]'
           }`}
         >
           <SlidersHorizontal size={14} />
@@ -148,17 +148,17 @@ export default function FilterBar({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="mt-4 p-6 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="mt-4 p-6 bg-[#FAFAF9] border border-stone-200 rounded-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Campaign Filter (Requirement 13 & 15) */}
               {onCampaignChange && (
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <label className="text-[11px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-2">
                     <Megaphone size={12} /> Target Campaign
                   </label>
                   <select 
                     value={selectedCampaign}
                     onChange={(e) => onCampaignChange(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-400 cursor-pointer"
+                    className="w-full bg-white border border-stone-200 rounded-lg p-2.5 text-xs font-bold text-[#12263A] focus:outline-none focus:border-[#166534] cursor-pointer"
                   >
                     <option value="">All Campaigns</option>
                     {campaigns.map(camp => (
@@ -170,7 +170,7 @@ export default function FilterBar({
 
               {/* Status Filter */}
               <div className="space-y-2">
-                 <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                 <label className="text-[11px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-2">
                    Life Cycle Status
                  </label>
                  <div className="flex flex-wrap gap-2">
@@ -181,8 +181,8 @@ export default function FilterBar({
                         onClick={() => onStatusChange(selectedStatus === status ? '' : status)}
                         className={`px-3 py-1.5 border rounded-lg text-[10px] font-bold transition-all capitalize ${
                           selectedStatus === status 
-                          ? 'bg-slate-900 border-slate-900 text-white shadow-sm' 
-                          : 'bg-white border-slate-200 text-slate-600 hover:border-slate-900'
+                          ? 'bg-[#166534] border-[#166534] text-white shadow-sm' 
+                          : 'bg-white border-stone-200 text-[#57534E] hover:border-[#166534]'
                         }`}
                       >
                        {status}
@@ -193,13 +193,13 @@ export default function FilterBar({
 
               {/* Activity Filter */}
               <div className="space-y-2">
-                 <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                 <label className="text-[11px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-2">
                    Last Touchpoint
                  </label>
                  <select 
                     value={lastTouchpoint}
                     onChange={(e) => onTouchpointChange(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-400 cursor-pointer"
+                    className="w-full bg-white border border-stone-200 rounded-lg p-2.5 text-xs font-bold text-[#12263A] focus:outline-none focus:border-[#166534] cursor-pointer"
                   >
                    <option value="">Anytime</option>
                    <option value="24_hours">Last 24 Hours</option>
@@ -210,7 +210,7 @@ export default function FilterBar({
 
               {/* Tag Selection list */}
               <div className="space-y-2">
-                 <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                 <label className="text-[11px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-2">
                     Quick Tag Select
                  </label>
                  <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto no-scrollbar">
@@ -221,8 +221,8 @@ export default function FilterBar({
                         onClick={() => onTagChange(selectedTag === tag.id ? '' : tag.id)}
                         className={`px-2.5 py-1 border rounded-lg text-[10px] font-bold transition-all ${
                           selectedTag === tag.id
-                          ? 'bg-slate-900 border-slate-900 text-white shadow-sm'
-                          : 'bg-white border-slate-200 text-slate-600 hover:border-slate-900'
+                          ? 'bg-[#166534] border-[#166534] text-white shadow-sm'
+                          : 'bg-white border-stone-200 text-[#57534E] hover:border-[#166534]'
                         }`}
                       >
                         {tag.name}
@@ -231,18 +231,18 @@ export default function FilterBar({
                  </div>
               </div>
 
-              <div className="lg:col-span-4 pt-4 border-t border-slate-200 flex items-center justify-between">
-                 <button onClick={() => setShowAdvanced(false)} className="text-[11px] font-bold text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-all cursor-pointer">Dismiss</button>
+              <div className="lg:col-span-4 pt-4 border-t border-stone-200 flex items-center justify-between">
+                 <button onClick={() => setShowAdvanced(false)} className="text-[11px] font-bold text-stone-400 uppercase tracking-widest hover:text-[#12263A] transition-all cursor-pointer">Dismiss</button>
                  <div className="flex gap-4">
                     <button 
                       onClick={onResetFilters}
-                      className="text-[11px] font-bold text-red-500 uppercase tracking-widest hover:underline cursor-pointer"
+                      className="text-[11px] font-bold text-red-600 uppercase tracking-widest hover:underline cursor-pointer"
                     >
                       Reset All
                     </button>
                     <button 
                       onClick={onApplyFilters}
-                      className="px-6 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-slate-800 transition-all cursor-pointer"
+                      className="px-6 py-2 bg-[#12263A] hover:bg-[#166534] text-white rounded-lg text-xs font-bold shadow-sm transition-all cursor-pointer"
                     >
                       Apply Filters
                     </button>

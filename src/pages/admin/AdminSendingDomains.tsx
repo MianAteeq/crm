@@ -141,7 +141,7 @@ export default function AdminSendingDomains() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-600/20">
+            <div className="w-10 h-10 rounded-xl bg-[#166534] text-white flex items-center justify-center shadow-md shadow-[#166534]/15">
               <Globe size={20} />
             </div>
             <div>
@@ -156,7 +156,7 @@ export default function AdminSendingDomains() {
           <button
             onClick={() => fetchDomains(page)}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4.5 py-2.5 text-xs font-bold text-[#57534E] bg-white border border-slate-200 hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] rounded-xl transition-all shadow-xs cursor-pointer active:scale-95 disabled:opacity-50"
           >
             <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
             Refresh
@@ -181,7 +181,7 @@ export default function AdminSendingDomains() {
             placeholder="Search domain or verification ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full pl-9 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#166534] focus:border-[#166534]"
           />
         </div>
 
@@ -191,7 +191,7 @@ export default function AdminSendingDomains() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full md:w-auto"
+              className="text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#166534] w-full md:w-auto"
             >
               <option value="">All Statuses</option>
               <option value="verified">Verified</option>
@@ -237,7 +237,7 @@ export default function AdminSendingDomains() {
               {loading ? (
                 <tr>
                   <td colSpan={11} className="py-12 text-center text-slate-400">
-                    <RefreshCw size={24} className="animate-spin mx-auto mb-2 text-indigo-500" />
+                    <RefreshCw size={24} className="animate-spin mx-auto mb-2 text-[#166534]" />
                     Loading domain records...
                   </td>
                 </tr>
@@ -310,7 +310,7 @@ export default function AdminSendingDomains() {
                     <td className="px-4 py-4 text-right">
                       <button
                         onClick={() => setInspectDomain(dom)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] rounded-lg transition-all shadow-xs cursor-pointer active:scale-95"
                         title="Inspect DNS Records"
                       >
                         <Eye size={13} />
@@ -334,14 +334,14 @@ export default function AdminSendingDomains() {
               <button
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page <= 1}
-                className="p-1.5 rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 transition-colors"
+                className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] text-slate-600 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer transition-all active:scale-95 shadow-xs"
               >
                 <ChevronLeft size={16} />
               </button>
               <button
                 onClick={() => handlePageChange(page + 1)}
                 disabled={page >= totalPages}
-                className="p-1.5 rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 transition-colors"
+                className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] text-slate-600 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer transition-all active:scale-95 shadow-xs"
               >
                 <ChevronRight size={16} />
               </button>
@@ -357,7 +357,7 @@ export default function AdminSendingDomains() {
             {/* Modal Header */}
             <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ShieldCheck size={18} className="text-indigo-600" />
+                <ShieldCheck size={18} className="text-[#166534]" />
                 <h3 className="font-bold text-slate-900">
                   DNS Configuration for {inspectDomain.domain}
                 </h3>
@@ -411,7 +411,7 @@ export default function AdminSendingDomains() {
                         className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1.5"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-bold uppercase px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 text-[10px]">
+                          <span className="font-bold uppercase px-2 py-0.5 rounded bg-[#F0FDF4] text-[#166534] border border-[#bbf7d0] text-[10px]">
                             {rec.record_type || rec.type}
                           </span>
                           <span className="text-slate-500 font-medium">{rec.purpose || 'Deliverability'}</span>
@@ -443,7 +443,7 @@ export default function AdminSendingDomains() {
             <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end">
               <button
                 onClick={() => setInspectDomain(null)}
-                className="px-4 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+                className="px-4.5 py-2.5 text-xs font-bold text-[#57534E] bg-white border border-slate-200 hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] rounded-xl transition-all cursor-pointer shadow-xs active:scale-95"
               >
                 Close
               </button>

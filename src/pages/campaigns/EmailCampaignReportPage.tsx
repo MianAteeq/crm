@@ -65,7 +65,7 @@ export default function EmailCampaignReportPage() {
   if (isLoading && !report) {
     return (
       <div className="p-16 flex flex-col items-center justify-center gap-3 text-slate-400">
-        <RefreshCw size={24} className="animate-spin text-indigo-600" />
+        <RefreshCw size={24} className="animate-spin text-[#166534]" />
         <p className="text-xs font-semibold uppercase tracking-wider">Loading campaign analytics...</p>
       </div>
     );
@@ -77,7 +77,7 @@ export default function EmailCampaignReportPage() {
         <p className="text-sm text-slate-500">Campaign not found.</p>
         <button
           onClick={() => navigate('/email-campaigns')}
-          className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold"
+          className="mt-4 px-4 py-2 bg-[#166534] text-white rounded-xl text-xs font-bold"
         >
           Back to Campaigns
         </button>
@@ -106,7 +106,7 @@ export default function EmailCampaignReportPage() {
       case 'skipped':
         return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">Suppressed</span>;
       case 'sending':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 animate-pulse">Sending</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#F0FDF4] text-[#14532d] border border-[#bbf7d0] animate-pulse">Sending</span>;
       default:
         return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-50 text-slate-500 border border-slate-200">Pending</span>;
     }
@@ -140,7 +140,7 @@ export default function EmailCampaignReportPage() {
           disabled={isRefreshing}
           className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-sm disabled:opacity-50"
         >
-          <RefreshCw size={14} className={isRefreshing ? 'animate-spin text-indigo-600' : ''} />
+          <RefreshCw size={14} className={isRefreshing ? 'animate-spin text-[#166534]' : ''} />
           Refresh Stats
         </button>
       </div>
@@ -149,15 +149,15 @@ export default function EmailCampaignReportPage() {
       <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
         <div className="flex items-center justify-between text-xs font-bold">
           <div className="flex items-center gap-2">
-            <BarChart3 size={16} className="text-indigo-600" />
+            <BarChart3 size={16} className="text-[#166534]" />
             <span className="text-slate-900 uppercase tracking-wider">Sending Progress</span>
           </div>
-          <span className="text-indigo-600 text-sm font-extrabold">{metrics.progress_percent}%</span>
+          <span className="text-[#166534] text-sm font-extrabold">{metrics.progress_percent}%</span>
         </div>
 
         <div className="w-full h-3 rounded-full bg-slate-100 overflow-hidden">
           <div 
-            className="h-full rounded-full bg-indigo-600 transition-all duration-500"
+            className="h-full rounded-full bg-[#166534] transition-all duration-500"
             style={{ width: `${metrics.progress_percent}%` }}
           />
         </div>
@@ -184,7 +184,7 @@ export default function EmailCampaignReportPage() {
         {/* Sent */}
         <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm">
           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Sent</p>
-          <p className="text-2xl font-bold text-indigo-600 mt-1">{metrics.sent.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-[#166534] mt-1">{metrics.sent.toLocaleString()}</p>
           <p className="text-[10px] text-slate-400 mt-0.5">Dispatched to MTA</p>
         </div>
 

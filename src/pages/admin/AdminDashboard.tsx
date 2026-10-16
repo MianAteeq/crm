@@ -56,8 +56,8 @@ interface RecentUser {
 
 const PLAN_COLORS = {
   free: '#64748b',
-  pro: '#6d4aff',
-  enterprise: '#10b981'
+  pro: '#166534',
+  enterprise: '#22c55e'
 };
 
 export default function AdminDashboard() {
@@ -80,7 +80,7 @@ export default function AdminDashboard() {
             response.plan_distribution.map((item: any) => ({
               name: item.plan.toUpperCase(),
               value: item.count,
-              color: PLAN_COLORS[item.plan as keyof typeof PLAN_COLORS] || '#6d4aff'
+              color: PLAN_COLORS[item.plan as keyof typeof PLAN_COLORS] || '#166534'
             }))
           );
           setRecentTenants(response.recent_tenants || []);
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3">
-        <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-[#bbf7d0] border-t-[#166534] rounded-full animate-spin"></div>
         <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Gathering System Diagnostics...</p>
       </div>
     );
@@ -123,7 +123,7 @@ export default function AdminDashboard() {
         <p className="text-xs">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="mt-4 px-4 py-2 bg-red-650 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all"
+          className="mt-4 px-4.5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm hover:shadow-rose-600/15 active:scale-95 cursor-pointer"
         >
           Retry Connection
         </button>
@@ -159,16 +159,16 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8 animate-fade-in relative">
       {/* Visual Ambient Background Lights */}
-      <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-150px] right-[-150px] w-[500px] h-[500px] rounded-full bg-purple-500/5 blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-[#166534]/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-150px] right-[-150px] w-[500px] h-[500px] rounded-full bg-[#166534]/5 blur-[120px] pointer-events-none" />
 
       {/* SaaS Welcome Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 rounded-3xl p-6 md:p-8 text-white relative overflow-hidden border border-slate-800 shadow-xl">
+      <div className="bg-gradient-to-r from-[#12263A] via-[#12263A]/95 to-[#166534]/90 rounded-3xl p-6 md:p-8 text-white relative overflow-hidden border border-slate-800 shadow-xl">
         <div className="absolute right-0 bottom-0 top-0 w-1/3 opacity-10 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.5)_0,transparent_70%)] pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2.5">
-              <span className="px-2.5 py-1 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full text-[10px] font-black uppercase tracking-wider">
+              <span className="px-2.5 py-1 bg-[#166534]/20 text-[#22C55E] border border-[#22C55E]/30 rounded-full text-[10px] font-black uppercase tracking-wider">
                 Console Active
               </span>
               <span className="flex h-2 w-2 relative">
@@ -182,7 +182,7 @@ export default function AdminDashboard() {
             </p>
           </div>
           <div className="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl flex items-center gap-3 backdrop-blur-sm self-start md:self-auto">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-sm shrink-0">
+            <div className="w-10 h-10 bg-[#166534] rounded-xl flex items-center justify-center text-white shadow-sm shrink-0">
               <Cpu size={18} />
             </div>
             <div>
@@ -207,7 +207,7 @@ export default function AdminDashboard() {
               <TrendingUp size={12} /> Active Tenants
             </p>
           </div>
-          <div className="w-12 h-12 bg-indigo-50 text-indigo-650 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 border border-indigo-100">
+          <div className="w-12 h-12 bg-[#F0FDF4] text-[#166534] rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 border border-[#bbf7d0]">
             <Building2 size={20} />
           </div>
         </motion.div>
@@ -220,11 +220,11 @@ export default function AdminDashboard() {
           <div className="space-y-1">
             <p className="text-[10px] font-bold text-slate-450 uppercase tracking-widest">Registered Users</p>
             <h3 className="text-2xl font-black text-slate-900">{stats?.total_users || 0}</h3>
-            <p className="text-[10px] font-semibold text-indigo-500 flex items-center gap-1">
+            <p className="text-[10px] font-semibold text-[#166534] flex items-center gap-1">
               <Activity size={12} /> Live Across Tenants
             </p>
           </div>
-          <div className="w-12 h-12 bg-purple-50 text-purple-650 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 border border-purple-100">
+          <div className="w-12 h-12 bg-[#F0FDF4] text-[#166534] rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 border border-[#bbf7d0]">
             <Users size={20} />
           </div>
         </motion.div>
@@ -237,7 +237,7 @@ export default function AdminDashboard() {
           <div className="space-y-1">
             <p className="text-[10px] font-bold text-slate-450 uppercase tracking-widest">Total Campaigns</p>
             <h3 className="text-2xl font-black text-slate-900">{stats?.total_campaigns || 0}</h3>
-            <p className="text-[10px] font-semibold text-indigo-500 flex items-center gap-1">
+            <p className="text-[10px] font-semibold text-[#166534] flex items-center gap-1">
               <TrendingUp size={12} /> Broadcast automations
             </p>
           </div>
@@ -280,7 +280,7 @@ export default function AdminDashboard() {
                 <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 'bold', paddingTop: '10px' }} />
-                <Bar dataKey="Broadcasts" fill="#6d4aff" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Broadcasts" fill="#166534" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="Inbound" fill="#10b981" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -343,7 +343,7 @@ export default function AdminDashboard() {
             </div>
             <button
               onClick={() => navigate('/admin/tenants')}
-              className="text-xs font-black text-indigo-600 hover:text-indigo-900 flex items-center gap-1.5 uppercase tracking-widest transition-colors cursor-pointer"
+              className="text-xs font-bold text-[#166534] hover:text-[#14532d] flex items-center gap-1.5 uppercase tracking-widest transition-colors cursor-pointer"
             >
               <span>Manage all</span>
               <ArrowRight size={13} />
@@ -357,11 +357,11 @@ export default function AdminDashboard() {
               recentTenants.map((tenant) => (
                 <div key={tenant.id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 group">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-650 flex items-center justify-center font-black text-xs border border-indigo-100 shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-[#F0FDF4] text-[#166534] flex items-center justify-center font-black text-xs border border-[#bbf7d0] shrink-0">
                       {tenant.name.substring(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <p className="text-xs font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors leading-none">
+                      <p className="text-xs font-extrabold text-slate-900 group-hover:text-[#166534] transition-colors leading-none">
                         {tenant.name}
                       </p>
                       <p className="text-[10px] text-slate-400 font-semibold mt-1">
@@ -372,7 +372,7 @@ export default function AdminDashboard() {
                   <div className="flex items-center gap-3 self-start sm:self-auto">
                     <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider leading-none border ${
                       tenant.plan === 'enterprise' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' :
-                      tenant.plan === 'pro' ? 'bg-indigo-50 border-indigo-100 text-indigo-600' :
+                      tenant.plan === 'pro' ? 'bg-[#F0FDF4] border-[#bbf7d0] text-[#166534]' :
                       'bg-slate-50 border-slate-200 text-slate-500'
                     }`}>
                       {tenant.plan}
@@ -396,7 +396,7 @@ export default function AdminDashboard() {
             </div>
             <button
               onClick={() => navigate('/admin/users')}
-              className="text-xs font-black text-indigo-600 hover:text-indigo-900 flex items-center gap-1.5 uppercase tracking-widest transition-colors cursor-pointer"
+              className="text-xs font-bold text-[#166534] hover:text-[#14532d] flex items-center gap-1.5 uppercase tracking-widest transition-colors cursor-pointer"
             >
               <span>Manage all</span>
               <ArrowRight size={13} />
@@ -410,7 +410,7 @@ export default function AdminDashboard() {
               recentUsers.map((user) => (
                 <div key={user.id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 group">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-655 flex items-center justify-center font-black text-xs border border-purple-100 shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-[#F0FDF4] text-[#166534] flex items-center justify-center font-black text-xs border border-[#bbf7d0] shrink-0">
                       {user.name.substring(0, 2).toUpperCase()}
                     </div>
                     <div>
@@ -425,7 +425,7 @@ export default function AdminDashboard() {
                   <div className="flex items-center gap-3 self-start sm:self-auto">
                     <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider leading-none border ${
                       user.role === 'superadmin' ? 'bg-rose-50 border-rose-100 text-rose-600' :
-                      user.role === 'admin' ? 'bg-indigo-50 border-indigo-100 text-indigo-600' :
+                      user.role === 'admin' ? 'bg-[#F0FDF4] border-[#bbf7d0] text-[#166534]' :
                       'bg-slate-50 border-slate-200 text-slate-500'
                     }`}>
                       {user.role}

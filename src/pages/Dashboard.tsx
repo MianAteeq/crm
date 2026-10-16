@@ -60,10 +60,10 @@ const performanceData = [
 ];
 
 const distributionData = [
-  { name: 'Marketing', value: 400, color: '#6D4AFF' },
+  { name: 'Marketing', value: 400, color: '#166534' },
   { name: 'Utility', value: 300, color: '#22C55E' },
-  { name: 'Authentication', value: 300, color: '#F59E0B' },
-  { name: 'Service', value: 200, color: '#EC4899' },
+  { name: 'Authentication', value: 300, color: '#12263A' },
+  { name: 'Service', value: 200, color: '#57534E' },
 ];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -266,7 +266,7 @@ export default function Dashboard() {
       change: isLive ? '0%' : '+12.4%',
       positive: true,
       icon: MessageSquare,
-      accent: '#6D4AFF',
+      accent: '#12263A',
       spark: isLive ? [0, 0, 0, 0, 0, 0, 0, conversationsCount] : [12, 18, 14, 22, 19, 28, 26, 34],
     },
     {
@@ -275,7 +275,7 @@ export default function Dashboard() {
       change: isLive ? '0%' : '+8.1%',
       positive: true,
       icon: Users,
-      accent: '#8B5CF6',
+      accent: '#166534',
       spark: isLive ? [0, 0, 0, 0, 0, 0, 0, totalContacts] : [20, 22, 21, 26, 30, 28, 33, 38],
     },
     {
@@ -284,7 +284,7 @@ export default function Dashboard() {
       change: isLive ? '0' : '+3',
       positive: true,
       icon: Send,
-      accent: '#0EA5E9',
+      accent: '#22C55E',
       spark: isLive ? [0, 0, 0, 0, 0, 0, 0, totalCampaigns] : [4, 6, 5, 8, 7, 9, 11, 12],
     },
     {
@@ -293,7 +293,7 @@ export default function Dashboard() {
       change: isLive ? '0%' : '+15.2%',
       positive: true,
       icon: CheckCircle2,
-      accent: '#22C55E',
+      accent: '#166534',
       spark: isLive ? [0, 0, 0, 0, 0, 0, 0, totalDelivered] : [30, 34, 32, 40, 44, 42, 50, 56],
     },
     {
@@ -302,7 +302,7 @@ export default function Dashboard() {
       change: isLive ? '0%' : '+3.1%',
       positive: true,
       icon: Activity,
-      accent: '#F59E0B',
+      accent: '#57534E',
       spark: isLive ? [0, 0, 0, 0, 0, 0, 0, parseFloat(responseRate) || 0] : [60, 62, 58, 66, 70, 68, 72, 74],
     },
     {
@@ -311,7 +311,7 @@ export default function Dashboard() {
       change: isLive ? '0%' : '+22.2%',
       positive: true,
       icon: DollarSign,
-      accent: '#EC4899',
+      accent: '#12263A',
       spark: isLive ? [0, 0, 0, 0, 0, 0, 0, revenueGenerated] : [40, 48, 52, 60, 58, 70, 82, 96],
     },
   ];
@@ -359,7 +359,7 @@ export default function Dashboard() {
   })();
 
   const categoryColorMap: Record<string, string> = {
-    MARKETING: '#6D4AFF',
+    MARKETING: '#166534',
     UTILITY: '#22C55E',
     AUTHENTICATION: '#F59E0B',
     SERVICE: '#EC4899',
@@ -395,7 +395,7 @@ export default function Dashboard() {
       const campaignsList = apiData?.campaigns;
       if (Array.isArray(campaignsList) && campaignsList.length > 0) {
         return campaignsList.map((item: any) => {
-          const type = String(item.type || 'broadcast').toUpperCase();
+          const type = String(item.type || 'broadcast');
           const status = String(item.status || 'completed').toUpperCase();
           const engagement = item.efficiency ?? 100;
 
@@ -406,7 +406,7 @@ export default function Dashboard() {
 
           return {
             name: item.name || 'Untitled Campaign',
-            subtitle: `${type} Deployment`,
+            subtitle: `${type.charAt(0).toUpperCase() + type.slice(1)} Campaign`,
             reach: (item.total_recipients ?? item.sent_count ?? 0).toLocaleString(),
             subReach: 'Total Recipients',
             engagement,
@@ -419,21 +419,21 @@ export default function Dashboard() {
     }
 
     return [
-      { name: 'Summer Solstice VIP Sale', subtitle: 'Manual Deployment', reach: '14,020', subReach: 'Total Recipients', engagement: 74, status: 'TRANSMITTING', color: 'indigo' },
-      { name: 'Abandoned Cart Recovery', subtitle: 'Manual Deployment', reach: '3,211', subReach: 'Total Recipients', engagement: 52, status: 'STANDBY', color: 'emerald' },
-      { name: 'New Product Launch Teaser', subtitle: 'Manual Deployment', reach: '2,842', subReach: 'Total Recipients', engagement: 81, status: 'QUEUED', color: 'amber' },
-      { name: 'Customer Reactivation Protocol', subtitle: 'Manual Deployment', reach: '1,105', subReach: 'Total Recipients', engagement: 44, status: 'OPTIMIZING', color: 'rose' },
+      { name: 'Product Launch Announcement', subtitle: 'WhatsApp Broadcast', reach: '14,020', subReach: 'Total Recipients', engagement: 74, status: 'ACTIVE', color: 'indigo' },
+      { name: 'Abandoned Cart Follow-Up', subtitle: 'Automated Flow', reach: '3,211', subReach: 'Total Recipients', engagement: 52, status: 'ACTIVE', color: 'emerald' },
+      { name: 'VIP Customer Exclusive Offer', subtitle: 'Email Campaign', reach: '2,842', subReach: 'Total Recipients', engagement: 81, status: 'COMPLETED', color: 'indigo' },
+      { name: 'Inactive Lead Re-engagement', subtitle: 'Drip Flow', reach: '1,105', subReach: 'Total Recipients', engagement: 44, status: 'SCHEDULED', color: 'amber' },
     ];
   })();
 
-  const activeConnectedClusters =
+  const activePipelineStatus =
     dashboardMode === 'live'
       ? apiData?.campaigns?.length > 0
-        ? `${apiData.campaigns.length} Active Deployments`
+        ? `${apiData.campaigns.length} Active Campaigns`
         : apiData?.recent_activity?.length > 0
-          ? `${apiData.recent_activity.length} Signals Active`
-          : '0 Clusters Active'
-      : '4 Clusters Active';
+          ? `${apiData.recent_activity.length} Recent Activities`
+          : 'Live Pipeline'
+      : 'Active Pipeline';
 
   // Customer journey funnel (derived; uses live numbers where present)
   const baseLeads = totalContacts;
@@ -494,12 +494,12 @@ export default function Dashboard() {
   });
 
   const quickActions = [
-    { label: 'Create Campaign', icon: Megaphone, accent: '#6D4AFF', to: '/campaigns/create' },
-    { label: 'Send Broadcast', icon: Send, accent: '#8B5CF6', to: '/campaigns/create' },
-    { label: 'Import Contacts', icon: Upload, accent: '#0EA5E9', to: '/contacts' },
+    { label: 'Create Campaign', icon: Megaphone, accent: '#12263A', to: '/campaigns/create' },
+    { label: 'Send Broadcast', icon: Send, accent: '#166534', to: '/campaigns/create' },
+    { label: 'Import Contacts', icon: Upload, accent: '#57534E', to: '/contacts' },
     { label: 'Add Contact', icon: UserPlus, accent: '#22C55E', to: '/contacts/add' },
-    { label: 'Create Template', icon: LayoutTemplate, accent: '#F59E0B', to: '/templates/builder' },
-    { label: 'AI Generated Reply', icon: Bot, accent: '#EC4899', to: '/inbox' },
+    { label: 'Create Template', icon: LayoutTemplate, accent: '#166534', to: '/templates/builder' },
+    { label: 'AI Reply Assistant', icon: Bot, accent: '#12263A', to: '/inbox' },
   ];
 
   const statusDot = (s: string) =>
@@ -515,19 +515,21 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center gap-3">
           {isLoading && (
-            <div className="flex items-center gap-2 text-[#6D4AFF] text-xs font-medium">
-              <div className="w-3.5 h-3.5 border-2 border-[#6D4AFF] border-t-transparent rounded-full animate-spin" />
+            <div className="flex items-center gap-2 text-[#166534] text-xs font-medium">
+              <div className="w-3.5 h-3.5 border-2 border-[#166534] border-t-transparent rounded-full animate-spin" />
               Syncing
             </div>
           )}
-          <div className="flex items-center gap-1 p-1 bg-white border border-slate-200 rounded-xl shadow-sm">
+          <div className="flex items-center gap-1 p-1 bg-white border border-slate-200 rounded-xl shadow-xs">
             {[30, 90].map((d) => (
               <button
                 key={d}
                 onClick={() => handleTimeRangeChange(d)}
                 className={cn(
-                  'px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all',
-                  timeRange === d ? 'bg-[#6D4AFF] text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                  'h-8 px-3.5 rounded-lg text-xs font-semibold transition-all cursor-pointer select-none',
+                  timeRange === d
+                    ? 'bg-[#166534] text-white shadow-xs'
+                    : 'text-[#57534E] hover:text-[#12263A] hover:bg-[#F0FDF4]'
                 )}
               >
                 {d} Days
@@ -564,8 +566,8 @@ export default function Dashboard() {
           title="Customer Journey"
           subtitle="From first contact to converted customer"
           action={
-            <span className="px-3 py-1 rounded-full bg-[#6D4AFF]/10 text-[#6D4AFF] text-xs font-semibold">
-              {activeConnectedClusters}
+            <span className="px-3 py-1 rounded-full bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 text-xs font-semibold">
+              {activePipelineStatus}
             </span>
           }
         />
@@ -576,9 +578,9 @@ export default function Dashboard() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.06 }}
-                className="w-36 bg-slate-50 hover:bg-white border border-slate-200 hover:shadow-md rounded-2xl p-4 transition-all duration-300"
+                className="w-36 bg-white hover:bg-[#FAFAF9] border border-[#e7e5e4] hover:border-[#166534]/30 hover:shadow-md rounded-2xl p-4 transition-all duration-300"
               >
-                <div className="w-9 h-9 rounded-xl bg-[#6D4AFF]/10 text-[#6D4AFF] flex items-center justify-center mb-3">
+                <div className="w-9 h-9 rounded-xl bg-[#F0FDF4] text-[#166534] flex items-center justify-center mb-3">
                   <step.icon size={17} />
                 </div>
                 <p className="text-[11px] font-medium text-slate-500 leading-tight h-7">{step.label}</p>
@@ -605,11 +607,11 @@ export default function Dashboard() {
             subtitle="Reach vs engagement over time"
             action={
               <div className="flex items-center gap-4 text-xs font-medium">
-                <span className="flex items-center gap-1.5 text-slate-500">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#6D4AFF]" /> Reach
+                <span className="flex items-center gap-1.5 text-[#57534E]">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#12263A]" /> Reach
                 </span>
-                <span className="flex items-center gap-1.5 text-slate-500">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]" /> Engagement
+                <span className="flex items-center gap-1.5 text-[#57534E]">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#166534]" /> Engagement
                 </span>
               </div>
             }
@@ -619,20 +621,20 @@ export default function Dashboard() {
               <AreaChart data={activePerformanceData}>
                 <defs>
                   <linearGradient id="colorReach" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6D4AFF" stopOpacity={0.18} />
-                    <stop offset="95%" stopColor="#6D4AFF" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#12263A" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#12263A" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="colorEngage" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22C55E" stopOpacity={0.18} />
-                    <stop offset="95%" stopColor="#22C55E" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#166534" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#166534" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e7e5e4" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#57534E' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#57534E' }} />
                 <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="reach" stroke="#6D4AFF" strokeWidth={3} fillOpacity={1} fill="url(#colorReach)" name="Reach" />
-                <Area type="monotone" dataKey="engagement" stroke="#22C55E" strokeWidth={3} fillOpacity={1} fill="url(#colorEngage)" name="Engagement" />
+                <Area type="monotone" dataKey="reach" stroke="#12263A" strokeWidth={3} fillOpacity={1} fill="url(#colorReach)" name="Reach" />
+                <Area type="monotone" dataKey="engagement" stroke="#166534" strokeWidth={3} fillOpacity={1} fill="url(#colorEngage)" name="Engagement" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -666,20 +668,20 @@ export default function Dashboard() {
                   className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition-all group"
                 >
                   <div className="relative shrink-0">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#6D4AFF] to-[#8B5CF6] text-white flex items-center justify-center text-xs font-bold">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#12263A] to-[#166534] text-white flex items-center justify-center text-xs font-bold">
                       {c.name.substring(0, 1).toUpperCase()}
                     </div>
                     <span className={cn('absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white', statusDot(c.status))} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-[13px] font-semibold text-slate-900 truncate">{c.name}</p>
-                      <span className="text-[11px] text-slate-400 shrink-0">{c.time}</span>
+                      <p className="text-[13px] font-semibold text-[#12263A] truncate">{c.name}</p>
+                      <span className="text-[11px] text-[#57534E] shrink-0">{c.time}</span>
                     </div>
-                    <p className="text-xs text-slate-500 truncate">{c.last}</p>
+                    <p className="text-xs text-[#57534E] truncate">{c.last}</p>
                   </div>
                   {c.unread > 0 && (
-                    <span className="shrink-0 min-w-[18px] h-[18px] px-1 rounded-full bg-[#6D4AFF] text-white text-[10px] font-bold flex items-center justify-center">
+                    <span className="shrink-0 min-w-[18px] h-[18px] px-1 rounded-full bg-[#166534] text-white text-[10px] font-bold flex items-center justify-center">
                       {c.unread}
                     </span>
                   )}
@@ -690,7 +692,7 @@ export default function Dashboard() {
           <div className="p-4 border-t border-slate-100">
             <button 
               onClick={() => navigate('/inbox')}
-              className="w-full py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-[13px] font-semibold text-slate-700 transition-all flex items-center justify-center gap-1.5"
+              className="w-full h-10 rounded-xl bg-white hover:bg-[#F0FDF4] border border-slate-200 hover:border-[#bbf7d0] text-xs font-bold text-[#12263A] hover:text-[#166534] transition-all flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.98] cursor-pointer"
             >
               View all conversations <ArrowRight size={14} />
             </button>
@@ -706,15 +708,15 @@ export default function Dashboard() {
             <button
               key={a.label}
               onClick={() => navigate(a.to)}
-              className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-slate-50 hover:bg-white border border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+              className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-white hover:bg-[#F0FDF4]/50 border border-slate-200/90 hover:border-[#bbf7d0] shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-200 group cursor-pointer active:scale-95"
             >
               <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110"
+                className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-xs"
                 style={{ backgroundColor: `${a.accent}14`, color: a.accent }}
               >
                 <a.icon size={20} />
               </div>
-              <span className="text-[13px] font-semibold text-slate-700 text-center leading-tight">{a.label}</span>
+              <span className="text-xs font-bold text-[#12263A] group-hover:text-[#166534] text-center leading-tight transition-colors">{a.label}</span>
             </button>
           ))}
         </div>
@@ -804,7 +806,7 @@ export default function Dashboard() {
           <div className="p-4 border-t border-slate-100 flex justify-center">
             <button 
               onClick={() => navigate('/campaigns')}
-              className="text-[13px] font-semibold text-slate-500 hover:text-[#6D4AFF] transition-all flex items-center gap-1.5 cursor-pointer"
+              className="w-full sm:w-auto h-10 px-5 rounded-xl bg-white hover:bg-[#F0FDF4] border border-slate-200 hover:border-[#bbf7d0] text-xs font-bold text-[#12263A] hover:text-[#166534] transition-all flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.98] cursor-pointer"
             >
               View all campaigns <ArrowRight size={14} />
             </button>
@@ -864,7 +866,7 @@ export default function Dashboard() {
               <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} dy={10} />
               <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} />
               <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="reach" stroke="#6D4AFF" strokeWidth={3} dot={false} name="Revenue" />
+              <Line type="monotone" dataKey="reach" stroke="#166534" strokeWidth={3} dot={false} name="Revenue" />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -875,15 +877,15 @@ export default function Dashboard() {
 
 /* color helpers (static class strings for tailwind JIT safety) */
 function accentBg(c: string) {
-  if (c === 'emerald') return 'bg-emerald-50 text-emerald-600';
-  if (c === 'indigo') return 'bg-[#6D4AFF]/10 text-[#6D4AFF]';
+  if (c === 'emerald') return 'bg-[#F0FDF4] text-[#166534]';
+  if (c === 'indigo') return 'bg-[#F0FDF4] text-[#166534]';
   if (c === 'amber') return 'bg-amber-50 text-amber-600';
   return 'bg-rose-50 text-rose-600';
 }
 
 function accentBar(c: string) {
-  if (c === 'emerald') return 'bg-emerald-500';
-  if (c === 'indigo') return 'bg-[#6D4AFF]';
+  if (c === 'emerald') return 'bg-[#22C55E]';
+  if (c === 'indigo') return 'bg-[#166534]';
   if (c === 'amber') return 'bg-amber-500';
   return 'bg-rose-500';
 }

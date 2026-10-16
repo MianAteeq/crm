@@ -81,7 +81,7 @@ const NotionLogo = () => (
 // ==========================================
 const AnimatedChatMockup = () => {
   const [messages, setMessages] = useState<any[]>([
-    { id: 1, text: "Hello! I'm your AI Copilot ✨\nHow can I help you automate your business today?", isUser: false }
+    { id: 1, text: "Hi Sarah! 👋 Thanks for reaching out. Your consultation is confirmed for tomorrow at 3:00 PM. Would you like a calendar invite or SMS reminder?", isUser: false }
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -115,22 +115,20 @@ const AnimatedChatMockup = () => {
     setTimeout(() => {
       setIsTyping(false);
       const lowerInput = userMsg.toLowerCase();
-      let responseText = "That's a great question! I'm an AI Copilot designed to help you automate these exact kinds of conversations. How can I help your business further?";
+      let responseText = "Understood! I've updated your preferences. You'll receive automated updates directly through WhatsApp.";
 
       if (lowerInput.includes('pricing') || lowerInput.includes('cost')) {
-        responseText = "Our pricing starts at $49/mo for the Pro plan, which includes full WhatsApp API access. Would you like the link to our pricing page?";
-      } else if (lowerInput.includes('demo') || lowerInput.includes('tour')) {
-        responseText = "Awesome! You can book a demo directly from our calendar. Shall I send the link? 📅";
+        responseText = "Our plans start with full WhatsApp Cloud API access and unlimited contacts. Would you like a link to our plan details?";
+      } else if (lowerInput.includes('calendar') || lowerInput.includes('yes') || lowerInput.includes('invite')) {
+        responseText = "Awesome! The calendar invite has been sent to your email. See you tomorrow at 3:00 PM! 📅";
       } else if (lowerInput.includes('help') || lowerInput.includes('support')) {
-        responseText = "I'm here to help! Our support team is also available 24/7. What specific feature do you need assistance with?";
+        responseText = "I'm here to help! Our team is available 24/7 if you need human assistance as well.";
       } else if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
-        responseText = "Hello there! 👋 How can I assist you with WhatsApp automation today?";
-      } else if (lowerInput.includes('broadcast') || lowerInput.includes('campaign')) {
-        responseText = "With our platform, you can launch targeted broadcast campaigns to thousands of contacts in just a few clicks! 🚀";
+        responseText = "Hello there! 👋 How can I help you today?";
       }
 
       setMessages(prev => [...prev, { id: Date.now() + 1, text: responseText, isUser: false }]);
-    }, 1200);
+    }, 1100);
   };
 
   return (
@@ -139,12 +137,12 @@ const AnimatedChatMockup = () => {
       <div className="bg-[#202c33] px-4 py-3 flex items-center gap-3 border-b border-white/5 relative z-10 shadow-sm">
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center p-0.5 shadow-lg shadow-indigo-500/20">
           <div className="w-full h-full bg-[#202c33] rounded-full flex items-center justify-center">
-            <Bot size={22} className="text-indigo-400" />
+            <Bot size={22} className="text-[#22C55E]" />
           </div>
         </div>
         <div>
           <h4 className="text-slate-100 font-semibold text-[15px] leading-tight flex items-center gap-1.5">
-            AI Copilot Agent <CheckCircle2 size={12} className="text-indigo-400" />
+            AI Copilot Agent <CheckCircle2 size={12} className="text-[#22C55E]" />
           </h4>
           <span className="text-emerald-500 text-[11px] font-medium flex items-center gap-1">
             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" /> Always Active
@@ -172,7 +170,7 @@ const AnimatedChatMockup = () => {
               )}
             >
               {!msg.isUser && (
-                <Sparkles size={12} className="absolute -top-1.5 -left-1.5 text-indigo-400" />
+                <Sparkles size={12} className="absolute -top-1.5 -left-1.5 text-[#22C55E]" />
               )}
               <div className="whitespace-pre-wrap">{msg.text}</div>
               <div className="text-[10px] text-white/50 text-right mt-1.5 flex justify-end items-center gap-1">
@@ -211,7 +209,7 @@ const AnimatedChatMockup = () => {
         <button
           type="submit"
           disabled={!inputValue.trim() || isTyping}
-          className="w-10 h-10 rounded-full bg-indigo-600 disabled:bg-indigo-600/50 text-white flex items-center justify-center shadow-lg hover:bg-indigo-500 transition-colors shrink-0 disabled:cursor-not-allowed"
+          className="w-10 h-10 rounded-full bg-[#166534] disabled:bg-[#166534]/50 text-white flex items-center justify-center shadow-lg hover:bg-[#F0FDF4]0 transition-colors shrink-0 disabled:cursor-not-allowed"
         >
           <Send size={16} className="ml-0.5" />
         </button>
@@ -222,11 +220,11 @@ const AnimatedChatMockup = () => {
 
 export function Hero() {
   return (
-    <section className="relative min-h-[90vh] pt-40 pb-24 px-6 overflow-hidden bg-[#020617] text-white flex items-center">
+    <section className="relative min-h-[90vh] pt-40 pb-24 px-6 overflow-hidden bg-[#12263A] text-white flex items-center">
       {/* Background Animated Tech Mesh & Gradients */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0" />
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-[120px] pointer-events-none z-0 mix-blend-screen" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/15 rounded-full blur-[120px] pointer-events-none z-0 mix-blend-screen" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#166534]/25 rounded-full blur-[120px] pointer-events-none z-0 mix-blend-screen" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#22C55E]/15 rounded-full blur-[120px] pointer-events-none z-0 mix-blend-screen" />
 
       {/* Floating Automation Icons (Background) */}
       <motion.div
@@ -234,21 +232,21 @@ export function Hero() {
         transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
         className="absolute top-[20%] left-[10%] opacity-20 hidden lg:block"
       >
-        <MessageCircle size={48} className="text-indigo-400" />
+        <MessageCircle size={48} className="text-[#22C55E]" />
       </motion.div>
       <motion.div
         animate={{ y: [15, -15, 15], rotate: [0, -10, 10, 0] }}
         transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
         className="absolute bottom-[20%] right-[8%] opacity-20 hidden lg:block"
       >
-        <Zap size={56} className="text-purple-400" />
+        <Zap size={56} className="text-[#166534]" />
       </motion.div>
       <motion.div
         animate={{ scale: [0.9, 1.1, 0.9], opacity: [0.1, 0.3, 0.1] }}
         transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
         className="absolute top-[30%] right-[15%] hidden lg:block"
       >
-        <Bot size={40} className="text-emerald-400" />
+        <Bot size={40} className="text-[#22C55E]" />
       </motion.div>
 
       <div className="max-w-7xl mx-auto relative z-10 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
@@ -258,10 +256,10 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-indigo-500/10 border border-indigo-500/30 rounded-full shadow-lg shadow-indigo-500/5 backdrop-blur-md"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#166534]/30 border border-[#22C55E]/30 rounded-full shadow-lg shadow-[#166534]/10 backdrop-blur-md"
           >
-            <Sparkles size={14} className="text-indigo-400 animate-pulse" />
-            <span className="font-sans font-[500] text-[13px] uppercase tracking-[1px] text-indigo-300">AI Automation Now Live</span>
+            <Sparkles size={14} className="text-[#22C55E]" />
+            <span className="font-sans font-medium text-[13px] tracking-wide text-[#F0FDF4]">Modern Conversational CRM & Marketing</span>
           </motion.div>
 
           <motion.h1
@@ -270,16 +268,16 @@ export function Hero() {
             transition={{ delay: 0.1 }}
             className="font-display font-[800] text-[44px] sm:text-[54px] md:text-[64px] lg:text-[72px] leading-[1.05] tracking-[-2.5px] text-white max-w-2xl"
           >
-            AI-Powered <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#25D366] to-[#128C7E]">WhatsApp</span> Automation
+            Turn WhatsApp & Email Into Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] to-[#166534]">Highest-ROI</span> Channels
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="font-sans font-normal text-[18px] md:text-[20px] leading-[1.7] max-w-[580px] text-slate-300"
+            className="font-sans font-normal text-[18px] md:text-[20px] leading-[1.7] max-w-[580px] text-stone-300"
           >
-            Deploy intelligent AI copilots, launch targeted broadcast campaigns, and fully automate your customer journey to drive repeat sales on autopilot.
+            Launch targeted broadcast campaigns, automate customer journeys, and resolve customer inquiries faster with an all-in-one conversational CRM.
           </motion.p>
 
           <motion.div
@@ -290,15 +288,15 @@ export function Hero() {
           >
             <NavLink
               to="/signup"
-              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(99,102,241,0.4)] active:scale-97 text-center shadow-lg flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-sans font-bold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(34,197,94,0.3)] active:scale-97 text-center shadow-lg flex items-center justify-center gap-2"
             >
               Start Free Trial <ArrowRight size={18} />
             </NavLink>
             <NavLink
               to="/contact"
-              className="w-full sm:w-auto px-8 py-4 bg-slate-900 border border-slate-700 text-slate-200 font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:bg-slate-800 hover:text-white hover:border-slate-600 active:scale-95 text-center shadow-sm flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-4 bg-white/10 border border-white/20 text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:bg-white/20 hover:text-white active:scale-95 text-center shadow-sm flex items-center justify-center gap-2"
             >
-              <Bot size={18} /> See AI Demo
+              <Bot size={18} className="text-[#22C55E]" /> See AI Demo
             </NavLink>
           </motion.div>
 
@@ -307,11 +305,11 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="pt-6 mt-4 border-t border-white/5 flex flex-wrap items-center justify-center lg:justify-start gap-y-3 gap-x-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest"
+            className="pt-6 mt-4 border-t border-white/10 flex flex-wrap items-center justify-center lg:justify-start gap-y-3 gap-x-6 text-[11px] font-bold text-stone-400 uppercase tracking-widest"
           >
-            <span className="flex items-center gap-1.5 text-slate-300"><CheckCircle2 size={14} className="text-[#25D366]" /> Official WhatsApp API</span>
-            <span className="flex items-center gap-1.5 text-slate-300"><CheckCircle2 size={14} className="text-indigo-400" /> Advanced AI Routing</span>
-            <span className="flex items-center gap-1.5 text-slate-300"><CheckCircle2 size={14} className="text-purple-400" /> 24/7 Autopilot</span>
+            <span className="flex items-center gap-1.5 text-stone-300"><CheckCircle2 size={14} className="text-[#22C55E]" /> Official WhatsApp API</span>
+            <span className="flex items-center gap-1.5 text-stone-300"><CheckCircle2 size={14} className="text-[#22C55E]" /> Advanced AI Routing</span>
+            <span className="flex items-center gap-1.5 text-stone-300"><CheckCircle2 size={14} className="text-[#22C55E]" /> 24/7 Autopilot</span>
           </motion.div>
         </div>
 
@@ -339,7 +337,7 @@ export function TrustedBy() {
   return (
     <section className="py-16 border-y border-slate-100 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 text-center">
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] mb-10">Trusted by fast-growing SaaS & retail teams globally</p>
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-10">Integrates seamlessly with your existing stack & tools</p>
 
         {/* Infinite scrolling logo row with responsive Vector SVG logos */}
         <div className="flex w-full overflow-hidden relative">
@@ -367,11 +365,11 @@ export function TrustedBy() {
 // ==========================================
 export function Statistics() {
   const stats = [
-    { value: '99.99%', label: 'Platform Uptime', sub: 'SLA Guarantee' },
-    { value: '4.9★', label: 'Customer Rating', sub: '2,000+ Reviews' },
-    { value: '2 Billion+', label: 'Messages Delivered', sub: 'Meta Cloud API' },
-    { value: '150+', label: 'Countries Supported', sub: 'Global Coverage' },
-    { value: '24/7', label: 'Priority Support', sub: 'Instant Response' }
+    { value: '99.9%', label: 'Platform Uptime', sub: 'Enterprise SLA' },
+    { value: '< 250ms', label: 'Message Latency', sub: 'High Throughput' },
+    { value: 'Official', label: 'Meta Cloud API', sub: 'Verified Partner' },
+    { value: '150+', label: 'Countries Supported', sub: 'Global Routing' },
+    { value: '24/7', label: 'Automation & Support', sub: 'Zero Downtime' }
   ];
 
   return (
@@ -424,7 +422,7 @@ export function Features() {
       title: 'Automated Messaging',
       desc: 'Automate birthday greetings and service reminders (e.g., Filler touch-ups) at the perfect time to enhance customer loyalty.',
       bullets: ['Birthday wish triggers', 'Service follow-up alerts', 'Customer loyalty engine'],
-      color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20',
+      color: 'bg-[#F0FDF4]0/10 text-[#166534] border-indigo-500/20',
       route: '/services/automation'
     },
     {
@@ -473,7 +471,7 @@ export function Features() {
     <section id="features" className="py-32 px-6 bg-slate-50/50">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-24 max-w-xl mx-auto space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50">Capabilities</span>
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">Capabilities</span>
           <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Everything you need to automate & engage</h2>
           <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Ditch multiple subscription services. Manage your marketing campaigns, workflows, messaging pipelines, and customer support from one interface.</p>
         </div>
@@ -532,7 +530,7 @@ export function AIWorkflow() {
   ];
 
   return (
-    <section className="py-32 px-6 bg-slate-950 text-white relative overflow-hidden">
+    <section className="py-32 px-6 bg-[#12263A] text-white relative overflow-hidden">
       {/* Glow Effects */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
 
@@ -585,7 +583,7 @@ export function OmnichannelInbox() {
     { icon: MessageCircle, name: 'WhatsApp', color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
     { icon: Facebook, name: 'Facebook Messenger', color: 'bg-blue-600/10 text-blue-500 border-blue-600/20' },
     { icon: Instagram, name: 'Instagram DM', color: 'bg-pink-500/10 text-pink-500 border-pink-500/20' },
-    { icon: Smartphone, name: 'SMS', color: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20' },
+    { icon: Smartphone, name: 'SMS', color: 'bg-[#F0FDF4]0/10 text-indigo-500 border-indigo-500/20' },
     { icon: Mail, name: 'Email Inbox', color: 'bg-amber-500/10 text-amber-500 border-amber-500/20' },
     { icon: Globe, name: 'Web ChatWidget', color: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20' }
   ];
@@ -604,7 +602,7 @@ export function OmnichannelInbox() {
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-xs font-bold tracking-tight text-slate-200">WhatsApp Workspace</span>
               </div>
-              <div className="flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-lg border border-white/5 text-[9px] font-mono text-emerald-400">
+              <div className="flex items-center gap-1.5 bg-[#12263A] px-2.5 py-1 rounded-lg border border-white/5 text-[9px] font-mono text-emerald-400">
                 <span>OFFICIAL API</span>
               </div>
             </div>
@@ -614,7 +612,7 @@ export function OmnichannelInbox() {
 
               {/* Channel Switcher Sidebar -> WhatsApp Views Sidebar */}
               <div className="w-1/3 border-r border-white/5 pr-3 space-y-2 text-[10.5px] font-bold text-slate-450">
-                <div className="p-2 bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-between">
+                <div className="p-2 bg-[#166534]/10 border border-indigo-500/20 text-[#22C55E] rounded-xl flex items-center justify-between">
                   <span className="flex items-center gap-1.5">💬 All Chats</span>
                   <span className="w-4 h-4 bg-emerald-500 text-white text-[8px] rounded-full flex items-center justify-center">4</span>
                 </div>
@@ -641,7 +639,7 @@ export function OmnichannelInbox() {
                     <span className="text-[10.5px] font-bold text-white block">Ahmad Khan</span>
                     <span className="text-[8.5px] text-slate-500 block">via WhatsApp Business</span>
                   </div>
-                  <span className="text-[8.5px] text-indigo-400 font-bold bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">AI suggested</span>
+                  <span className="text-[8.5px] text-[#22C55E] font-bold bg-[#F0FDF4]0/10 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">AI suggested</span>
                 </div>
 
                 {/* Message feed */}
@@ -649,7 +647,7 @@ export function OmnichannelInbox() {
 
                   {/* Incoming */}
                   <div className="flex flex-col items-start max-w-[85%] self-start space-y-1">
-                    <div className="p-3 bg-slate-950 border border-white/5 rounded-2xl rounded-tl-none text-xs leading-relaxed text-slate-200">
+                    <div className="p-3 bg-[#12263A] border border-white/5 rounded-2xl rounded-tl-none text-xs leading-relaxed text-slate-200">
                       "Hi! Do you have slots available for a demo call today?"
                     </div>
                     <span className="text-[8px] text-slate-500 font-semibold pl-1">Ahmad • 10:41 AM</span>
@@ -657,7 +655,7 @@ export function OmnichannelInbox() {
 
                   {/* AI Suggested Response */}
                   <div className="flex flex-col items-end max-w-[85%] self-end space-y-1">
-                    <div className="p-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl rounded-tr-none text-xs leading-relaxed text-white relative">
+                    <div className="p-3 bg-gradient-to-r from-[#166534] to-[#22C55E] rounded-2xl rounded-tr-none text-xs leading-relaxed text-white relative">
                       <Sparkles size={10} className="absolute top-2 right-2 text-indigo-200 animate-pulse" />
                       "Yes, Ahmed! We have slots open at 3:00 PM and 5:00 PM. Book here."
                     </div>
@@ -671,10 +669,10 @@ export function OmnichannelInbox() {
                   <input
                     type="text"
                     placeholder="Send auto-reply or type response..."
-                    className="flex-1 bg-slate-950 border border-white/5 rounded-xl h-8 px-3 text-[10px] placeholder-slate-650 focus:outline-none focus:border-indigo-650"
+                    className="flex-1 bg-[#12263A] border border-white/5 rounded-xl h-8 px-3 text-[10px] placeholder-slate-650 focus:outline-none focus:border-indigo-650"
                     disabled
                   />
-                  <button className="h-8 px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] rounded-xl flex items-center justify-center cursor-default">
+                  <button className="h-8 px-3 bg-[#166534] hover:bg-[#14532d] text-white font-bold text-[10px] rounded-xl flex items-center justify-center cursor-default">
                     Send
                   </button>
                 </div>
@@ -688,7 +686,7 @@ export function OmnichannelInbox() {
 
         {/* Text Area */}
         <div className="lg:col-span-6 space-y-8 text-left">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50">WhatsApp Automation</span>
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">WhatsApp Automation</span>
           <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Scale your business on WhatsApp</h2>
           <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Stop manually replying to repetitive queries. Automate responses, route conversations to the right team, and send targeted broadcast campaigns on the world's most popular messaging app.</p>
 
@@ -773,7 +771,7 @@ export function CRMDashboardPreview() {
     <section className="py-32 px-6 bg-slate-50/50">
       <div className="max-w-7xl mx-auto space-y-16">
         <div className="text-center max-w-xl mx-auto space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50">Core Engine</span>
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">Core Engine</span>
           <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Complete Customer Relationship Pipeline</h2>
           <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Monitor deals, track lead status, view active customer profiles, and review task timelines from one central workspace.</p>
         </div>
@@ -785,10 +783,10 @@ export function CRMDashboardPreview() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-6 gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-pulse" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#166534] animate-pulse" />
                 <h3 className="text-base font-bold text-slate-900 tracking-tight">Throb Active Deals Board</h3>
               </div>
-              <span className="text-[11px] font-semibold text-slate-450 mt-0.5 block">Pipeline Value: <strong className="text-indigo-600">$14,600 USD</strong> • 3 active customer profiles</span>
+              <span className="text-[11px] font-semibold text-slate-450 mt-0.5 block">Pipeline Value: <strong className="text-[#166534]">$14,600 USD</strong> • 3 active customer profiles</span>
             </div>
 
             <div className="flex items-center gap-3">
@@ -810,7 +808,7 @@ export function CRMDashboardPreview() {
                     <span className="font-display font-[700] text-sm text-slate-800 block">{col.title}</span>
                     <span className="text-[9.5px] text-slate-450 font-semibold">{col.count}</span>
                   </div>
-                  <span className="text-xs font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-lg">{col.value}</span>
+                  <span className="text-xs font-bold text-[#166534] bg-[#F0FDF4] border border-[#bbf7d0] px-2 py-0.5 rounded-lg">{col.value}</span>
                 </div>
 
                 {/* Cards List inside column */}
@@ -821,7 +819,7 @@ export function CRMDashboardPreview() {
                       {/* Card Header Profile & Tag */}
                       <div className="flex justify-between items-start gap-2">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8.5 h-8.5 rounded-xl bg-indigo-50 border border-indigo-100/50 text-indigo-650 flex items-center justify-center text-xs font-bold shadow-sm">
+                          <div className="w-8.5 h-8.5 rounded-xl bg-[#F0FDF4] border border-[#bbf7d0]/50 text-indigo-650 flex items-center justify-center text-xs font-bold shadow-sm">
                             {deal.initials}
                           </div>
                           <div>
@@ -882,7 +880,7 @@ export function MarketingAutomation() {
     <section className="py-32 px-6 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto space-y-20">
         <div className="text-center max-w-xl mx-auto space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50">Automation Flow</span>
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">Automation Flow</span>
           <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Advanced marketing workflow mapping</h2>
           <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Visually model how users engage with your brand touchpoints. Create custom wait delays, filter conditions, message blocks, and alerts.</p>
         </div>
@@ -911,15 +909,15 @@ export function MarketingAutomation() {
 // ==========================================
 export function AnalyticsDashboard() {
   return (
-    <section id="integrations" className="py-32 px-6 bg-slate-950 text-white overflow-hidden relative">
+    <section id="integrations" className="py-32 px-6 bg-[#12263A] text-white overflow-hidden relative">
       {/* Background blobs */}
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#F0FDF4]0/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
 
         {/* Text Area */}
         <div className="lg:col-span-5 space-y-8 text-left">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-400 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20">Unified Metrics</span>
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#22C55E] bg-[#F0FDF4]0/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20">Unified Metrics</span>
           <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-white">Campaign analytics with pixel-perfect accuracy</h2>
           <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-300">Monitor conversion rates, sales pipelines, message volume, and support resolution metrics. Our real-time data visualizer tracks agent response speeds and total return-on-investment automatically.</p>
 
@@ -1032,7 +1030,7 @@ export function IntegrationsGrid() {
     <section className="py-32 px-6 bg-white border-t border-slate-100">
       <div className="max-w-7xl mx-auto space-y-16">
         <div className="text-center max-w-xl mx-auto space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50">Connectivity</span>
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">Connectivity</span>
           <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Connected Integrations Ecosystem</h2>
           <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Sync contact fields, events, tags, pipelines, and trigger workflows instantly using secure REST endpoints and native webhooks.</p>
         </div>
@@ -1041,7 +1039,7 @@ export function IntegrationsGrid() {
           {integrations.map((int) => (
             <div key={int.name} className="p-8 bg-slate-50/50 border border-slate-150 rounded-3xl hover:border-slate-300 transition-colors flex flex-col justify-between">
               <div className="space-y-4">
-                <div className="w-10 h-10 bg-white border border-slate-200 text-indigo-600 rounded-xl flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 bg-white border border-slate-200 text-[#166534] rounded-xl flex items-center justify-center shrink-0">
                   <int.icon size={18} strokeWidth={2.5} />
                 </div>
                 <h3 className="text-base font-bold text-slate-900 block tracking-tight">{int.name}</h3>
@@ -1075,9 +1073,9 @@ export function Testimonials() {
     {
       text: "Our marketing workflows became unified in minutes. The WhatsApp Graph API integration is compliant, robust, and performs flawlessly during high-volume promo sales events.",
       author: "Marcus Aurel",
-      role: "Founder, FissionMonster",
+      role: "Founder, NexxDigital",
       stats: "4x Faster Response",
-      logo: "FissionMonster",
+      logo: "NexxDigital",
       avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
       gradient: "from-purple-500/5 to-pink-500/5"
     }
@@ -1087,18 +1085,18 @@ export function Testimonials() {
     <section id="resources" className="py-32 px-6 bg-slate-50 relative overflow-hidden border-y border-slate-100">
       {/* Background decoration */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-indigo-500/5 blur-[120px] rounded-full" />
+        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-[#F0FDF4]0/5 blur-[120px] rounded-full" />
         <div className="absolute top-[60%] -right-[10%] w-[50%] h-[50%] bg-purple-500/5 blur-[120px] rounded-full" />
       </div>
 
       <div className="max-w-7xl mx-auto space-y-20 relative z-10">
         <div className="text-center max-w-2xl mx-auto space-y-6">
-          <span className="font-sans font-[600] text-[13px] uppercase tracking-[1.5px] text-indigo-600 bg-white px-4 py-2 rounded-full border border-indigo-100 shadow-sm shadow-indigo-100/50 inline-flex items-center gap-2">
-            <Star size={14} className="fill-indigo-600 text-indigo-600" />
+          <span className="font-sans font-[600] text-[13px] uppercase tracking-[1.5px] text-[#166534] bg-white px-4 py-2 rounded-full border border-[#bbf7d0] shadow-sm shadow-indigo-100/50 inline-flex items-center gap-2">
+            <Star size={14} className="fill-indigo-600 text-[#166534]" />
             Success Stories
           </span>
           <h2 className="font-display font-[800] text-[36px] md:text-[48px] lg:text-[56px] leading-[1.1] tracking-[-1.5px] text-slate-900">
-            Hear it from teams who <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">build on Throb</span>
+            Hear it from teams who <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#166534] to-[#22C55E]">build on Throb</span>
           </h2>
           <p className="font-sans font-medium text-[18px] leading-[1.8] max-w-[620px] mx-auto text-slate-500">
             See how high-growth startups and local businesses streamline customer support, scale marketing outreach, and automate replies.
@@ -1145,7 +1143,7 @@ export function Testimonials() {
                   </div>
                 </div>
                 <div className="text-right flex flex-col items-end gap-1.5">
-                  <span className="text-[11px] font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md uppercase tracking-wider">{r.stats}</span>
+                  <span className="text-[11px] font-black text-[#166534] bg-[#F0FDF4] px-2.5 py-1 rounded-md uppercase tracking-wider">{r.stats}</span>
                   <span className="text-[11px] text-slate-400 font-bold block uppercase tracking-widest">{r.logo}</span>
                 </div>
               </div>
@@ -1244,11 +1242,11 @@ export function Pricing() {
     <section id="pricing" className="py-32 px-6 bg-white relative overflow-hidden border-t border-slate-100">
       {/* Background glow effects */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-200 to-transparent" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-50/50 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#F0FDF4]/50 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-16 max-w-2xl mx-auto space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50">Pricing Plans</span>
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">Pricing Plans</span>
           <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Scale your WhatsApp operations</h2>
           <p className="font-sans font-normal text-[18px] leading-[1.8] text-slate-500">Choose a plan that fits your business scale. Unlock unlimited contacts, advanced AI auto-replies, and seamless CRM integrations.</p>
         </div>
@@ -1258,13 +1256,13 @@ export function Pricing() {
           <span className={cn("text-xs font-black uppercase tracking-wider", !isYearly ? "text-slate-900" : "text-slate-400")}>Monthly Billing</span>
           <button
             onClick={() => setIsYearly(!isYearly)}
-            className="w-14 h-7 bg-indigo-50 border border-indigo-100 rounded-full p-1 transition-all duration-300 relative focus:outline-none cursor-pointer hover:bg-indigo-100"
+            className="w-14 h-7 bg-[#F0FDF4] border border-[#bbf7d0] rounded-full p-1 transition-all duration-300 relative focus:outline-none cursor-pointer hover:bg-[#dcfce7]"
           >
-            <div className={cn("w-5 h-5 bg-indigo-600 rounded-full transition-all duration-300 shadow-sm", isYearly ? "translate-x-7" : "translate-x-0")} />
+            <div className={cn("w-5 h-5 bg-[#166534] rounded-full transition-all duration-300 shadow-sm", isYearly ? "translate-x-7" : "translate-x-0")} />
           </button>
           <div className="flex items-center gap-2">
             <span className={cn("text-xs font-black uppercase tracking-wider", isYearly ? "text-slate-900" : "text-slate-400")}>Yearly Billing</span>
-            <span className="text-[9px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-md border border-indigo-200">Save 20%</span>
+            <span className="text-[9px] font-black uppercase tracking-widest bg-[#dcfce7] text-[#166534] px-2.5 py-1 rounded-md border border-[#bbf7d0]">Save 20%</span>
           </div>
         </div>
 
@@ -1273,17 +1271,17 @@ export function Pricing() {
             <div key={plan.name} className={cn(
               "p-10 rounded-[2.5rem] flex flex-col transition-all duration-500 relative group overflow-hidden",
               plan.highlighted
-                ? "bg-white text-slate-900 border-2 border-indigo-600 shadow-[0_20px_60px_rgba(79,70,229,0.15)] md:-translate-y-4 z-10"
-                : "bg-white text-slate-900 border border-slate-200/80 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-900/5 hover:-translate-y-2"
+                ? "bg-white text-slate-900 border-2 border-[#166534] shadow-[0_20px_60px_rgba(22,101,52,0.12)] md:-translate-y-4 z-10"
+                : "bg-white text-slate-900 border border-slate-200/80 hover:border-[#bbf7d0] hover:shadow-xl hover:shadow-indigo-900/5 hover:-translate-y-2"
             )}>
               
               {plan.highlighted && (
-                <div className="absolute top-6 right-6 bg-indigo-50 text-indigo-700 border border-indigo-200 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
-                  <Sparkles size={12} className="text-indigo-600" /> Most Popular
+                <div className="absolute top-6 right-6 bg-[#F0FDF4] text-[#166534] border border-[#bbf7d0] text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                  <Sparkles size={12} className="text-[#166534]" /> Most Popular
                 </div>
               )}
 
-              <h3 className={cn("text-sm font-black uppercase tracking-[0.2em] mb-2", plan.highlighted ? "text-indigo-600" : "text-slate-500")}>{plan.name}</h3>
+              <h3 className={cn("text-sm font-black uppercase tracking-[0.2em] mb-2", plan.highlighted ? "text-[#166534]" : "text-slate-500")}>{plan.name}</h3>
               <p className="text-slate-500 text-xs font-medium mb-6 min-h-[32px]">{plan.desc}</p>
               
               <div className="flex items-baseline gap-2 mb-2">
@@ -1293,14 +1291,14 @@ export function Pricing() {
 
               <div className="h-6 mb-8">
                 {isYearly && plan.price !== 'Custom' && (
-                  <span className="block text-[10.5px] font-bold text-indigo-600 uppercase tracking-wider bg-indigo-50 w-fit px-2.5 py-1 rounded-md border border-indigo-100">Billed annually</span>
+                  <span className="block text-[10.5px] font-bold text-[#166534] uppercase tracking-wider bg-[#F0FDF4] w-fit px-2.5 py-1 rounded-md border border-[#bbf7d0]">Billed annually</span>
                 )}
               </div>
 
               <div className="flex-1 space-y-4 mb-10">
                 {plan.features.map((f: string) => (
                   <div key={f} className="flex items-start gap-3 text-sm font-medium text-slate-700">
-                    <CheckCircle2 size={18} className={cn("shrink-0 mt-0.5", plan.highlighted ? "text-indigo-600" : "text-indigo-400")} />
+                    <CheckCircle2 size={18} className={cn("shrink-0 mt-0.5", plan.highlighted ? "text-[#166534]" : "text-[#22C55E]")} />
                     <span>{f}</span>
                   </div>
                 ))}
@@ -1311,8 +1309,8 @@ export function Pricing() {
                 className={cn(
                   "w-full py-4 rounded-xl font-bold text-[13px] uppercase tracking-widest transition-all active:scale-95 cursor-pointer text-center block relative overflow-hidden group-hover:shadow-md",
                   plan.highlighted
-                    ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-600/30"
-                    : "bg-slate-50 border border-slate-200 text-slate-800 hover:border-indigo-600 hover:text-indigo-600 hover:bg-white"
+                    ? "bg-[#166534] text-white hover:bg-[#14532d] shadow-lg shadow-[#166534]/30"
+                    : "bg-slate-50 border border-slate-200 text-slate-800 hover:border-[#166534] hover:text-[#166534] hover:bg-white"
                 )}
               >
                 <span className="relative z-10">Get Started</span>
@@ -1357,7 +1355,7 @@ export function FAQ() {
   return (
     <section className="py-32 px-6 bg-slate-50 relative overflow-hidden">
       {/* Decorative Background */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-indigo-50/50 -skew-x-12 transform origin-top-right z-0" />
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-[#F0FDF4]/50 -skew-x-12 transform origin-top-right z-0" />
       <div className="absolute top-20 right-20 w-72 h-72 bg-purple-200/50 rounded-full blur-[80px] pointer-events-none z-0" />
       <div className="absolute bottom-20 left-20 w-72 h-72 bg-indigo-200/50 rounded-full blur-[80px] pointer-events-none z-0" />
 
@@ -1366,12 +1364,12 @@ export function FAQ() {
         {/* Left Content Area */}
         <div className="lg:col-span-5 space-y-8 sticky top-24">
           <div className="space-y-4">
-            <span className="font-sans font-[600] text-[13px] uppercase tracking-[1.5px] text-indigo-600 bg-white px-4 py-2 rounded-full border border-indigo-100 shadow-sm shadow-indigo-100/50 inline-flex items-center gap-2">
-              <HelpCircle size={14} className="text-indigo-600" />
+            <span className="font-sans font-[600] text-[13px] uppercase tracking-[1.5px] text-[#166534] bg-white px-4 py-2 rounded-full border border-[#bbf7d0] shadow-sm shadow-indigo-100/50 inline-flex items-center gap-2">
+              <HelpCircle size={14} className="text-[#166534]" />
               Support Center
             </span>
             <h2 className="font-display font-[800] text-[36px] md:text-[44px] leading-[1.1] tracking-[-1px] text-slate-900">
-              Got questions about <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">WhatsApp AI?</span>
+              Got questions about <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#166534] to-[#22C55E]">WhatsApp AI?</span>
             </h2>
             <p className="font-sans font-medium text-[18px] leading-[1.7] text-slate-500">
               Everything you need to know about setting up your WhatsApp Business API, automation limits, compliance, and CRM integrations.
@@ -1379,13 +1377,13 @@ export function FAQ() {
           </div>
 
           <div className="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
-              <MessageCircle size={24} className="text-indigo-600" />
+            <div className="w-12 h-12 rounded-full bg-[#F0FDF4] flex items-center justify-center shrink-0">
+              <MessageCircle size={24} className="text-[#166534]" />
             </div>
             <div>
               <h4 className="font-bold text-slate-900 mb-1">Still have questions?</h4>
               <p className="text-sm text-slate-500 mb-3">Our WhatsApp automation experts are ready to help you build the perfect workflow.</p>
-              <a href="#contact" className="text-sm font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1.5 transition-colors">
+              <a href="#contact" className="text-sm font-bold text-[#166534] hover:text-[#166534] flex items-center gap-1.5 transition-colors">
                 Chat with our team <ArrowRight size={14} />
               </a>
             </div>
@@ -1402,7 +1400,7 @@ export function FAQ() {
                 className={cn(
                   "border rounded-2xl overflow-hidden transition-all duration-300",
                   isOpen 
-                    ? "bg-white border-indigo-200 shadow-lg shadow-indigo-900/5" 
+                    ? "bg-white border-[#bbf7d0] shadow-lg shadow-indigo-900/5" 
                     : "bg-white/60 border-slate-200/80 hover:bg-white hover:border-slate-300"
                 )}
               >
@@ -1413,7 +1411,7 @@ export function FAQ() {
                   <div className="flex gap-4">
                     <span className={cn(
                       "font-mono text-xs font-bold mt-1 shrink-0",
-                      isOpen ? "text-indigo-600" : "text-slate-400"
+                      isOpen ? "text-[#166534]" : "text-slate-400"
                     )}>
                       {String(idx + 1).padStart(2, '0')}
                     </span>
@@ -1426,7 +1424,7 @@ export function FAQ() {
                   </div>
                   <div className={cn(
                     "shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors",
-                    isOpen ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-500"
+                    isOpen ? "bg-[#166534] text-white" : "bg-slate-100 text-slate-500"
                   )}>
                     {isOpen ? <Minus size={16} strokeWidth={2.5} /> : <Plus size={16} strokeWidth={2.5} />}
                   </div>
@@ -1460,7 +1458,7 @@ export function FAQ() {
 // ==========================================
 export function FinalCTA() {
   return (
-    <section id="contact" className="py-36 px-6 bg-slate-950 text-white text-center relative overflow-hidden">
+    <section id="contact" className="py-36 px-6 bg-[#12263A] text-white text-center relative overflow-hidden">
       {/* Mesh Grid & Radial Glow overlays */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.12),transparent_70%)] pointer-events-none" />
@@ -1468,14 +1466,14 @@ export function FinalCTA() {
       <div className="max-w-4xl mx-auto space-y-10 relative z-10 flex flex-col items-center">
 
         {/* Sparkles tag */}
-        <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-300 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20 flex items-center gap-1.5">
-          <Sparkles size={12} className="text-indigo-400 animate-pulse" />
+        <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#22C55E] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30 flex items-center gap-1.5">
+          <Sparkles size={12} className="text-[#22C55E] animate-pulse" />
           Get Started Today
         </span>
 
         {/* Header */}
         <h2 className="font-display font-[800] text-[38px] md:text-[48px] lg:text-[60px] xl:text-[68px] leading-[1.05] tracking-[-2px] text-white max-w-3xl">
-          Ready to Transform Customer <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300">Communication?</span>
+          Ready to Transform Customer <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] via-[#86efac] to-[#bbf7d0]">Communication?</span>
         </h2>
 
         {/* Description */}
@@ -1486,19 +1484,19 @@ export function FinalCTA() {
         {/* Glassmorphic Checklist Bar */}
         <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-8 text-[12px] font-semibold text-slate-300 font-sans uppercase tracking-[0.5px] bg-white/5 border border-white/10 px-8 py-3.5 rounded-full backdrop-blur-md">
           <div className="flex items-center gap-2">
-            <CheckCircle2 size={13} className="text-indigo-455" />
+            <CheckCircle2 size={13} className="text-[#22C55E]" />
             <span>Unlimited Messaging</span>
           </div>
           <div className="flex items-center gap-2">
-            <CheckCircle2 size={13} className="text-indigo-455" />
+            <CheckCircle2 size={13} className="text-[#22C55E]" />
             <span>AI Included</span>
           </div>
           <div className="flex items-center gap-2">
-            <CheckCircle2 size={13} className="text-indigo-455" />
+            <CheckCircle2 size={13} className="text-[#22C55E]" />
             <span>CRM Included</span>
           </div>
           <div className="flex items-center gap-2">
-            <CheckCircle2 size={13} className="text-indigo-455" />
+            <CheckCircle2 size={13} className="text-[#22C55E]" />
             <span>No Credit Card</span>
           </div>
         </div>
@@ -1507,7 +1505,7 @@ export function FinalCTA() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 w-full">
           <NavLink
             to="/signup"
-            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(99,102,241,0.4)] active:scale-97 text-center shadow-lg"
+            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(22,101,52,0.35)] active:scale-97 text-center shadow-lg"
           >
             Start Free Trial
           </NavLink>
@@ -1546,7 +1544,7 @@ export function WhatsAppAutomation() {
       icon: FileText,
       title: 'Interactive Service Selection',
       desc: 'Display business services as clickable WhatsApp buttons so customers can quickly navigate to the service they need.',
-      color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20'
+      color: 'bg-[#F0FDF4]0/10 text-[#166534] border-indigo-500/20'
     },
     {
       icon: Calendar,
@@ -1571,7 +1569,7 @@ export function WhatsAppAutomation() {
   const workflowSteps = [
     { label: 'Customer Clicks Ad', sub: 'TikTok • Facebook • Instagram • Snapchat • Google', icon: MousePointerClick },
     { label: 'WhatsApp Opens Instantly', sub: 'Direct deep-link conversation', icon: MessageCircle },
-    { label: 'Automatic Welcome Message', sub: '"Welcome to Throbtech 👋"', icon: Send },
+    { label: 'Automatic Welcome Message', sub: '"Welcome to Talkinexx 👋"', icon: Send },
     { label: 'Customer Selects Service', sub: 'Book • Quote • Services • Support', icon: FileText },
     { label: 'AI Asks Required Questions', sub: 'Smart contextual follow-ups', icon: Bot },
     { label: 'Booking Confirmed', sub: 'Appointment or quote locked in', icon: Calendar },
@@ -1598,12 +1596,12 @@ export function WhatsAppAutomation() {
 
           {/* Section Badge + Title */}
           <div className="text-center mb-20 max-w-2xl mx-auto space-y-4 flex flex-col items-center">
-            <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-600 bg-indigo-50 px-3.5 py-1.5 rounded-full border border-indigo-100/50 flex items-center gap-1.5 w-fit">
+            <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50 flex items-center gap-1.5 w-fit">
               <MessageCircle size={14} className="text-indigo-500" />
               WhatsApp Automation
             </span>
             <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">
-              AI WhatsApp Automation for <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300">Businesses & Clinics</span>
+              AI WhatsApp Automation for <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] via-[#86efac] to-[#bbf7d0]">Businesses & Clinics</span>
             </h2>
             <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[700px] text-slate-500">
               Transform customer communication with intelligent WhatsApp automation that replies instantly, guides customers through services, books appointments, captures leads, and integrates directly with your marketing campaigns.
@@ -1638,7 +1636,7 @@ export function WhatsAppAutomation() {
                     <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center border transition-colors mb-3", f.color)}>
                       <f.icon size={18} strokeWidth={2.5} />
                     </div>
-                    <h4 className="text-sm font-bold text-slate-900 mb-1.5 tracking-tight group-hover:text-indigo-600 transition-colors">{f.title}</h4>
+                    <h4 className="text-sm font-bold text-slate-900 mb-1.5 tracking-tight group-hover:text-[#166534] transition-colors">{f.title}</h4>
                     <p className="text-slate-500 font-medium text-[11px] leading-relaxed">{f.desc}</p>
                   </motion.div>
                 ))}
@@ -1653,7 +1651,7 @@ export function WhatsAppAutomation() {
               >
                 <NavLink
                   to="/contact"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-sans font-semibold text-[15px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(99,102,241,0.35)] active:scale-97 shadow-lg"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-sans font-semibold text-[15px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(22,101,52,0.35)] active:scale-97 shadow-lg"
                 >
                   Get Started with WhatsApp AI
                   <ArrowRight size={16} />
@@ -1663,19 +1661,19 @@ export function WhatsAppAutomation() {
 
             {/* ---- RIGHT COLUMN: Workflow Visualization ---- */}
             <div className="lg:col-span-7 w-full">
-              <div className="w-full bg-slate-950 border border-slate-800 rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden">
+              <div className="w-full bg-[#12263A] border border-slate-800 rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden">
 
                 {/* Background glow */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
-                <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-indigo-500/5 rounded-full blur-[80px] pointer-events-none" />
+                <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-[#F0FDF4]0/5 rounded-full blur-[80px] pointer-events-none" />
 
                 {/* Console Header */}
                 <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-6 relative z-10">
                   <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#F0FDF4]0 animate-pulse" />
                     <span className="text-xs font-bold tracking-tight text-slate-200">WhatsApp Automation Pipeline</span>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1 rounded-lg border border-white/5 text-[9px] font-mono text-indigo-400">
+                  <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1 rounded-lg border border-white/5 text-[9px] font-mono text-[#22C55E]">
                     <span>LIVE • 8 STEPS</span>
                   </div>
                 </div>
@@ -1734,10 +1732,10 @@ export function WhatsAppAutomation() {
                 {/* Bottom Status Bar */}
                 <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] relative z-10">
                   <span className="flex items-center gap-1.5 text-slate-400 font-semibold">
-                    <CheckCircle2 size={11} className="text-indigo-400" />
+                    <CheckCircle2 size={11} className="text-[#22C55E]" />
                     End-to-end automation • Zero manual intervention
                   </span>
-                  <span className="text-indigo-400 font-bold uppercase tracking-wider text-[9px]">Active</span>
+                  <span className="text-[#22C55E] font-bold uppercase tracking-wider text-[9px]">Active</span>
                 </div>
               </div>
             </div>
@@ -1750,9 +1748,9 @@ export function WhatsAppAutomation() {
       <section className="py-20 px-6 bg-white relative overflow-hidden">
         
         <div className="max-w-6xl mx-auto relative z-10">
-          <div className="bg-slate-950 border border-slate-800/60 shadow-[0_20px_60px_rgba(0,0,0,0.15)] rounded-[2.5rem] p-10 md:p-14 relative overflow-hidden group">
+          <div className="bg-[#12263A] border border-slate-800/60 shadow-[0_20px_60px_rgba(0,0,0,0.15)] rounded-[2.5rem] p-10 md:p-14 relative overflow-hidden group">
             {/* Animated Background Glows */}
-            <div className="absolute top-0 left-1/4 w-1/2 h-1/2 bg-indigo-500/20 blur-[100px] pointer-events-none rounded-full group-hover:bg-indigo-500/30 transition-colors duration-700" />
+            <div className="absolute top-0 left-1/4 w-1/2 h-1/2 bg-[#F0FDF4]0/20 blur-[100px] pointer-events-none rounded-full group-hover:bg-[#F0FDF4]0/30 transition-colors duration-700" />
             <div className="absolute bottom-0 right-1/4 w-1/2 h-1/2 bg-purple-500/20 blur-[100px] pointer-events-none rounded-full group-hover:bg-purple-500/30 transition-colors duration-700" />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 relative z-10">
@@ -1782,19 +1780,19 @@ export function WhatsAppAutomation() {
       </section>
 
       {/* ========== CTA SECTION ========== */}
-      <section className="py-28 px-6 bg-slate-950 text-white text-center relative overflow-hidden">
+      <section className="py-28 px-6 bg-[#12263A] text-white text-center relative overflow-hidden">
         {/* Background overlays */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.12),transparent_70%)] pointer-events-none" />
 
         <div className="max-w-3xl mx-auto space-y-8 relative z-10 flex flex-col items-center">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-indigo-300 bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20 flex items-center gap-1.5">
-            <Sparkles size={12} className="text-indigo-400 animate-pulse" />
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#22C55E] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30 flex items-center gap-1.5">
+            <Sparkles size={12} className="text-[#22C55E] animate-pulse" />
             WhatsApp AI
           </span>
 
           <h2 className="font-display font-[800] text-[32px] md:text-[42px] lg:text-[52px] leading-[1.08] tracking-[-2px] text-white max-w-2xl">
-            Ready to Automate Your Customer <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300">Conversations?</span>
+            Ready to Automate Your Customer <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] via-[#86efac] to-[#bbf7d0]">Conversations?</span>
           </h2>
 
           <p className="font-sans font-normal text-[17px] leading-[1.8] max-w-[600px] text-slate-400">
@@ -1804,19 +1802,19 @@ export function WhatsAppAutomation() {
           {/* Glassmorphic Features Bar */}
           <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-8 text-[12px] font-semibold text-slate-300 font-sans uppercase tracking-[0.5px] bg-white/5 border border-white/10 px-8 py-3.5 rounded-full backdrop-blur-md">
             <div className="flex items-center gap-2">
-              <CheckCircle2 size={13} className="text-indigo-455" />
+              <CheckCircle2 size={13} className="text-[#22C55E]" />
               <span>Click-to-WhatsApp Ads</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 size={13} className="text-indigo-455" />
+              <CheckCircle2 size={13} className="text-[#22C55E]" />
               <span>AI Booking</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 size={13} className="text-indigo-455" />
+              <CheckCircle2 size={13} className="text-[#22C55E]" />
               <span>CRM Sync</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 size={13} className="text-indigo-455" />
+              <CheckCircle2 size={13} className="text-[#22C55E]" />
               <span>24/7 Auto-Reply</span>
             </div>
           </div>
@@ -1825,7 +1823,7 @@ export function WhatsAppAutomation() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 w-full">
             <NavLink
               to="/signup"
-              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(99,102,241,0.4)] active:scale-97 text-center shadow-lg"
+              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(22,101,52,0.35)] active:scale-97 text-center shadow-lg"
             >
               Get Started
             </NavLink>

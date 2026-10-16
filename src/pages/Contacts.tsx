@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { UserPlus, Upload, LayoutGrid, List, Users, Loader2, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'motion/react';
-import { contacts as mockContacts, Contact, Tag } from '../data/contactsMock';
+import { Contact, Tag } from '../types';
 import ContactTable from '../components/contacts/ContactTable';
 import ContactCard from '../components/contacts/ContactCard';
 import FilterBar from '../components/contacts/FilterBar';
@@ -169,16 +169,7 @@ export default function Contacts() {
   }, [searchQuery, selectedTag, selectedStatus, lastTouchpoint, selectedCategory, selectedEmailStatus, selectedCampaign]);
 
   const displayTags = useMemo(() => {
-    if (Array.isArray(tags) && tags.length > 0) return tags;
-    // Fallback static tags if API returns nothing but still want objects
-    return [
-      { id: '1', name: 'VIP', color: '#8b5cf6' },
-      { id: '2', name: 'Eid Promo', color: '#f59e0b' },
-      { id: '3', name: 'New Customer', color: '#10b981' },
-      { id: '4', name: 'Wholesale', color: '#3b82f6' },
-      { id: '5', name: 'Complaint', color: '#ef4444' },
-      { id: '6', name: 'Inactive', color: '#64748b' }
-    ];
+    return Array.isArray(tags) ? tags : [];
   }, [tags]);
 
   // Filtering Logic (Local fallback if needed, but primary is server-side now)
@@ -253,36 +244,38 @@ export default function Contacts() {
       {/* Page Header */}
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-slate-100 text-slate-900 rounded-xl flex items-center justify-center shadow-sm">
+          <div className="w-12 h-12 bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 rounded-xl flex items-center justify-center shadow-sm">
             <Users size={24} strokeWidth={2} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Audience CRM</h1>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-0.5">
-              Targeted Segmentation & Management
+            <h1 className="text-2xl font-bold text-[#12263A] tracking-tight">Contacts</h1>
+            <p className="text-xs font-medium text-[#57534E] mt-0.5">
+              Manage, segment, and engage your audience across all channels
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="hidden md:flex bg-slate-100 p-1 rounded-xl">
+          <div className="hidden md:flex bg-stone-100 p-1 rounded-xl gap-0.5">
             <button 
               onClick={() => setViewMode('table')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'table' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${viewMode === 'table' ? 'bg-[#166534] text-white shadow-xs' : 'text-stone-400 hover:text-[#12263A] hover:bg-stone-200/50'}`}
+              title="Table view"
             >
-              <List size={20} />
+              <List size={18} />
             </button>
             <button 
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-[#166534] text-white shadow-xs' : 'text-stone-400 hover:text-[#12263A] hover:bg-stone-200/50'}`}
+              title="Grid view"
             >
-              <LayoutGrid size={20} />
+              <LayoutGrid size={18} />
             </button>
           </div>
 
           <button 
             onClick={() => setIsImportOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm"
+            className="h-10 px-4 bg-white border border-slate-200 hover:border-[#bbf7d0] rounded-xl text-xs sm:text-sm font-semibold text-[#57534E] hover:text-[#166534] hover:bg-[#F0FDF4] transition-all shadow-xs active:scale-95 flex items-center gap-2 cursor-pointer"
           >
             <Upload size={16} /> 
             <span>Import</span>
@@ -292,9 +285,9 @@ export default function Contacts() {
 
           <button 
             onClick={() => navigate('/contacts/add')}
-            className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-all shadow-sm"
+            className="h-10 px-5 bg-[#166534] hover:bg-[#14532d] text-white rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 flex items-center gap-2 cursor-pointer"
           >
-            <UserPlus size={18} /> 
+            <UserPlus size={17} /> 
             <span>Add Contact</span>
           </button>
         </div>
@@ -303,7 +296,7 @@ export default function Contacts() {
       <div className="grid grid-cols-12 gap-8">
         {/* Main Content: Table & Filters */}
         <main className="col-span-12 space-y-6">
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
+          <div className="bg-white border border-stone-200 rounded-xl shadow-sm p-4">
             <FilterBar 
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
@@ -369,19 +362,19 @@ export default function Contacts() {
             
             {/* Pagination Controls */}
             {pagination && pagination.lastPage > 1 && (
-              <div className="mt-6 bg-white border border-slate-200 rounded-xl px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-                <span className="text-xs font-semibold text-slate-500">
-                  Showing <strong className="text-slate-800">{(pagination.currentPage - 1) * pagination.perPage + 1}</strong> to{' '}
-                  <strong className="text-slate-800">
+              <div className="mt-6 bg-white border border-stone-200 rounded-xl px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                <span className="text-xs font-semibold text-[#57534E]">
+                  Showing <strong className="text-[#12263A]">{(pagination.currentPage - 1) * pagination.perPage + 1}</strong> to{' '}
+                  <strong className="text-[#12263A]">
                     {Math.min(pagination.currentPage * pagination.perPage, pagination.total)}
                   </strong>{' '}
-                  of <strong className="text-slate-800">{pagination.total}</strong> entries
+                  of <strong className="text-[#12263A]">{pagination.total}</strong> entries
                 </span>
                 <div className="flex items-center gap-1.5">
                   <button
                     disabled={currentPage === 1}
                     onClick={() => handlePageChange(currentPage - 1)}
-                    className="w-8 h-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-slate-650 transition-all active:scale-95"
+                    className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-[#57534E] transition-all active:scale-95 shadow-xs"
                   >
                     <ChevronLeft size={16} />
                   </button>
@@ -401,13 +394,13 @@ export default function Contacts() {
                         <button
                           key={1}
                           onClick={() => handlePageChange(1)}
-                          className="w-8 h-8 rounded-lg border text-xs font-bold transition-all active:scale-95 border-slate-200 bg-white hover:bg-slate-50 text-slate-650"
+                          className="w-8.5 h-8.5 rounded-xl border text-xs font-bold transition-all active:scale-95 border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] text-[#57534E] shadow-xs cursor-pointer"
                         >
                           1
                         </button>
                       );
                       if (startPage > 2) {
-                        pages.push(<span key="dots-start" className="text-slate-400 px-1 text-xs select-none">...</span>);
+                        pages.push(<span key="dots-start" className="text-stone-400 px-1 text-xs select-none">...</span>);
                       }
                     }
 
@@ -416,10 +409,10 @@ export default function Contacts() {
                         <button
                           key={p}
                           onClick={() => handlePageChange(p)}
-                          className={`w-8 h-8 rounded-lg border text-xs font-bold transition-all active:scale-95 ${
+                          className={`w-8.5 h-8.5 rounded-xl border text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-xs ${
                             currentPage === p
-                              ? 'bg-slate-900 border-slate-900 text-white'
-                              : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-650'
+                              ? 'bg-[#166534] border-[#166534] text-white'
+                              : 'border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] text-[#57534E]'
                           }`}
                         >
                           {p}
@@ -429,13 +422,13 @@ export default function Contacts() {
 
                     if (endPage < pagination.lastPage) {
                       if (endPage < pagination.lastPage - 1) {
-                        pages.push(<span key="dots-end" className="text-slate-400 px-1 text-xs select-none">...</span>);
+                        pages.push(<span key="dots-end" className="text-stone-400 px-1 text-xs select-none">...</span>);
                       }
                       pages.push(
                         <button
                           key={pagination.lastPage}
                           onClick={() => handlePageChange(pagination.lastPage)}
-                          className="w-8 h-8 rounded-lg border text-xs font-bold transition-all active:scale-95 border-slate-200 bg-white hover:bg-slate-50 text-slate-650"
+                          className="w-8.5 h-8.5 rounded-xl border text-xs font-bold transition-all active:scale-95 border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] text-[#57534E] shadow-xs cursor-pointer"
                         >
                           {pagination.lastPage}
                         </button>
@@ -448,7 +441,7 @@ export default function Contacts() {
                   <button
                     disabled={currentPage === pagination.lastPage}
                     onClick={() => handlePageChange(currentPage + 1)}
-                    className="w-8 h-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-slate-650 transition-all active:scale-95"
+                    className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-[#57534E] transition-all active:scale-95 shadow-xs"
                   >
                     <ChevronRight size={16} />
                   </button>
@@ -460,20 +453,20 @@ export default function Contacts() {
             <div className="mt-6 flex items-center justify-between px-2">
                <div className="flex items-center gap-6">
                   <div className="flex items-center gap-2">
-                     <Users size={14} className="text-slate-400" />
-                     <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                     <Users size={14} className="text-[#166534]" />
+                     <span className="text-[11px] font-bold text-[#57534E] uppercase tracking-wider">
                        Contacts: {pagination?.total ?? filteredContacts.length}
                      </span>
                   </div>
                   <div className="flex items-center gap-2">
-                     <Star size={14} className="text-amber-500" />
-                     <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Target Reach: 92%</span>
+                     <Star size={14} className="text-[#22C55E]" />
+                     <span className="text-[11px] font-bold text-[#57534E] uppercase tracking-wider">Target Reach: 92%</span>
                   </div>
                </div>
                <div className="flex items-center gap-4">
-                  <button onClick={() => handleExport('csv')} className="text-[11px] font-bold text-slate-900 hover:underline uppercase tracking-wider">Download Export</button>
-                  <div className="w-1 h-1 rounded-full bg-slate-300" />
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">North Region</span>
+                  <button onClick={() => handleExport('csv')} className="text-[11px] font-bold text-[#12263A] hover:text-[#166534] hover:underline uppercase tracking-wider transition-colors">Download Export</button>
+                  <div className="w-1 h-1 rounded-full bg-stone-300" />
+                  <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">North Region</span>
                </div>
             </div>
           </motion.div>

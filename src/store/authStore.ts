@@ -11,6 +11,8 @@ interface AuthState {
   logout: () => void;
   updateOnboarding: (step: number, data?: Partial<User>) => void;
   updateProfile: (data: Partial<User>) => void;
+  verifyEmail: (code?: string) => Promise<void>;
+  resendVerification: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -30,7 +32,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         id: String(response.user.id),
         email: response.user.email,
         name: response.user.name,
-        businessName: response.user.tenant?.name || response.user.businessName || 'throbtech Enterprise',
+        businessName: response.user.tenant?.name || response.user.businessName || 'Talkinexx Workspace',
         avatar: response.user.avatar || 'royal',
         onboardingStep: 4,
         tenantId: String(tenantIdValue),
@@ -107,6 +109,35 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
       return { user: updatedUser };
     });
+  },
+
+  verifyEmail: async (code?: string) => {
+    const currentUser = useAuthStore.getState().user;
+    if (!currentUser?.email) return;
+    try {
+      await AuthService.verifyEmail(currentUser.email, code);
+      const updatedUser: User = {
+        ...currentUser,
+        emailVerified: true,
+        email_verified_at: new Date().toISOString(),
+      };
+      set({ user: updatedUser });
+      localStorage.setItem('auth_session', JSON.stringify(updatedUser));
+    } catch (error) {
+      console.error('Failed to verify email', error);
+      throw error;
+    }
+  },
+
+  resendVerification: async () => {
+    const currentUser = useAuthStore.getState().user;
+    if (!currentUser?.email) return;
+    try {
+      await AuthService.resendVerification(currentUser.email);
+    } catch (error) {
+      console.error('Failed to resend verification', error);
+      throw error;
+    }
   },
 }));
 

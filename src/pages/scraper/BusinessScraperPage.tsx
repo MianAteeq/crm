@@ -656,53 +656,57 @@ export default function BusinessScraperPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 animate-fade-in font-sans">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#6D4AFF] via-[#7B57FF] to-[#8B5CF6] text-white p-8 shadow-xl shadow-[#6D4AFF]/15">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-xs font-semibold tracking-wide">
-              <Compass size={14} className="animate-spin-slow" />
-              <span>Official Google Places & Public Website Scraper</span>
+      {/* Page Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-2">
+        <div className="flex items-start sm:items-center gap-4">
+          <div className="w-12 h-12 bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 rounded-2xl flex items-center justify-center shadow-xs shrink-0">
+            <Compass size={24} strokeWidth={2} className="text-[#166534]" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#12263A] tracking-tight">
+                Discover Businesses
+              </h1>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
+                Google Places & Website Scraper
+              </span>
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight">DISCOVER BUSINESSES</h1>
-            <p className="text-white/85 text-sm max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm font-medium text-[#57534E] max-w-2xl leading-relaxed">
               Find businesses, websites & public contact emails. Inspect business homepages, contact & about pages, normalize verified addresses, and selectively import qualified leads to your CRM.
             </p>
           </div>
-
-          {/* Quick Stats Pill Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-3 text-center">
-              <p className="text-xs text-white/70 font-medium">Searches</p>
-              <p className="text-xl font-black mt-0.5">{stats?.total_searches ?? 0}</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-3 text-center">
-              <p className="text-xs text-white/70 font-medium">Businesses</p>
-              <p className="text-xl font-black mt-0.5">{stats?.total_leads_scraped ?? 0}</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-3 text-center">
-              <p className="text-xs text-white/70 font-medium">Emails Found</p>
-              <p className="text-xl font-black text-emerald-300 mt-0.5">{stats?.total_emails_discovered ?? 0}</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-3 text-center">
-              <p className="text-xs text-white/70 font-medium">In CRM</p>
-              <p className="text-xl font-black text-indigo-200 mt-0.5">{stats?.total_imported_crm ?? 0}</p>
-            </div>
-          </div>
         </div>
 
-        {/* Decorative circle */}
-        <div className="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-white/5 pointer-events-none blur-2xl" />
+        {/* Quick Stats Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="bg-white border border-stone-200/80 rounded-2xl px-4 py-3 text-center shadow-xs min-w-[100px]">
+            <p className="text-[11px] uppercase tracking-wider text-[#57534E] font-bold">Searches</p>
+            <p className="text-xl font-black text-[#12263A] mt-0.5">{stats?.total_searches ?? 0}</p>
+          </div>
+          <div className="bg-white border border-stone-200/80 rounded-2xl px-4 py-3 text-center shadow-xs min-w-[100px]">
+            <p className="text-[11px] uppercase tracking-wider text-[#57534E] font-bold">Businesses</p>
+            <p className="text-xl font-black text-[#12263A] mt-0.5">{stats?.total_leads_scraped ?? 0}</p>
+          </div>
+          <div className="bg-white border border-stone-200/80 rounded-2xl px-4 py-3 text-center shadow-xs min-w-[100px]">
+            <p className="text-[11px] uppercase tracking-wider text-[#57534E] font-bold">Emails Found</p>
+            <p className="text-xl font-black text-[#166534] mt-0.5">{stats?.total_emails_discovered ?? 0}</p>
+          </div>
+          <div className="bg-white border border-stone-200/80 rounded-2xl px-4 py-3 text-center shadow-xs min-w-[100px]">
+            <p className="text-[11px] uppercase tracking-wider text-[#57534E] font-bold">In CRM</p>
+            <p className="text-xl font-black text-[#166534] mt-0.5">{stats?.total_imported_crm ?? 0}</p>
+          </div>
+        </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex items-center gap-2 border-b border-slate-200">
+      <div className="flex items-center gap-2 border-b border-stone-200">
         <button
           onClick={() => setActiveTab('search')}
           className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all cursor-pointer ${
             activeTab === 'search'
-              ? 'border-[#6D4AFF] text-[#6D4AFF]'
-              : 'border-transparent text-slate-500 hover:text-slate-900'
+              ? 'border-[#166534] text-[#166534]'
+              : 'border-transparent text-stone-500 hover:text-[#12263A]'
           }`}
         >
           <Search size={16} />
@@ -716,14 +720,14 @@ export default function BusinessScraperPage() {
           }}
           className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all cursor-pointer relative ${
             activeTab === 'results'
-              ? 'border-[#6D4AFF] text-[#6D4AFF]'
-              : 'border-transparent text-slate-500 hover:text-slate-900'
+              ? 'border-[#166534] text-[#166534]'
+              : 'border-transparent text-stone-500 hover:text-[#12263A]'
           }`}
         >
           <Building2 size={16} />
           <span>Discovered Leads</span>
           {pagination?.total ? (
-            <span className="px-2 py-0.5 text-[11px] rounded-full bg-purple-100 text-[#6D4AFF] font-bold">
+            <span className="px-2 py-0.5 text-[11px] rounded-full bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 font-bold">
               {pagination.total}
             </span>
           ) : null}
@@ -736,8 +740,8 @@ export default function BusinessScraperPage() {
           }}
           className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all cursor-pointer ${
             activeTab === 'history'
-              ? 'border-[#6D4AFF] text-[#6D4AFF]'
-              : 'border-transparent text-slate-500 hover:text-slate-900'
+              ? 'border-[#166534] text-[#166534]'
+              : 'border-transparent text-stone-500 hover:text-[#12263A]'
           }`}
         >
           <Clock size={16} />
@@ -754,10 +758,10 @@ export default function BusinessScraperPage() {
           <div className="lg:col-span-8 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-7">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div>
-                <h2 className="text-xl font-extrabold text-slate-900">DISCOVER BUSINESSES</h2>
-                <p className="text-xs text-slate-500 mt-1">Find businesses, websites & public contact emails</p>
+                <h2 className="text-lg font-bold text-[#12263A]">Discover Businesses</h2>
+                <p className="text-xs text-[#57534E] mt-0.5">Find businesses, websites & public contact emails</p>
               </div>
-              <span className="w-10 h-10 rounded-2xl bg-purple-50 text-[#6D4AFF] flex items-center justify-center">
+              <span className="w-10 h-10 rounded-2xl bg-[#F0FDF4] text-[#166534] flex items-center justify-center">
                 <Sparkles size={20} />
               </span>
             </div>
@@ -779,7 +783,7 @@ export default function BusinessScraperPage() {
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
                     placeholder="e.g. Dental Clinic, Real Estate Agency, Software Company"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#6D4AFF] transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#166534] transition-all"
                   />
                 </div>
 
@@ -794,8 +798,8 @@ export default function BusinessScraperPage() {
                         onClick={() => setKeyword(chip)}
                         className={`px-3 py-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
                           keyword === chip
-                            ? 'bg-[#6D4AFF] text-white border-[#6D4AFF]'
-                            : 'bg-slate-50 hover:bg-purple-50 text-slate-700 hover:text-[#6D4AFF] border-slate-200'
+                            ? 'bg-[#166534] text-white border-[#166534]'
+                            : 'bg-slate-50 hover:bg-[#F0FDF4] text-slate-700 hover:text-[#166534] border-slate-200'
                         }`}
                       >
                         {chip}
@@ -811,7 +815,7 @@ export default function BusinessScraperPage() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide">
-                      Category <span className="text-[#6D4AFF] font-extrabold">*</span>
+                      Category <span className="text-[#166534] font-extrabold">*</span>
                     </label>
                     <span className="text-[10px] text-slate-400 font-medium">Auto-links to CRM</span>
                   </div>
@@ -826,7 +830,7 @@ export default function BusinessScraperPage() {
                         if (!keyword) setKeyword(cat.name);
                       }
                     }}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-[#6D4AFF] transition-all cursor-pointer"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] transition-all cursor-pointer"
                   >
                     <option value="">Select CRM Category...</option>
                     {categories.map((cat) => (
@@ -858,7 +862,7 @@ export default function BusinessScraperPage() {
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
                       placeholder="e.g. Lahore, Pakistan or London, UK"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-12 pr-4 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#6D4AFF] transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-12 pr-4 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#166534] transition-all"
                     />
                   </div>
                   <p className="text-[11px] text-slate-400">Enter city, region, or country</p>
@@ -875,7 +879,7 @@ export default function BusinessScraperPage() {
                   <select
                     value={coverageRadius}
                     onChange={(e) => setCoverageRadius(Number(e.target.value))}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-[#6D4AFF] transition-all cursor-pointer"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] transition-all cursor-pointer"
                   >
                     <option value={5000}>5 km — Local</option>
                     <option value={10000}>10 km — Nearby</option>
@@ -894,7 +898,7 @@ export default function BusinessScraperPage() {
                   <select
                     value={leadVolume}
                     onChange={(e) => setLeadVolume(Number(e.target.value))}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-[#6D4AFF] transition-all cursor-pointer"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] transition-all cursor-pointer"
                   >
                     <option value={20}>20 — Quick Test</option>
                     <option value={50}>50 — Small Search</option>
@@ -920,17 +924,17 @@ export default function BusinessScraperPage() {
                     onClick={() => setSearchMode('deep')}
                     className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${
                       searchMode === 'deep'
-                        ? 'border-[#6D4AFF] bg-purple-50/50 shadow-sm'
+                        ? 'border-[#166534] bg-[#F0FDF4]/50 shadow-sm'
                         : 'border-slate-200 bg-slate-50 hover:bg-white'
                     }`}
                   >
-                    <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md bg-[#6D4AFF] text-[9px] font-extrabold text-white uppercase tracking-wider">
+                    <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md bg-[#166534] text-[9px] font-extrabold text-white uppercase tracking-wider">
                       5,000 Volume Ready
                     </span>
                     <div className="flex items-center gap-2">
                       <div
                         className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          searchMode === 'deep' ? 'border-[#6D4AFF] bg-[#6D4AFF]' : 'border-slate-300'
+                          searchMode === 'deep' ? 'border-[#166534] bg-[#166534]' : 'border-slate-300'
                         }`}
                       >
                         {searchMode === 'deep' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -946,14 +950,14 @@ export default function BusinessScraperPage() {
                     onClick={() => setSearchMode('standard')}
                     className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                       searchMode === 'standard'
-                        ? 'border-[#6D4AFF] bg-purple-50/50 shadow-sm'
+                        ? 'border-[#166534] bg-[#F0FDF4]/50 shadow-sm'
                         : 'border-slate-200 bg-slate-50 hover:bg-white'
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       <div
                         className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          searchMode === 'standard' ? 'border-[#6D4AFF] bg-[#6D4AFF]' : 'border-slate-300'
+                          searchMode === 'standard' ? 'border-[#166534] bg-[#166534]' : 'border-slate-300'
                         }`}
                       >
                         {searchMode === 'standard' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -974,7 +978,7 @@ export default function BusinessScraperPage() {
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 bg-slate-50 p-4 rounded-2xl border border-slate-200/80 text-xs">
                   <label className="flex items-center gap-2 text-slate-800 font-semibold cursor-default">
-                    <input type="checkbox" checked disabled className="rounded text-[#6D4AFF]" />
+                    <input type="checkbox" checked disabled className="rounded text-[#166534]" />
                     <span>Business Name</span>
                   </label>
                   <label className="flex items-center gap-2 text-slate-800 font-semibold cursor-pointer">
@@ -982,7 +986,7 @@ export default function BusinessScraperPage() {
                       type="checkbox"
                       checked={dataToCollect.website}
                       onChange={(e) => setDataToCollect((p) => ({ ...p, website: e.target.checked }))}
-                      className="rounded text-[#6D4AFF]"
+                      className="rounded text-[#166534]"
                     />
                     <span>Website</span>
                   </label>
@@ -991,7 +995,7 @@ export default function BusinessScraperPage() {
                       type="checkbox"
                       checked={dataToCollect.email}
                       onChange={(e) => setDataToCollect((p) => ({ ...p, email: e.target.checked }))}
-                      className="rounded text-[#6D4AFF]"
+                      className="rounded text-[#166534]"
                     />
                     <span>Email</span>
                   </label>
@@ -1000,7 +1004,7 @@ export default function BusinessScraperPage() {
                       type="checkbox"
                       checked={dataToCollect.phone}
                       onChange={(e) => setDataToCollect((p) => ({ ...p, phone: e.target.checked }))}
-                      className="rounded text-[#6D4AFF]"
+                      className="rounded text-[#166534]"
                     />
                     <span>Phone</span>
                   </label>
@@ -1009,7 +1013,7 @@ export default function BusinessScraperPage() {
                       type="checkbox"
                       checked={dataToCollect.address}
                       onChange={(e) => setDataToCollect((p) => ({ ...p, address: e.target.checked }))}
-                      className="rounded text-[#6D4AFF]"
+                      className="rounded text-[#166534]"
                     />
                     <span>Address</span>
                   </label>
@@ -1018,7 +1022,7 @@ export default function BusinessScraperPage() {
                       type="checkbox"
                       checked={dataToCollect.google_maps_url}
                       onChange={(e) => setDataToCollect((p) => ({ ...p, google_maps_url: e.target.checked }))}
-                      className="rounded text-[#6D4AFF]"
+                      className="rounded text-[#166534]"
                     />
                     <span>Google Maps URL</span>
                   </label>
@@ -1027,7 +1031,7 @@ export default function BusinessScraperPage() {
                       type="checkbox"
                       checked={dataToCollect.rating}
                       onChange={(e) => setDataToCollect((p) => ({ ...p, rating: e.target.checked }))}
-                      className="rounded text-[#6D4AFF]"
+                      className="rounded text-[#166534]"
                     />
                     <span>Rating</span>
                   </label>
@@ -1036,7 +1040,7 @@ export default function BusinessScraperPage() {
                       type="checkbox"
                       checked={dataToCollect.reviews}
                       onChange={(e) => setDataToCollect((p) => ({ ...p, reviews: e.target.checked }))}
-                      className="rounded text-[#6D4AFF]"
+                      className="rounded text-[#166534]"
                     />
                     <span>Review Count</span>
                   </label>
@@ -1045,7 +1049,7 @@ export default function BusinessScraperPage() {
                       type="checkbox"
                       checked={dataToCollect.category}
                       onChange={(e) => setDataToCollect((p) => ({ ...p, category: e.target.checked }))}
-                      className="rounded text-[#6D4AFF]"
+                      className="rounded text-[#166534]"
                     />
                     <span>Category</span>
                   </label>
@@ -1058,7 +1062,7 @@ export default function BusinessScraperPage() {
                   <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide">
                     Email Discovery
                   </label>
-                  <span className="text-[11px] text-[#6D4AFF] font-bold">Public website contact email</span>
+                  <span className="text-[11px] text-[#166534] font-bold">Public website contact email</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1066,14 +1070,14 @@ export default function BusinessScraperPage() {
                     onClick={() => setEmailDiscoveryMode('basic')}
                     className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                       emailDiscoveryMode === 'basic'
-                        ? 'border-[#6D4AFF] bg-purple-50/50 shadow-sm'
+                        ? 'border-[#166534] bg-[#F0FDF4]/50 shadow-sm'
                         : 'border-slate-200 bg-slate-50 hover:bg-white'
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       <div
                         className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          emailDiscoveryMode === 'basic' ? 'border-[#6D4AFF] bg-[#6D4AFF]' : 'border-slate-300'
+                          emailDiscoveryMode === 'basic' ? 'border-[#166534] bg-[#166534]' : 'border-slate-300'
                         }`}
                       >
                         {emailDiscoveryMode === 'basic' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -1089,18 +1093,18 @@ export default function BusinessScraperPage() {
                     onClick={() => setEmailDiscoveryMode('website_contact')}
                     className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${
                       emailDiscoveryMode === 'website_contact'
-                        ? 'border-[#6D4AFF] bg-purple-50/50 shadow-sm'
+                        ? 'border-[#166534] bg-[#F0FDF4]/50 shadow-sm'
                         : 'border-slate-200 bg-slate-50 hover:bg-white'
                     }`}
                   >
-                    <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-[#6D4AFF] text-[9px] font-extrabold text-white uppercase tracking-wider">
+                    <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-[#166534] text-[9px] font-extrabold text-white uppercase tracking-wider">
                       Recommended
                     </span>
                     <div className="flex items-center gap-2">
                       <div
                         className={`w-4 h-4 rounded-full border flex items-center justify-center ${
                           emailDiscoveryMode === 'website_contact'
-                            ? 'border-[#6D4AFF] bg-[#6D4AFF]'
+                            ? 'border-[#166534] bg-[#166534]'
                             : 'border-slate-300'
                         }`}
                       >
@@ -1119,14 +1123,14 @@ export default function BusinessScraperPage() {
                     onClick={() => setEmailDiscoveryMode('deep')}
                     className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                       emailDiscoveryMode === 'deep'
-                        ? 'border-[#6D4AFF] bg-purple-50/50 shadow-sm'
+                        ? 'border-[#166534] bg-[#F0FDF4]/50 shadow-sm'
                         : 'border-slate-200 bg-slate-50 hover:bg-white'
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       <div
                         className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                          emailDiscoveryMode === 'deep' ? 'border-[#6D4AFF] bg-[#6D4AFF]' : 'border-slate-300'
+                          emailDiscoveryMode === 'deep' ? 'border-[#166534] bg-[#166534]' : 'border-slate-300'
                         }`}
                       >
                         {emailDiscoveryMode === 'deep' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -1153,7 +1157,7 @@ export default function BusinessScraperPage() {
                         type="checkbox"
                         checked={leadRequirements.must_have_email}
                         onChange={(e) => setLeadRequirements((p) => ({ ...p, must_have_email: e.target.checked }))}
-                        className="rounded text-[#6D4AFF]"
+                        className="rounded text-[#166534]"
                       />
                       <span>Must have email (Recommended)</span>
                     </label>
@@ -1162,7 +1166,7 @@ export default function BusinessScraperPage() {
                         type="checkbox"
                         checked={leadRequirements.must_have_website}
                         onChange={(e) => setLeadRequirements((p) => ({ ...p, must_have_website: e.target.checked }))}
-                        className="rounded text-[#6D4AFF]"
+                        className="rounded text-[#166534]"
                       />
                       <span>Must have website</span>
                     </label>
@@ -1171,7 +1175,7 @@ export default function BusinessScraperPage() {
                         type="checkbox"
                         checked={leadRequirements.must_have_phone}
                         onChange={(e) => setLeadRequirements((p) => ({ ...p, must_have_phone: e.target.checked }))}
-                        className="rounded text-[#6D4AFF]"
+                        className="rounded text-[#166534]"
                       />
                       <span>Must have phone</span>
                     </label>
@@ -1190,7 +1194,7 @@ export default function BusinessScraperPage() {
                         name="dup_handling"
                         checked={autoDeduplicate}
                         onChange={() => setAutoDeduplicate(true)}
-                        className="text-[#6D4AFF]"
+                        className="text-[#166534]"
                       />
                       <span>Automatically remove duplicates</span>
                     </label>
@@ -1297,7 +1301,7 @@ export default function BusinessScraperPage() {
                 <button
                   type="submit"
                   disabled={isStartingSearch}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#6D4AFF] to-[#8B5CF6] hover:from-[#603de6] hover:to-[#7c4ef0] text-white font-bold text-sm shadow-lg shadow-[#6D4AFF]/25 transition-all flex items-center justify-center gap-2.5 cursor-pointer active:scale-[0.99] disabled:opacity-70"
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#166534] to-[#22C55E] hover:from-[#12263A] hover:to-[#14532d] text-white font-bold text-sm shadow-lg shadow-[#166534]/25 transition-all flex items-center justify-center gap-2.5 cursor-pointer active:scale-[0.99] disabled:opacity-70"
                 >
                   {isStartingSearch ? (
                     <>
@@ -1346,7 +1350,7 @@ export default function BusinessScraperPage() {
                     {activeSearch.keyword} — {activeSearch.location}
                   </p>
                   <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                    <span className="px-2 py-0.5 rounded-md bg-purple-50 text-[#6D4AFF] text-[10px] font-bold">
+                    <span className="px-2 py-0.5 rounded-md bg-[#F0FDF4] text-[#166534] text-[10px] font-bold">
                       Target: {Number(activeSearch.lead_volume ?? activeSearch.max_results ?? 5000).toLocaleString()}
                     </span>
                     <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-bold uppercase">
@@ -1413,7 +1417,7 @@ export default function BusinessScraperPage() {
                   </div>
                   <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-[#6D4AFF] to-[#8B5CF6] transition-all duration-500 rounded-full"
+                      className="h-full bg-gradient-to-r from-[#166534] to-[#22C55E] transition-all duration-500 rounded-full"
                       style={{
                         width: `${(() => {
                           if (activeSearch.status === 'completed') return 100;
@@ -1480,7 +1484,7 @@ export default function BusinessScraperPage() {
                   <div className="p-4 bg-slate-50 border border-slate-200/90 rounded-2xl text-xs space-y-3">
                     <div className="flex items-center justify-between border-b border-slate-200/70 pb-2.5">
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-[#6D4AFF]" />
+                        <span className="w-2 h-2 rounded-full bg-[#166534]" />
                         <h4 className="font-extrabold text-slate-800 text-[11px] uppercase tracking-wider">
                           Discovery Saturation Statistics
                         </h4>
@@ -1507,7 +1511,7 @@ export default function BusinessScraperPage() {
                       </div>
                       <div className="bg-white border border-slate-200/80 rounded-xl p-2">
                         <span className="text-[10px] text-slate-400 font-bold uppercase block">Unique</span>
-                        <p className="font-extrabold text-[#6D4AFF] text-xs mt-0.5">
+                        <p className="font-extrabold text-[#166534] text-xs mt-0.5">
                           {Number(activeSearch.options.discovery_stats.unique_businesses ?? activeSearch.total_found ?? 0).toLocaleString()}
                         </p>
                       </div>
@@ -1538,7 +1542,7 @@ export default function BusinessScraperPage() {
                               className="flex items-center justify-between bg-white border border-slate-200/70 rounded-lg px-2.5 py-1.5 text-[11px]"
                             >
                               <div className="flex items-center gap-1.5 truncate max-w-[65%]">
-                                <span className="font-bold text-[#6D4AFF]">Round {r.round}:</span>
+                                <span className="font-bold text-[#166534]">Round {r.round}:</span>
                                 <span className="text-slate-600 truncate">{r.name}</span>
                               </div>
                               <div className="flex items-center gap-2 shrink-0">
@@ -1570,7 +1574,7 @@ export default function BusinessScraperPage() {
                       setActiveTab('results');
                       loadResults(1, activeSearch.id);
                     }}
-                    className="flex-1 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="flex-1 h-10 px-5 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white font-semibold text-xs sm:text-sm transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <span>View Qualified Results ({(activeSearch.total_found ?? 0).toLocaleString()})</span>
                     <ChevronRight size={14} />
@@ -1579,31 +1583,31 @@ export default function BusinessScraperPage() {
               </div>
             ) : (
               <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-[#6D4AFF] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-[#166534] flex items-center justify-center">
                   <ShieldCheck size={20} />
                 </div>
                 <h3 className="text-base font-bold text-slate-900">Discovery Engine Architecture</h3>
                 <div className="space-y-3 text-xs text-slate-600 leading-relaxed">
                   <div className="flex gap-2.5">
-                    <span className="font-bold text-[#6D4AFF]">1.</span>
+                    <span className="font-bold text-[#166534]">1.</span>
                     <p>
                       <strong>Google Places Platform:</strong> Discovers registered businesses with place IDs, phone numbers, and official websites.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
-                    <span className="font-bold text-[#6D4AFF]">2.</span>
+                    <span className="font-bold text-[#166534]">2.</span>
                     <p>
                       <strong>Ethical Website Crawling:</strong> Inspects company websites, contact pages (/contact, /about), footers, and mailto links.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
-                    <span className="font-bold text-[#6D4AFF]">3.</span>
+                    <span className="font-bold text-[#166534]">3.</span>
                     <p>
                       <strong>Strict 4-Level Deduplication:</strong> Eliminates duplicate Place IDs, domains, address pairs, and case-normalized emails.
                     </p>
                   </div>
                   <div className="flex gap-2.5">
-                    <span className="font-bold text-[#6D4AFF]">4.</span>
+                    <span className="font-bold text-[#166534]">4.</span>
                     <p>
                       <strong>Isolated CRM Import:</strong> Data stays cleanly segregated until you explicitly choose to import into CRM Contacts.
                     </p>
@@ -1617,7 +1621,7 @@ export default function BusinessScraperPage() {
               <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                   <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-xl bg-purple-50 text-[#6D4AFF] flex items-center justify-center">
+                    <span className="w-8 h-8 rounded-xl bg-[#F0FDF4] text-[#166534] flex items-center justify-center">
                       <Layers size={16} />
                     </span>
                     <div>
@@ -1627,7 +1631,7 @@ export default function BusinessScraperPage() {
                       </p>
                     </div>
                   </div>
-                  {isLoadingCategoryStats && <RotateCw size={14} className="animate-spin text-[#6D4AFF]" />}
+                  {isLoadingCategoryStats && <RotateCw size={14} className="animate-spin text-[#166534]" />}
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs">
@@ -1756,9 +1760,9 @@ export default function BusinessScraperPage() {
 
           {/* Active Search Context Filter Banner */}
           {filterSearchId ? (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-purple-50/80 border border-[#6D4AFF]/20 rounded-2xl px-5 py-3 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F0FDF4]/80 border border-[#166534]/20 rounded-2xl px-5 py-3 shadow-xs">
               <div className="flex items-center gap-3">
-                <span className="w-8 h-8 rounded-xl bg-[#6D4AFF]/10 text-[#6D4AFF] flex items-center justify-center font-bold shrink-0">
+                <span className="w-8 h-8 rounded-xl bg-[#166534]/10 text-[#166534] flex items-center justify-center font-bold shrink-0">
                   <Compass size={16} />
                 </span>
                 <div>
@@ -1806,7 +1810,7 @@ export default function BusinessScraperPage() {
                   value={filterSearch}
                   onChange={(e) => setFilterSearch(e.target.value)}
                   placeholder="Filter by name, email, phone, location, category..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-[#6D4AFF] transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] transition-all"
                 />
               </div>
 
@@ -1816,7 +1820,7 @@ export default function BusinessScraperPage() {
                   <button
                     onClick={handleBulkEnrich}
                     disabled={isBulkEnriching}
-                    className="px-3.5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm shadow-purple-600/25 transition-all cursor-pointer disabled:opacity-50"
+                    className="px-3.5 py-2.5 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white font-bold text-xs flex items-center gap-1.5 shadow-sm shadow-[#166534]/25 transition-all cursor-pointer disabled:opacity-50"
                     title="Enrich missing information for selected leads"
                   >
                     <Sparkles size={14} className={isBulkEnriching ? 'animate-spin' : ''} />
@@ -1866,7 +1870,7 @@ export default function BusinessScraperPage() {
                     <button
                       onClick={() => handleImportToCrm({ importAll: true })}
                       disabled={isImporting || results.length === 0}
-                      className="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-[#6D4AFF] to-indigo-700 hover:from-[#5b3ce0] hover:to-indigo-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm shadow-[#6D4AFF]/20 transition-all cursor-pointer disabled:opacity-50"
+                      className="px-3.5 py-2.5 rounded-xl bg-[#12263A] hover:bg-[#166534] text-white font-bold text-xs flex items-center gap-1.5 shadow-sm shadow-[#166534]/20 transition-all cursor-pointer disabled:opacity-50"
                       title={
                         allInCrm
                           ? 'All discovered leads in this view are in CRM. Click to sync and enrich missing data.'
@@ -1885,7 +1889,7 @@ export default function BusinessScraperPage() {
 
                 <button
                   onClick={handleExportCsv}
-                  className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                  className="h-10 px-4 bg-white border border-slate-200 hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-[#12263A] hover:text-[#166534] rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
                 >
                   <Download size={14} />
                   <span>Export CSV</span>
@@ -1894,7 +1898,7 @@ export default function BusinessScraperPage() {
                 {selectedIds.length > 0 && (
                   <button
                     onClick={handleBatchDelete}
-                    className="px-3 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                    className="h-10 px-4 rounded-xl bg-rose-50 border border-rose-100 hover:bg-rose-600 hover:border-rose-600 hover:text-white text-rose-600 transition-all font-semibold text-xs shadow-xs active:scale-95 cursor-pointer flex items-center gap-1.5"
                   >
                     <Trash2 size={14} />
                     <span>Delete ({selectedIds.length})</span>
@@ -1903,7 +1907,7 @@ export default function BusinessScraperPage() {
 
                 <button
                   onClick={() => loadResults(currentPage)}
-                  className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-all cursor-pointer"
+                  className="w-10 h-10 rounded-xl bg-white border border-slate-200 hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-slate-600 hover:text-[#166534] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-90"
                   title="Refresh"
                 >
                   <RotateCw size={15} />
@@ -1930,7 +1934,7 @@ export default function BusinessScraperPage() {
                   onClick={() => setResultFilterTab(tab.id as any)}
                   className={`px-3.5 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
                     resultFilterTab === tab.id
-                      ? 'bg-[#6D4AFF] text-white shadow-sm shadow-[#6D4AFF]/25'
+                      ? 'bg-[#166534] text-white shadow-sm shadow-[#166534]/25'
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
                   }`}
                 >
@@ -1949,7 +1953,7 @@ export default function BusinessScraperPage() {
                     <th className="p-4 w-12 text-center">
                       <button onClick={handleSelectAll} className="cursor-pointer text-slate-400 hover:text-slate-700">
                         {results.length > 0 && selectedIds.length === results.length ? (
-                          <CheckSquare size={16} className="text-[#6D4AFF]" />
+                          <CheckSquare size={16} className="text-[#166534]" />
                         ) : (
                           <Square size={16} />
                         )}
@@ -1970,7 +1974,7 @@ export default function BusinessScraperPage() {
                   {isLoadingResults ? (
                     <tr>
                       <td colSpan={10} className="p-12 text-center text-slate-400">
-                        <RotateCw size={24} className="animate-spin mx-auto mb-2 text-[#6D4AFF]" />
+                        <RotateCw size={24} className="animate-spin mx-auto mb-2 text-[#166534]" />
                         Loading qualified leads...
                       </td>
                     </tr>
@@ -1994,8 +1998,8 @@ export default function BusinessScraperPage() {
                       return (
                         <tr
                           key={biz.id}
-                          className={`hover:bg-purple-50/20 transition-colors cursor-pointer ${
-                            isSelected ? 'bg-purple-50/40' : ''
+                          className={`hover:bg-[#F0FDF4]/20 transition-colors cursor-pointer ${
+                            isSelected ? 'bg-[#F0FDF4]/40' : ''
                           }`}
                           onClick={(e) => {
                             // Don't open modal if clicked on checkbox, links or action buttons
@@ -2010,7 +2014,7 @@ export default function BusinessScraperPage() {
                               className="cursor-pointer text-slate-400 hover:text-slate-700"
                             >
                               {isSelected ? (
-                                <CheckSquare size={16} className="text-[#6D4AFF]" />
+                                <CheckSquare size={16} className="text-[#166534]" />
                               ) : (
                                 <Square size={16} />
                               )}
@@ -2090,7 +2094,7 @@ export default function BusinessScraperPage() {
                                     e.stopPropagation();
                                     copyToClipboard(biz.email!);
                                   }}
-                                  className="text-slate-400 hover:text-[#6D4AFF] cursor-pointer p-0.5"
+                                  className="text-slate-400 hover:text-[#166534] cursor-pointer p-0.5"
                                   title="Copy Email"
                                 >
                                   {copiedEmail === biz.email ? (
@@ -2100,7 +2104,7 @@ export default function BusinessScraperPage() {
                                   )}
                                 </button>
                                 {biz.email_source && (
-                                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-purple-50 text-[#6D4AFF] font-bold">
+                                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#F0FDF4] text-[#166534] font-bold">
                                     {biz.email_source}
                                   </span>
                                 )}
@@ -2165,10 +2169,10 @@ export default function BusinessScraperPage() {
                               <button
                                 onClick={() => handleEnrichLead(biz.id)}
                                 disabled={enrichingId === biz.id}
-                                className="p-1.5 rounded-lg text-purple-600 hover:text-purple-700 hover:bg-purple-50 transition-colors cursor-pointer disabled:opacity-50"
+                                className="w-8 h-8 rounded-lg flex items-center justify-center text-[#166534] bg-white hover:bg-[#F0FDF4] border border-slate-200 hover:border-[#bbf7d0] transition-all cursor-pointer active:scale-90 shadow-xs disabled:opacity-50"
                                 title="Enrich Missing Data (Targeted Scrape)"
                               >
-                                <Sparkles size={14} className={enrichingId === biz.id ? 'animate-spin text-[#6D4AFF]' : ''} />
+                                <Sparkles size={14} className={enrichingId === biz.id ? 'animate-spin text-[#166534]' : ''} />
                               </button>
 
                               <button
@@ -2176,7 +2180,7 @@ export default function BusinessScraperPage() {
                                   setSelectedBusiness(biz);
                                   loadAuditLogs(biz.id);
                                 }}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-[#6D4AFF] hover:bg-purple-50 transition-colors cursor-pointer"
+                                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#166534] bg-white hover:bg-[#F0FDF4] border border-slate-200 hover:border-[#bbf7d0] transition-all cursor-pointer active:scale-90 shadow-xs"
                                 title="View Details & Enrichment Logs"
                               >
                                 <Eye size={14} />
@@ -2184,7 +2188,7 @@ export default function BusinessScraperPage() {
 
                               <button
                                 onClick={() => handleDeleteOne(biz.id)}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                                className="w-8 h-8 rounded-lg flex items-center justify-center text-rose-500 hover:text-white bg-rose-50/60 hover:bg-rose-600 border border-rose-100 hover:border-rose-600 transition-all cursor-pointer active:scale-90 shadow-xs"
                                 title="Delete Lead"
                               >
                                 <Trash2 size={14} />
@@ -2212,19 +2216,19 @@ export default function BusinessScraperPage() {
                   <button
                     disabled={currentPage <= 1}
                     onClick={() => loadResults(currentPage - 1)}
-                    className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                    className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer transition-all active:scale-95 shadow-xs"
                   >
-                    <ChevronLeft size={14} />
+                    <ChevronLeft size={15} />
                   </button>
-                  <span className="font-bold text-slate-700">
+                  <span className="font-bold text-slate-700 px-1">
                     Page {currentPage} of {pagination.last_page}
                   </span>
                   <button
                     disabled={currentPage >= pagination.last_page}
                     onClick={() => loadResults(currentPage + 1)}
-                    className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                    className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer transition-all active:scale-95 shadow-xs"
                   >
-                    <ChevronRight size={14} />
+                    <ChevronRight size={15} />
                   </button>
                 </div>
               </div>
@@ -2261,7 +2265,7 @@ export default function BusinessScraperPage() {
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-slate-900 text-sm">{s.keyword}</span>
                       {s.industry && (
-                        <span className="px-2 py-0.5 rounded bg-purple-50 text-[#6D4AFF] text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded bg-[#F0FDF4] text-[#166534] text-[10px] font-bold">
                           {s.industry}
                         </span>
                       )}
@@ -2293,7 +2297,7 @@ export default function BusinessScraperPage() {
                         setActiveTab('results');
                         loadResults(1, s.id);
                       }}
-                      className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                      className="h-8.5 px-3.5 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white text-xs font-semibold transition-all shadow-xs active:scale-95 cursor-pointer flex items-center justify-center"
                     >
                       View Results
                     </button>
@@ -2305,7 +2309,7 @@ export default function BusinessScraperPage() {
                         loadStatus();
                         toast.success('Deleted', 'Search record removed.');
                       }}
-                      className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                      className="w-8.5 h-8.5 rounded-xl bg-rose-50/60 border border-rose-100 hover:bg-rose-600 hover:border-rose-600 text-rose-500 hover:text-white flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-xs"
                       title="Delete Search"
                     >
                       <Trash2 size={14} />
@@ -2340,7 +2344,7 @@ export default function BusinessScraperPage() {
               {/* Modal Header */}
               <div className="flex items-start justify-between pb-4 border-b border-slate-100">
                 <div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-50 text-[#6D4AFF]">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#F0FDF4] text-[#166534]">
                     {selectedBusiness.category || 'Business Lead'}
                   </span>
                   <h2 className="text-xl font-extrabold text-slate-900 mt-1.5">
@@ -2381,7 +2385,7 @@ export default function BusinessScraperPage() {
                       <button
                         onClick={() => handleEnrichLead(selectedBusiness.id)}
                         disabled={enrichingId === selectedBusiness.id}
-                        className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all cursor-pointer disabled:opacity-50"
+                        className="px-3 py-1.5 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all cursor-pointer disabled:opacity-50"
                         title="Search and populate missing fields"
                       >
                         <Sparkles size={13} className={enrichingId === selectedBusiness.id ? 'animate-spin' : ''} />
@@ -2455,8 +2459,8 @@ export default function BusinessScraperPage() {
               </div>
 
               {/* Email Section */}
-              <div className="bg-purple-50/40 border border-purple-100 rounded-2xl p-4 space-y-2">
-                <span className="text-[10px] font-bold text-[#6D4AFF] uppercase tracking-wider">
+              <div className="bg-[#F0FDF4]/40 border border-[#bbf7d0] rounded-2xl p-4 space-y-2">
+                <span className="text-[10px] font-bold text-[#166534] uppercase tracking-wider">
                   Contact Email
                 </span>
                 {selectedBusiness.email ? (
@@ -2477,7 +2481,7 @@ export default function BusinessScraperPage() {
                     </div>
                     <button
                       onClick={() => copyToClipboard(selectedBusiness.email!)}
-                      className="px-3 py-1.5 rounded-xl bg-white border border-purple-200 text-[#6D4AFF] hover:bg-purple-50 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+                      className="px-3 py-1.5 rounded-xl bg-white border border-[#bbf7d0] text-[#166534] hover:bg-[#F0FDF4] text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
                     >
                       <Copy size={13} />
                       <span>Copy</span>
@@ -2497,7 +2501,7 @@ export default function BusinessScraperPage() {
                       href={selectedBusiness.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[#6D4AFF] hover:underline font-semibold flex items-center gap-1 truncate"
+                      className="text-[#166534] hover:underline font-semibold flex items-center gap-1 truncate"
                     >
                       <span className="truncate">{selectedBusiness.website}</span>
                       <ExternalLink size={12} className="shrink-0" />
@@ -2552,7 +2556,7 @@ export default function BusinessScraperPage() {
                   className="w-full flex items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100 transition-colors text-xs font-bold text-slate-700 cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
-                    <History size={15} className="text-[#6D4AFF]" />
+                    <History size={15} className="text-[#166534]" />
                     <span>Enrichment Audit History ({auditLogs.length})</span>
                   </div>
                   {showAuditLogs ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
@@ -2562,7 +2566,7 @@ export default function BusinessScraperPage() {
                   <div className="p-3.5 divide-y divide-slate-100 bg-white max-h-48 overflow-y-auto space-y-2">
                     {isLoadingLogs ? (
                       <div className="p-4 text-center text-xs text-slate-400">
-                        <RotateCw size={16} className="animate-spin mx-auto mb-1 text-[#6D4AFF]" />
+                        <RotateCw size={16} className="animate-spin mx-auto mb-1 text-[#166534]" />
                         Loading enrichment logs...
                       </div>
                     ) : auditLogs.length === 0 ? (
@@ -2573,7 +2577,7 @@ export default function BusinessScraperPage() {
                       auditLogs.map((log) => (
                         <div key={log.id} className="pt-2 first:pt-0 text-[11px] space-y-0.5">
                           <div className="flex items-center justify-between font-bold">
-                            <span className="text-purple-700 uppercase tracking-wider">{log.field_name}</span>
+                            <span className="text-[#14532d] uppercase tracking-wider">{log.field_name}</span>
                             <span className="text-[10px] text-slate-400 font-normal">
                               {new Date(log.created_at).toLocaleString()}
                             </span>
@@ -2601,7 +2605,7 @@ export default function BusinessScraperPage() {
                 <button
                   onClick={() => handleImportToCrm({ ids: [selectedBusiness.id] })}
                   disabled={isImporting || selectedBusiness.is_imported_to_crm}
-                  className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 cursor-pointer disabled:opacity-50"
+                  className="flex-1 h-10 px-5 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer disabled:opacity-50 transition-all"
                 >
                   <UserPlus size={15} />
                   <span>{selectedBusiness.is_imported_to_crm ? 'Already in CRM' : 'Import to CRM'}</span>
@@ -2612,7 +2616,7 @@ export default function BusinessScraperPage() {
                     href={selectedBusiness.google_maps_url}
                     target="_blank"
                     rel="noreferrer"
-                    className="px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-all"
+                    className="h-10 px-4 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-slate-700 hover:text-[#166534] font-semibold text-xs flex items-center gap-1.5 transition-all shadow-xs active:scale-95"
                   >
                     <MapPin size={15} />
                     <span>Maps</span>
@@ -2621,7 +2625,7 @@ export default function BusinessScraperPage() {
 
                 <button
                   onClick={() => setSelectedBusiness(null)}
-                  className="px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all cursor-pointer"
+                  className="h-10 px-4.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-slate-700 hover:text-[#166534] font-semibold text-xs transition-all shadow-xs active:scale-95 cursor-pointer"
                 >
                   Close
                 </button>
@@ -2738,7 +2742,7 @@ export default function BusinessScraperPage() {
               <div className="flex items-center gap-2 pt-1">
                 <Link
                   to="/contacts"
-                  className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#6D4AFF] to-indigo-700 hover:from-[#5b3ce0] hover:to-indigo-800 text-white font-bold text-xs text-center transition-all shadow-sm shadow-[#6D4AFF]/25"
+                  className="flex-1 py-2.5 rounded-xl bg-[#12263A] hover:bg-[#166534] text-white font-bold text-xs text-center transition-all shadow-sm shadow-[#166534]/25"
                 >
                   View in CRM Contacts &rarr;
                 </Link>

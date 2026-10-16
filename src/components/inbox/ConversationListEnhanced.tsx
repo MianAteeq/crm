@@ -86,7 +86,7 @@ export function ConversationListEnhanced({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search conversations..."
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#6D4AFF] focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/30 focus:border-[#166534] focus:border-transparent"
           />
         </div>
 
@@ -99,7 +99,7 @@ export function ConversationListEnhanced({
               className={cn(
                 'px-3 py-1.5 text-xs font-medium rounded-lg transition-colors',
                 filterStatus === filter
-                  ? 'bg-[#6D4AFF] text-white'
+                  ? 'bg-[#166534] text-white'
                   : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
               )}
             >
@@ -139,14 +139,14 @@ export function ConversationListEnhanced({
                 className={cn(
                   'relative p-4 border-b border-slate-200 dark:border-slate-700 cursor-pointer transition-colors group',
                   selectedId === conv.id
-                    ? 'bg-[#6D4AFF]/5 dark:bg-[#6D4AFF]/10 border-l-4 border-l-[#6D4AFF]'
+                    ? 'bg-[#F0FDF4] dark:bg-[#F0FDF4] border-l-4 border-l-[#166534]'
                     : 'hover:bg-slate-50 dark:hover:bg-slate-900 border-l-4 border-l-transparent'
                 )}
               >
                 <div className="flex items-start gap-3">
                   {/* Avatar */}
                   <div className="relative flex-shrink-0">
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#6D4AFF] to-[#8B5CF6] rounded-full flex items-center justify-center text-white font-semibold">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#12263A] to-[#166534] rounded-full flex items-center justify-center text-white font-semibold">
                       {conv.contact.name.charAt(0).toUpperCase()}
                     </div>
                     {conv.isOnline && (
@@ -181,7 +181,7 @@ export function ConversationListEnhanced({
                         {conv.lastMessage.content}
                       </p>
                       {conv.unreadCount > 0 && (
-                        <span className="flex-shrink-0 w-5 h-5 bg-[#6D4AFF] text-white text-xs font-semibold rounded-full flex items-center justify-center">
+                        <span className="flex-shrink-0 w-5 h-5 bg-[#166534] text-white text-xs font-semibold rounded-full flex items-center justify-center">
                           {conv.unreadCount}
                         </span>
                       )}

@@ -88,53 +88,53 @@ export default function ContactDrawer({
             className="fixed top-0 right-0 w-full max-w-xl h-full bg-white border-l border-slate-200 z-[101] flex flex-col shadow-2xl"
           >
             {/* Header */}
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div className="p-6 border-b border-stone-200 flex items-center justify-between bg-[#FAFAF9]">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-xl font-bold text-white shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-[#12263A] border border-[#166534]/30 flex items-center justify-center text-xl font-bold text-white shadow-sm">
                   {(contact.name || 'C').charAt(0).toUpperCase()}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-bold text-slate-900 tracking-tight">{contact.name || 'Unnamed Contact'}</h2>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                    <h2 className="text-lg font-bold text-[#12263A] tracking-tight">{contact.name || 'Unnamed Contact'}</h2>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30">
                       {contactType}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
                     {businessName && (
-                      <span className="text-xs text-slate-600 font-semibold flex items-center gap-1">
-                        <Building size={12} className="text-slate-400" />
+                      <span className="text-xs text-[#57534E] font-semibold flex items-center gap-1">
+                        <Building size={12} className="text-stone-400" />
                         {businessName}
                       </span>
                     )}
                     {contact.categories && contact.categories.length > 0 && (
-                      <span className="text-xs text-indigo-600 font-medium">
+                      <span className="text-xs text-[#166534] font-medium">
                         • {contact.categories.map(c => c.name).join(', ')}
                       </span>
                     )}
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <button 
                   onClick={() => onEdit(contact)} 
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer"
+                  className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-stone-500 hover:text-[#166534] transition-all flex items-center justify-center cursor-pointer shadow-xs active:scale-90"
                   title="Edit Contact"
                 >
-                  <Edit3 size={18} />
+                  <Edit3 size={15} />
                 </button>
                 <button 
                   onClick={onClose} 
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer"
+                  className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-stone-500 hover:text-[#166534] transition-all flex items-center justify-center cursor-pointer shadow-xs active:scale-90"
                   title="Close"
                 >
-                  <X size={20} />
+                  <X size={17} />
                 </button>
               </div>
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex border-b border-slate-200 bg-white px-6 overflow-x-auto no-scrollbar gap-6">
+            <div className="flex border-b border-stone-200 bg-white px-6 overflow-x-auto no-scrollbar gap-6">
               {[
                 { key: 'profile', label: 'Profile' },
                 { key: 'business', label: 'Business' },
@@ -147,12 +147,12 @@ export default function ContactDrawer({
                   key={key}
                   onClick={() => setActiveTab(key as Tab)}
                   className={`py-3.5 text-xs font-bold transition-all whitespace-nowrap relative ${
-                    activeTab === key ? 'text-slate-900' : 'text-slate-400 hover:text-slate-600'
+                    activeTab === key ? 'text-[#166534]' : 'text-[#57534E]/60 hover:text-[#12263A]'
                   }`}
                 >
                   <span>{label}</span>
                   {activeTab === key && (
-                    <motion.div layoutId="activeTabDrawer" className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-full" />
+                    <motion.div layoutId="activeTabDrawer" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#166534] rounded-t-full" />
                   )}
                 </button>
               ))}
@@ -181,7 +181,7 @@ export default function ContactDrawer({
                           <div className="min-w-0">
                             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{item.label}</p>
                             {item.isLink ? (
-                              <a href={item.value} target="_blank" rel="noreferrer" className="text-xs font-bold text-indigo-600 hover:underline mt-0.5 flex items-center gap-1 truncate">
+                              <a href={item.value} target="_blank" rel="noreferrer" className="text-xs font-bold text-[#166534] hover:underline mt-0.5 flex items-center gap-1 truncate">
                                 <span>{item.value}</span>
                                 <ExternalLink size={12} />
                               </a>
@@ -256,7 +256,7 @@ export default function ContactDrawer({
                         {business?.website && (
                           <div className="mt-3 p-3 bg-slate-50 rounded-xl">
                             <span className="text-[10px] font-bold text-slate-400 uppercase">Website</span>
-                            <a href={business.website} target="_blank" rel="noreferrer" className="text-indigo-600 font-semibold block hover:underline truncate mt-0.5">
+                            <a href={business.website} target="_blank" rel="noreferrer" className="text-[#166534] font-semibold block hover:underline truncate mt-0.5">
                               {business.website}
                             </a>
                           </div>
@@ -293,7 +293,7 @@ export default function ContactDrawer({
                     <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                       Global Email Campaign History ({emailActivities.length})
                     </h3>
-                    <Mail size={16} className="text-indigo-600" />
+                    <Mail size={16} className="text-[#166534]" />
                   </div>
 
                   {isEmailLoading ? (
@@ -366,7 +366,7 @@ export default function ContactDrawer({
                     <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                       Discovery Provenance ({scraperHistory.length})
                     </h3>
-                    <Search size={16} className="text-indigo-600" />
+                    <Search size={16} className="text-[#166534]" />
                   </div>
 
                   {isScraperLoading ? (
@@ -377,7 +377,7 @@ export default function ContactDrawer({
                         <div key={sh.id} className="p-4 bg-white border border-slate-200 rounded-xl flex flex-col gap-1.5 shadow-xs">
                           <div className="flex items-center justify-between">
                             <h4 className="text-xs font-bold text-slate-900">{sh.search_query || 'Direct Search'}</h4>
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#F0FDF4] text-[#166534] border border-[#bbf7d0]">
                               {sh.category_name || 'General'}
                             </span>
                           </div>
@@ -460,13 +460,13 @@ export default function ContactDrawer({
             <div className="p-6 border-t border-slate-200 bg-slate-50/70 grid grid-cols-2 gap-4">
               <button 
                 onClick={() => onDelete(contact.id)}
-                className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-slate-200 rounded-xl text-xs font-bold uppercase tracking-wider text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-all shadow-xs cursor-pointer"
+                className="h-10 flex items-center justify-center gap-2 px-4 bg-white border border-rose-200 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 hover:border-rose-300 transition-all shadow-xs active:scale-95 cursor-pointer"
               >
                 <Trash2 size={15} /> Delete Contact
               </button>
               <button 
                 onClick={() => onEdit(contact)}
-                className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-800 transition-all shadow-sm cursor-pointer"
+                className="h-10 flex items-center justify-center gap-2 px-4 bg-[#166534] hover:bg-[#14532d] text-white rounded-xl text-xs font-semibold transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer"
               >
                 <Edit3 size={15} /> Edit Details
               </button>

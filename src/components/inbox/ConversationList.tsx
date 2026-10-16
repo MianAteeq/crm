@@ -73,7 +73,7 @@ export default function ConversationList({ conversations, activeId, onSelect, is
               onClick={() => setFilter(f.id as any)}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all whitespace-nowrap ${
                 filter === f.id
-                  ? 'bg-slate-900 border-slate-900 text-white shadow-sm'
+                  ? 'bg-[#12263A] border-[#12263A] text-white shadow-sm'
                   : 'bg-white border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >

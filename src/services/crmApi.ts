@@ -2,75 +2,6 @@ import { Contact, Tag, Category, ContactScraperHistoryItem, WhatsAppSettings, Co
 import { AuthService } from './authService';
 import { apiClient } from './apiClient';
 
-// Mock Data
-const MOCK_TAGS: Tag[] = [
-  { id: '1', name: 'VIP', color: '#8b5cf6' },
-  { id: '2', name: 'Eid Promo', color: '#f59e0b' },
-  { id: '3', name: 'New Customer', color: '#10b981' },
-  { id: '4', name: 'Wholesale', color: '#3b82f6' },
-  { id: '5', name: 'Complaint', color: '#ef4444' },
-  { id: '6', name: 'Inactive', color: '#64748b' }
-];
-
-const MOCK_CONTACTS: Contact[] = [
-  {
-    id: '1',
-    name: 'Muhammad Ahmad',
-    phone: '+92 300 1234567',
-    email: 'ahmad@example.com',
-    status: 'active',
-    tags: ['1', '3'],
-    lastSeen: new Date().toISOString(),
-    created_at: '2024-01-15T10:00:00Z',
-    company: 'Tech Solutions',
-    job_title: 'Manager'
-  },
-  {
-    id: '2',
-    name: 'Fatima Zahra',
-    phone: '+92 321 7654321',
-    email: 'fatima@example.com',
-    status: 'active',
-    tags: ['2'],
-    lastSeen: new Date(Date.now() - 3600000).toISOString(),
-    created_at: '2024-02-20T14:30:00Z',
-    company: 'Creative Studio',
-    job_title: 'Designer'
-  }
-];
-
-const MOCK_CONVERSATIONS: Conversation[] = [
-  {
-    id: '1',
-    contact: MOCK_CONTACTS[0],
-    unreadCount: 2,
-    isOnline: true,
-    messages: [],
-    lastMessage: {
-      id: 'm1',
-      sender: 'contact',
-      type: 'text',
-      content: 'Hello, I have a question about my order.',
-      timestamp: new Date().toISOString(),
-      status: 'read'
-    }
-  },
-  {
-    id: '2',
-    contact: MOCK_CONTACTS[1],
-    unreadCount: 0,
-    isOnline: false,
-    messages: [],
-    lastMessage: {
-      id: 'm2',
-      sender: 'user',
-      type: 'text',
-      content: 'Your order has been shipped!',
-      timestamp: new Date(Date.now() - 7200000).toISOString(),
-      status: 'delivered'
-    }
-  }
-];
 
 class CrmApiService {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -109,9 +40,9 @@ class CrmApiService {
     try {
       const data = await this.request<any>('/tags', options);
       const tags = Array.isArray(data) ? data : (data?.data || data?.tags || []);
-      return (Array.isArray(tags) && tags.length > 0) ? tags : MOCK_TAGS;
+      return Array.isArray(tags) ? tags : [];
     } catch (error) {
-      return MOCK_TAGS;
+      return [];
     }
   }
 
@@ -179,9 +110,15 @@ class CrmApiService {
         contactsArray = response.contacts;
       }
 
-      if (contactsArray.length === 0 && !params?.search && !params?.tag && !params?.status && !params?.lastTouchpoint) {
-        const result: any = [...MOCK_CONTACTS];
-        return result;
+      if (contactsArray.length === 0) {
+        const emptyResult: any = [];
+        emptyResult.pagination = paginationData || {
+          currentPage: 1,
+          lastPage: 1,
+          perPage: params?.perPage || 10,
+          total: 0
+        };
+        return emptyResult;
       }
 
       const mappedContacts: any = contactsArray.map(c => ({ 
@@ -197,56 +134,47 @@ class CrmApiService {
 
       return mappedContacts;
     } catch (error) {
-      const result: any = [...MOCK_CONTACTS];
-      return result;
+      console.error('[CRM API] Failed to fetch contacts:', error);
+      const emptyResult: any = [];
+      emptyResult.pagination = {
+        currentPage: 1,
+        lastPage: 1,
+        perPage: params?.perPage || 10,
+        total: 0
+      };
+      return emptyResult;
     }
   }
 
   async getContact(id: string, options?: RequestInit): Promise<Contact> {
-    try {
-      const data = await this.request<Contact>(`/contacts/${id}`, options);
-      const tags = Array.isArray(data.tags) ? data.tags.map((t: any) => typeof t === 'object' ? t.id : t) : [];
-      return { ...data, createdAt: data.createdAt || data.created_at, tags };
-    } catch (error) {
-      return MOCK_CONTACTS.find(c => c.id === id) || MOCK_CONTACTS[0];
-    }
+    const data = await this.request<Contact>(`/contacts/${id}`, options);
+    const tags = Array.isArray(data.tags) ? data.tags.map((t: any) => typeof t === 'object' ? t.id : t) : [];
+    return { ...data, createdAt: data.createdAt || data.created_at, tags };
   }
 
   async createContact(contactData: Partial<Contact>): Promise<Contact> {
-    try {
-      const data = await this.request<Contact>('/contacts', {
-        method: 'POST',
-        body: JSON.stringify(contactData),
-      });
-      return { ...data, createdAt: data.createdAt || data.created_at };
-    } catch (error) {
-      return { ...MOCK_CONTACTS[0], ...contactData, id: Math.random().toString(), created_at: new Date().toISOString() } as Contact;
-    }
+    const data = await this.request<Contact>('/contacts', {
+      method: 'POST',
+      body: JSON.stringify(contactData),
+    });
+    return { ...data, createdAt: data.createdAt || data.created_at };
   }
 
   async updateContact(id: string, contactData: Partial<Contact>): Promise<Contact> {
-    try {
-      const data = await this.request<Contact>(`/contacts/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(contactData),
-      });
-      return { ...data, createdAt: data.createdAt || data.created_at };
-    } catch (error) {
-      return { ...MOCK_CONTACTS[0], ...contactData, id } as Contact;
-    }
+    const data = await this.request<Contact>(`/contacts/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(contactData),
+    });
+    return { ...data, createdAt: data.createdAt || data.created_at };
   }
 
   async importContacts(file: File, mappings?: Record<string, string>): Promise<{ message: string; success_count: number }> {
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      if (mappings) {
-        formData.append('mappings', JSON.stringify(mappings));
-      }
-      return await this.request('/contacts/import', { method: 'POST', body: formData });
-    } catch (error) {
-      return { message: 'Imported successfully (Mock)', success_count: 50 };
+    const formData = new FormData();
+    formData.append('file', file);
+    if (mappings) {
+      formData.append('mappings', JSON.stringify(mappings));
     }
+    return await this.request('/contacts/import', { method: 'POST', body: formData });
   }
 
   async deleteContact(id: string | number): Promise<{ success?: boolean; message: string }> {

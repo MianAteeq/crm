@@ -19,7 +19,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({ conversation, isAct
         onClick={onClick}
         className={`p-4 flex items-center gap-3 cursor-pointer transition-all relative ${
           isActive 
-            ? 'bg-slate-50 border-r-2 border-slate-900' 
+            ? 'bg-[#F0FDF4] border-r-2 border-[#166534]' 
             : 'hover:bg-slate-50/50'
         }`}
       >
@@ -78,7 +78,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({ conversation, isAct
             </p>
           </div>
           {conversation.unreadCount > 0 && (
-            <span className="bg-slate-900 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+            <span className="bg-[#166534] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
               {conversation.unreadCount}
             </span>
           )}

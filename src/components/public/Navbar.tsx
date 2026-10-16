@@ -50,19 +50,22 @@ export default function Navbar() {
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
       showTransparent
         ? "py-5 bg-transparent"
-        : "py-3 bg-[#020617] border-b border-white/5 shadow-xl"
+        : "py-3 bg-[#12263A] border-b border-white/5 shadow-xl"
     )}>
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
 
         {/* Sleek Logo & Brand */}
-        <Link to="/" className="flex items-center gap-2 group">
+        <Link to="/" className="flex items-center gap-2.5 group">
           {websiteLogo ? (
-            <img src={websiteLogo} alt="Logo" className="w-60 h-auto object-contain rounded-lg shrink-0 transition-transform duration-300 group-hover:scale-105" />
+            <img src={websiteLogo} alt={websiteName} className="h-9 w-auto max-w-[200px] object-contain rounded-lg shrink-0 transition-transform duration-300 group-hover:scale-105" />
           ) : (
-            <div className={cn("w-60 h-10 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-sm",
-              showTransparent ? "bg-white text-slate-950" : "bg-slate-950 text-white"
-            )}>
-              <MessageCircle size={18} strokeWidth={2.5} />
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#12263A] to-[#166534] text-white flex items-center justify-center shadow-md shadow-[#12263A]/20 group-hover:scale-105 transition-transform duration-200">
+                <MessageCircle size={19} strokeWidth={2.5} />
+              </div>
+              <span className="text-xl font-display font-extrabold text-white tracking-tight group-hover:text-slate-100 transition-colors">
+                {websiteName}
+              </span>
             </div>
           )}
         </Link>
@@ -161,7 +164,7 @@ export default function Navbar() {
           {!user && (
             <Link
               to="/signup"
-              className="px-7 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-[16px] font-semibold tracking-[0.3px] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(99,102,241,0.25)] active:scale-97"
+              className="px-7 py-3.5 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white rounded-xl text-[16px] font-semibold tracking-[0.3px] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(22,101,52,0.25)] active:scale-97"
             >
               Start Free Trial
             </Link>
@@ -173,7 +176,7 @@ export default function Navbar() {
           {!user && (
             <Link
               to="/signup"
-              className="px-3.5 py-1.8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-xs font-bold"
+              className="px-3.5 py-1.8 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white rounded-lg text-xs font-bold"
             >
               Start Free
             </Link>

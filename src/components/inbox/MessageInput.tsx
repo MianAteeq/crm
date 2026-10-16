@@ -307,7 +307,7 @@ export default function MessageInput({ onSend, disabled, recipientPhone, recipie
               <button
                 type="button"
                 onClick={() => setShowTemplatePicker(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-[#6D4AFF] hover:shadow-lg rounded-xl text-xs font-bold text-white transition-all active:scale-95 shadow-sm cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#12263A] to-[#166534] hover:shadow-lg rounded-xl text-xs font-bold text-white transition-all active:scale-95 shadow-sm cursor-pointer"
               >
                 <Layout size={13} /> Select & Send Template
               </button>
@@ -320,9 +320,9 @@ export default function MessageInput({ onSend, disabled, recipientPhone, recipie
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-white/90 dark:bg-slate-800/90 rounded-[20px] z-30 flex items-center justify-center border-2 border-dashed border-[#6D4AFF] m-1"
+                className="absolute inset-0 bg-white/90 dark:bg-slate-800/90 rounded-[20px] z-30 flex items-center justify-center border-2 border-dashed border-[#166534] m-1"
               >
-                <div className="flex flex-col items-center gap-2 text-[#6D4AFF]">
+                <div className="flex flex-col items-center gap-2 text-[#166534]">
                   <Paperclip size={24} className="animate-bounce" />
                   <span className="text-sm font-bold tracking-wide">Drop files here to attach</span>
                 </div>
@@ -356,7 +356,7 @@ export default function MessageInput({ onSend, disabled, recipientPhone, recipie
               >
                 <div className="p-4 border-b border-slate-100 dark:border-slate-700/80 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/30">
                   <div className="flex items-center gap-2">
-                    <Layout size={15} className="text-[#6D4AFF]" />
+                    <Layout size={15} className="text-[#166534]" />
                     <span className="text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-widest">Select Template</span>
                   </div>
                   <button 
@@ -499,12 +499,12 @@ export default function MessageInput({ onSend, disabled, recipientPhone, recipie
                       {file.progress < 100 ? (
                         <div className="space-y-1 mt-1">
                           <div className="h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#6D4AFF] rounded-full transition-all duration-150" style={{ width: `${file.progress}%` }} />
+                            <div className="h-full bg-[#166534] rounded-full transition-all duration-150" style={{ width: `${file.progress}%` }} />
                           </div>
                           <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{file.progress}% Uploading</span>
                         </div>
                       ) : (
-                        <span className="text-[8px] font-bold text-[#6D4AFF] uppercase tracking-wider mt-0.5 block">Ready</span>
+                        <span className="text-[8px] font-bold text-[#166534] uppercase tracking-wider mt-0.5 block">Ready</span>
                       )}
                     </div>
                     <button
@@ -526,7 +526,7 @@ export default function MessageInput({ onSend, disabled, recipientPhone, recipie
             <div className="flex-1 relative">
               {isAiLoading && (
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none z-10">
-                  <Loader2 size={16} className="animate-spin text-[#6D4AFF]" />
+                  <Loader2 size={16} className="animate-spin text-[#166534]" />
                   <span className="text-[10px] font-bold text-slate-450 uppercase tracking-widest ml-2">AI polishing rewrite...</span>
                 </div>
               )}
@@ -544,7 +544,7 @@ export default function MessageInput({ onSend, disabled, recipientPhone, recipie
                 onKeyDown={handleKeyDown}
                 placeholder={isAiLoading ? "" : "Type your message..."}
                 className={cn(
-                  "w-full bg-slate-50/50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-750/70 rounded-[14px] py-3.5 px-4.5 text-sm font-semibold leading-relaxed text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-400 dark:focus:border-indigo-700/80 transition-all resize-none max-h-44 overflow-y-auto block scrollbar-hide select-text",
+                  "w-full bg-slate-50/50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-750/70 rounded-[14px] py-3.5 px-4.5 text-sm font-semibold leading-relaxed text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-[#166534]/15 focus:border-[#166534] transition-all resize-none max-h-44 overflow-y-auto block scrollbar-hide select-text",
                   isAiLoading && "pl-48 opacity-40 select-none pointer-events-none"
                 )}
                 style={{ height: '56px' }}
@@ -556,7 +556,7 @@ export default function MessageInput({ onSend, disabled, recipientPhone, recipie
               type="submit"
               disabled={(!text.trim() && attachedFiles.length === 0) || disabled || isSending || isAiLoading}
               className={cn(
-                "w-12 h-12 bg-gradient-to-r from-indigo-600 to-[#6D4AFF] hover:shadow-lg hover:shadow-[#6D4AFF]/10 text-white rounded-xl flex items-center justify-center transition-all shrink-0 active:scale-95 cursor-pointer disabled:opacity-40 disabled:pointer-events-none disabled:shadow-none mb-1 shadow-sm",
+                "w-12 h-12 bg-gradient-to-r from-[#12263A] to-[#166534] hover:shadow-lg hover:shadow-[#166534]/20 text-white rounded-xl flex items-center justify-center transition-all shrink-0 active:scale-95 cursor-pointer disabled:opacity-40 disabled:pointer-events-none disabled:shadow-none mb-1 shadow-sm",
                 sendSuccess && "from-emerald-500 to-emerald-600 shadow-emerald-500/15"
               )}
             >

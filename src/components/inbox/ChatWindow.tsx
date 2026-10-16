@@ -85,14 +85,14 @@ export default function ChatWindow({
 
         <div className="flex items-center gap-2">
            {onToggleAutoReply && (
-             <button
-               onClick={onToggleAutoReply}
-               className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm border ${
-                 isAutoReplyEnabled 
-                   ? 'bg-indigo-50 border-indigo-200 text-indigo-600 dark:bg-indigo-950/30 dark:border-indigo-900/50 dark:text-indigo-400' 
-                   : 'bg-slate-100 border-slate-200 text-slate-500 dark:bg-slate-800/50 dark:border-slate-800 dark:text-slate-400'
-               }`}
-               title="Toggle Auto-Reply Simulator"
+               <button
+                 onClick={onToggleAutoReply}
+                 className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-xs border cursor-pointer active:scale-95 ${
+                   isAutoReplyEnabled 
+                     ? 'bg-[#F0FDF4] border-[#bbf7d0] text-[#166534]' 
+                     : 'bg-slate-100 border-slate-200 text-slate-500 hover:text-slate-700'
+                 }`}
+                 title="Toggle Auto-Reply Simulator"
              >
                <Bot size={14} className={isAutoReplyEnabled ? 'animate-pulse text-indigo-500' : 'text-slate-400'} />
                <span>Auto-Reply: {isAutoReplyEnabled ? 'ON' : 'OFF'}</span>

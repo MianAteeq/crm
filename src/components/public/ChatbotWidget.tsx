@@ -38,7 +38,7 @@ const knowledgeBase: QAPair[] = [
   },
   {
     keywords: ['feature', 'features', 'what can', 'capabilities', 'offer', 'service', 'services'],
-    answer: 'Throbtech is a complete customer communication platform:\n\n• 📣 WhatsApp Marketing Campaigns\n• 🤖 AI-Powered Auto-Replies\n• 📅 Appointment Booking Automation\n• 💬 Omnichannel Inbox (WhatsApp, Instagram, FB, Email)\n• 📊 CRM & Lead Management\n• 🔗 Click-to-WhatsApp Ads Integration\n• 📱 Social Media Planner\n• 📄 Landing Page & Form Builder',
+    answer: 'Talkinexx is a complete customer communication platform:\n\n• 📣 WhatsApp Marketing Campaigns\n• 🤖 AI-Powered Auto-Replies\n• 📅 Appointment Booking Automation\n• 💬 Omnichannel Inbox (WhatsApp, Instagram, FB, Email)\n• 📊 CRM & Lead Management\n• 🔗 Click-to-WhatsApp Ads Integration\n• 📱 Social Media Planner\n• 📄 Landing Page & Form Builder',
   },
   {
     keywords: ['ai', 'artificial', 'intelligence', 'chatbot', 'bot', 'automated', 'auto reply', 'auto-reply', 'copilot'],
@@ -62,11 +62,11 @@ const knowledgeBase: QAPair[] = [
   },
   {
     keywords: ['support', 'help', 'issue', 'problem', 'trouble', 'bug', 'error', 'not working'],
-    answer: 'Our support team is here to help! Here\'s how to reach us:\n\n• 💬 Live chat support (you\'re using it now!)\n• 📧 Email: support@throbtech.com\n• 📞 Priority phone support for Business & Enterprise plans\n• 📚 Knowledge base & documentation\n\nBusiness and Enterprise plans include 24/7 priority support with dedicated account managers.',
+    answer: 'Our support team is here to help! Here\'s how to reach us:\n\n• 💬 Live chat support (you\'re using it now!)\n• 📧 Email: support@talkinexx.com\n• 📞 Priority phone support for Business & Enterprise plans\n• 📚 Knowledge base & documentation\n\nBusiness and Enterprise plans include 24/7 priority support with dedicated account managers.',
   },
   {
     keywords: ['trial', 'free', 'try', 'test', 'start', 'sign up', 'signup', 'register', 'get started'],
-    answer: 'You can get started with Throbtech absolutely free! Our Starter plan includes:\n\n• Up to 1,000 contacts\n• Basic analytics\n• 5 automation workflows\n• WhatsApp API connection\n• Standard support\n\nNo credit card required. Sign up and start automating in minutes!',
+    answer: 'You can get started with Talkinexx absolutely free! Our Starter plan includes:\n\n• Up to 1,000 contacts\n• Basic analytics\n• 5 automation workflows\n• WhatsApp API connection\n• Standard support\n\nNo credit card required. Sign up and start automating in minutes!',
   },
   {
     keywords: ['security', 'secure', 'gdpr', 'hipaa', 'privacy', 'data', 'protection', 'safe'],
@@ -74,7 +74,7 @@ const knowledgeBase: QAPair[] = [
   },
   {
     keywords: ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening', 'greetings', 'assalam', 'salam'],
-    answer: 'Hello! 👋 Welcome to Throbtech. I\'m here to help you learn about our WhatsApp automation and CRM platform. Feel free to ask me anything about our features, pricing, or how we can help your business!',
+    answer: 'Hello! 👋 Welcome to Talkinexx. I\'m here to help you learn about our WhatsApp automation and CRM platform. Feel free to ask me anything about our features, pricing, or how we can help your business!',
   },
   {
     keywords: ['thank', 'thanks', 'appreciate', 'awesome', 'great', 'perfect', 'good'],
@@ -150,7 +150,7 @@ const quickActions = [
 // ==========================================
 export default function ChatbotWidget() {
   const { websiteName, websiteLogo } = useBrandingStore();
-  const botName = websiteName || 'Throbtech AI';
+  const botName = websiteName || 'Talkinexx AI';
 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -349,7 +349,7 @@ export default function ChatbotWidget() {
                     <div
                       className={`px-4 py-3 text-[12.5px] leading-relaxed font-medium ${
                         msg.sender === 'user'
-                          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl rounded-tr-md shadow-sm'
+                          ? 'bg-gradient-to-r from-[#12263A] to-[#166534] text-white rounded-2xl rounded-tr-md shadow-sm'
                           : 'bg-white border border-slate-200/80 text-slate-700 rounded-2xl rounded-tl-md shadow-sm'
                       }`}
                     >
@@ -428,7 +428,7 @@ export default function ChatbotWidget() {
                 <button
                   type="submit"
                   disabled={!input.trim() || isTyping}
-                  className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-xl flex items-center justify-center hover:shadow-lg hover:shadow-indigo-500/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer active:scale-95 shrink-0"
+                  className="w-10 h-10 bg-gradient-to-br from-[#12263A] to-[#166534] text-white rounded-xl flex items-center justify-center hover:shadow-lg hover:shadow-[#166534]/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer active:scale-95 shrink-0"
                   aria-label="Send message"
                 >
                   <Send size={16} />

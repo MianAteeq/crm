@@ -54,7 +54,7 @@ export default function ContactPage() {
               <div>
                 <span className="text-[11px] font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-4 py-2 rounded-full inline-block mb-6 shadow-sm border border-indigo-100/50">Office Channels</span>
                 <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.1]">
-                  Let's build something <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">great together.</span>
+                  Let's build something <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#12263A] to-[#166534]">great together.</span>
                 </h2>
                 <p className="text-slate-500 font-medium text-base mt-5 leading-relaxed">
                   Our support desk is online 24/7. Reach out via email, phone, or live WhatsApp to resolve account setup issues and configure your automations.
@@ -62,13 +62,13 @@ export default function ContactPage() {
               </div>
               
               <div className="space-y-4 pt-2">
-                <a href="mailto:support@throbtech.com" className="group flex items-center gap-5 p-5 rounded-2xl border border-slate-200/60 bg-white/60 backdrop-blur-sm hover:bg-white hover:border-indigo-200 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-900/5 cursor-pointer">
+                <a href="mailto:support@talkinexx.com" className="group flex items-center gap-5 p-5 rounded-2xl border border-slate-200/60 bg-white/60 backdrop-blur-sm hover:bg-white hover:border-indigo-200 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-900/5 cursor-pointer">
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
                     <Mail size={24} strokeWidth={2} />
                   </div>
                   <div>
                     <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-1">Email Outreach</span>
-                    <span className="text-[15px] font-extrabold text-slate-800 transition-colors">support@throbtech.com</span>
+                    <span className="text-[15px] font-extrabold text-slate-800 transition-colors">support@talkinexx.com</span>
                   </div>
                 </a>
 
@@ -97,7 +97,7 @@ export default function ContactPage() {
             {/* Right Column: Contact form */}
             <div className="lg:col-span-7 relative group">
               {/* Form background glow */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-[3rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#12263A] via-[#166534] to-[#22C55E] rounded-[3rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
               
               <form onSubmit={handleSubmit} className="relative p-8 md:p-12 bg-white/90 backdrop-blur-xl ring-1 ring-slate-900/5 shadow-2xl rounded-[2.5rem] space-y-8">
                 <div>
@@ -132,7 +132,7 @@ export default function ContactPage() {
                   <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">Company Name (Optional)</label>
                   <input 
                     type="text" 
-                    placeholder="ThrobTech LLC" 
+                    placeholder="Talkinexx LLC" 
                     value={form.company}
                     onChange={(e) => setForm({ ...form, company: e.target.value })}
                     className="w-full h-12 px-4 bg-white border border-slate-200/80 rounded-xl text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400 shadow-sm"
@@ -153,7 +153,7 @@ export default function ContactPage() {
                 <button 
                   type="submit" 
                   disabled={loading}
-                  className="w-full h-14 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl transition-all active:scale-95 text-sm uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-lg shadow-indigo-600/25"
+                  className="w-full h-14 bg-gradient-to-r from-[#12263A] to-[#166534] hover:from-[#0a1826] hover:to-[#14532d] text-white font-bold rounded-xl transition-all active:scale-95 text-sm uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-lg shadow-[#12263A]/25"
                 >
                   {loading ? 'Submitting Form...' : 'Send Message'} <ArrowRight size={16} />
                 </button>

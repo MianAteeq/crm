@@ -88,7 +88,7 @@ export default function APIIntegrationContent() {
               <div className="w-6 h-[2px] bg-zinc-800 flex items-center justify-center -mx-1 relative z-0">
                 <Link2 size={10} className="text-zinc-600" />
               </div>
-              <div className="w-10 h-10 bg-[#6D4AFF] rounded-full flex items-center justify-center text-white shadow-lg z-10">
+              <div className="w-10 h-10 bg-[#166534] rounded-full flex items-center justify-center text-white shadow-lg z-10">
                 <MessageSquare size={20} />
               </div>
             </div>

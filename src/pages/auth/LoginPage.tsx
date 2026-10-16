@@ -43,18 +43,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-white min-h-screen flex flex-col justify-between selection:bg-indigo-500/20 selection:text-indigo-900 font-sans">
+    <div className="bg-[#FAFAF9] min-h-screen flex flex-col justify-between selection:bg-[#F0FDF4] selection:text-[#166534] font-sans">
       <Navbar />
       
-      <div className="flex-1 flex items-center justify-center p-6 pt-32 pb-24 bg-slate-50 relative overflow-hidden">
+      <div className="flex-1 flex items-center justify-center p-6 pt-32 pb-24 bg-[#FAFAF9] relative overflow-hidden">
         {/* Decorative Background Elements */}
-        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-indigo-400/20 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-purple-400/20 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#22C55E]/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[#166534]/10 rounded-full blur-[100px] pointer-events-none" />
         
         <div className="w-full max-w-[440px] space-y-8 relative z-10">
           <div className="text-center">
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-3">Welcome back</h1>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest px-10">Access your enterprise communication portal</p>
+            <h1 className="text-3xl font-extrabold text-[#12263A] tracking-tight mb-3">Welcome back</h1>
+            <p className="text-xs font-bold text-[#57534E] uppercase tracking-widest px-10">Access your enterprise communication portal</p>
           </div>
 
           <motion.div 
@@ -63,10 +63,10 @@ export default function LoginPage() {
             className="relative group"
           >
             {/* Background Glow */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-[3rem] blur-xl opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-[#12263A] via-[#166534] to-[#22C55E] rounded-[3rem] blur-xl opacity-20 group-hover:opacity-30 transition duration-1000 group-hover:duration-200"></div>
 
-            <div className="bg-white/90 backdrop-blur-xl border border-slate-200/60 p-10 rounded-[2.5rem] shadow-2xl relative">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-6 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-[9px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg whitespace-nowrap">
+            <div className="bg-white/95 backdrop-blur-xl border border-stone-200 p-10 rounded-[2.5rem] shadow-2xl relative">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-6 py-1.5 bg-[#12263A] border border-[#22C55E]/30 text-[#22C55E] text-[9px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg whitespace-nowrap">
                 Secure Authentication Gateway
               </div>
 
@@ -83,15 +83,15 @@ export default function LoginPage() {
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
                 <div className="space-y-2.5">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Business Email</label>
+                  <label className="text-[10px] font-black text-[#57534E] uppercase tracking-widest pl-1">Business Email</label>
                   <div className="relative group/input">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors" size={18} />
                     <input 
                       {...register('email')}
                       type="email"
                       placeholder="name@company.com"
-                      className={`w-full h-14 bg-slate-50/50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
-                        errors.email ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white'
+                      className={`w-full h-14 bg-[#FAFAF9] border rounded-2xl p-4 pl-12 text-sm font-bold text-[#12263A] focus:outline-none transition-all ${
+                        errors.email ? 'border-rose-300 bg-rose-50' : 'border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 focus:bg-white'
                       }`}
                     />
                   </div>
@@ -100,23 +100,23 @@ export default function LoginPage() {
 
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between pl-1">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Password</label>
-                    <button type="button" className="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 transition-colors">Forgot Password?</button>
+                    <label className="text-[10px] font-black text-[#57534E] uppercase tracking-widest">Password</label>
+                    <button type="button" className="text-[10px] font-bold text-[#166534] hover:text-[#12263A] transition-colors">Forgot Password?</button>
                   </div>
                   <div className="relative group/input">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors" size={18} />
                     <input 
                       {...register('password')}
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
-                      className={`w-full h-14 bg-slate-50/50 border rounded-2xl p-4 pl-12 text-sm font-bold text-slate-900 focus:outline-none transition-all ${
-                        errors.password ? 'border-rose-300 bg-rose-50' : 'border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white'
+                      className={`w-full h-14 bg-[#FAFAF9] border rounded-2xl p-4 pl-12 text-sm font-bold text-[#12263A] focus:outline-none transition-all ${
+                        errors.password ? 'border-rose-300 bg-rose-50' : 'border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 focus:bg-white'
                       }`}
                     />
                     <button 
                       type="button" 
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-[#12263A] transition-colors"
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -129,7 +129,7 @@ export default function LoginPage() {
                   disabled={isLoading}
                   whileHover={{ scale: isLoading ? 1 : 1.02 }}
                   whileTap={{ scale: isLoading ? 1 : 0.98 }}
-                  className="w-full h-14 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 transition-all shadow-xl shadow-indigo-600/25 flex items-center justify-center gap-3 mt-8 cursor-pointer relative overflow-hidden"
+                  className="w-full h-14 bg-gradient-to-r from-[#12263A] to-[#166534] hover:from-[#0a1826] hover:to-[#14532d] text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl disabled:opacity-50 transition-all shadow-xl shadow-[#12263A]/20 flex items-center justify-center gap-3 mt-8 cursor-pointer relative overflow-hidden"
                 >
                   <AnimatePresence mode="wait">
                     {isLoading ? (
@@ -161,8 +161,8 @@ export default function LoginPage() {
             </div>
           </motion.div>
 
-          <p className="text-center text-[12px] font-semibold text-slate-500 pt-4">
-            New to {websiteName}? <Link to="/signup" className="text-indigo-600 hover:text-indigo-700 font-bold ml-1">Create an account</Link>
+          <p className="text-center text-[12px] font-semibold text-[#57534E] pt-4">
+            New to {websiteName}? <Link to="/signup" className="text-[#166534] hover:text-[#12263A] font-bold ml-1">Create an account</Link>
           </p>
         </div>
       </div>

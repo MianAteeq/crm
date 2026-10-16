@@ -266,14 +266,14 @@ export default function CampaignBuilderPage() {
           <div className="flex items-center gap-3">
              <button 
                onClick={() => navigate('/campaigns')}
-               className="px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-all uppercase tracking-widest text-[10px] cursor-pointer"
+               className="h-10 px-4.5 border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-xs font-semibold text-[#57534E] hover:text-[#166534] rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer flex items-center justify-center"
              >
                 Cancel
              </button>
              <button 
                 onClick={handleLaunch}
                 disabled={!campaignData.name || !campaignData.template || isLaunching || launchSuccess}
-                className="bg-slate-900 text-white px-6 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] shadow-lg shadow-slate-900/10 hover:bg-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+                className="h-10 px-6 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white text-xs sm:text-sm font-semibold transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
              >
                 {isLaunching && <Loader2 size={12} className="animate-spin text-white" />}
                 {launchSuccess ? 'Launched' : 'Launch Campaign'}
@@ -358,7 +358,7 @@ export default function CampaignBuilderPage() {
                        const themeMap = {
                          emerald: { border: 'border-emerald-500', bg: 'bg-emerald-50/30', icon: 'bg-emerald-100 text-emerald-600', text: 'text-emerald-700', check: 'bg-emerald-500' },
                          blue: { border: 'border-blue-500', bg: 'bg-blue-50/30', icon: 'bg-blue-100 text-blue-600', text: 'text-blue-700', check: 'bg-blue-500' },
-                         purple: { border: 'border-purple-500', bg: 'bg-purple-50/30', icon: 'bg-purple-100 text-purple-600', text: 'text-purple-700', check: 'bg-purple-500' },
+                         purple: { border: 'border-[#166534]', bg: 'bg-[#F0FDF4]', icon: 'bg-[#dcfce7] text-[#166534]', text: 'text-[#166534]', check: 'bg-[#166534]' },
                          amber: { border: 'border-amber-500', bg: 'bg-amber-50/30', icon: 'bg-amber-100 text-amber-600', text: 'text-amber-700', check: 'bg-amber-500' }
                        };
                        const currentTheme = themeMap[type.theme as keyof typeof themeMap];
@@ -406,7 +406,7 @@ export default function CampaignBuilderPage() {
             {/* Section 2: Template Selection */}
             <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm space-y-6">
                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-1.5 h-6 bg-indigo-500 rounded-full" />
+                  <div className="w-1.5 h-6 bg-[#166534] rounded-full" />
                   <h2 className="text-lg font-bold text-slate-900">Select Template</h2>
                </div>
 

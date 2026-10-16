@@ -184,7 +184,7 @@ export default function AdminPlans() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <Loader2 size={32} className="animate-spin text-indigo-650" />
+        <Loader2 size={32} className="animate-spin text-[#166534]" />
         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Querying SaaS Tier Configs...</p>
       </div>
     );
@@ -208,7 +208,7 @@ export default function AdminPlans() {
     <div className="space-y-8 animate-fade-in pb-12">
       {/* Header section with modern dark glow design and create button */}
       <div className="relative overflow-hidden bg-slate-900 text-white p-8 rounded-3xl border border-slate-800 shadow-xl">
-        <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-[#166534]/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-10 -mb-16 w-48 h-48 bg-emerald-500/5 rounded-full blur-2xl" />
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -224,7 +224,7 @@ export default function AdminPlans() {
           </div>
           <button
             onClick={handleOpenCreate}
-            className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white rounded-xl transition-all shadow-md active:scale-95 cursor-pointer shrink-0"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] text-xs font-bold text-white rounded-xl transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer shrink-0"
           >
             <Plus size={15} />
             <span>Create New Plan</span>
@@ -260,7 +260,7 @@ export default function AdminPlans() {
               whileHover={{ y: -5 }}
               className={`bg-white border rounded-3xl p-6 flex flex-col justify-between shadow-sm relative overflow-hidden transition-all duration-300 ${
                 isPro 
-                  ? 'border-indigo-500/80 ring-2 ring-indigo-500/10 shadow-lg shadow-indigo-500/5' 
+                  ? 'border-[#166534]/80 ring-2 ring-[#166534]/10 shadow-lg shadow-[#166534]/5' 
                   : isEnterprise
                     ? 'border-emerald-500/30'
                     : 'border-slate-200/80'
@@ -272,7 +272,7 @@ export default function AdminPlans() {
                   <div className="flex items-center justify-between">
                     <span className={`w-10 h-10 rounded-2xl flex items-center justify-center border shadow-inner ${
                       isPro 
-                        ? 'bg-indigo-50 border-indigo-100 text-indigo-650' 
+                        ? 'bg-[#F0FDF4] border-[#bbf7d0] text-[#166534]' 
                         : isEnterprise 
                           ? 'bg-emerald-50 border-emerald-100 text-emerald-600' 
                           : 'bg-slate-50 border-slate-100 text-slate-700'
@@ -284,13 +284,13 @@ export default function AdminPlans() {
                     <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => handleOpenEdit(plan)}
-                        className="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200 hover:bg-indigo-50 hover:border-indigo-100 text-slate-500 hover:text-indigo-650 flex items-center justify-center transition-all cursor-pointer shadow-sm"
+                        className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-slate-500 hover:text-[#166534] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-90"
                       >
                         <Edit2 size={12} />
                       </button>
                       <button
                         onClick={() => { setDeletingPlan(plan); setDeleteError(null); }}
-                        className="w-7 h-7 rounded-lg bg-red-50/50 border border-red-100 hover:bg-red-500 hover:border-red-500 text-red-500 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-sm"
+                        className="w-8 h-8 rounded-lg bg-rose-50/60 border border-rose-100 hover:bg-rose-600 hover:border-rose-600 text-rose-500 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-90"
                       >
                         <Trash2 size={12} />
                       </button>
@@ -301,7 +301,7 @@ export default function AdminPlans() {
                     <div className="flex items-center gap-2">
                       <h3 className="text-base font-black text-slate-900 uppercase tracking-tight">{plan.name}</h3>
                       {isPro && (
-                        <span className="bg-indigo-650 text-white text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full flex items-center gap-0.5 select-none shrink-0">
+                        <span className="bg-[#166534] text-white text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full flex items-center gap-0.5 select-none shrink-0">
                           <Sparkles size={8} />
                           <span>Popular</span>
                         </span>
@@ -336,7 +336,7 @@ export default function AdminPlans() {
                     </div>
                     <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div 
-                        className={`h-full rounded-full ${isPro ? 'bg-indigo-500' : isEnterprise ? 'bg-emerald-500' : 'bg-slate-400'}`} 
+                        className={`h-full rounded-full ${isPro ? 'bg-[#166534]' : isEnterprise ? 'bg-emerald-500' : 'bg-slate-400'}`} 
                         style={{ width: plan.limits.contacts.toLowerCase().includes('unlimited') ? '100%' : '50%' }} 
                       />
                     </div>
@@ -353,7 +353,7 @@ export default function AdminPlans() {
                     </div>
                     <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div 
-                        className={`h-full rounded-full ${isPro ? 'bg-indigo-500' : isEnterprise ? 'bg-emerald-500' : 'bg-slate-400'}`} 
+                        className={`h-full rounded-full ${isPro ? 'bg-[#166534]' : isEnterprise ? 'bg-emerald-500' : 'bg-slate-400'}`} 
                         style={{ width: plan.limits.messages.toLowerCase().includes('unlimited') ? '100%' : '40%' }} 
                       />
                     </div>
@@ -370,7 +370,7 @@ export default function AdminPlans() {
                     </div>
                     <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div 
-                        className={`h-full rounded-full ${isPro ? 'bg-indigo-500' : isEnterprise ? 'bg-emerald-500' : 'bg-slate-400'}`} 
+                        className={`h-full rounded-full ${isPro ? 'bg-[#166534]' : isEnterprise ? 'bg-emerald-500' : 'bg-slate-400'}`} 
                         style={{ width: plan.limits.campaigns.toLowerCase().includes('unlimited') || plan.limits.campaigns.toLowerCase().includes('enabled') ? '100%' : '0%' }} 
                       />
                     </div>
@@ -387,7 +387,7 @@ export default function AdminPlans() {
                     </div>
                     <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div 
-                        className={`h-full rounded-full ${isPro ? 'bg-indigo-500' : isEnterprise ? 'bg-emerald-500' : 'bg-slate-400'}`} 
+                        className={`h-full rounded-full ${isPro ? 'bg-[#166534]' : isEnterprise ? 'bg-emerald-500' : 'bg-slate-400'}`} 
                         style={{ width: plan.limits.ai_replies.toLowerCase().includes('unlimited') || plan.limits.ai_replies.toLowerCase().includes('enabled') ? '100%' : '0%' }} 
                       />
                     </div>
@@ -410,8 +410,8 @@ export default function AdminPlans() {
                   <span>Unified Omnichannel Live Chat Inbox</span>
                 </div>
                 {isEnterprise && (
-                  <div className="flex items-center gap-2.5 text-[11px] font-bold text-indigo-650 animate-pulse">
-                    <span className="w-5 h-5 rounded-lg bg-indigo-50 text-indigo-650 flex items-center justify-center shrink-0 border border-indigo-100">
+                  <div className="flex items-center gap-2.5 text-[11px] font-bold text-[#166534] animate-pulse">
+                    <span className="w-5 h-5 rounded-lg bg-[#F0FDF4] text-[#166534] flex items-center justify-center shrink-0 border border-[#bbf7d0]">
                       <Cpu size={12} />
                     </span>
                     <span>Custom Dedicated Instance support</span>
@@ -445,7 +445,7 @@ export default function AdminPlans() {
               <form onSubmit={handleSavePlan} className="flex flex-col">
                 <div className="bg-slate-55 border-b border-slate-100 p-6 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-650 animate-pulse">
+                    <span className="w-9 h-9 rounded-xl bg-[#166534]/10 flex items-center justify-center text-[#166534] animate-pulse">
                       <FileText size={15} />
                     </span>
                     <div>
@@ -475,7 +475,7 @@ export default function AdminPlans() {
                         placeholder="e.g. standard"
                         value={planKey}
                         onChange={(e) => setPlanKey(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all disabled:opacity-50"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all disabled:opacity-50"
                       />
                     </div>
 
@@ -488,7 +488,7 @@ export default function AdminPlans() {
                         placeholder="e.g. Standard Tier"
                         value={planName}
                         onChange={(e) => setPlanName(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                       />
                     </div>
                   </div>
@@ -502,12 +502,12 @@ export default function AdminPlans() {
                       placeholder="e.g. $29/month or Custom Pricing"
                       value={planPrice}
                       onChange={(e) => setPlanPrice(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
                     />
                   </div>
 
                   <div className="border-t border-slate-100 pt-4.5 space-y-4">
-                    <p className="text-[10px] font-black text-indigo-650 uppercase tracking-widest select-none">Resource Ceilings</p>
+                    <p className="text-[10px] font-black text-[#166534] uppercase tracking-widest select-none">Resource Ceilings</p>
                     
                     <div className="grid grid-cols-2 gap-4">
                       {/* Contacts */}
@@ -518,7 +518,7 @@ export default function AdminPlans() {
                           required
                           value={limitContacts}
                           onChange={(e) => setLimitContacts(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-mono"
                         />
                       </div>
 
@@ -530,7 +530,7 @@ export default function AdminPlans() {
                           required
                           value={limitMessages}
                           onChange={(e) => setLimitMessages(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-mono"
                         />
                       </div>
                     </div>
@@ -544,7 +544,7 @@ export default function AdminPlans() {
                           required
                           value={limitCampaigns}
                           onChange={(e) => setLimitCampaigns(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-mono"
                         />
                       </div>
 
@@ -556,7 +556,7 @@ export default function AdminPlans() {
                           required
                           value={limitAiReplies}
                           onChange={(e) => setLimitAiReplies(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-mono"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-mono"
                         />
                       </div>
                     </div>
@@ -581,14 +581,14 @@ export default function AdminPlans() {
                       type="button"
                       onClick={() => setIsModalOpen(false)}
                       disabled={saving}
-                      className="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-650 rounded-xl transition-all cursor-pointer"
+                      className="px-4.5 py-2.5 border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-xs font-bold text-[#57534E] hover:text-[#166534] rounded-xl transition-all cursor-pointer shadow-xs active:scale-95"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={saving || saveStatus === 'success'}
-                      className="px-4 py-2 bg-indigo-650 hover:bg-indigo-750 text-xs font-bold text-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+                      className="px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] text-xs font-bold text-white rounded-xl transition-all flex items-center gap-2 shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer disabled:opacity-50"
                     >
                       {saving && <Loader2 size={13} className="animate-spin text-white" />}
                       <span>{editingPlan ? 'Save Changes' : 'Create Plan'}</span>
@@ -642,7 +642,7 @@ export default function AdminPlans() {
                   type="button"
                   onClick={() => setDeletingPlan(null)}
                   disabled={deleting}
-                  className="flex-1 py-2.5 border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-650 rounded-xl transition-all cursor-pointer"
+                  className="flex-1 py-2.5 border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-600 rounded-xl transition-all cursor-pointer"
                 >
                   Keep Plan
                 </button>

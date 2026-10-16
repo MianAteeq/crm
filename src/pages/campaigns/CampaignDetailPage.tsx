@@ -145,7 +145,7 @@ export default function CampaignDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-[500px] flex flex-col items-center justify-center gap-4">
-        <Loader2 size={36} className="animate-spin text-indigo-600 stroke-[2.5px]" />
+        <Loader2 size={36} className="animate-spin text-[#166534] stroke-[2.5px]" />
         <p className="text-xs font-black uppercase tracking-widest text-slate-400">Loading campaign nodes...</p>
       </div>
     );

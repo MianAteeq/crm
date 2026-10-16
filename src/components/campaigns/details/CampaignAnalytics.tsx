@@ -12,9 +12,9 @@ interface CampaignAnalyticsProps {
 
 export default function CampaignAnalytics({ campaign }: CampaignAnalyticsProps) {
   const deliveryData = [
-    { name: 'Sent', value: campaign.sent, color: '#3b82f6' },
-    { name: 'Delivered', value: campaign.delivered, color: '#10b981' },
-    { name: 'Read', value: campaign.read, color: '#8b5cf6' },
+    { name: 'Sent', value: campaign.sent, color: '#12263A' },
+    { name: 'Delivered', value: campaign.delivered, color: '#22c55e' },
+    { name: 'Read', value: campaign.read, color: '#166534' },
     { name: 'Failed', value: campaign.failed, color: '#ef4444' },
   ];
 
@@ -25,12 +25,12 @@ export default function CampaignAnalytics({ campaign }: CampaignAnalyticsProps) 
     { name: 'Pending', value: campaign.sent - campaign.delivered - campaign.failed },
   ];
 
-  const COLORS = ['#8b5cf6', '#10b981', '#ef4444', '#3b82f6'];
+  const COLORS = ['#166534', '#22c55e', '#ef4444', '#12263A'];
 
   const stats = [
-    { label: 'Total Sent', value: campaign.sent, icon: Mail, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Delivered', value: campaign.delivered, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    { label: 'Read Count', value: campaign.read, icon: Eye, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+    { label: 'Total Sent', value: campaign.sent, icon: Mail, color: 'text-[#12263A]', bg: 'bg-slate-100' },
+    { label: 'Delivered', value: campaign.delivered, icon: CheckCircle2, color: 'text-[#22c55e]', bg: 'bg-emerald-50' },
+    { label: 'Read Count', value: campaign.read, icon: Eye, color: 'text-[#166534]', bg: 'bg-[#F0FDF4]' },
     { label: 'Failed', value: campaign.failed, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50' },
   ];
 

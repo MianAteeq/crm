@@ -119,7 +119,7 @@ function ServicePageLayout({ title, subtitle, category, description, color, bull
             >
               <div className="relative w-full max-w-lg mx-auto flex items-center justify-center">
                 {/* Glowing backdrop for the mockup */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/40 to-purple-500/40 blur-2xl transform rotate-3 rounded-[3rem] -m-2" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-[#12263A]/40 to-[#166534]/40 blur-2xl transform rotate-3 rounded-[3rem] -m-2" />
                 <div className="relative transform hover:-translate-y-2 hover:scale-[1.02] transition-all duration-500 w-full">
                   {mockup}
                 </div>

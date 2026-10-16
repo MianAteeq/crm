@@ -86,7 +86,7 @@ export function ContactDetailsPanel({
 
         {/* Avatar & Name */}
         <div className="text-center">
-          <div className="w-20 h-20 bg-gradient-to-br from-[#6D4AFF] to-[#8B5CF6] rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3 shadow-lg shadow-[#6D4AFF]/20">
+          <div className="w-20 h-20 bg-gradient-to-br from-[#12263A] to-[#166534] rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3 shadow-lg shadow-[#12263A]/20">
             {contact.name.charAt(0).toUpperCase()}
           </div>
           <h4 className="text-xl font-semibold text-slate-900 dark:text-white mb-1">
@@ -226,11 +226,11 @@ export function ContactDetailsPanel({
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
                 placeholder="Enter tag name..."
-                className="flex-1 px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#6D4AFF]"
+                className="flex-1 px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#22C55E]/30 focus:border-[#166534]"
               />
               <button
                 onClick={handleAddTag}
-                className="px-3 py-2 bg-[#6D4AFF] text-white rounded-lg hover:bg-[#5b3ce0] transition-colors"
+                className="px-3 py-2 bg-[#166534] text-white rounded-lg hover:bg-[#14532d] transition-colors"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -246,7 +246,7 @@ export function ContactDetailsPanel({
             </h5>
             <select
               onChange={(e) => onAssignAgent?.(contact.id, e.target.value)}
-              className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#6D4AFF]"
+              className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#22C55E]/30 focus:border-[#166534]"
             >
               <option value="">Unassigned</option>
               {availableAgents.map((agent) => (
@@ -281,7 +281,7 @@ export function ContactDetailsPanel({
                 onChange={(e) => setNotes(e.target.value)}
                 rows={4}
                 placeholder="Add notes about this contact..."
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#6D4AFF] resize-none"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/30 focus:border-[#166534] resize-none"
               />
               <div className="flex gap-2">
                 <button

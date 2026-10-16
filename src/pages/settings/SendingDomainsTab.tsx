@@ -182,10 +182,10 @@ export default function SendingDomainsTab() {
   return (
     <div className="space-y-6">
       {/* 5-STEP SETUP FLOW BANNER (Requirement 15) */}
-      <div className="bg-gradient-to-r from-indigo-900 via-slate-900 to-slate-900 text-white p-6 rounded-3xl shadow-sm space-y-4">
+      <div className="bg-gradient-to-r from-[#12263A] via-[#166534] to-[#12263A] text-white p-6 rounded-3xl shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full border border-indigo-500/30">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#22C55E] bg-[#166534]/20 px-2.5 py-1 rounded-full border border-[#22C55E]/30">
               Deliverability & Compliance
             </span>
             <h2 className="text-lg font-bold text-white mt-1.5 tracking-tight flex items-center gap-2">
@@ -200,7 +200,7 @@ export default function SendingDomainsTab() {
           <button
             type="button"
             onClick={() => setIsAddModalOpen(true)}
-            className="px-4 py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold transition-all shadow-md flex items-center gap-2 whitespace-nowrap"
+            className="px-4 py-2.5 rounded-xl bg-[#166534] hover:bg-[#166534] text-white text-xs font-bold transition-all shadow-md flex items-center gap-2 whitespace-nowrap"
           >
             <Plus size={16} />
             Add Sending Domain
@@ -217,8 +217,8 @@ export default function SendingDomainsTab() {
             { step: '5', title: 'Send Emails', desc: 'High inbox delivery' },
           ].map((s, idx) => (
             <div key={s.step} className="p-2.5 rounded-xl bg-white/5 border border-white/10 space-y-0.5">
-              <div className="flex items-center gap-1.5 text-indigo-300 font-bold text-[10px]">
-                <span className="w-4 h-4 rounded-full bg-indigo-500/30 flex items-center justify-center text-[9px] text-white">
+              <div className="flex items-center gap-1.5 text-[#22C55E] font-bold text-[10px]">
+                <span className="w-4 h-4 rounded-full bg-[#166534]/30 flex items-center justify-center text-[9px] text-white">
                   {s.step}
                 </span>
                 STEP {s.step}
@@ -292,7 +292,7 @@ export default function SendingDomainsTab() {
               className="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-50 transition-all"
               title="Refresh domain list"
             >
-              <RefreshCw size={16} className={isRefreshing ? 'animate-spin text-indigo-600' : ''} />
+              <RefreshCw size={16} className={isRefreshing ? 'animate-spin text-[#166534]' : ''} />
             </button>
 
             <button
@@ -308,13 +308,13 @@ export default function SendingDomainsTab() {
 
         {isLoading ? (
           <div className="p-16 text-center text-xs text-slate-400 flex flex-col items-center gap-3">
-            <RefreshCw size={24} className="animate-spin text-indigo-600" />
+            <RefreshCw size={24} className="animate-spin text-[#166534]" />
             <span>Loading domain records...</span>
           </div>
         ) : domains.length === 0 ? (
           /* EMPTY STATE (Requirement 15) */
           <div className="p-16 text-center space-y-4 max-w-md mx-auto">
-            <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto shadow-inner">
+            <div className="w-14 h-14 rounded-2xl bg-[#F0FDF4] text-[#166534] flex items-center justify-center mx-auto shadow-inner">
               <Globe size={28} />
             </div>
             <div>
@@ -326,7 +326,7 @@ export default function SendingDomainsTab() {
             <button
               type="button"
               onClick={() => setIsAddModalOpen(true)}
-              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-md shadow-indigo-600/20 inline-flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white text-xs font-bold transition-all shadow-md shadow-[#166534]/20 inline-flex items-center gap-2"
             >
               <Plus size={16} />
               Add Sending Domain
@@ -339,7 +339,7 @@ export default function SendingDomainsTab() {
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="text-base font-bold text-slate-900 font-mono tracking-tight flex items-center gap-2">
-                      <Globe size={18} className="text-indigo-600 shrink-0" />
+                      <Globe size={18} className="text-[#166534] shrink-0" />
                       {dom.domain}
                     </span>
                     {getStatusBadge(dom.status)}
@@ -377,7 +377,7 @@ export default function SendingDomainsTab() {
                     }}
                     className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all flex items-center gap-1.5 shadow-xs"
                   >
-                    <Info size={14} className="text-indigo-600" />
+                    <Info size={14} className="text-[#166534]" />
                     View DNS Records
                   </button>
 
@@ -385,7 +385,7 @@ export default function SendingDomainsTab() {
                     type="button"
                     onClick={() => handleVerifyDomain(dom)}
                     disabled={verifyingDomainId === dom.id}
-                    className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm shadow-indigo-600/20 disabled:opacity-50"
+                    className="px-4 py-2 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm shadow-[#166534]/20 disabled:opacity-50"
                   >
                     <RefreshCw size={13} className={verifyingDomainId === dom.id ? 'animate-spin' : ''} />
                     {verifyingDomainId === dom.id ? 'Checking...' : 'Verify Domain'}
@@ -412,7 +412,7 @@ export default function SendingDomainsTab() {
           <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-[#F0FDF4] text-[#166534] flex items-center justify-center">
                   <Plus size={18} />
                 </div>
                 <h3 className="text-base font-bold text-slate-900">Add Sending Domain</h3>
@@ -437,7 +437,7 @@ export default function SendingDomainsTab() {
                   value={newDomain}
                   onChange={(e) => setNewDomain(e.target.value)}
                   placeholder="e.g. example.com or mail.example.com"
-                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-mono"
+                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534] font-mono"
                 />
                 <p className="text-[11px] text-slate-400 mt-1.5">
                   Enter your root domain (e.g. <code>company.com</code>) or dedicated sending subdomain (e.g. <code>mail.company.com</code>).
@@ -446,7 +446,7 @@ export default function SendingDomainsTab() {
 
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
                 <div className="flex items-center gap-1.5 font-bold text-slate-800 text-[11px]">
-                  <HelpCircle size={13} className="text-indigo-600" />
+                  <HelpCircle size={13} className="text-[#166534]" />
                   What happens next?
                 </div>
                 <p className="text-[11px] text-slate-500">
@@ -465,7 +465,7 @@ export default function SendingDomainsTab() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-600/20 disabled:opacity-50 flex items-center gap-2"
+                  className="px-5 py-2 rounded-xl bg-[#166534] text-white text-xs font-bold hover:bg-[#14532d] transition-all shadow-md shadow-[#166534]/20 disabled:opacity-50 flex items-center gap-2"
                 >
                   {isSubmitting ? <RefreshCw size={14} className="animate-spin" /> : null}
                   {isSubmitting ? 'Registering domain...' : 'Add Domain'}
@@ -483,13 +483,13 @@ export default function SendingDomainsTab() {
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-[#F0FDF4] text-[#166534] flex items-center justify-center">
                   <ShieldCheck size={22} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-bold text-slate-900">
-                      DNS Records: <span className="font-mono text-indigo-600">{activeDnsDomain.domain}</span>
+                      DNS Records: <span className="font-mono text-[#166534]">{activeDnsDomain.domain}</span>
                     </h3>
                     {getStatusBadge(activeDnsDomain.status)}
                   </div>
@@ -511,7 +511,7 @@ export default function SendingDomainsTab() {
             {/* Provider Agnostic Instructions */}
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-600 shrink-0 space-y-1">
               <p className="font-bold text-slate-800 flex items-center gap-1.5 text-xs">
-                <Info size={14} className="text-indigo-600" />
+                <Info size={14} className="text-[#166534]" />
                 DNS Instructions for Any Provider (Cloudflare, GoDaddy, Namecheap, Route 53, etc.)
               </p>
               <p className="text-[11px] text-slate-500 leading-relaxed">
@@ -541,8 +541,8 @@ export default function SendingDomainsTab() {
                   ) : (
                     activeDnsDomain.dns_records.map((rec, idx) => (
                       <tr key={idx} className="hover:bg-slate-50/50">
-                        <td className="py-3.5 px-4 font-mono font-bold text-indigo-700 whitespace-nowrap">
-                          <span className="px-2 py-0.5 rounded bg-indigo-50 border border-indigo-200">
+                        <td className="py-3.5 px-4 font-mono font-bold text-[#166534] whitespace-nowrap">
+                          <span className="px-2 py-0.5 rounded bg-[#F0FDF4] border border-[#bbf7d0]">
                             {rec.record_type}
                           </span>
                         </td>
@@ -620,7 +620,7 @@ export default function SendingDomainsTab() {
                   type="button"
                   onClick={() => handleVerifyDomain(activeDnsDomain)}
                   disabled={verifyingDomainId === activeDnsDomain.id}
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-md shadow-indigo-600/20 flex items-center gap-2 disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white text-xs font-bold transition-all shadow-md shadow-[#166534]/20 flex items-center gap-2 disabled:opacity-50"
                 >
                   <RefreshCw size={14} className={verifyingDomainId === activeDnsDomain.id ? 'animate-spin' : ''} />
                   {verifyingDomainId === activeDnsDomain.id ? 'Verifying domain records...' : 'Verify Domain'}

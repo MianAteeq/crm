@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { 
-  PauseCircle, 
   PlayCircle, 
   Send, 
   CheckCircle2, 
-  AlertTriangle, 
-  Clock, 
   Activity,
   Workflow,
-  ChevronRight
+  ChevronRight,
+  History
 } from 'lucide-react';
 import { crmApi } from '../../services/crmApi';
 import { cn } from '../../lib/utils';
@@ -47,7 +45,7 @@ export default function AutomationDashboard() {
         const statsData = await crmApi.getAutomationDashboardStats();
         const execData = await crmApi.getAutomationLogs();
         if (statsData) setStats(statsData);
-        if (execData) setExecutions(execData);
+        if (Array.isArray(execData)) setExecutions(execData);
       } catch (err) {
         console.error('Failed to load automation dashboard data', err);
       } finally {
@@ -58,37 +56,37 @@ export default function AutomationDashboard() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#FFFFFF]">
       
       {/* Title Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#E2E8F0]">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">Automation Overview</h1>
-          <p className="text-xs text-slate-405 dark:text-slate-500 font-semibold mt-1 uppercase tracking-wider">Metrics and recent orchestration runs</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[#12263A]">Automation Overview</h1>
+          <p className="text-xs sm:text-sm text-[#64748B] mt-1 font-medium">Metrics and recent orchestration runs.</p>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/60 rounded-xl text-indigo-650 text-[10px] font-black uppercase tracking-wider">
-          <Activity size={12} className="animate-pulse" /> Live monitor
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-[#F0FDF4] border border-[#22C55E]/30 rounded-xl text-[#166534] text-xs font-bold uppercase tracking-wider">
+          <Activity size={13} className="animate-pulse" /> Live monitor
         </div>
       </div>
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Workflows', value: stats.totalWorkflows, icon: Workflow, color: 'text-indigo-600 bg-indigo-50 dark:bg-indigo-950/20 border-indigo-100 dark:border-indigo-900/40' },
-          { label: 'Active Workflows', value: stats.activeWorkflows, icon: PlayCircle, color: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/40' },
-          { label: 'Messages Sent Today', value: stats.messagesSentToday, icon: Send, color: 'text-blue-500 bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/40' },
-          { label: 'Total Executions', value: stats.totalExecutions, icon: CheckCircle2, color: 'text-violet-500 bg-violet-50 dark:bg-violet-950/20 border-violet-100 dark:border-violet-900/40' },
+          { label: 'Total Workflows', value: stats.totalWorkflows, icon: Workflow, color: 'text-[#166534] bg-[#F0FDF4] border-[#22C55E]/30' },
+          { label: 'Active Workflows', value: stats.activeWorkflows, icon: PlayCircle, color: 'text-[#15803D] bg-[#F0FDF4] border-[#22C55E]/30' },
+          { label: 'Messages Sent Today', value: stats.messagesSentToday, icon: Send, color: 'text-blue-600 bg-blue-50 border-blue-200' },
+          { label: 'Total Executions', value: stats.totalExecutions, icon: CheckCircle2, color: 'text-violet-600 bg-violet-50 border-violet-200' },
         ].map((card, idx) => (
           <motion.div
             key={card.label}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.05 }}
-            className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-750/70 rounded-2xl p-5 flex items-center justify-between shadow-sm relative group hover:border-indigo-500 transition-all"
+            className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl p-5 flex items-center justify-between shadow-xs hover:shadow-sm transition-all"
           >
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-505 uppercase tracking-widest block">{card.label}</span>
-              <span className="text-xl font-extrabold text-slate-900 dark:text-white leading-none block">
+              <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{card.label}</span>
+              <span className="text-2xl font-bold text-[#12263A] leading-none block font-mono">
                 {isLoading ? '...' : card.value.toLocaleString()}
               </span>
             </div>
@@ -100,52 +98,58 @@ export default function AutomationDashboard() {
       </div>
 
       {/* Recent Executions list */}
-      <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-750/70 rounded-2xl p-5 shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl p-6 shadow-xs space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
           <div>
-            <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Recent Executions</h3>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold mt-0.5">Chronological lists of active step pipelines</p>
+            <h3 className="text-sm font-bold text-[#12263A] uppercase tracking-wider">Recent Executions</h3>
+            <p className="text-xs text-[#64748B] mt-0.5">Chronological list of workflow executions</p>
           </div>
-          <a href="/automation/executions" className="text-[10px] font-bold text-indigo-600 uppercase hover:underline flex items-center gap-0.5">
-            View All Runs <ChevronRight size={12} />
+          <a href="/automation/executions" className="text-xs font-bold text-[#166534] uppercase hover:underline flex items-center gap-1">
+            View All Runs <ChevronRight size={13} />
           </a>
         </div>
 
         <div className="space-y-2.5 max-h-[360px] overflow-y-auto custom-scrollbar pr-1">
           {isLoading ? (
-            <div className="text-center py-8 text-xs font-semibold text-slate-400">Loading recent runs...</div>
+            <div className="text-center py-8 text-xs font-semibold text-[#64748B]">Loading recent runs...</div>
           ) : executions.length === 0 ? (
-            <div className="text-center py-8 text-xs font-semibold text-slate-405">No executions found. Try deploying a workflow!</div>
+            <div className="text-center py-12 px-4 space-y-2">
+              <div className="w-10 h-10 bg-[#F0FDF4] border border-[#22C55E]/30 rounded-xl flex items-center justify-center text-[#166534] mx-auto">
+                <History size={20} />
+              </div>
+              <p className="text-xs font-semibold text-[#12263A]">No executions recorded yet</p>
+              <p className="text-[11px] text-[#64748B]">Workflows will log their runs here once triggered.</p>
+            </div>
           ) : (
             executions.map((log) => (
               <div
                 key={log.id}
-                className="p-3 bg-slate-50 dark:bg-slate-900/30 border border-slate-150/70 dark:border-slate-800 rounded-xl flex items-center justify-between gap-4"
+                className="p-3.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl flex items-center justify-between gap-4 hover:bg-[#F1F5F9] transition-colors"
               >
                 <div className="min-w-0 flex items-center gap-3">
                   <div className={cn(
-                    "w-2 h-2 rounded-full shrink-0 animate-pulse",
-                    log.status === 'completed' || log.status === 'success' ? 'bg-emerald-500' : 'bg-red-500'
+                    "w-2 h-2 rounded-full shrink-0",
+                    log.status === 'completed' || log.status === 'success' ? 'bg-[#22C55E]' : 'bg-red-500'
                   )} />
                   <div className="min-w-0">
-                    <p className="text-[11.5px] font-extrabold text-slate-900 dark:text-white truncate">{log.workflow}</p>
-                    <p className="text-[9.5px] font-semibold text-slate-450 mt-0.5 flex items-center gap-1.5">
+                    <p className="text-xs font-bold text-[#12263A] truncate">{log.workflow}</p>
+                    <p className="text-[11px] text-[#64748B] mt-0.5 flex items-center gap-2">
                       <span>Recipient: {log.contact}</span>
-                      <span className="w-1 h-1 rounded-full bg-slate-300" />
-                      <span>ID: {log.id}</span>
+                      <span>•</span>
+                      <span className="font-mono text-[#166534] font-semibold">{log.id}</span>
                     </p>
                   </div>
                 </div>
                 <div className="text-right shrink-0">
                   <span className={cn(
-                    "px-2.5 py-1 text-[8.5px] font-black uppercase tracking-wider rounded-lg block text-center leading-none",
+                    "px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md border block text-center leading-normal",
                     log.status === 'completed' || log.status === 'success' 
-                      ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 border border-emerald-100 dark:border-emerald-900/20' 
-                      : 'bg-red-50 dark:bg-red-950/20 text-red-650 border border-red-100 dark:border-red-900/20'
+                      ? 'bg-[#F0FDF4] text-[#15803D] border-[#22C55E]/30' 
+                      : 'bg-red-50 text-[#DC2626] border-red-200'
                   )}>
                     {log.status}
                   </span>
-                  <span className="text-[8.5px] font-bold text-slate-400 mt-1 block font-mono">{log.time} ({log.duration})</span>
+                  <span className="text-[10px] text-[#64748B] mt-1 block font-mono">{log.time} ({log.duration})</span>
                 </div>
               </div>
             ))

@@ -1,39 +1,69 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
   ChevronRight, 
   X, 
   FileCode,
-  AlertCircle
+  AlertCircle,
+  History,
+  RotateCw,
+  GitFork,
+  CheckCircle2,
+  Clock,
+  ArrowRight
 } from 'lucide-react';
 import { crmApi } from '../../services/crmApi';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 
+interface ExecutionLogItem {
+  id?: number | string;
+  step_name?: string;
+  status?: string;
+  message?: string;
+  execution_time_ms?: number;
+  created_at?: string | null;
+}
+
 interface Execution {
   id: string;
+  raw_id?: number | string;
   workflow: string;
   contact: string;
   status: string;
   time: string;
   duration: string;
+  created_at?: string | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+  logs?: ExecutionLogItem[];
+  last_error?: string | null;
 }
 
 export default function ExecutionsPage() {
+  const navigate = useNavigate();
   const [executions, setExecutions] = useState<Execution[]>([]);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'success' | 'failed'>('all');
   const [selectedLog, setSelectedLog] = useState<Execution | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const fetchExecutions = async () => {
+    setIsLoading(true);
+    setErrorMessage(null);
     try {
       const data = await crmApi.getAutomationLogs();
-      if (data && Array.isArray(data)) {
+      if (Array.isArray(data)) {
         setExecutions(data);
+      } else {
+        setExecutions([]);
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error('[Automation] Failed to load executions:', err);
+      setErrorMessage(err?.message || 'Unable to load execution history.');
+      setExecutions([]);
     } finally {
       setIsLoading(false);
     }
@@ -44,190 +74,394 @@ export default function ExecutionsPage() {
   }, []);
 
   const filteredLogs = executions.filter(l => {
-    const matchesSearch = l.workflow.toLowerCase().includes(search.toLowerCase()) || 
-                          l.id.toLowerCase().includes(search.toLowerCase()) ||
-                          l.contact.includes(search);
+    const term = search.toLowerCase().trim();
+    const matchesSearch = !term ||
+      (l.workflow && l.workflow.toLowerCase().includes(term)) || 
+      (l.id && l.id.toLowerCase().includes(term)) ||
+      (l.contact && l.contact.toLowerCase().includes(term));
     
-    const matchesStatus = statusFilter === 'all' || 
-      (statusFilter === 'success' && (l.status === 'completed' || l.status === 'success')) ||
-      (statusFilter === 'failed' && l.status === 'failed');
+    const status = (l.status || '').toLowerCase();
+    const isSuccess = status === 'completed' || status === 'success';
+    const isFailed = status === 'failed' || status === 'error';
+
+    const matchesStatus = 
+      statusFilter === 'all' || 
+      (statusFilter === 'success' && isSuccess) ||
+      (statusFilter === 'failed' && isFailed);
       
     return matchesSearch && matchesStatus;
   });
 
+  const successCount = executions.filter(e => {
+    const s = (e.status || '').toLowerCase();
+    return s === 'completed' || s === 'success';
+  }).length;
+
+  const failedCount = executions.filter(e => {
+    const s = (e.status || '').toLowerCase();
+    return s === 'failed' || s === 'error';
+  }).length;
+
+  const renderStatusBadge = (statusStr: string) => {
+    const s = (statusStr || '').toLowerCase();
+    if (s === 'completed' || s === 'success') {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-md border bg-[#F0FDF4] text-[#15803D] border-[#22C55E]/30">
+          <CheckCircle2 size={12} className="text-[#22C55E]" />
+          Success
+        </span>
+      );
+    }
+    if (s === 'failed' || s === 'error') {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-md border bg-red-50 text-[#DC2626] border-red-200">
+          <AlertCircle size={12} className="text-red-500" />
+          Failed
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-md border bg-blue-50 text-[#1D4ED8] border-blue-200">
+        <Clock size={12} className="text-blue-500" />
+        {statusStr || 'Running'}
+      </span>
+    );
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#FFFFFF]">
       
       {/* Title Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#E2E8F0]">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">Execution Logs</h1>
-          <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold mt-1 uppercase tracking-wider">Historical records of completed workflow execution pipelines</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[#12263A]">Execution Logs</h1>
+          <p className="text-xs sm:text-sm text-[#64748B] mt-1 font-medium">Historical records of completed workflow execution pipelines.</p>
         </div>
+        <button
+          onClick={fetchExecutions}
+          disabled={isLoading}
+          className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-[#12263A] hover:text-[#166534] bg-[#FFFFFF] hover:bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+        >
+          <RotateCw size={14} className={cn("text-[#166534]", isLoading && "animate-spin")} />
+          Refresh
+        </button>
       </div>
 
       {/* Filter panel */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-800 p-4 border border-slate-200/80 dark:border-slate-750/70 rounded-2xl shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#FFFFFF] p-4 border border-[#E2E8F0] rounded-2xl shadow-xs">
         
-        {/* Search */}
+        {/* Search Input */}
         <div className="relative w-full sm:w-80">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64748B]" />
           <input 
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search execution ID, contact, workflow..."
-            className="w-full h-10 pl-10 pr-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all placeholder:text-slate-450"
+            className="w-full h-10 pl-10 pr-9 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs font-medium text-[#12263A] focus:outline-none focus:ring-4 focus:ring-[#166534]/10 focus:border-[#166534] focus:bg-white transition-all placeholder:text-[#64748B]"
           />
+          {search && (
+            <button
+              onClick={() => setSearch('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#12263A]"
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
 
-        {/* Status filters */}
-        <div className="flex gap-2">
-          {['all', 'success', 'failed'].map((st) => (
-            <button
-              key={st}
-              onClick={() => setStatusFilter(st)}
-              className={cn(
-                "px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer",
-                statusFilter === st
-                  ? "bg-slate-900 dark:bg-indigo-650 text-white shadow-sm"
-                  : "text-slate-550 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-900"
-              )}
-            >
-              {st}
-            </button>
-          ))}
+        {/* Status Filter Chips */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={cn(
+              "px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer border",
+              statusFilter === 'all'
+                ? "bg-[#166534] text-white border-[#166534] shadow-xs"
+                : "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:text-[#12263A] hover:bg-[#F1F5F9]"
+            )}
+          >
+            All ({executions.length})
+          </button>
+          <button
+            onClick={() => setStatusFilter('success')}
+            className={cn(
+              "px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer border",
+              statusFilter === 'success'
+                ? "bg-[#166534] text-white border-[#166534] shadow-xs"
+                : "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:text-[#12263A] hover:bg-[#F1F5F9]"
+            )}
+          >
+            Success ({successCount})
+          </button>
+          <button
+            onClick={() => setStatusFilter('failed')}
+            className={cn(
+              "px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer border",
+              statusFilter === 'failed'
+                ? "bg-[#166534] text-white border-[#166534] shadow-xs"
+                : "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:text-[#12263A] hover:bg-[#F1F5F9]"
+            )}
+          >
+            Failed ({failedCount})
+          </button>
         </div>
 
       </div>
 
-      {/* Logs Table */}
-      <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-750/70 rounded-2xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto custom-scrollbar">
-          {isLoading ? (
-            <div className="text-center py-16 text-xs font-semibold text-slate-400">Loading logs...</div>
-          ) : filteredLogs.length === 0 ? (
-            <div className="text-center py-16 text-xs font-semibold text-slate-400">No logs found matching criteria.</div>
-          ) : (
+      {/* Logs Table / States Container */}
+      <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
+        
+        {/* Loading State */}
+        {isLoading && (
+          <div className="p-8 sm:p-12 space-y-4">
+            <div className="flex items-center justify-center gap-3 text-sm font-semibold text-[#64748B]">
+              <RotateCw size={18} className="animate-spin text-[#166534]" />
+              <span>Loading execution records…</span>
+            </div>
+            <div className="space-y-3 pt-4 max-w-4xl mx-auto">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="h-12 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl animate-pulse" />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Error State */}
+        {!isLoading && errorMessage && (
+          <div className="text-center py-16 px-6 max-w-md mx-auto space-y-4">
+            <div className="w-14 h-14 bg-red-50 border border-red-200 rounded-2xl flex items-center justify-center text-red-600 mx-auto shadow-xs">
+              <AlertCircle size={28} />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-[#12263A]">Unable to load execution history</h3>
+              <p className="text-xs sm:text-sm text-[#64748B] mt-1 leading-relaxed">{errorMessage}</p>
+            </div>
+            <button
+              onClick={fetchExecutions}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] text-white text-xs font-semibold rounded-xl shadow-xs transition-colors cursor-pointer"
+            >
+              <RotateCw size={13} /> Retry
+            </button>
+          </div>
+        )}
+
+        {/* Zero Records Empty State (True empty history) */}
+        {!isLoading && !errorMessage && executions.length === 0 && (
+          <div className="text-center py-16 sm:py-20 px-6 max-w-md mx-auto space-y-4">
+            <div className="w-16 h-16 bg-[#F0FDF4] border border-[#22C55E]/30 rounded-2xl flex items-center justify-center text-[#166534] mx-auto shadow-xs">
+              <History size={32} />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-[#12263A]">No executions yet</h3>
+              <p className="text-sm text-[#64748B] mt-1 leading-relaxed">
+                Your workflow execution history will appear here after your workflows run.
+              </p>
+            </div>
+            <div className="pt-2">
+              <button
+                onClick={() => navigate('/automation/workflows')}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[#166534] hover:bg-[#14532d] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer"
+              >
+                <GitFork size={14} /> Go to Workflows
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Filtered 0-result State */}
+        {!isLoading && !errorMessage && executions.length > 0 && filteredLogs.length === 0 && (
+          <div className="text-center py-16 px-6 max-w-md mx-auto space-y-3">
+            <div className="w-12 h-12 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl flex items-center justify-center text-[#64748B] mx-auto">
+              <Search size={20} />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-[#12263A]">No matching executions</h3>
+              <p className="text-xs text-[#64748B] mt-0.5">No execution records found matching your active filter criteria.</p>
+            </div>
+            <button
+              onClick={() => { setSearch(''); setStatusFilter('all'); }}
+              className="text-xs font-semibold text-[#166534] hover:underline cursor-pointer"
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
+
+        {/* Populated Table */}
+        {!isLoading && !errorMessage && filteredLogs.length > 0 && (
+          <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-100 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-900/10">
-                  <th className="p-4 text-[9.5px] font-black uppercase tracking-wider text-slate-400">Execution ID</th>
-                  <th className="p-4 text-[9.5px] font-black uppercase tracking-wider text-slate-400">Workflow Name</th>
-                  <th className="p-4 text-[9.5px] font-black uppercase tracking-wider text-slate-400">Contact Recipient</th>
-                  <th className="p-4 text-[9.5px] font-black uppercase tracking-wider text-slate-400">Duration</th>
-                  <th className="p-4 text-[9.5px] font-black uppercase tracking-wider text-slate-400">Status</th>
-                  <th className="p-4 text-[9.5px] font-black uppercase tracking-wider text-slate-400">Execution Time</th>
-                  <th className="p-4 w-12"></th>
+                <tr className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
+                  <th className="p-4 pl-6 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">Execution ID</th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">Workflow Name</th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">Contact Recipient</th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">Duration</th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">Status</th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">Execution Time</th>
+                  <th className="p-4 pr-6 w-12"></th>
                 </tr>
               </thead>
-              <tbody>
-                {filteredLogs.map((log) => {
-                  const isSuccess = log.status === 'completed' || log.status === 'success';
-                  return (
-                    <tr 
-                      key={log.id}
-                      onClick={() => setSelectedLog(log)}
-                      className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-900/10 transition-colors cursor-pointer"
-                    >
-                      <td className="p-4 text-xs font-mono font-bold text-indigo-600">{log.id}</td>
-                      <td className="p-4 text-xs font-extrabold text-slate-800 dark:text-white leading-tight">{log.workflow}</td>
-                      <td className="p-4 text-xs font-bold text-slate-650 dark:text-slate-305">{log.contact}</td>
-                      <td className="p-4 text-xs font-bold font-mono text-slate-500">{log.duration}</td>
-                      <td className="p-4">
-                        <span className={cn(
-                          "px-2.5 py-0.5 text-[8.5px] font-black uppercase tracking-wider rounded-md border",
-                          isSuccess ? 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/20 dark:border-emerald-900/10' : 'bg-red-50 text-red-600 border-red-100 dark:bg-red-950/20 dark:border-red-900/10'
-                        )}>
-                          {log.status}
-                        </span>
-                      </td>
-                      <td className="p-4 text-[10.5px] font-bold text-slate-400 font-mono">{log.time}</td>
-                      <td className="p-4 text-right">
-                        <ChevronRight size={14} className="text-slate-350" />
-                      </td>
-                    </tr>
-                  );
-                })}
+              <tbody className="divide-y divide-[#E2E8F0]">
+                {filteredLogs.map((log) => (
+                  <tr 
+                    key={log.id}
+                    onClick={() => setSelectedLog(log)}
+                    className="hover:bg-[#F8FAFC] transition-colors cursor-pointer group"
+                  >
+                    <td className="p-4 pl-6 text-xs font-mono font-bold text-[#166534]">
+                      {log.id}
+                    </td>
+                    <td className="p-4 text-xs font-bold text-[#12263A] leading-tight">
+                      {log.workflow}
+                    </td>
+                    <td className="p-4 text-xs font-medium text-[#12263A]">
+                      {log.contact}
+                    </td>
+                    <td className="p-4 text-xs font-medium font-mono text-[#64748B]">
+                      {log.duration}
+                    </td>
+                    <td className="p-4">
+                      {renderStatusBadge(log.status)}
+                    </td>
+                    <td className="p-4 text-xs font-mono text-[#64748B]">
+                      {log.time}
+                    </td>
+                    <td className="p-4 pr-6 text-right">
+                      <ChevronRight size={15} className="text-[#64748B] group-hover:text-[#12263A] transition-colors" />
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Log Detail Drawer */}
       <AnimatePresence>
         {selectedLog && (
           <>
-            <div className="fixed inset-0 z-20" onClick={() => setSelectedLog(null)} />
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-slate-900/30 backdrop-blur-xs z-40" 
+              onClick={() => setSelectedLog(null)} 
+            />
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="fixed right-0 top-0 bottom-0 w-96 bg-white dark:bg-slate-850 border-l border-slate-200 dark:border-slate-800 shadow-2xl z-30 flex flex-col"
+              transition={{ type: 'spring', damping: 26, stiffness: 240 }}
+              className="fixed right-0 top-0 bottom-0 w-full sm:w-[420px] bg-[#FFFFFF] border-l border-[#E2E8F0] shadow-2xl z-50 flex flex-col"
             >
-              <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <FileCode size={15} className="text-indigo-600" />
-                  <span className="text-[10px] font-black text-slate-850 dark:text-white uppercase tracking-widest">Execution Path Details</span>
+              {/* Drawer Header */}
+              <div className="p-5 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAFC]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#F0FDF4] border border-[#22C55E]/30 text-[#166534] flex items-center justify-center">
+                    <FileCode size={16} />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider block">Execution Details</span>
+                    <span className="text-[10px] font-mono font-medium text-[#64748B]">{selectedLog.id}</span>
+                  </div>
                 </div>
                 <button 
                   onClick={() => setSelectedLog(null)}
-                  className="text-slate-400 hover:text-slate-650 dark:hover:text-slate-200"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:text-[#12263A] hover:bg-white transition-colors"
                 >
                   <X size={16} />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+              {/* Drawer Content */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-[#FFFFFF]">
                 
-                {/* Meta details list */}
-                <div className="grid grid-cols-2 gap-4 bg-slate-50 dark:bg-slate-900/40 p-4 border border-slate-150/70 dark:border-slate-800 rounded-2xl">
+                {/* Metadata Card */}
+                <div className="grid grid-cols-2 gap-4 bg-[#F8FAFC] p-4 border border-[#E2E8F0] rounded-xl">
                   <div>
-                    <span className="text-[8px] font-bold text-slate-400 dark:text-slate-505 uppercase tracking-widest block leading-none">Execution ID</span>
-                    <span className="text-[11.5px] font-mono font-bold text-slate-900 dark:text-white mt-1.5 block leading-none">{selectedLog.id}</span>
+                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">Execution ID</span>
+                    <span className="text-xs font-mono font-bold text-[#12263A] mt-1 block">{selectedLog.id}</span>
                   </div>
                   <div>
-                    <span className="text-[8px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-widest block leading-none">Status</span>
-                    <span className={cn(
-                      "px-2.5 py-0.5 text-[8.5px] font-black uppercase tracking-wider rounded-md border mt-1.5 inline-block leading-none",
-                      (selectedLog.status === 'completed' || selectedLog.status === 'success') ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-red-50 text-red-600 border-red-100'
-                    )}>
-                      {selectedLog.status}
-                    </span>
+                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">Status</span>
+                    <div className="mt-1">
+                      {renderStatusBadge(selectedLog.status)}
+                    </div>
                   </div>
                   <div>
-                    <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none">Duration</span>
-                    <span className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200 mt-1.5 block leading-none">{selectedLog.duration}</span>
+                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">Duration</span>
+                    <span className="text-xs font-mono font-semibold text-[#12263A] mt-1 block">{selectedLog.duration}</span>
                   </div>
                   <div>
-                    <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none">Executed</span>
-                    <span className="text-xs font-bold text-slate-850 dark:text-slate-205 mt-1.5 block leading-none">{selectedLog.time}</span>
+                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">Executed</span>
+                    <span className="text-xs font-medium text-[#12263A] mt-1 block">{selectedLog.time}</span>
                   </div>
                 </div>
 
+                {/* Target Workflow Info */}
                 <div className="space-y-2">
-                  <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none">Target Workflow Flow</span>
-                  <div className="p-3 bg-slate-50 dark:bg-slate-900 border border-slate-150 dark:border-slate-800 rounded-xl">
-                    <p className="text-xs font-extrabold text-slate-900 dark:text-white leading-normal">{selectedLog.workflow}</p>
-                    <p className="text-[10px] text-slate-400 font-semibold mt-1">Recipient: {selectedLog.contact}</p>
+                  <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider block">Target Workflow</span>
+                  <div className="p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl space-y-1">
+                    <p className="text-sm font-bold text-[#12263A]">{selectedLog.workflow}</p>
+                    <p className="text-xs text-[#64748B]">Recipient: <span className="font-semibold text-[#12263A]">{selectedLog.contact}</span></p>
                   </div>
                 </div>
 
+                {/* Sub-step logs if present */}
+                {selectedLog.logs && selectedLog.logs.length > 0 ? (
+                  <div className="space-y-2.5">
+                    <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider block">Pipeline Steps</span>
+                    <div className="space-y-2">
+                      {selectedLog.logs.map((step, idx) => (
+                        <div key={idx} className="p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-[#12263A]">{step.step_name || `Step #${idx + 1}`}</span>
+                            <span className={cn(
+                              "text-[10px] font-bold uppercase",
+                              step.status === 'success' ? "text-[#15803D]" : "text-[#DC2626]"
+                            )}>
+                              {step.status}
+                            </span>
+                          </div>
+                          {step.message && (
+                            <p className="text-[11px] text-[#64748B] font-mono leading-relaxed">{step.message}</p>
+                          )}
+                          {step.execution_time_ms !== undefined && (
+                            <span className="text-[10px] text-[#64748B] font-mono block">{step.execution_time_ms}ms</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* Error Banner if execution failed */}
+                {selectedLog.last_error && (
+                  <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-red-700">
+                      <AlertCircle size={14} /> Error Details
+                    </div>
+                    <p className="text-xs text-red-600 font-mono leading-relaxed">{selectedLog.last_error}</p>
+                  </div>
+                )}
+
+                {/* Trace Log Output */}
                 <div className="space-y-2">
-                  <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none">Trace Log Output</span>
-                  <div className="p-3.5 bg-slate-950 text-slate-200 rounded-2xl border border-slate-800 text-[10.5px] font-mono leading-relaxed overflow-x-auto">
-                    {`[INFO] Starting execution for workflow "${selectedLog.workflow}"...\n`}
-                    {`[INFO] Node triggers matched successfully.\n`}
-                    {`[INFO] Executing Action: Send Template Message.\n`}
-                    {selectedLog.status === 'failed' ? (
-                      <span className="text-red-400">{`[ERROR] Failed step send: User number is not registered on WhatsApp servers.`}</span>
+                  <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider block">Execution Trace Log</span>
+                  <div className="p-4 bg-[#12263A] text-slate-200 rounded-xl border border-[#12263A] text-[11px] font-mono leading-relaxed overflow-x-auto custom-scrollbar">
+                    <p className="text-slate-400">[INFO] Pipeline execution initialized for workflow "{selectedLog.workflow}".</p>
+                    <p className="text-slate-400">[INFO] Context recipient target: {selectedLog.contact}</p>
+                    {selectedLog.status === 'failed' || selectedLog.status === 'error' ? (
+                      <p className="text-red-400 mt-1">[ERROR] Execution failed: {selectedLog.last_error || 'Execution halted on error step.'}</p>
                     ) : (
-                      <span className="text-emerald-400">{`[SUCCESS] Workflow execution completed in ${selectedLog.duration}`}</span>
+                      <p className="text-emerald-400 mt-1">[SUCCESS] Execution finished successfully in {selectedLog.duration}.</p>
                     )}
                   </div>
                 </div>
+
               </div>
             </motion.div>
           </>

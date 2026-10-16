@@ -239,9 +239,10 @@ export default function ContactEditorPage() {
           <button 
             type="button"
             onClick={() => navigate('/contacts')}
-            className="p-2 lg:p-3 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-400 transition-all shadow-sm"
+            className="w-10 h-10 rounded-xl bg-white border border-slate-200 hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-slate-500 hover:text-[#166534] flex items-center justify-center transition-all shadow-xs active:scale-90 cursor-pointer"
+            title="Back to contacts"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={18} />
           </button>
           <div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
@@ -256,7 +257,7 @@ export default function ContactEditorPage() {
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 disabled:bg-slate-400 transition-all shadow-lg shadow-slate-900/10"
+          className="h-10 px-5 bg-[#166534] hover:bg-[#14532d] text-white rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 flex items-center gap-2 cursor-pointer disabled:opacity-50"
         >
           {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={18} />}
           <span>{id ? 'Save Changes' : 'Create Contact'}</span>
@@ -285,7 +286,7 @@ export default function ContactEditorPage() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Ex: Muhammad Ahmad"
-                  className={`w-full bg-slate-50 border ${errors.name ? 'border-red-500 bg-red-50/30' : 'border-slate-200'} rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5 transition-all`}
+                  className={`w-full bg-slate-50 border ${errors.name ? 'border-red-500 bg-red-50/30' : 'border-slate-200'} rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-2 focus:ring-[#166534]/15 focus:ring-4 focus:ring-slate-900/5 transition-all`}
                 />
                 {errors.name && <p className="text-[10px] text-red-500 font-bold ml-1">{errors.name}</p>}
               </div>
@@ -313,7 +314,7 @@ export default function ContactEditorPage() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="ahmad@company.com"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 pl-11 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 pl-11 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-2 focus:ring-[#166534]/15 transition-all"
                     />
                   </div>
                 </div>
@@ -324,7 +325,7 @@ export default function ContactEditorPage() {
                 <select
                   value={formData.status || 'active'}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-2 focus:ring-[#166534]/15 transition-all"
                 >
                   <option value="active">Active</option>
                   <option value="lead">Lead</option>
@@ -358,7 +359,7 @@ export default function ContactEditorPage() {
                       value={formData.company}
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                       placeholder="Tech Solutions Ltd"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 pl-11 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 pl-11 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-2 focus:ring-[#166534]/15 transition-all"
                     />
                   </div>
                 </div>
@@ -369,7 +370,7 @@ export default function ContactEditorPage() {
                     value={formData.job_title}
                     onChange={(e) => setFormData({ ...formData, job_title: e.target.value })}
                     placeholder="Managing Director"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-2 focus:ring-[#166534]/15 transition-all"
                   />
                 </div>
               </div>
@@ -379,7 +380,7 @@ export default function ContactEditorPage() {
                 <select
                   value={formData.contact_type || 'General'}
                   onChange={(e) => setFormData({ ...formData, contact_type: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-2 focus:ring-[#166534]/15 transition-all"
                 >
                   {CONTACT_TYPES.map(type => (
                     <option key={type} value={type}>{type}</option>
@@ -399,7 +400,7 @@ export default function ContactEditorPage() {
           <div className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-6 shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-50 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-xl bg-[#F0FDF4] text-[#166534] flex items-center justify-center font-bold">
                   <Layers size={20} />
                 </div>
                 <div>
@@ -411,7 +412,7 @@ export default function ContactEditorPage() {
               <button
                 type="button"
                 onClick={() => setIsCreatingCategory(!isCreatingCategory)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-400 transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-[#57534E] hover:text-[#166534] transition-all cursor-pointer shadow-xs active:scale-95"
               >
                 {isCreatingCategory ? <X size={14} /> : <Plus size={14} />}
                 <span>{isCreatingCategory ? 'Cancel' : 'New Category'}</span>
@@ -436,13 +437,13 @@ export default function ContactEditorPage() {
                       }
                     }}
                     placeholder="e.g. Dental Clinics, Real Estate..."
-                    className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900"
+                    className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#166534] focus:ring-2 focus:ring-[#166534]/15"
                   />
                   <button
                     type="button"
                     disabled={creatingCategoryLoading || !newCategoryName.trim()}
                     onClick={() => handleCreateCategory()}
-                    className="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center gap-1.5"
+                    className="px-4 py-2 bg-[#166534] hover:bg-[#14532d] text-white rounded-lg text-xs font-semibold disabled:opacity-50 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
                   >
                     {creatingCategoryLoading ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
                     <span>Add</span>
@@ -464,9 +465,9 @@ export default function ContactEditorPage() {
                     return (
                       <span
                         key={catId}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg text-xs font-bold shadow-sm"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F0FDF4] border border-[#bbf7d0] text-[#166534] rounded-lg text-xs font-bold shadow-sm"
                       >
-                        <Check size={12} className="text-indigo-600" />
+                        <Check size={12} className="text-[#166534]" />
                         <span>{name}</span>
                         <button
                           type="button"
@@ -498,8 +499,8 @@ export default function ContactEditorPage() {
                       onClick={() => toggleCategory(category.id)}
                       className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
                         isSelected
-                          ? 'bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/10'
-                          : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400 hover:bg-slate-50'
+                          ? 'bg-[#166534] text-white border-[#166534] shadow-xs'
+                          : 'bg-white text-slate-600 border-slate-200 hover:border-[#bbf7d0] hover:text-[#166534] hover:bg-[#F0FDF4]'
                       }`}
                     >
                       {isSelected && <Check size={13} className="text-white" />}
@@ -531,8 +532,8 @@ export default function ContactEditorPage() {
                       onClick={() => handleCreateCategory(sug)}
                       className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all border ${
                         isSelected
-                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50/50'
+                          ? 'bg-[#166534] text-white border-[#166534] shadow-sm'
+                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-[#166534] hover:text-[#166534] hover:bg-[#F0FDF4]/50'
                       }`}
                     >
                       {isSelected ? `✓ ${sug}` : `+ ${sug}`}
@@ -565,8 +566,8 @@ export default function ContactEditorPage() {
                     onClick={() => toggleTag(tag.id)}
                     className={`px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-tight border transition-all ${
                       isSelected 
-                        ? 'bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/10' 
-                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'
+                        ? 'bg-[#166534] text-white border-[#166534] shadow-xs' 
+                        : 'bg-white text-slate-500 border-slate-200 hover:border-[#bbf7d0] hover:text-[#166534] hover:bg-[#F0FDF4]'
                     }`}
                   >
                     {tag.name}
@@ -598,7 +599,7 @@ export default function ContactEditorPage() {
                   value={formData.address || ''}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   placeholder="123 Street, City, Country"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-2 focus:ring-[#166534]/15 transition-all"
                 />
               </div>
 
@@ -611,7 +612,7 @@ export default function ContactEditorPage() {
                       type="date"
                       value={formData.birthday || ''}
                       onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 pl-11 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 pl-11 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-2 focus:ring-[#166534]/15 transition-all"
                     />
                   </div>
                 </div>
@@ -624,7 +625,7 @@ export default function ContactEditorPage() {
                       value={formData.website || ''}
                       onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                       placeholder="https://example.com"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 pl-11 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 pl-11 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-2 focus:ring-[#166534]/15 transition-all"
                     />
                   </div>
                 </div>
@@ -637,11 +638,30 @@ export default function ContactEditorPage() {
                   value={formData.notes || ''}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Add internal context, preferences, or audit details..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-slate-900 transition-all resize-none"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-2 focus:ring-[#166534]/15 transition-all resize-none"
                 />
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Bottom Actions Bar */}
+        <div className="col-span-1 md:col-span-2 flex items-center justify-end gap-3 pt-6 border-t border-slate-200">
+          <button
+            type="button"
+            onClick={() => navigate('/contacts')}
+            className="h-10 px-5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-xs sm:text-sm font-semibold text-[#57534E] hover:text-[#166534] transition-all shadow-xs active:scale-95 cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="h-10 px-6 bg-[#166534] hover:bg-[#14532d] text-white rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={18} />}
+            <span>{id ? 'Save Changes' : 'Create Contact'}</span>
+          </button>
         </div>
       </form>
     </div>
