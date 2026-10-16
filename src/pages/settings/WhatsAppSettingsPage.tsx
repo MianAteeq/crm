@@ -374,16 +374,14 @@ export default function WhatsAppSettingsPage() {
     return () => { active = false; };
   }, [status, isRegistered, isFetching]);
 
-  // ── Auto-subscribe WABA if connected and registered but not yet subscribed ──
+  // ── Auto-subscribe WABA if connected but not yet confirmed ──
   useEffect(() => {
     let active = true;
     const autoSubscribe = async () => {
       if (
         status === 'connected' &&
-        isRegistered &&
         !isWabaSubscribed &&
         !isSubscribingWaba &&
-        !wabaSubscriptionError &&
         !isFetching
       ) {
         setIsSubscribingWaba(true);
@@ -416,7 +414,7 @@ export default function WhatsAppSettingsPage() {
 
     autoSubscribe();
     return () => { active = false; };
-  }, [status, isRegistered, isWabaSubscribed, wabaSubscriptionError, isFetching]);
+  }, [status, isWabaSubscribed, isFetching]);
 
   // ── Polling for Registration Status ──
   useEffect(() => {
