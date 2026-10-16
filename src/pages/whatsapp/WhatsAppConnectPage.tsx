@@ -10,8 +10,8 @@ import { WhatsAppConnectionData, WhatsAppDashboardStats } from '../../types';
 import { crmApi } from '../../services/crmApi';
 
 // Mock data for demo - replace with your actual config
-const FB_APP_ID = "1333790982005297";
-const FB_CONFIG_ID = "1590706469334907";
+const FB_APP_ID = "1570952461271028";
+const FB_CONFIG_ID = "1397654585410667";
 
 export default function WhatsAppConnectPage() {
   const [connectionData, setConnectionData] = useState<WhatsAppConnectionData | null>(null);
