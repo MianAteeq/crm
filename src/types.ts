@@ -171,6 +171,8 @@ export interface WhatsAppSettings {
   phone_number?: string;
   webhook_status?: 'active' | 'inactive';
   is_registered?: boolean;
+  is_waba_subscribed?: boolean;
+  waba_subscription_error?: string | null;
   last_synced?: string;
   messaging_limit_tier?: string;
   openai_key?: string;

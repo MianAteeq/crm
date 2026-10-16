@@ -641,7 +641,7 @@ class CrmApiService {
     }
   }
 
-  async registerWhatsAppNumber(pin: string): Promise<{ success: boolean; message: string }> {
+  async registerWhatsAppNumber(pin: string): Promise<{ success: boolean; message: string; waba_subscription?: any }> {
     try {
       return await this.request('/whatsapp/register', {
         method: 'POST',
@@ -652,6 +652,26 @@ class CrmApiService {
       });
     } catch (error) {
       console.error('[CRM API] WhatsApp number registration failed:', error);
+      throw error;
+    }
+  }
+
+  async subscribeWaba(): Promise<{ success: boolean; is_subscribed: boolean; message: string; app_id?: string; app_name?: string; data?: any }> {
+    try {
+      return await this.request('/whatsapp/subscribe-waba', {
+        method: 'POST',
+      });
+    } catch (error) {
+      console.error('[CRM API] WABA subscription failed:', error);
+      throw error;
+    }
+  }
+
+  async getWabaSubscriptionStatus(): Promise<{ success: boolean; is_subscribed: boolean; message: string; app_id?: string; app_name?: string; data?: any }> {
+    try {
+      return await this.request('/whatsapp/subscribe-waba/status');
+    } catch (error) {
+      console.error('[CRM API] Failed to check WABA subscription status:', error);
       throw error;
     }
   }

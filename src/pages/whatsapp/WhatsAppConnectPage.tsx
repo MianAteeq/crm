@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Zap, Shield, MessageSquare, CheckCircle2, ArrowRight, Settings, Info, AlertCircle } from 'lucide-react';
 import { WhatsAppStatusCard } from '../../components/whatsapp/WhatsAppStatusCard';
@@ -14,6 +14,7 @@ const FB_APP_ID = "1570952461271028";
 const FB_CONFIG_ID = "1397654585410667";
 
 export default function WhatsAppConnectPage() {
+  const navigate = useNavigate();
   const [connectionData, setConnectionData] = useState<WhatsAppConnectionData | null>(null);
   const [dashboardStats, setDashboardStats] = useState<WhatsAppDashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -97,11 +98,9 @@ export default function WhatsAppConnectPage() {
 
       if (!response) throw new Error('Failed to complete WhatsApp connection');
 
-      // Reload connection data
-      await loadWhatsAppConnection();
-      await loadDashboardStats();
-
       setError(null);
+      // Redirect to /settings/whatsapp to finalize registration and WABA subscription
+      navigate('/settings/whatsapp?connected=true');
     } catch (error: any) {
       setError(error.message);
     }

@@ -10,6 +10,7 @@ import {
   Copy,
   Send,
   AlertTriangle,
+  AlertCircle,
   RefreshCw,
   Unlink,
   Zap,
@@ -144,6 +145,10 @@ export default function WhatsAppSettingsPage() {
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [isWabaSubscribed, setIsWabaSubscribed] = useState(false);
+  const [isSubscribingWaba, setIsSubscribingWaba] = useState(false);
+  const [wabaSubscriptionError, setWabaSubscriptionError] = useState<string | null>(null);
+  const [wabaAppName, setWabaAppName] = useState<string | null>(null);
 
   const [form, setForm] = useState<LocalConfig>({
     accessToken: '',
@@ -253,6 +258,8 @@ export default function WhatsAppSettingsPage() {
         setStatus(currentStatus);
         const registered = !!res.is_registered;
         setIsRegistered(registered);
+        setIsWabaSubscribed(!!(res as any).is_waba_subscribed);
+        setWabaSubscriptionError((res as any).waba_subscription_error || null);
         setLastSynced((res as any).last_synced || null);
         setBusinessInfo({
           name:  (res as any).business_name  || '',
@@ -267,6 +274,36 @@ export default function WhatsAppSettingsPage() {
       // silent
     } finally {
       setIsFetching(false);
+    }
+  };
+
+  // ── WABA Subscription Handler ──
+  const handleSubscribeWaba = async () => {
+    if (isSubscribingWaba) return;
+    setIsSubscribingWaba(true);
+    setWabaSubscriptionError(null);
+    try {
+      addToast('info', 'Subscribing WhatsApp Business Account to Meta app...');
+      const res = await crmApi.subscribeWaba();
+      if (res.success && res.is_subscribed) {
+        setIsWabaSubscribed(true);
+        setWabaSubscriptionError(null);
+        if (res.app_name) setWabaAppName(res.app_name);
+        addToast('success', 'Webhook subscription confirmed!');
+        fetchSettings(false);
+      } else {
+        setIsWabaSubscribed(false);
+        const errMsg = res.message || 'Meta WABA subscription failed.';
+        setWabaSubscriptionError(errMsg);
+        addToast('error', errMsg);
+      }
+    } catch (err: any) {
+      setIsWabaSubscribed(false);
+      const errMsg = err?.message || 'Failed to subscribe WABA to Meta App.';
+      setWabaSubscriptionError(errMsg);
+      addToast('error', errMsg);
+    } finally {
+      setIsSubscribingWaba(false);
     }
   };
 
@@ -295,7 +332,7 @@ export default function WhatsAppSettingsPage() {
     }
   };
 
-  // ── Automatic Background Registration ──
+  // ── Automatic Background Registration & WABA Subscription ──
   useEffect(() => {
     let active = true;
     const autoRegister = async () => {
@@ -308,6 +345,15 @@ export default function WhatsAppSettingsPage() {
             setIsRegistered(true);
             addToast('success', 'WhatsApp number registered and verified successfully!');
             fetchProfile();
+
+            if (regRes.waba_subscription?.is_subscribed) {
+              setIsWabaSubscribed(true);
+              setWabaSubscriptionError(null);
+              addToast('success', 'Webhook subscription confirmed!');
+            } else {
+              // Trigger explicit subscription
+              handleSubscribeWaba();
+            }
           } else if (active) {
             addToast('error', regRes.message || 'Auto-registration failed.');
           }
@@ -327,6 +373,50 @@ export default function WhatsAppSettingsPage() {
     autoRegister();
     return () => { active = false; };
   }, [status, isRegistered, isFetching]);
+
+  // ── Auto-subscribe WABA if connected and registered but not yet subscribed ──
+  useEffect(() => {
+    let active = true;
+    const autoSubscribe = async () => {
+      if (
+        status === 'connected' &&
+        isRegistered &&
+        !isWabaSubscribed &&
+        !isSubscribingWaba &&
+        !wabaSubscriptionError &&
+        !isFetching
+      ) {
+        setIsSubscribingWaba(true);
+        try {
+          addToast('info', 'Subscribing WABA to Meta app automatically...');
+          const res = await crmApi.subscribeWaba();
+          if (active) {
+            if (res.success && res.is_subscribed) {
+              setIsWabaSubscribed(true);
+              setWabaSubscriptionError(null);
+              if (res.app_name) setWabaAppName(res.app_name);
+              addToast('success', 'Webhook subscription confirmed!');
+            } else {
+              setIsWabaSubscribed(false);
+              setWabaSubscriptionError(res.message || 'Auto-subscription failed.');
+            }
+          }
+        } catch (err: any) {
+          if (active) {
+            setIsWabaSubscribed(false);
+            setWabaSubscriptionError(err?.message || 'Auto-subscription failed.');
+          }
+        } finally {
+          if (active) {
+            setIsSubscribingWaba(false);
+          }
+        }
+      }
+    };
+
+    autoSubscribe();
+    return () => { active = false; };
+  }, [status, isRegistered, isWabaSubscribed, wabaSubscriptionError, isFetching]);
 
   // ── Polling for Registration Status ──
   useEffect(() => {
@@ -493,28 +583,95 @@ export default function WhatsAppSettingsPage() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden"
+                  className="overflow-hidden space-y-3"
                 >
-                  <div className="bg-[#F0FDF4] border border-[#22C55E]/30 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4 shadow-xs">
-                    <div className="w-10 h-10 bg-[#22C55E] rounded-xl flex items-center justify-center shrink-0 shadow-xs">
-                      <CheckCircle2 size={18} className="text-white" />
+                  <div className="bg-[#F0FDF4] border border-[#22C55E]/30 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 bg-[#22C55E] rounded-xl flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                        <CheckCircle2 size={18} className="text-white" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-bold text-[#166534] text-sm tracking-wide">
+                            {businessInfo.name ? `${businessInfo.name} — WhatsApp Connected` : 'WhatsApp API Connected Successfully'}
+                          </p>
+                          {isWabaSubscribed ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#DCFCE7] text-[#15803D] border border-[#86EFAC]">
+                              <CheckCircle2 size={11} /> Webhook subscription confirmed
+                            </span>
+                          ) : isSubscribingWaba ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE]">
+                              <Loader2 size={11} className="animate-spin" /> Subscribing WABA to Meta App...
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
+                              <AlertCircle size={11} /> Webhook Pending Subscription
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#166534]/90 font-medium">
+                          {businessInfo.phone && (
+                            <span className="inline-flex items-center gap-1">
+                              <Smartphone size={12} className="text-[#166534]" />
+                              <strong>Connected Number:</strong> {businessInfo.phone}
+                            </span>
+                          )}
+                          <span>•</span>
+                          <span>{isRegistered ? 'Number Registered & Active' : 'Number Registration Pending'}</span>
+                          {lastSynced && (
+                            <>
+                              <span>•</span>
+                              <span>Synced: {new Date(lastSynced).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-[#166534] text-sm tracking-wide">
-                        {businessInfo.name ? `${businessInfo.name} — WhatsApp Connected` : 'WhatsApp API Connected Successfully'}
-                      </p>
-                      <p className="text-xs text-[#166534]/80 mt-1 font-medium">
-                        {businessInfo.phone && `Number: ${businessInfo.phone} · `}
-                        {lastSynced && `Last Synced: ${new Date(lastSynced).toLocaleString()}`}
-                      </p>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {!isWabaSubscribed && (
+                        <button
+                          onClick={handleSubscribeWaba}
+                          disabled={isSubscribingWaba}
+                          className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-[#166534] hover:bg-[#14532d] disabled:opacity-50 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
+                        >
+                          {isSubscribingWaba ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />} 
+                          {isSubscribingWaba ? 'Subscribing...' : 'Subscribe WABA'}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => fetchSettings(true)}
+                        className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-[#166534] border border-[#22C55E]/30 bg-white rounded-xl hover:bg-[#F0FDF4] transition-all shadow-xs active:scale-95 cursor-pointer"
+                      >
+                        <RefreshCw size={12} className="text-[#166534]" /> Refresh Profile
+                      </button>
                     </div>
-                    <button
-                      onClick={() => fetchSettings(true)}
-                      className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-[#166534] border border-[#22C55E]/30 bg-white rounded-xl hover:bg-[#F0FDF4] transition-all shrink-0 shadow-xs active:scale-95 cursor-pointer"
-                    >
-                      <RefreshCw size={12} className="text-[#166534]" /> Refresh Profile
-                    </button>
                   </div>
+
+                  {/* Actionable Error & Retry Banner if subscription failed */}
+                  {wabaSubscriptionError && !isWabaSubscribed && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-[#FEF2F2] border border-[#FCA5A5] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs"
+                    >
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-xs font-bold text-red-900">WABA Webhook Subscription Unconfirmed</p>
+                          <p className="text-xs text-red-700 mt-0.5 leading-relaxed">{wabaSubscriptionError}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleSubscribeWaba}
+                        disabled={isSubscribingWaba}
+                        className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-xl transition-all shadow-xs shrink-0 cursor-pointer"
+                      >
+                        {isSubscribingWaba ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+                        Retry Subscription
+                      </button>
+                    </motion.div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -1054,14 +1211,34 @@ export default function WhatsAppSettingsPage() {
                   <div className="space-y-6">
                     {/* Webhook Config */}
                     <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
-                      <div className="flex items-center gap-3 px-6 py-4 border-b border-[#E2E8F0] bg-[#F8FAFC]">
-                        <div className="w-8 h-8 bg-[#F0FDF4] border border-[#22C55E]/30 text-[#166534] rounded-lg flex items-center justify-center">
-                          <Globe size={15} />
+                      <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] bg-[#F8FAFC]">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-[#F0FDF4] border border-[#22C55E]/30 text-[#166534] rounded-lg flex items-center justify-center">
+                            <Globe size={15} />
+                          </div>
+                          <div>
+                            <h2 className="text-sm font-bold text-[#12263A]">Webhook Config</h2>
+                            <p className="text-xs text-[#64748B]">Values to configure in Meta App dashboard</p>
+                          </div>
                         </div>
-                        <div>
-                          <h2 className="text-sm font-bold text-[#12263A]">Webhook Config</h2>
-                          <p className="text-xs text-[#64748B]">Values to configure in Meta App dashboard</p>
-                        </div>
+                        {isConnected && (
+                          <div>
+                            {isWabaSubscribed ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold bg-[#DCFCE7] text-[#15803D] rounded-full border border-[#86EFAC]">
+                                <CheckCircle2 size={11} /> Verified & Active
+                              </span>
+                            ) : (
+                              <button
+                                onClick={handleSubscribeWaba}
+                                disabled={isSubscribingWaba}
+                                className="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold text-[#166534] bg-[#F0FDF4] hover:bg-[#DCFCE7] border border-[#22C55E]/40 rounded-lg transition-all cursor-pointer"
+                              >
+                                {isSubscribingWaba ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
+                                {isSubscribingWaba ? 'Verifying...' : 'Verify Subscription'}
+                              </button>
+                            )}
+                          </div>
+                        )}
                       </div>
 
                       <div className="p-6 space-y-4">
