@@ -41,10 +41,17 @@ import { motion, AnimatePresence } from 'motion/react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '../../lib/utils';
 import { crmApi } from '../../services/crmApi';
+import { useBrandingStore, DEFAULT_INTEGRATION_LOGOS, IntegrationLogoItem } from '../../store/brandingStore';
 
 // ==========================================
 // MOCK CLIENT SVG LOGOS
 // ==========================================
+const TcLogo = () => (
+  <svg className="h-6 opacity-40 hover:opacity-100 hover:text-slate-900 transition-all duration-300 fill-current" viewBox="0 0 34 22" xmlns="http://www.w3.org/2000/svg">
+    <path d="M1 10h4v11h4V10h4V6H9V1H5v5H1v4zm15-4v15h16v-4h-11v-2h8v-3h-8v-2h11V6H16z" />
+  </svg>
+);
+
 const StripeLogo = () => (
   <svg className="h-6 opacity-40 hover:opacity-100 hover:text-[#635BFF] transition-all duration-300 fill-current" viewBox="0 0 80 34" xmlns="http://www.w3.org/2000/svg">
     <path d="M41.4 12.3c0-3.3 2.5-4.4 6.7-4.4 3.7 0 7.3.9 10.3 2.5V3.1C55.4 1.7 51.5 1 47.9 1 34.6 1 27.6 8.1 27.6 19c0 9.8 6.7 14.1 16.5 14.1 4 0 7.8-.7 10.7-2.1v-7.3c-2.9 1.5-6.3 2.1-9.4 2.1-5.1 0-7-2-7-6.8h23.2v-1.7H41.4zm0-5c0-1.8 1.2-2.8 3.3-2.8 2.2 0 3.3 1 3.3 2.8H41.4zM24.8 9.5c0-.8-.7-1.4-1.5-1.4h-5.5V1h-9.3v7.1H3c-.8 0-1.4.6-1.4 1.4v6.8c0 .8.6 1.4 1.4 1.4h5.5v15.7h9.3V17.7h5.5c.8 0 1.4-.6 1.4-1.4V9.5z" />
@@ -334,25 +341,84 @@ export function Hero() {
 // TRUSTED BY LOGO MARQUEE SECTION
 // ==========================================
 export function TrustedBy() {
+  const { integrationTitle, integrationLogos, loadBranding } = useBrandingStore();
+
+  useEffect(() => {
+    loadBranding();
+  }, [loadBranding]);
+
+  const activeLogos = (integrationLogos && integrationLogos.length > 0
+    ? integrationLogos.filter(l => l.active !== false)
+    : DEFAULT_INTEGRATION_LOGOS);
+
+  const renderLogo = (item: IntegrationLogoItem, index: number) => {
+    if (item.logo_url) {
+      return (
+        <a
+          key={`${item.id}-${index}`}
+          href={item.url || '#'}
+          target={item.url ? '_blank' : undefined}
+          rel="noreferrer"
+          className="shrink-0 transition-transform duration-200 hover:scale-105"
+        >
+          <img
+            src={item.logo_url}
+            alt={item.name}
+            className="h-6 max-h-7 w-auto object-contain opacity-40 hover:opacity-100 transition-opacity duration-300 grayscale hover:grayscale-0"
+          />
+        </a>
+      );
+    }
+
+    const type = (item.type || item.name || '').toLowerCase();
+
+    let logoElement: React.ReactNode = null;
+    if (type.includes('notion')) {
+      logoElement = <NotionLogo />;
+    } else if (type.includes('tc') || type.includes('techcrunch')) {
+      logoElement = <TcLogo />;
+    } else if (type.includes('linear')) {
+      logoElement = <LinearLogo />;
+    } else if (type.includes('hubspot')) {
+      logoElement = <HubSpotLogo />;
+    } else if (type.includes('vercel')) {
+      logoElement = <VercelLogo />;
+    } else if (type.includes('stripe')) {
+      logoElement = <StripeLogo />;
+    } else {
+      logoElement = (
+        <span className="font-sans font-black tracking-widest text-base uppercase opacity-40 hover:opacity-100 hover:text-slate-900 transition-all duration-300 text-slate-700">
+          {item.name}
+        </span>
+      );
+    }
+
+    return (
+      <a
+        key={`${item.id}-${index}`}
+        href={item.url || '#'}
+        target={item.url ? '_blank' : undefined}
+        rel="noreferrer"
+        className="shrink-0 inline-flex items-center justify-center transition-transform duration-200 hover:scale-105"
+      >
+        {logoElement}
+      </a>
+    );
+  };
+
   return (
     <section className="py-16 border-y border-slate-100 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 text-center">
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-10">Integrates seamlessly with your existing stack & tools</p>
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-10">
+          {integrationTitle || 'INTEGRATES SEAMLESSLY WITH YOUR EXISTING STACK & TOOLS'}
+        </p>
 
         {/* Infinite scrolling logo row with responsive Vector SVG logos */}
         <div className="flex w-full overflow-hidden relative">
           <div className="flex gap-24 animate-marquee whitespace-nowrap py-3 shrink-0 items-center">
-            <StripeLogo />
-            <LinearLogo />
-            <HubSpotLogo />
-            <VercelLogo />
-            <NotionLogo />
+            {activeLogos.map((item, idx) => renderLogo(item, idx))}
             {/* Duplicate for infinite loop */}
-            <StripeLogo />
-            <LinearLogo />
-            <HubSpotLogo />
-            <VercelLogo />
-            <NotionLogo />
+            {activeLogos.map((item, idx) => renderLogo(item, idx + activeLogos.length))}
           </div>
         </div>
       </div>

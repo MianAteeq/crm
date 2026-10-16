@@ -3,6 +3,7 @@ import { MessageSquare, Twitter, Github, Linkedin, ArrowRight, MessageCircle } f
 import { useBrandingStore } from '../../store/brandingStore';
 import { Link } from 'react-router-dom';
 import { toast } from '../ui/Toast';
+import logoImg from '../../assets/logo-2.png';
 
 export default function Footer() {
   const { websiteName, websiteLogo } = useBrandingStore();
@@ -28,18 +29,13 @@ export default function Footer() {
           
           {/* Main Info */}
           <div className="sm:col-span-2 lg:col-span-3 space-y-6 text-left lg:pr-4">
-            <div className="flex items-center">
-              {websiteLogo ? (
-                <img src={websiteLogo} alt="Logo" className="w-56 h-auto object-contain rounded-lg shrink-0" />
-              ) : (
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center">
-                    <MessageCircle size={18} strokeWidth={2.5} />
-                  </div>
-                  <span className="text-xl font-bold tracking-tight">{websiteName}</span>
-                </div>
-              )}
-            </div>
+            <Link to="/" className="flex items-center">
+              <img
+                src={websiteLogo || logoImg}
+                alt={websiteName || "Talkinexx"}
+                className="h-11 md:h-13 w-auto max-w-[260px] object-contain shrink-0"
+              />
+            </Link>
             <p className="text-xs font-medium text-slate-400 leading-relaxed max-w-sm">
               The enterprise-grade WhatsApp automation platform for teams who value speed, efficiency, and real-time customer engagement.
             </p>

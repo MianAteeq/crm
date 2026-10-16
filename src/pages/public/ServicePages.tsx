@@ -30,8 +30,12 @@ function ServicePageLayout({ title, subtitle, category, description, color, bull
       
       <main>
         {/* Service Hero Header */}
-        <section className="pt-48 pb-36 px-6 bg-slate-950 text-white text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15),transparent_60%)] pointer-events-none" />
+        <section className="pt-48 pb-36 px-6 bg-[#12263A] text-white text-center relative overflow-hidden">
+          {/* Background Tech Mesh & Gradients */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#166534]/25 rounded-full blur-[120px] pointer-events-none z-0 mix-blend-screen" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#22C55E]/15 rounded-full blur-[120px] pointer-events-none z-0 mix-blend-screen" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.1),transparent_70%)] pointer-events-none z-0" />
           
           <div className="max-w-4xl mx-auto space-y-6 relative z-10 flex flex-col items-center justify-center">
             <motion.div 
@@ -43,7 +47,7 @@ function ServicePageLayout({ title, subtitle, category, description, color, bull
               <NavLink to="/features" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-white uppercase tracking-[0.2em] transition-colors mb-2">
                 <ArrowLeft size={14} /> Back to Services
               </NavLink>
-              <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] bg-indigo-500/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20">
+              <span className="text-[10px] font-black text-[#F0FDF4] uppercase tracking-[0.2em] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30">
                 {category}
               </span>
             </motion.div>
@@ -52,7 +56,7 @@ function ServicePageLayout({ title, subtitle, category, description, color, bull
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-4xl md:text-6xl font-extrabold tracking-tight"
+              className="font-display font-[800] text-4xl md:text-6xl tracking-tight text-white"
             >
               {title}
             </motion.h1>
@@ -61,7 +65,7 @@ function ServicePageLayout({ title, subtitle, category, description, color, bull
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-slate-450 font-medium text-sm md:text-base max-w-2xl mx-auto leading-relaxed"
+              className="font-sans font-normal text-stone-300 text-sm md:text-base max-w-2xl mx-auto leading-relaxed"
             >
               {subtitle}
             </motion.p>

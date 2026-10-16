@@ -32,11 +32,15 @@ import {
   Instagram,
   Linkedin,
   Twitter,
-  Youtube
+  Youtube,
+  Plus,
+  ExternalLink,
+  Eye,
+  Layers
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { crmApi } from '../../services/crmApi';
-import { useBrandingStore } from '../../store/brandingStore';
+import { useBrandingStore, IntegrationLogoItem, DEFAULT_INTEGRATION_LOGOS } from '../../store/brandingStore';
 
 interface SettingItem {
   id: number;
@@ -68,7 +72,7 @@ const ALL_TIMEZONES = typeof Intl !== 'undefined' && typeof Intl.supportedValues
       'Europe/Paris', 'Asia/Dubai', 'Asia/Singapore', 'Asia/Tokyo', 'Australia/Sydney'
     ];
 
-type TabType = 'general' | 'contact' | 'smtp' | 'diagnostics' | 'audit';
+type TabType = 'general' | 'contact' | 'integrations' | 'smtp' | 'diagnostics' | 'audit';
 
 export default function AdminSettings() {
   const loadBranding = useBrandingStore(state => state.loadBranding);
@@ -359,6 +363,7 @@ export default function AdminSettings() {
             {[
               { id: 'general', label: 'General & SEO', icon: Globe },
               { id: 'contact', label: 'Contact coordinates', icon: Mail },
+              { id: 'integrations', label: 'Integration Logos', icon: Zap },
               { id: 'smtp', label: 'SMTP Email Configuration', icon: Send },
               { id: 'diagnostics', label: 'Diagnostics Health', icon: Activity },
               { id: 'audit', label: 'Audit Logs Trail', icon: FileClock }
@@ -866,7 +871,243 @@ export default function AdminSettings() {
               </form>
             )}
 
-            {/* 3. SMTP TAB */}
+            {/* 3. INTEGRATIONS & PARTNER LOGOS TAB */}
+            {activeTab === 'integrations' && (
+              <form onSubmit={handleSave} className="space-y-6">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="w-10 h-10 rounded-2xl bg-[#F0FDF4] flex items-center justify-center text-[#166534] border border-[#bbf7d0]/50 shadow-inner">
+                      <Zap size={18} />
+                    </span>
+                    <div>
+                      <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">Landing Page Integration Logos Section</h3>
+                      <p className="text-xs text-slate-450 mt-0.5">Manage the dynamic partner/tool logos marquee shown below the hero section. Saved in database.</p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = (() => {
+                        try {
+                          if (values['general.integration_logos']) {
+                            const p = JSON.parse(values['general.integration_logos']);
+                            if (Array.isArray(p)) return p;
+                          }
+                        } catch (e) {}
+                        return DEFAULT_INTEGRATION_LOGOS;
+                      })();
+                      const newItem: IntegrationLogoItem = {
+                        id: String(Date.now()),
+                        name: 'NEW LOGO',
+                        type: 'custom',
+                        logo_url: '',
+                        url: '',
+                        active: true
+                      };
+                      handleFieldChange('general.integration_logos', JSON.stringify([...current, newItem]));
+                    }}
+                    className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+                  >
+                    <Plus size={14} />
+                    <span>Add Partner Logo</span>
+                  </button>
+                </div>
+
+                <div className="w-full h-px bg-slate-100" />
+
+                {/* Section Title Configuration */}
+                <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 space-y-2">
+                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                    Section Header Subtitle
+                  </label>
+                  <input
+                    type="text"
+                    value={values['general.integration_title'] || 'INTEGRATES SEAMLESSLY WITH YOUR EXISTING STACK & TOOLS'}
+                    onChange={(e) => handleFieldChange('general.integration_title', e.target.value)}
+                    placeholder="e.g. INTEGRATES SEAMLESSLY WITH YOUR EXISTING STACK & TOOLS"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all uppercase tracking-wider"
+                  />
+                  <p className="text-[10px] text-slate-400">This text appears directly above the infinite scrolling logo marquee.</p>
+                </div>
+
+                {/* Logo Items List */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-black text-slate-600 uppercase tracking-wider">
+                      Configured Partner Logos ({(() => {
+                        try {
+                          if (values['general.integration_logos']) {
+                            const p = JSON.parse(values['general.integration_logos']);
+                            if (Array.isArray(p)) return p.length;
+                          }
+                        } catch (e) {}
+                        return DEFAULT_INTEGRATION_LOGOS.length;
+                      })()})
+                    </span>
+                    <span className="text-[10px] text-slate-400">Order reflects left-to-right display in the marquee</span>
+                  </div>
+
+                  {(() => {
+                    let logos: IntegrationLogoItem[] = DEFAULT_INTEGRATION_LOGOS;
+                    try {
+                      if (values['general.integration_logos']) {
+                        const parsed = JSON.parse(values['general.integration_logos']);
+                        if (Array.isArray(parsed) && parsed.length > 0) logos = parsed;
+                      }
+                    } catch (e) {}
+
+                    return (
+                      <div className="space-y-2.5">
+                        {logos.map((item, idx) => (
+                          <div
+                            key={item.id || idx}
+                            className={`p-4 bg-white border rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all shadow-sm ${
+                              item.active !== false ? 'border-slate-200' : 'border-slate-200/50 bg-slate-50/50 opacity-60'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 shrink-0">
+                              <span className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-500">
+                                #{idx + 1}
+                              </span>
+                              <div>
+                                <span className="font-extrabold text-xs text-slate-900 block">{item.name || 'Unnamed'}</span>
+                                <span className="text-[10px] text-slate-400 font-mono">preset: {item.type || 'text'}</span>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1 w-full md:w-auto">
+                              {/* Logo Name Input */}
+                              <input
+                                type="text"
+                                value={item.name}
+                                onChange={(e) => {
+                                  const updated = logos.map((l, i) => i === idx ? { ...l, name: e.target.value } : l);
+                                  handleFieldChange('general.integration_logos', JSON.stringify(updated));
+                                }}
+                                placeholder="Company Name"
+                                className="bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-[#166534]"
+                              />
+
+                              {/* Logo Preset Type */}
+                              <select
+                                value={item.type || 'custom'}
+                                onChange={(e) => {
+                                  const updated = logos.map((l, i) => i === idx ? { ...l, type: e.target.value } : l);
+                                  handleFieldChange('general.integration_logos', JSON.stringify(updated));
+                                }}
+                                className="bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 text-xs font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-[#166534]"
+                              >
+                                <option value="notion">Notion (SVG)</option>
+                                <option value="tc">TechCrunch tC (SVG)</option>
+                                <option value="linear">Linear (SVG)</option>
+                                <option value="hubspot">HubSpot (SVG)</option>
+                                <option value="vercel">Vercel (SVG)</option>
+                                <option value="stripe">Stripe (SVG)</option>
+                                <option value="custom">Custom Text or Image URL</option>
+                              </select>
+
+                              {/* Custom Image URL */}
+                              <input
+                                type="text"
+                                value={item.logo_url || ''}
+                                onChange={(e) => {
+                                  const updated = logos.map((l, i) => i === idx ? { ...l, logo_url: e.target.value } : l);
+                                  handleFieldChange('general.integration_logos', JSON.stringify(updated));
+                                }}
+                                placeholder="Optional Logo Image URL"
+                                className="bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-[#166534]"
+                              />
+                            </div>
+
+                            <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
+                              {/* Toggle active button */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updated = logos.map((l, i) => i === idx ? { ...l, active: l.active === false ? true : false } : l);
+                                  handleFieldChange('general.integration_logos', JSON.stringify(updated));
+                                }}
+                                className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer ${
+                                  item.active !== false
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                                    : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200'
+                                }`}
+                              >
+                                {item.active !== false ? 'Active' : 'Hidden'}
+                              </button>
+
+                              {/* Delete button */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updated = logos.filter((_, i) => i !== idx);
+                                  handleFieldChange('general.integration_logos', JSON.stringify(updated));
+                                }}
+                                className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100 flex items-center justify-center transition-all cursor-pointer"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Real-time Marquee Preview */}
+                <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-6 space-y-4">
+                  <div className="flex items-center gap-2 text-xs font-black text-slate-700 uppercase tracking-wider">
+                    <Eye size={14} className="text-[#166534]" />
+                    <span>Real-time Landing Page Preview</span>
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded-xl p-6 text-center shadow-inner overflow-hidden">
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-6">
+                      {values['general.integration_title'] || 'INTEGRATES SEAMLESSLY WITH YOUR EXISTING STACK & TOOLS'}
+                    </p>
+                    <div className="flex flex-wrap items-center justify-center gap-10 opacity-70">
+                      {(() => {
+                        let logos: IntegrationLogoItem[] = DEFAULT_INTEGRATION_LOGOS;
+                        try {
+                          if (values['general.integration_logos']) {
+                            const p = JSON.parse(values['general.integration_logos']);
+                            if (Array.isArray(p) && p.length > 0) logos = p;
+                          }
+                        } catch (e) {}
+
+                        return logos.filter(l => l.active !== false).map((l, i) => (
+                          <div key={i} className="text-xs font-black tracking-wider uppercase text-slate-600 px-3 py-1 bg-slate-50 rounded-lg border border-slate-100">
+                            {l.logo_url ? <img src={l.logo_url} alt={l.name} className="h-5 w-auto object-contain inline-block" /> : l.name}
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Row */}
+                <div className="border-t border-slate-100 pt-6 flex items-center justify-between">
+                  <div>
+                    {saveStatus === 'success' && (
+                      <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                        <CheckCircle size={14} /> Integration settings committed to database
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={saving || saveStatus === 'success'}
+                    className="px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] text-xs font-bold text-white rounded-xl transition-all flex items-center gap-2 shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer disabled:opacity-50"
+                  >
+                    {saving && <Loader2 size={13} className="animate-spin text-white" />}
+                    <span>Save Integration Changes</span>
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* 4. SMTP TAB */}
             {activeTab === 'smtp' && (
               <form onSubmit={handleSave} className="space-y-6">
                 <div className="flex items-center justify-between gap-4">

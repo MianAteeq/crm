@@ -94,6 +94,16 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-display tracking-tight text-[#12263A];
   }
+
+  /* When inside dark hero sections or elements marked with text-white, ensure headings are crisp and visible light */
+  .text-white h1, .text-white h2, .text-white h3, .text-white h4, .text-white h5, .text-white h6,
+  [class*="bg-slate-9"] h1, [class*="bg-slate-9"] h2, [class*="bg-slate-9"] h3,
+  [class*="bg-slate-9"] h4, [class*="bg-slate-9"] h5, [class*="bg-slate-9"] h6,
+  [class*="bg-[#12263A]"] h1, [class*="bg-[#12263A]"] h2, [class*="bg-[#12263A]"] h3,
+  [class*="bg-[#0b141a]"] h1, [class*="bg-[#0b141a]"] h2, [class*="bg-[#0b141a]"] h3,
+  [class*="bg-gray-9"] h1, [class*="bg-gray-9"] h2, [class*="bg-gray-9"] h3 {
+    color: #ffffff !important;
+  }
 }
 
 @utility glass-panel {

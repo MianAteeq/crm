@@ -17,6 +17,7 @@ import {
 import { cn } from '../../lib/utils';
 import { useAuthStore } from '../../store/authStore';
 import { useBrandingStore } from '../../store/brandingStore';
+import logoImg from '../../assets/logo-2.png';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -56,22 +57,23 @@ export default function Navbar() {
 
         {/* Sleek Logo & Brand */}
         <Link to="/" className="flex items-center gap-2.5 group">
-          {websiteLogo ? (
-            <img src={websiteLogo} alt={websiteName} className="h-9 w-auto max-w-[200px] object-contain rounded-lg shrink-0 transition-transform duration-300 group-hover:scale-105" />
-          ) : (
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#12263A] to-[#166534] text-white flex items-center justify-center shadow-md shadow-[#12263A]/20 group-hover:scale-105 transition-transform duration-200">
-                <MessageCircle size={19} strokeWidth={2.5} />
-              </div>
-              <span className="text-xl font-display font-extrabold text-white tracking-tight group-hover:text-slate-100 transition-colors">
-                {websiteName}
-              </span>
-            </div>
-          )}
+          <img
+            src={websiteLogo || logoImg}
+            alt={websiteName || "Talkinexx"}
+            className="h-10 md:h-12 lg:h-13 w-auto max-w-[260px] object-contain shrink-0 transition-transform duration-300 group-hover:scale-105"
+          />
         </Link>
 
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-8">
+          <Link
+            to="/"
+            className={cn("text-[16px] font-semibold leading-[24px] tracking-[0.2px] transition-colors duration-200",
+              showTransparent ? "text-slate-300 hover:text-white" : "text-slate-200 hover:text-white"
+            )}
+          >
+            Home
+          </Link>
 
           {/* Services Mega Dropdown */}
           <div
@@ -190,6 +192,14 @@ export default function Navbar() {
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-white border-b border-slate-200/50 p-6 flex flex-col gap-5 md:hidden animate-in slide-in-from-top-4 duration-300 shadow-xl text-left">
+
+          <Link
+            to="/"
+            className="text-sm font-bold text-slate-800 pb-2 border-b border-slate-100"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Home
+          </Link>
 
           <div className="space-y-3">
             <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Services</span>
