@@ -133,7 +133,7 @@ export default function SignupPage() {
           <Link to="/" className="inline-flex items-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#22C55E] rounded-xl p-1">
             <img 
               src={websiteLogo || logoImg} 
-              alt={websiteName || 'Talkinexx'} 
+              alt={websiteName || 'ThrobTech'} 
               className="h-10 md:h-11 w-auto max-w-[220px] object-contain shrink-0 transition-transform duration-300 group-hover:scale-105" 
             />
           </Link>

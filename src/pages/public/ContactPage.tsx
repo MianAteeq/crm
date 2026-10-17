@@ -67,23 +67,23 @@ export default function ContactPage() {
               </div>
 
               <div className="space-y-4 pt-2">
-                <a href="mailto:support@talkinexx.com" className="group flex items-center gap-5 p-5 rounded-2xl border border-slate-200/60 bg-white/60 backdrop-blur-sm hover:bg-white hover:border-indigo-200 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-900/5 cursor-pointer">
+                <a href="mailto:admin@throbtech.com" className="group flex items-center gap-5 p-5 rounded-2xl border border-slate-200/60 bg-white/60 backdrop-blur-sm hover:bg-white hover:border-indigo-200 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-900/5 cursor-pointer">
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
                     <Mail size={24} strokeWidth={2} />
                   </div>
                   <div>
                     <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-1">Email Outreach</span>
-                    <span className="text-[15px] font-extrabold text-slate-800 transition-colors">support@talkinexx.com</span>
+                    <span className="text-[15px] font-extrabold text-slate-800 transition-colors">admin@throbtech.com</span>
                   </div>
                 </a>
 
-                <a href="https://wa.me/+923314547089" target="_blank" rel="noreferrer" className="group flex items-center gap-5 p-5 rounded-2xl border border-slate-200/60 bg-white/60 backdrop-blur-sm hover:bg-white hover:border-emerald-200 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-900/5 cursor-pointer">
+                <a href="https://wa.me/966545903269" target="_blank" rel="noreferrer" className="group flex items-center gap-5 p-5 rounded-2xl border border-slate-200/60 bg-white/60 backdrop-blur-sm hover:bg-white hover:border-emerald-200 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-900/5 cursor-pointer">
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 bg-emerald-50 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
                     <MessageCircle size={24} strokeWidth={2} />
                   </div>
                   <div>
                     <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-1">WhatsApp Live Chat</span>
-                    <span className="text-[15px] font-extrabold text-slate-800 transition-colors">+92 331 4547089</span>
+                    <span className="text-[15px] font-extrabold text-slate-800 transition-colors">+966 54 590 3269</span>
                   </div>
                 </a>
 
@@ -137,7 +137,7 @@ export default function ContactPage() {
                   <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">Company Name (Optional)</label>
                   <input
                     type="text"
-                    placeholder="Talkinexx LLC"
+                    placeholder="ThrobTech LLC"
                     value={form.company}
                     onChange={(e) => setForm({ ...form, company: e.target.value })}
                     className="w-full h-12 px-4 bg-white border border-slate-200/80 rounded-xl text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400 shadow-sm"

@@ -28,7 +28,7 @@ export default function OnboardingPage() {
   const [step, setStep] = useState<number>(isInitiallyVerified ? 2 : 1);
   
   // Workspace Setup State
-  const defaultWorkspaceName = user?.businessName && user.businessName !== 'Workspace' && user.businessName !== 'Talkinexx Workspace'
+  const defaultWorkspaceName = user?.businessName && user.businessName !== 'Workspace' && user.businessName !== 'ThrobTech Workspace'
     ? user.businessName
     : user?.name 
       ? `${user.name.split(' ')[0]}'s Workspace`
@@ -666,7 +666,7 @@ export default function OnboardingPage() {
       {/* Clean, Non-Competing Onboarding Footer */}
       <footer className="py-4 border-t border-stone-200/60 bg-white/50 text-center text-[11px] font-medium text-stone-400">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>&copy; {new Date().getFullYear()} Talkinexx. All rights reserved.</span>
+          <span>&copy; {new Date().getFullYear()} ThrobTech. All rights reserved.</span>
           <div className="flex items-center gap-4">
             <a href="/privacy" className="hover:text-stone-600 transition-colors">Privacy Policy</a>
             <span className="text-stone-300">•</span>

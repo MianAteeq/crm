@@ -59,7 +59,7 @@ export default function Navbar() {
         <Link to="/" className="flex items-center gap-2.5 group">
           <img
             src={websiteLogo || logoImg}
-            alt={websiteName || "Talkinexx"}
+            alt={websiteName || "ThrobTech"}
             className="h-10 md:h-12 lg:h-13 w-auto max-w-[260px] object-contain shrink-0 transition-transform duration-300 group-hover:scale-105"
           />
         </Link>

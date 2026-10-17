@@ -1646,7 +1646,7 @@ export function WhatsAppAutomation() {
   const workflowSteps = [
     { label: 'Customer Clicks Ad', sub: 'TikTok • Facebook • Instagram • Snapchat • Google', icon: MousePointerClick },
     { label: 'WhatsApp Opens Instantly', sub: 'Direct deep-link conversation', icon: MessageCircle },
-    { label: 'Automatic Welcome Message', sub: '"Welcome to Talkinexx 👋"', icon: Send },
+    { label: 'Automatic Welcome Message', sub: '"Welcome to ThrobTech 👋"', icon: Send },
     { label: 'Customer Selects Service', sub: 'Book • Quote • Services • Support', icon: FileText },
     { label: 'AI Asks Required Questions', sub: 'Smart contextual follow-ups', icon: Bot },
     { label: 'Booking Confirmed', sub: 'Appointment or quote locked in', icon: Calendar },

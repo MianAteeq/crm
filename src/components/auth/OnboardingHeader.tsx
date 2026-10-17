@@ -28,7 +28,7 @@ export default function OnboardingHeader({ showLogout = true }: OnboardingHeader
         <Link to="/" className="flex items-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] rounded-xl p-1">
           <img 
             src={darkLogoImg} 
-            alt={websiteName || 'Talkinexx'} 
+            alt={websiteName || 'ThrobTech'} 
             className="h-8 md:h-9 w-auto max-w-[180px] object-contain shrink-0 transition-transform duration-300 group-hover:scale-105" 
           />
         </Link>

@@ -36,8 +36,8 @@ interface BrandingState {
 }
 
 export const useBrandingStore = create<BrandingState>((set) => ({
-  websiteName: 'Talkinexx',
-  websiteTitle: 'Talkinexx - Conversational CRM & Marketing Platform',
+  websiteName: 'ThrobTech',
+  websiteTitle: 'ThrobTech - Conversational CRM & Marketing Platform',
   websiteLogo: defaultLogo,
   websiteFavicon: defaultFavicon,
   integrationTitle: DEFAULT_INTEGRATION_TITLE,
@@ -60,8 +60,8 @@ export const useBrandingStore = create<BrandingState>((set) => ({
         }
 
         set({
-          websiteName: data.website_name || 'Talkinexx',
-          websiteTitle: data.website_title || 'Talkinexx - Conversational CRM & Marketing Platform',
+          websiteName: data.website_name || 'ThrobTech',
+          websiteTitle: data.website_title || 'ThrobTech - Conversational CRM & Marketing Platform',
           websiteLogo: data.website_logo || defaultLogo,
           websiteFavicon: data.website_favicon || defaultFavicon,
           integrationTitle: data.integration_title || DEFAULT_INTEGRATION_TITLE,

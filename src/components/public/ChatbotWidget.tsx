@@ -38,7 +38,7 @@ const knowledgeBase: QAPair[] = [
   },
   {
     keywords: ['feature', 'features', 'what can', 'capabilities', 'offer', 'service', 'services'],
-    answer: 'Talkinexx is a complete customer communication platform:\n\n• 📣 WhatsApp Marketing Campaigns\n• 🤖 AI-Powered Auto-Replies\n• 📅 Appointment Booking Automation\n• 💬 Omnichannel Inbox (WhatsApp, Instagram, FB, Email)\n• 📊 CRM & Lead Management\n• 🔗 Click-to-WhatsApp Ads Integration\n• 📱 Social Media Planner\n• 📄 Landing Page & Form Builder',
+    answer: 'ThrobTech is a complete customer communication platform:\n\n• 📣 WhatsApp Marketing Campaigns\n• 🤖 AI-Powered Auto-Replies\n• 📅 Appointment Booking Automation\n• 💬 Omnichannel Inbox (WhatsApp, Instagram, FB, Email)\n• 📊 CRM & Lead Management\n• 🔗 Click-to-WhatsApp Ads Integration\n• 📱 Social Media Planner\n• 📄 Landing Page & Form Builder',
   },
   {
     keywords: ['ai', 'artificial', 'intelligence', 'chatbot', 'bot', 'automated', 'auto reply', 'auto-reply', 'copilot'],
@@ -62,11 +62,11 @@ const knowledgeBase: QAPair[] = [
   },
   {
     keywords: ['support', 'help', 'issue', 'problem', 'trouble', 'bug', 'error', 'not working'],
-    answer: 'Our support team is here to help! Here\'s how to reach us:\n\n• 💬 Live chat support (you\'re using it now!)\n• 📧 Email: support@talkinexx.com\n• 📞 Priority phone support for Business & Enterprise plans\n• 📚 Knowledge base & documentation\n\nBusiness and Enterprise plans include 24/7 priority support with dedicated account managers.',
+    answer: 'Our support team is here to help! Here\'s how to reach us:\n\n• 💬 Live chat support (you\'re using it now!)\n• 📧 Email: admin@throbtech.com\n• 📞 Priority phone support for Business & Enterprise plans\n• 📚 Knowledge base & documentation\n\nBusiness and Enterprise plans include 24/7 priority support with dedicated account managers.',
   },
   {
     keywords: ['trial', 'free', 'try', 'test', 'start', 'sign up', 'signup', 'register', 'get started'],
-    answer: 'You can get started with Talkinexx absolutely free! Our Starter plan includes:\n\n• Up to 1,000 contacts\n• Basic analytics\n• 5 automation workflows\n• WhatsApp API connection\n• Standard support\n\nNo credit card required. Sign up and start automating in minutes!',
+    answer: 'You can get started with ThrobTech absolutely free! Our Starter plan includes:\n\n• Up to 1,000 contacts\n• Basic analytics\n• 5 automation workflows\n• WhatsApp API connection\n• Standard support\n\nNo credit card required. Sign up and start automating in minutes!',
   },
   {
     keywords: ['security', 'secure', 'gdpr', 'hipaa', 'privacy', 'data', 'protection', 'safe'],
@@ -74,7 +74,7 @@ const knowledgeBase: QAPair[] = [
   },
   {
     keywords: ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening', 'greetings', 'assalam', 'salam'],
-    answer: 'Hello! 👋 Welcome to Talkinexx. I\'m here to help you learn about our WhatsApp automation and CRM platform. Feel free to ask me anything about our features, pricing, or how we can help your business!',
+    answer: 'Hello! 👋 Welcome to ThrobTech. I\'m here to help you learn about our WhatsApp automation and CRM platform. Feel free to ask me anything about our features, pricing, or how we can help your business!',
   },
   {
     keywords: ['thank', 'thanks', 'appreciate', 'awesome', 'great', 'perfect', 'good'],
@@ -150,7 +150,7 @@ const quickActions = [
 // ==========================================
 export default function ChatbotWidget() {
   const { websiteName, websiteLogo } = useBrandingStore();
-  const botName = websiteName || 'Talkinexx AI';
+  const botName = websiteName || 'ThrobTech AI';
 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([

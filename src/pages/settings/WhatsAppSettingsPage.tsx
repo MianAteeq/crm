@@ -50,7 +50,7 @@ interface Toast {
 // ─── Constants ───────────────────────────────────────────────────────────────
 const WEBHOOK_URL   = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.origin
   ? `${window.location.origin}/api/webhook/whatsapp`
-  : 'https://crm.talkinexx.com/api/webhook/whatsapp';
+  : 'https://crm.throbtech.com/api/webhook/whatsapp';
 const VERIFY_TOKEN  = 'crm-throbtech-verify-token';
 const STEPS = [
   { num: 1, label: 'Meta Developer Portal', desc: 'Create an app on developers.facebook.com' },

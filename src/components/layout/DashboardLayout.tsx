@@ -316,7 +316,7 @@ export function Sidebar({
             ) : (
               <img
                 src={darkLogoImg}
-                alt={websiteName || "Talkinexx"}
+                alt={websiteName || "ThrobTech"}
                 className="h-8 md:h-9 w-auto max-w-[190px] object-contain shrink-0 hover:opacity-90 transition-opacity"
               />
             )}

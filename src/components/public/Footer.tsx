@@ -32,7 +32,7 @@ export default function Footer() {
             <Link to="/" className="flex items-center">
               <img
                 src={websiteLogo || logoImg}
-                alt={websiteName || "Talkinexx"}
+                alt={websiteName || "ThrobTech"}
                 className="h-11 md:h-13 w-auto max-w-[260px] object-contain shrink-0"
               />
             </Link>

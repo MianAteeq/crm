@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         id: String(response.user.id),
         email: response.user.email,
         name: response.user.name,
-        businessName: response.user.tenant?.name || response.user.businessName || 'Talkinexx Workspace',
+        businessName: response.user.tenant?.name || response.user.businessName || 'ThrobTech Workspace',
         avatar: response.user.avatar || 'royal',
         onboardingStep: 4,
         tenantId: String(tenantIdValue),
