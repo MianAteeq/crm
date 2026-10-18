@@ -4,8 +4,12 @@ import Footer from '../../components/public/Footer';
 import { FAQ } from '../../components/public/LandingSections';
 import { Mail, MessageCircle, Phone, ArrowRight, ShieldCheck } from 'lucide-react';
 import { toast } from '../../components/ui/Toast';
+import { useI18n } from '../../i18n';
+import { cn } from '../../lib/utils';
 
 export default function ContactPage() {
+  const { t, isRtl } = useI18n();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -16,14 +20,14 @@ export default function ContactPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
-      toast.error('Required Fields', 'Please complete the form before submitting.');
+      toast.error(isRtl ? 'حقول مطلوبة' : 'Required Fields', isRtl ? 'يرجى إكمال النموذج قبل الإرسال.' : 'Please complete the form before submitting.');
       return;
     }
 
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      toast.success('Form Received', 'Our support representatives will follow up within 2 hours.');
+      toast.success(isRtl ? 'تم استلام الرسالة' : 'Form Received', isRtl ? 'سيتواصل معك فريق الدعم خلال ساعتين.' : 'Our support representatives will follow up within 2 hours.');
       setForm({ name: '', email: '', company: '', message: '' });
     }, 1000);
   };
@@ -41,9 +45,9 @@ export default function ContactPage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.1),transparent_70%)] pointer-events-none z-0" />
 
           <div className="max-w-4xl mx-auto space-y-6 relative z-10">
-            <span className="text-[10px] font-black text-[#F0FDF4] uppercase tracking-[0.2em] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30">Talk to Support</span>
-            <h1 className="font-display font-[800] text-4xl md:text-6xl tracking-tight text-white">Contact Sales & Support Team</h1>
-            <p className="font-sans font-normal text-stone-300 text-sm md:text-base max-w-xl mx-auto leading-relaxed">Book a live configuration sandbox run or contact technical support for custom API deployments.</p>
+            <span className="text-[10px] font-black text-[#F0FDF4] uppercase tracking-[0.2em] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30">{t('contact.hero.eyebrow')}</span>
+            <h1 className="font-display font-[800] text-4xl md:text-6xl tracking-tight text-white">{t('contact.hero.title')}</h1>
+            <p className="font-sans font-normal text-stone-300 text-sm md:text-base max-w-xl mx-auto leading-relaxed">{t('contact.hero.description')}</p>
           </div>
         </section>
 
@@ -55,14 +59,14 @@ export default function ContactPage() {
           <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 relative z-10 items-center">
 
             {/* Left Column: Support Cards */}
-            <div className="lg:col-span-5 space-y-10 text-left">
+            <div className="lg:col-span-5 space-y-10 text-start">
               <div>
-                <span className="text-[11px] font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-4 py-2 rounded-full inline-block mb-6 shadow-sm border border-indigo-100/50">Office Channels</span>
+                <span className="text-[11px] font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-4 py-2 rounded-full inline-block mb-6 shadow-sm border border-indigo-100/50">{t('contact.channels.eyebrow')}</span>
                 <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.1]">
-                  Let's build something <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#12263A] to-[#166534]">great together.</span>
+                  {t('contact.channels.title')}
                 </h2>
                 <p className="text-slate-500 font-medium text-base mt-5 leading-relaxed">
-                  Our support desk is online 24/7. Reach out via email, phone, or live WhatsApp to resolve account setup issues and configure your automations.
+                  {t('contact.channels.description')}
                 </p>
               </div>
 
@@ -72,8 +76,8 @@ export default function ContactPage() {
                     <Mail size={24} strokeWidth={2} />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-1">Email Outreach</span>
-                    <span className="text-[15px] font-extrabold text-slate-800 transition-colors">admin@throbtech.com</span>
+                    <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-1">{t('contact.channels.email')}</span>
+                    <span className="text-[15px] font-extrabold text-slate-800 transition-colors"><bdi dir="ltr">admin@throbtech.com</bdi></span>
                   </div>
                 </a>
 
@@ -82,8 +86,8 @@ export default function ContactPage() {
                     <MessageCircle size={24} strokeWidth={2} />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-1">WhatsApp Live Chat</span>
-                    <span className="text-[15px] font-extrabold text-slate-800 transition-colors">+966 54 590 3269</span>
+                    <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-1">{t('contact.channels.whatsapp')}</span>
+                    <span className="text-[15px] font-extrabold text-slate-800 transition-colors"><bdi dir="ltr">+966 54 590 3269</bdi></span>
                   </div>
                 </a>
 
@@ -92,8 +96,8 @@ export default function ContactPage() {
                     <ShieldCheck size={24} strokeWidth={2} />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-1">SLA Guarantee</span>
-                    <span className="text-[15px] font-extrabold text-slate-800">99.9% Server Uptime</span>
+                    <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold block mb-1">{t('contact.channels.sla')}</span>
+                    <span className="text-[15px] font-extrabold text-slate-800">{t('contact.channels.uptime')}</span>
                   </div>
                 </div>
               </div>
@@ -106,23 +110,23 @@ export default function ContactPage() {
 
               <form onSubmit={handleSubmit} className="relative p-8 md:p-12 bg-white/90 backdrop-blur-xl ring-1 ring-slate-900/5 shadow-2xl rounded-[2.5rem] space-y-8">
                 <div>
-                  <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">Drop us a line</h3>
-                  <p className="text-slate-500 text-sm mt-2 font-medium">Fill out the form below and we'll get back to you shortly.</p>
+                  <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">{t('contact.form.title')}</h3>
+                  <p className="text-slate-500 text-sm mt-2 font-medium">{t('contact.form.description')}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2.5 text-left">
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">Full Name</label>
+                  <div className="space-y-2.5 text-start">
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">{t('contact.form.full_name')}</label>
                     <input
                       type="text"
-                      placeholder="e.g. John Doe"
+                      placeholder={t('contact.form.name_placeholder')}
                       value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
                       className="w-full h-12 px-4 bg-white border border-slate-200/80 rounded-xl text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400 shadow-sm"
                     />
                   </div>
-                  <div className="space-y-2.5 text-left">
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">Work Email</label>
+                  <div className="space-y-2.5 text-start">
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">{t('contact.form.work_email')}</label>
                     <input
                       type="email"
                       placeholder="name@company.com"
@@ -133,8 +137,8 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2.5 text-left">
-                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">Company Name (Optional)</label>
+                <div className="space-y-2.5 text-start">
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">{t('contact.form.company_optional')}</label>
                   <input
                     type="text"
                     placeholder="ThrobTech LLC"
@@ -144,11 +148,11 @@ export default function ContactPage() {
                   />
                 </div>
 
-                <div className="space-y-2.5 text-left">
-                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">Your Message</label>
+                <div className="space-y-2.5 text-start">
+                  <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">{t('contact.form.message')}</label>
                   <textarea
                     rows={4}
-                    placeholder="Describe your outreach campaign details or request support help..."
+                    placeholder={t('contact.form.message_placeholder')}
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                     className="w-full p-4 bg-white border border-slate-200/80 rounded-2xl text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none leading-relaxed placeholder:text-slate-400 shadow-sm"
@@ -160,7 +164,7 @@ export default function ContactPage() {
                   disabled={loading}
                   className="w-full h-14 bg-gradient-to-r from-[#12263A] to-[#166534] hover:from-[#0a1826] hover:to-[#14532d] text-white font-bold rounded-xl transition-all active:scale-95 text-sm uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-lg shadow-[#12263A]/25"
                 >
-                  {loading ? 'Submitting Form...' : 'Send Message'} <ArrowRight size={16} />
+                  {loading ? (isRtl ? 'جاري الإرسال...' : 'Submitting Form...') : t('contact.form.send')} <ArrowRight size={16} className={cn(isRtl && "rotate-180")} />
                 </button>
               </form>
             </div>

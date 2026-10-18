@@ -17,6 +17,8 @@ import {
 import { cn } from '../../lib/utils';
 import { useAuthStore } from '../../store/authStore';
 import { useBrandingStore } from '../../store/brandingStore';
+import { useI18n } from '../../i18n';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import logoImg from '../../assets/logo-2.png';
 
 export default function Navbar() {
@@ -25,6 +27,7 @@ export default function Navbar() {
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const { user } = useAuthStore();
   const { websiteName, websiteLogo } = useBrandingStore();
+  const { t, isRtl } = useI18n();
   const location = useLocation();
 
   useEffect(() => {
@@ -39,11 +42,11 @@ export default function Navbar() {
   const showTransparent = isHomePage && !isScrolled;
 
   const servicesList = [
-    { label: 'Targeted WhatsApp Campaigns', desc: 'Personalized broadcasts with real-time tracking.', href: '/services/whatsapp-campaigns', icon: Send },
-    { label: 'Automated WhatsApp Messaging', desc: 'Birthday greetings & automated follow-ups.', href: '/services/automation', icon: Clock },
-    { label: 'WhatsApp AI Copilot', desc: 'Automate chat answers & resolve queries 24/7.', href: '/services/ai-responses', icon: Sparkles },
-    { label: 'Contact List Retargeting', desc: 'Boost bookings and conversions via WhatsApp.', href: '/services/retargeting', icon: Database },
-    { label: 'WhatsApp Analytics', desc: 'Track message delivery, open rates, and ROI.', href: '/services/analytics', icon: BarChart3 }
+    { label: t('services.whatsapp_campaigns.title', 'Targeted WhatsApp Campaigns'), desc: t('shared.services_menu.campaigns_description', 'Personalized broadcasts with real-time tracking.'), href: '/services/whatsapp-campaigns', icon: Send },
+    { label: t('shared.services_menu.automated_messaging_title', 'Automated WhatsApp Messaging'), desc: t('shared.services_menu.automated_messaging_description', 'Birthday greetings & automated follow-ups.'), href: '/services/automation', icon: Clock },
+    { label: t('shared.services_menu.copilot_title', 'WhatsApp AI Copilot'), desc: t('shared.services_menu.copilot_description', 'Automate chat answers & resolve queries 24/7.'), href: '/services/ai-responses', icon: Sparkles },
+    { label: t('shared.services_menu.retargeting_title', 'Contact List Retargeting'), desc: t('shared.services_menu.retargeting_description', 'Boost bookings and conversions via WhatsApp.'), href: '/services/retargeting', icon: Database },
+    { label: t('services.analytics.title', 'WhatsApp Analytics'), desc: t('shared.services_menu.analytics_description', 'Track message delivery, open rates, and ROI.'), href: '/services/analytics', icon: BarChart3 }
   ];
 
   return (
@@ -72,7 +75,7 @@ export default function Navbar() {
               showTransparent ? "text-slate-300 hover:text-white" : "text-slate-200 hover:text-white"
             )}
           >
-            Home
+            {isRtl ? t('shared.footer.home', 'الرئيسية') : 'Home'}
           </Link>
 
           {/* Services Mega Dropdown */}
@@ -84,13 +87,13 @@ export default function Navbar() {
             <button className={cn("text-[16px] font-semibold leading-[24px] tracking-[0.2px] transition-colors duration-200 flex items-center gap-1.5 focus:outline-none cursor-pointer py-2",
               showTransparent ? "text-slate-300 hover:text-white" : "text-slate-200 hover:text-white"
             )}>
-              Services <ChevronDown size={15} className={cn("transition-transform duration-200 opacity-70", isServicesOpen && "rotate-180")} />
+              {t('shared.nav.services', 'Services')} <ChevronDown size={15} className={cn("transition-transform duration-200 opacity-70", isServicesOpen && "rotate-180")} />
             </button>
 
             {/* Megamenu layout: Compact Premium */}
             {isServicesOpen && (
               <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 z-50 w-[380px]">
-                <div className="bg-white rounded-2xl p-2.5 animate-in fade-in zoom-in-95 duration-200 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] ring-1 ring-slate-200/60 text-left flex flex-col gap-1">
+                <div className="bg-white rounded-2xl p-2.5 animate-in fade-in zoom-in-95 duration-200 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] ring-1 ring-slate-200/60 text-start flex flex-col gap-1">
                   
                   {/* Services List */}
                   {servicesList.map((item) => (
@@ -112,10 +115,10 @@ export default function Navbar() {
                   
                   {/* Bottom link inside services */}
                   <div className="mt-1 pt-3 border-t border-slate-100 px-3 pb-1 flex items-center justify-between">
-                    <span className="text-[12px] font-medium text-slate-500">Need a custom solution?</span>
+                    <span className="text-[12px] font-medium text-slate-500">{t('shared.services_menu.custom_solution', 'Need a custom solution?')}</span>
                     <Link to="/pricing" className="text-[12px] font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 group/custom">
-                      View Pricing
-                      <span className="group-hover/custom:translate-x-0.5 transition-transform duration-300">→</span>
+                      {t('shared.services_menu.view_pricing', 'View Pricing')}
+                      <span className={cn("transition-transform duration-300", isRtl ? "group-hover/custom:-translate-x-0.5" : "group-hover/custom:translate-x-0.5")}>{isRtl ? '←' : '→'}</span>
                     </Link>
                   </div>
 
@@ -130,7 +133,7 @@ export default function Navbar() {
               showTransparent ? "text-slate-300 hover:text-white" : "text-slate-200 hover:text-white"
             )}
           >
-            Pricing
+            {t('shared.nav.pricing', {}, 'Pricing')}
           </Link>
 
           <Link
@@ -139,51 +142,55 @@ export default function Navbar() {
               showTransparent ? "text-slate-300 hover:text-white" : "text-slate-200 hover:text-white"
             )}
           >
-            Contact
+            {t('shared.nav.contact', {}, 'Contact')}
           </Link>
         </div>
 
-        {/* Clean, High-Conversion CTA Buttons */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* Clean, High-Conversion CTA Buttons & Language Switcher */}
+        <div className="hidden md:flex items-center gap-3">
+          {/* Language Switcher */}
+          <LanguageSwitcher variant="navbar" />
+
           <Link
             to={user ? "/dashboard" : "/login"}
             className={cn("text-[16px] font-semibold leading-[24px] tracking-[0.2px] transition-colors duration-200",
               showTransparent ? "text-slate-300 hover:text-white" : "text-slate-200 hover:text-white"
             )}
           >
-            Login
+            {t('shared.nav.login', {}, 'Login')}
           </Link>
           <Link
             to="/contact"
-            className={cn("px-6 py-3.5 border rounded-xl text-[16px] font-semibold tracking-[0.3px] transition-all duration-200",
+            className={cn("px-5 py-2.5 border rounded-xl text-[15px] font-semibold tracking-[0.3px] transition-all duration-200",
               showTransparent
                 ? "border-white/20 text-slate-200 hover:bg-white/5 hover:border-white/40"
                 : "border-slate-700 text-slate-200 hover:bg-slate-800 hover:border-slate-500"
             )}
           >
-            Book Demo
+            {t('shared.actions.bookDemo', {}, 'Book Demo')}
           </Link>
           {!user && (
             <Link
               to="/signup"
-              className="px-7 py-3.5 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white rounded-xl text-[16px] font-semibold tracking-[0.3px] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(22,101,52,0.25)] active:scale-97"
+              className="px-6 py-2.5 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white rounded-xl text-[15px] font-semibold tracking-[0.3px] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(22,101,52,0.25)] active:scale-97"
             >
-              Start Free Trial
+              {t('shared.actions.startFreeTrial', {}, 'Start Free Trial')}
             </Link>
           )}
         </div>
 
         {/* Mobile menu controls */}
-        <div className="md:hidden flex items-center gap-3">
+        <div className="md:hidden flex items-center gap-2">
+          <LanguageSwitcher variant="navbar" />
           {!user && (
             <Link
               to="/signup"
-              className="px-3.5 py-1.8 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white rounded-lg text-xs font-bold"
+              className="px-3 py-1.5 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white rounded-lg text-xs font-bold"
             >
-              Start Free
+              {t('shared.actions.startFreeTrial', {}, 'Start Free')}
             </Link>
           )}
-          <button className={cn("focus:outline-none", showTransparent ? "text-white" : "text-slate-200")} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          <button className={cn("focus:outline-none cursor-pointer p-1", showTransparent ? "text-white" : "text-slate-200")} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -191,24 +198,24 @@ export default function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div className="absolute top-full left-0 right-0 bg-white border-b border-slate-200/50 p-6 flex flex-col gap-5 md:hidden animate-in slide-in-from-top-4 duration-300 shadow-xl text-left">
+        <div className="absolute top-full left-0 right-0 bg-white border-b border-slate-200/50 p-6 flex flex-col gap-5 md:hidden animate-in slide-in-from-top-4 duration-300 shadow-xl text-start">
 
           <Link
             to="/"
             className="text-sm font-bold text-slate-800 pb-2 border-b border-slate-100"
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            Home
+            {isRtl ? t('shared.footer.home', 'الرئيسية') : 'Home'}
           </Link>
 
           <div className="space-y-3">
-            <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Services</span>
+            <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('shared.nav.services', 'Services')}</span>
             {servicesList.map((item) => (
               <Link
                 key={item.label}
                 to={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block text-xs font-bold text-slate-800 hover:text-indigo-650 pl-2"
+                className="block text-xs font-bold text-slate-800 hover:text-indigo-650 px-2"
               >
                 {item.label}
               </Link>
@@ -216,10 +223,10 @@ export default function Navbar() {
           </div>
 
           <Link to="/pricing" className="text-sm font-bold text-slate-800 border-t border-slate-100 pt-4" onClick={() => setIsMobileMenuOpen(false)}>
-            Pricing
+            {t('shared.nav.pricing', {}, 'Pricing')}
           </Link>
           <Link to="/contact" className="text-sm font-bold text-slate-800" onClick={() => setIsMobileMenuOpen(false)}>
-            Contact
+            {t('shared.nav.contact', {}, 'Contact')}
           </Link>
 
           <div className="border-t border-slate-100 pt-4 flex flex-col gap-3">
@@ -228,14 +235,14 @@ export default function Navbar() {
               className="w-full text-center py-3.5 rounded-xl bg-slate-50 border border-slate-200 font-bold text-xs text-slate-900"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Login
+              {t('shared.nav.login', {}, 'Login')}
             </Link>
             <Link
               to="/contact"
               className="w-full text-center py-3.5 rounded-xl border border-slate-200 font-bold text-xs text-slate-600"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Book Demo
+              {t('shared.actions.bookDemo', {}, 'Book Demo')}
             </Link>
           </div>
         </div>

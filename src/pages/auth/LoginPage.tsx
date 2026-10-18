@@ -9,6 +9,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useBrandingStore } from '../../store/brandingStore';
 import Navbar from '../../components/public/Navbar';
 import Footer from '../../components/public/Footer';
+import { useI18n } from '../../i18n';
+import { LanguageSwitcher } from '../../components/common/LanguageSwitcher';
+import { cn } from '../../lib/utils';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -18,7 +21,8 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { websiteName, websiteLogo } = useBrandingStore();
+  const { websiteName } = useBrandingStore();
+  const { t, isRtl } = useI18n();
   const [showPassword, setShowPassword] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const { login, isLoading } = useAuthStore();
@@ -38,7 +42,7 @@ export default function LoginPage() {
       const targetPath = user?.role === 'superadmin' ? '/admin' : from;
       navigate(targetPath, { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
+      setError(err instanceof Error ? err.message : (isRtl ? 'فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.' : 'Login failed. Please try again.'));
     }
   };
 
@@ -53,8 +57,11 @@ export default function LoginPage() {
         
         <div className="w-full max-w-[440px] space-y-8 relative z-10">
           <div className="text-center">
-            <h1 className="text-3xl font-extrabold text-[#12263A] tracking-tight mb-3">Welcome back</h1>
-            <p className="text-xs font-bold text-[#57534E] uppercase tracking-widest px-10">Access your enterprise communication portal</p>
+            <div className="flex justify-center mb-3">
+              <LanguageSwitcher variant="auth" />
+            </div>
+            <h1 className="text-3xl font-extrabold text-[#12263A] tracking-tight mb-3">{t('auth.login.heroTitle')}</h1>
+            <p className="text-xs font-bold text-[#57534E] uppercase tracking-widest px-4">{t('auth.login.heroDescription')}</p>
           </div>
 
           <motion.div 
@@ -67,7 +74,7 @@ export default function LoginPage() {
 
             <div className="bg-white/95 backdrop-blur-xl border border-stone-200 p-10 rounded-[2.5rem] shadow-2xl relative">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-6 py-1.5 bg-[#12263A] border border-[#22C55E]/30 text-[#22C55E] text-[9px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg whitespace-nowrap">
-                Secure Authentication Gateway
+                {t('auth.login.formTitle')}
               </div>
 
               {error && (
@@ -82,46 +89,46 @@ export default function LoginPage() {
               )}
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
-                <div className="space-y-2.5">
-                  <label className="text-[10px] font-black text-[#57534E] uppercase tracking-widest pl-1">Business Email</label>
+                <div className="space-y-2.5 text-start">
+                  <label className="text-[10px] font-black text-[#57534E] uppercase tracking-widest">{t('auth.login.businessEmailLabel')}</label>
                   <div className="relative group/input">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors" size={18} />
+                    <Mail className={cn("absolute top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors", isRtl ? "right-4" : "left-4")} size={18} />
                     <input 
                       {...register('email')}
                       type="email"
                       placeholder="name@company.com"
-                      className={`w-full h-14 bg-[#FAFAF9] border rounded-2xl p-4 pl-12 text-sm font-bold text-[#12263A] focus:outline-none transition-all ${
+                      className={`w-full h-14 bg-[#FAFAF9] border rounded-2xl p-4 ${isRtl ? 'pr-12 pl-4' : 'pl-12 pr-4'} text-sm font-bold text-[#12263A] focus:outline-none transition-all ${
                         errors.email ? 'border-rose-300 bg-rose-50' : 'border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 focus:bg-white'
                       }`}
                     />
                   </div>
-                  {errors.email && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.email.message}</p>}
+                  {errors.email && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest">{errors.email.message}</p>}
                 </div>
 
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between pl-1">
-                    <label className="text-[10px] font-black text-[#57534E] uppercase tracking-widest">Password</label>
-                    <button type="button" className="text-[10px] font-bold text-[#166534] hover:text-[#12263A] transition-colors">Forgot Password?</button>
+                <div className="space-y-2.5 text-start">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black text-[#57534E] uppercase tracking-widest">{t('auth.fields.passwordLabel')}</label>
+                    <button type="button" className="text-[10px] font-bold text-[#166534] hover:text-[#12263A] transition-colors">{t('auth.login.forgotPassword')}</button>
                   </div>
                   <div className="relative group/input">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors" size={18} />
+                    <Lock className={cn("absolute top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors", isRtl ? "right-4" : "left-4")} size={18} />
                     <input 
                       {...register('password')}
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
-                      className={`w-full h-14 bg-[#FAFAF9] border rounded-2xl p-4 pl-12 text-sm font-bold text-[#12263A] focus:outline-none transition-all ${
+                      className={`w-full h-14 bg-[#FAFAF9] border rounded-2xl p-4 ${isRtl ? 'pr-12 pl-12' : 'pl-12 pr-12'} text-sm font-bold text-[#12263A] focus:outline-none transition-all ${
                         errors.password ? 'border-rose-300 bg-rose-50' : 'border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 focus:bg-white'
                       }`}
                     />
                     <button 
                       type="button" 
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-[#12263A] transition-colors"
+                      className={cn("absolute top-1/2 -translate-y-1/2 text-stone-400 hover:text-[#12263A] transition-colors", isRtl ? "left-4" : "right-4")}
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
-                  {errors.password && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest pl-1">{errors.password.message}</p>}
+                  {errors.password && <p className="text-[9px] font-bold text-rose-600 uppercase tracking-widest">{errors.password.message}</p>}
                 </div>
 
                 <motion.button 
@@ -141,7 +148,7 @@ export default function LoginPage() {
                         className="flex items-center gap-2"
                       >
                         <Loader2 size={16} className="animate-spin" />
-                        <span>Authenticating...</span>
+                        <span>{isRtl ? 'جاري التحقق...' : 'Authenticating...'}</span>
                       </motion.div>
                     ) : (
                       <motion.div
@@ -151,8 +158,8 @@ export default function LoginPage() {
                         exit={{ opacity: 0, y: 10 }}
                         className="flex items-center gap-2"
                       >
-                        <span>Sign In Securely</span>
-                        <ArrowRight size={16} />
+                        <span>{t('auth.login.submit')}</span>
+                        <ArrowRight size={16} className={cn(isRtl && "rotate-180")} />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -162,7 +169,9 @@ export default function LoginPage() {
           </motion.div>
 
           <p className="text-center text-[12px] font-semibold text-[#57534E] pt-4">
-            New to {websiteName}? <Link to="/signup" className="text-[#166534] hover:text-[#12263A] font-bold ml-1">Create an account</Link>
+            <Link to="/signup" className="text-[#166534] hover:text-[#12263A] font-bold">
+              {t('auth.login.signupPrompt')}
+            </Link>
           </p>
         </div>
       </div>

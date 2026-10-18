@@ -25,10 +25,12 @@ import {
   Image,
   Bot,
   Sparkles,
+  Languages,
 } from 'lucide-react';
 import { crmApi } from '../../services/crmApi';
 import { WhatsAppSettings } from '../../types';
 import { FormSkeleton } from '../../components/ui/Skeleton';
+import { useTranslation } from '../../i18n';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Status = 'connected' | 'disconnected' | 'pending' | 'error';
@@ -125,6 +127,7 @@ function StatusPill({ status }: { status: Status }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function WhatsAppSettingsPage() {
+  const { t, isRtl } = useTranslation();
   const { copied, copy } = useCopy();
   const navigate = useNavigate();
   const [toasts, setToasts]           = useState<Toast[]>([]);
@@ -160,6 +163,13 @@ export default function WhatsAppSettingsPage() {
   const [dirty, setDirty] = useState(false);
   const [openaiKey, setOpenaiKey] = useState('');
   const [companyPrompt, setCompanyPrompt] = useState('');
+  const [replyLanguage, setReplyLanguage] = useState<'ar-SA' | 'en'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('throb_whatsapp_reply_language');
+      if (saved === 'ar-SA' || saved === 'en') return saved;
+    }
+    return 'ar-SA'; // Default to Arabic for new configurations
+  });
   const [isSavingAi, setIsSavingAi] = useState(false);
   const toastCounter = useRef(0);
 
@@ -254,6 +264,9 @@ export default function WhatsAppSettingsPage() {
         });
         setOpenaiKey(res.openai_key || '');
         setCompanyPrompt(res.company_prompt || '');
+        if ((res as any).reply_language) {
+          setReplyLanguage((res as any).reply_language === 'en' ? 'en' : 'ar-SA');
+        }
         const currentStatus = (res.status as Status) || 'disconnected';
         setStatus(currentStatus);
         const registered = !!res.is_registered;
@@ -309,18 +322,22 @@ export default function WhatsAppSettingsPage() {
 
   const handleSaveAiSettings = async () => {
     if (!companyPrompt.trim()) {
-      addToast('error', 'Company prompt / context is required.');
+      addToast('error', t('app.dashboard.companyPromptRequired', 'Company prompt / context is required.'));
       return;
     }
 
     setIsSavingAi(true);
     try {
-      const res = await crmApi.saveAiSettings(openaiKey || undefined, companyPrompt);
+      const res = await crmApi.saveAiSettings(openaiKey || undefined, companyPrompt, replyLanguage);
       if (res.success) {
-        addToast('success', 'AI settings updated successfully!');
+        localStorage.setItem('throb_whatsapp_reply_language', replyLanguage);
+        addToast('success', t('app.dashboard.aiSavedSuccess', 'AI auto-reply settings updated successfully!'));
         if (res.data) {
           setOpenaiKey(res.data.openai_key || '');
           setCompanyPrompt(res.data.company_prompt || '');
+          if (res.data.reply_language) {
+            setReplyLanguage(res.data.reply_language === 'en' ? 'en' : 'ar-SA');
+          }
         }
       } else {
         addToast('error', res.message || 'Failed to update AI settings.');
@@ -1048,6 +1065,81 @@ export default function WhatsAppSettingsPage() {
                             <p className="text-xs text-[#166534] leading-relaxed font-medium">
                               DeepSeek AI is pre-configured and provided centrally by the platform. You do not need to purchase, add, or manage an API key. Simply provide your company knowledge and FAQs below!
                             </p>
+                          </div>
+                        </div>
+
+                        {/* Customer-Facing Reply Language Selection (Independent from Dashboard UI) */}
+                        <div className="p-4 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs space-y-3">
+                          <div className="flex items-center justify-between gap-3 flex-wrap">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-xl bg-emerald-50 text-[#166534] flex items-center justify-center border border-emerald-200">
+                                <Languages size={16} />
+                              </div>
+                              <div>
+                                <h4 className="text-xs font-bold text-[#12263A] uppercase tracking-wider">
+                                  {t('app.dashboard.autoReplyLanguage', 'Customer Auto-Reply Language')}
+                                </h4>
+                                <p className="text-[11px] text-[#64748B]">
+                                  {t('app.dashboard.autoReplyLanguageDesc', 'Independent from your dashboard language. Arabic is the default for new configurations.')}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="px-2.5 py-1 bg-amber-50 text-amber-800 text-[10px] font-bold rounded-full border border-amber-200">
+                              {t('app.dashboard.independentFromUi', 'Independent of UI Locale')}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            {/* Arabic Option (Default for new configs) */}
+                            <button
+                              type="button"
+                              onClick={() => setReplyLanguage('ar-SA')}
+                              className={`relative p-3.5 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-3 ${
+                                replyLanguage === 'ar-SA'
+                                  ? 'bg-[#F0FDF4] border-[#166534] shadow-xs ring-1 ring-[#166534]/20'
+                                  : 'bg-[#F8FAFC] border-[#E2E8F0] hover:bg-slate-50'
+                              }`}
+                            >
+                              <div className="text-xl">🇸🇦</div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-1">
+                                  <span className="text-xs font-bold text-[#12263A]">العربية (Saudi Arabic)</span>
+                                  <span className="px-1.5 py-0.5 bg-[#dcfce7] text-[#14532d] text-[9px] font-extrabold rounded">
+                                    {t('app.dashboard.defaultTag', 'Default')}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-[#64748B] mt-0.5">
+                                  {t('app.dashboard.arabicReplyDesc', 'Replies to customers in natural, polite Saudi Arabic.')}
+                                </p>
+                              </div>
+                              {replyLanguage === 'ar-SA' && (
+                                <CheckCircle2 size={16} className="text-[#166534] shrink-0 mt-0.5" />
+                              )}
+                            </button>
+
+                            {/* English Option */}
+                            <button
+                              type="button"
+                              onClick={() => setReplyLanguage('en')}
+                              className={`relative p-3.5 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-3 ${
+                                replyLanguage === 'en'
+                                  ? 'bg-[#F0FDF4] border-[#166534] shadow-xs ring-1 ring-[#166534]/20'
+                                  : 'bg-[#F8FAFC] border-[#E2E8F0] hover:bg-slate-50'
+                              }`}
+                            >
+                              <div className="text-xl">🇺🇸</div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-1">
+                                  <span className="text-xs font-bold text-[#12263A]">English (United States)</span>
+                                </div>
+                                <p className="text-[11px] text-[#64748B] mt-0.5">
+                                  {t('app.dashboard.englishReplyDesc', 'Replies to customers in professional, helpful English.')}
+                                </p>
+                              </div>
+                              {replyLanguage === 'en' && (
+                                <CheckCircle2 size={16} className="text-[#166534] shrink-0 mt-0.5" />
+                              )}
+                            </button>
                           </div>
                         </div>
 

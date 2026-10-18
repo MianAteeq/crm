@@ -268,3 +268,43 @@
   margin-bottom: 4px !important;
 }
 
+/* =========================================================================
+   Arabic & RTL Typography and Bidirectional Layout Rules
+   ========================================================================= */
+[dir="rtl"], html.rtl, body.rtl {
+  font-family: 'Noto Sans Arabic', 'Cairo', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+[dir="rtl"] .font-display,
+html.rtl .font-display {
+  font-family: 'Cairo', 'Noto Sans Arabic', 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Mixed direction isolation */
+[dir="ltr"], .ltr, bdi[dir="ltr"] {
+  direction: ltr !important;
+  text-align: left;
+  unicode-bidi: isolate;
+}
+
+bdi[dir="auto"] {
+  unicode-bidi: isolate;
+}
+
+/* Directional mirror for navigation arrows */
+[dir="rtl"] .rtl-mirror {
+  transform: scaleX(-1);
+}
+
+/* Phone input RTL alignment */
+[dir="rtl"] .PhoneInputInput {
+  border-radius: 0.75rem 0 0 0.75rem;
+  text-align: left;
+  direction: ltr;
+}
+
+[dir="rtl"] .PhoneInputCountry {
+  border-radius: 0 0.75rem 0.75rem 0;
+}
+
+

@@ -52,6 +52,7 @@ import { NavLink } from 'react-router-dom';
 import { cn } from '../../lib/utils';
 import { crmApi } from '../../services/crmApi';
 import { useBrandingStore, DEFAULT_INTEGRATION_LOGOS, IntegrationLogoItem } from '../../store/brandingStore';
+import { useI18n } from '../../i18n';
 
 // ==========================================
 // MOCK CLIENT SVG LOGOS
@@ -97,8 +98,9 @@ const NotionLogo = () => (
 // HERO SECTION & CHAT MOCKUP
 // ==========================================
 const AnimatedChatMockup = () => {
+  const { t, isRtl } = useI18n();
   const [messages, setMessages] = useState<any[]>([
-    { id: 1, text: "Hi Sarah! 👋 Thanks for reaching out. Your consultation is confirmed for tomorrow at 3:00 PM. Would you like a calendar invite or SMS reminder?", isUser: false }
+    { id: 1, text: `${t('home.aiPreview.greeting')} ${t('home.aiPreview.helpQuestion')}`, isUser: false }
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -132,16 +134,22 @@ const AnimatedChatMockup = () => {
     setTimeout(() => {
       setIsTyping(false);
       const lowerInput = userMsg.toLowerCase();
-      let responseText = "Understood! I've updated your preferences. You'll receive automated updates directly through WhatsApp.";
+      let responseText = isRtl
+        ? "مفهوم تمامًا! تم تحديث تفضيلاتك وستصلك التحديثات التلقائية عبر واتساب مباشرة."
+        : "Understood! I've updated your preferences. You'll receive automated updates directly through WhatsApp.";
 
-      if (lowerInput.includes('pricing') || lowerInput.includes('cost')) {
-        responseText = "Our plans start with full WhatsApp Cloud API access and unlimited contacts. Would you like a link to our plan details?";
-      } else if (lowerInput.includes('calendar') || lowerInput.includes('yes') || lowerInput.includes('invite')) {
-        responseText = "Awesome! The calendar invite has been sent to your email. See you tomorrow at 3:00 PM! 📅";
-      } else if (lowerInput.includes('help') || lowerInput.includes('support')) {
-        responseText = "I'm here to help! Our team is available 24/7 if you need human assistance as well.";
-      } else if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
-        responseText = "Hello there! 👋 How can I help you today?";
+      if (lowerInput.includes('pricing') || lowerInput.includes('cost') || lowerInput.includes('سعر') || lowerInput.includes('باقة')) {
+        responseText = isRtl
+          ? "تبدأ باقاتنا مع إمكانية الوصول الكامل إلى واجهة WhatsApp Cloud API الرسمية وجهات اتصال غير محدودة. هل تود تفاصيل الباقات؟"
+          : "Our plans start with full WhatsApp Cloud API access and unlimited contacts. Would you like a link to our plan details?";
+      } else if (lowerInput.includes('calendar') || lowerInput.includes('yes') || lowerInput.includes('نعم') || lowerInput.includes('حجز')) {
+        responseText = isRtl
+          ? "رائع! تم حجز الموعد وتأكيده عبر بريدك الإلكتروني ومحادثة واتساب 📅"
+          : "Awesome! The calendar invite has been sent to your email. See you tomorrow at 3:00 PM! 📅";
+      } else if (lowerInput.includes('help') || lowerInput.includes('مساعدة') || lowerInput.includes('دعم')) {
+        responseText = isRtl
+          ? "فريق الدعم متاح على مدار الساعة لمساعدتك في أي استفسار أو إعدادات!"
+          : "I'm here to help! Our team is available 24/7 if you need human assistance as well.";
       }
 
       setMessages(prev => [...prev, { id: Date.now() + 1, text: responseText, isUser: false }]);
@@ -159,10 +167,10 @@ const AnimatedChatMockup = () => {
         </div>
         <div>
           <h4 className="text-slate-100 font-semibold text-[15px] leading-tight flex items-center gap-1.5">
-            AI Copilot Agent <CheckCircle2 size={12} className="text-[#22C55E]" />
+            {t('home.aiPreview.agentTitle')} <CheckCircle2 size={12} className="text-[#22C55E]" />
           </h4>
           <span className="text-emerald-500 text-[11px] font-medium flex items-center gap-1">
-            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" /> Always Active
+            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" /> {t('home.aiPreview.alwaysActive')}
           </span>
         </div>
       </div>
@@ -187,9 +195,9 @@ const AnimatedChatMockup = () => {
               )}
             >
               {!msg.isUser && (
-                <Sparkles size={12} className="absolute -top-1.5 -left-1.5 text-[#22C55E]" />
+                <Sparkles size={12} className={cn("absolute -top-1.5 text-[#22C55E]", isRtl ? "-right-1.5" : "-left-1.5")} />
               )}
-              <div className="whitespace-pre-wrap">{msg.text}</div>
+              <div className="whitespace-pre-wrap"><bdi dir="auto">{msg.text}</bdi></div>
               <div className="text-[10px] text-white/50 text-right mt-1.5 flex justify-end items-center gap-1">
                 <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                 {msg.isUser && <CheckCircle2 size={12} className="text-[#53bdeb]" />}
@@ -220,7 +228,7 @@ const AnimatedChatMockup = () => {
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Message AI Copilot..."
+          placeholder={isRtl ? "اكتب رسالة للمساعد الذكي..." : "Message AI Copilot..."}
           className="flex-1 bg-[#2a3942] focus:bg-[#344651] transition-colors rounded-full h-10 px-4 text-slate-200 text-[13.5px] border border-white/5 outline-none placeholder:text-slate-400"
         />
         <button
@@ -228,7 +236,7 @@ const AnimatedChatMockup = () => {
           disabled={!inputValue.trim() || isTyping}
           className="w-10 h-10 rounded-full bg-[#166534] disabled:bg-[#166534]/50 text-white flex items-center justify-center shadow-lg hover:bg-[#F0FDF4]0 transition-colors shrink-0 disabled:cursor-not-allowed"
         >
-          <Send size={16} className="ml-0.5" />
+          <Send size={16} className={cn("ml-0.5", isRtl && "rotate-180")} />
         </button>
       </form>
     </div>
@@ -236,6 +244,8 @@ const AnimatedChatMockup = () => {
 };
 
 export function Hero() {
+  const { t, isRtl } = useI18n();
+
   return (
     <section className="relative min-h-[90vh] pt-40 pb-24 px-6 overflow-hidden bg-[#12263A] text-white flex items-center">
       {/* Background Animated Tech Mesh & Gradients */}
@@ -276,7 +286,7 @@ export function Hero() {
             className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#166534]/30 border border-[#22C55E]/30 rounded-full shadow-lg shadow-[#166534]/10 backdrop-blur-md"
           >
             <Sparkles size={14} className="text-[#22C55E]" />
-            <span className="font-sans font-medium text-[13px] tracking-wide text-[#F0FDF4]">Modern Conversational CRM & Marketing</span>
+            <span className="font-sans font-medium text-[13px] tracking-wide text-[#F0FDF4]">{t('home.hero.aiLive')}</span>
           </motion.div>
 
           <motion.h1
@@ -285,7 +295,7 @@ export function Hero() {
             transition={{ delay: 0.1 }}
             className="font-display font-[800] text-[44px] sm:text-[54px] md:text-[64px] lg:text-[72px] leading-[1.05] tracking-[-2.5px] text-white max-w-2xl"
           >
-            Turn WhatsApp & Email Into Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] to-[#166534]">Highest-ROI</span> Channels
+            {t('home.hero.title')}
           </motion.h1>
 
           <motion.p
@@ -294,7 +304,7 @@ export function Hero() {
             transition={{ delay: 0.2 }}
             className="font-sans font-normal text-[18px] md:text-[20px] leading-[1.7] max-w-[580px] text-stone-300"
           >
-            Launch targeted broadcast campaigns, automate customer journeys, and resolve customer inquiries faster with an all-in-one conversational CRM.
+            {t('home.hero.description')}
           </motion.p>
 
           <motion.div
@@ -307,13 +317,13 @@ export function Hero() {
               to="/signup"
               className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-sans font-bold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(34,197,94,0.3)] active:scale-97 text-center shadow-lg flex items-center justify-center gap-2"
             >
-              Start Free Trial <ArrowRight size={18} />
+              {t('shared.actions.startFreeTrial')} <ArrowRight size={18} className={cn(isRtl && "rotate-180")} />
             </NavLink>
             <NavLink
               to="/contact"
               className="w-full sm:w-auto px-8 py-4 bg-white/10 border border-white/20 text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:bg-white/20 hover:text-white active:scale-95 text-center shadow-sm flex items-center justify-center gap-2"
             >
-              <Bot size={18} className="text-[#22C55E]" /> See AI Demo
+              <Bot size={18} className="text-[#22C55E]" /> {t('home.hero.seeAiDemo')}
             </NavLink>
           </motion.div>
 
@@ -324,9 +334,9 @@ export function Hero() {
             transition={{ delay: 0.4 }}
             className="pt-6 mt-4 border-t border-white/10 flex flex-wrap items-center justify-center lg:justify-start gap-y-3 gap-x-6 text-[11px] font-bold text-stone-400 uppercase tracking-widest"
           >
-            <span className="flex items-center gap-1.5 text-stone-300"><CheckCircle2 size={14} className="text-[#22C55E]" /> Official WhatsApp API</span>
-            <span className="flex items-center gap-1.5 text-stone-300"><CheckCircle2 size={14} className="text-[#22C55E]" /> Advanced AI Routing</span>
-            <span className="flex items-center gap-1.5 text-stone-300"><CheckCircle2 size={14} className="text-[#22C55E]" /> 24/7 Autopilot</span>
+            <span className="flex items-center gap-1.5 text-stone-300"><CheckCircle2 size={14} className="text-[#22C55E]" /> {t('home.hero.officialWhatsappApi')}</span>
+            <span className="flex items-center gap-1.5 text-stone-300"><CheckCircle2 size={14} className="text-[#22C55E]" /> {t('home.hero.aiRouting')}</span>
+            <span className="flex items-center gap-1.5 text-stone-300"><CheckCircle2 size={14} className="text-[#22C55E]" /> {t('home.hero.autopilot247')}</span>
           </motion.div>
         </div>
 
@@ -351,6 +361,7 @@ export function Hero() {
 // TRUSTED BY LOGO MARQUEE SECTION
 // ==========================================
 export function TrustedBy() {
+  const { t } = useI18n();
   const { integrationTitle, integrationLogos, loadBranding } = useBrandingStore();
 
   useEffect(() => {
@@ -420,7 +431,7 @@ export function TrustedBy() {
     <section className="py-16 border-y border-slate-100 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 text-center">
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-10">
-          {integrationTitle || 'INTEGRATES SEAMLESSLY WITH YOUR EXISTING STACK & TOOLS'}
+          {integrationTitle || t('home.trust.heading')}
         </p>
 
         {/* Infinite scrolling logo row with responsive Vector SVG logos */}
@@ -596,13 +607,14 @@ export function Features() {
 // AI WORKFLOW ANIMATED SECTION
 // ==========================================
 export function AIWorkflow() {
+  const { t } = useI18n();
   const steps = [
-    { icon: MessageCircle, title: 'Inbound Message', desc: 'Customer texts your WhatsApp number or scans a QR code.' },
-    { icon: Zap, title: 'AI Context Engine', desc: 'Instantly analyzes context, language, and purchasing intent.' },
-    { icon: Send, title: 'Interactive Reply', desc: 'Fires back personalized replies with WhatsApp buttons & lists.' },
-    { icon: Calendar, title: 'In-Chat Booking', desc: 'Customer books a meeting slot directly within the chat window.' },
-    { icon: Database, title: 'CRM Sync', desc: 'Automatically logs the lead, tags intent, and updates your CRM.' },
-    { icon: Users, title: 'Smart Handoff', desc: 'Routes complex or high-value chats to human agents seamlessly.' }
+    { icon: MessageCircle, title: t('home.workflow.inbound.title'), desc: t('home.workflow.inbound.description') },
+    { icon: Zap, title: t('home.workflow.context.title'), desc: t('home.workflow.context.description') },
+    { icon: Send, title: t('home.workflow.reply.title'), desc: t('home.workflow.reply.description') },
+    { icon: Calendar, title: t('home.workflow.booking.title'), desc: t('home.workflow.booking.description') },
+    { icon: Database, title: t('home.workflow.crm.title'), desc: t('home.workflow.crm.description') },
+    { icon: Users, title: t('home.workflow.handoff.title'), desc: t('home.workflow.handoff.description') }
   ];
 
   return (
@@ -614,10 +626,10 @@ export function AIWorkflow() {
         <div className="max-w-2xl mx-auto space-y-4 mb-20 text-center flex flex-col items-center">
           <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-purple-400 bg-purple-500/10 px-3.5 py-1.5 rounded-full border border-purple-500/20 flex items-center gap-2">
             <Sparkles size={14} className="text-purple-400" />
-            100% Automated Workflow
+            {t('home.workflow.fullyAutomatedBadge')}
           </span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-white">Turn WhatsApp Into Your Best Employee</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-300">Deploy AI on your WhatsApp Business number to automate response generation, support workflows, and pipeline progression 24/7.</p>
+          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-white">{t('home.workflow.title')}</h2>
+          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-300">{t('home.workflow.description')}</p>
         </div>
 
         {/* Step-by-Step Flow diagram */}
@@ -656,6 +668,7 @@ export function AIWorkflow() {
 // OMNICHANNEL INBOX PIPELINE
 // ==========================================
 export function OmnichannelInbox() {
+  const { t, isRtl } = useI18n();
   const channels = [
     { icon: MessageCircle, name: 'WhatsApp', color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
     { icon: Facebook, name: 'Facebook Messenger', color: 'bg-blue-600/10 text-blue-500 border-blue-600/20' },
@@ -677,10 +690,10 @@ export function OmnichannelInbox() {
             <div className="flex items-center justify-between border-b border-white/5 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-bold tracking-tight text-slate-200">WhatsApp Workspace</span>
+                <span className="text-xs font-bold tracking-tight text-slate-200">{t('home.workspace.title')}</span>
               </div>
               <div className="flex items-center gap-1.5 bg-[#12263A] px-2.5 py-1 rounded-lg border border-white/5 text-[9px] font-mono text-emerald-400">
-                <span>OFFICIAL API</span>
+                <span>{t('home.workspace.officialApi')}</span>
               </div>
             </div>
 
@@ -690,20 +703,20 @@ export function OmnichannelInbox() {
               {/* Channel Switcher Sidebar -> WhatsApp Views Sidebar */}
               <div className="w-1/3 border-r border-white/5 pr-3 space-y-2 text-[10.5px] font-bold text-slate-450">
                 <div className="p-2 bg-[#166534]/10 border border-indigo-500/20 text-[#22C55E] rounded-xl flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">💬 All Chats</span>
+                  <span className="flex items-center gap-1.5">{t('home.workspace.allChats')}</span>
                   <span className="w-4 h-4 bg-emerald-500 text-white text-[8px] rounded-full flex items-center justify-center">4</span>
                 </div>
                 <div className="p-2 hover:bg-white/5 rounded-xl flex items-center justify-between transition-colors cursor-pointer">
-                  <span className="flex items-center gap-1.5 text-slate-300">🤖 AI Copilot</span>
+                  <span className="flex items-center gap-1.5 text-slate-300">{t('home.workspace.aiCopilot')}</span>
                 </div>
                 <div className="p-2 hover:bg-white/5 rounded-xl flex items-center gap-1.5 text-slate-400 transition-colors cursor-pointer">
-                  <span>🏷️ Sales Leads</span>
+                  <span>{t('home.workspace.salesLeads')}</span>
                 </div>
                 <div className="p-2 hover:bg-white/5 rounded-xl flex items-center gap-1.5 text-slate-400 transition-colors cursor-pointer">
-                  <span>🎫 Support</span>
+                  <span>{t('home.workspace.support')}</span>
                 </div>
                 <div className="p-2 hover:bg-white/5 rounded-xl flex items-center gap-1.5 text-slate-400 transition-colors cursor-pointer">
-                  <span>🚀 Broadcasts</span>
+                  <span>{t('home.workspace.broadcasts')}</span>
                 </div>
               </div>
 
@@ -714,9 +727,9 @@ export function OmnichannelInbox() {
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
                   <div>
                     <span className="text-[10.5px] font-bold text-white block">Ahmad Khan</span>
-                    <span className="text-[8.5px] text-slate-500 block">via WhatsApp Business</span>
+                    <span className="text-[8.5px] text-slate-500 block">{t('home.workspace.viaWhatsappBusiness')}</span>
                   </div>
-                  <span className="text-[8.5px] text-[#22C55E] font-bold bg-[#F0FDF4]0/10 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">AI suggested</span>
+                  <span className="text-[8.5px] text-[#22C55E] font-bold bg-[#F0FDF4]0/10 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">{t('home.workspace.aiSuggested')}</span>
                 </div>
 
                 {/* Message feed */}
@@ -725,7 +738,7 @@ export function OmnichannelInbox() {
                   {/* Incoming */}
                   <div className="flex flex-col items-start max-w-[85%] self-start space-y-1">
                     <div className="p-3 bg-[#12263A] border border-white/5 rounded-2xl rounded-tl-none text-xs leading-relaxed text-slate-200">
-                      "Hi! Do you have slots available for a demo call today?"
+                      {t('home.workspace.customerDemoMessage')}
                     </div>
                     <span className="text-[8px] text-slate-500 font-semibold pl-1">Ahmad • 10:41 AM</span>
                   </div>
@@ -733,10 +746,10 @@ export function OmnichannelInbox() {
                   {/* AI Suggested Response */}
                   <div className="flex flex-col items-end max-w-[85%] self-end space-y-1">
                     <div className="p-3 bg-gradient-to-r from-[#166534] to-[#22C55E] rounded-2xl rounded-tr-none text-xs leading-relaxed text-white relative">
-                      <Sparkles size={10} className="absolute top-2 right-2 text-indigo-200 animate-pulse" />
-                      "Yes, Ahmed! We have slots open at 3:00 PM and 5:00 PM. Book here."
+                      <Sparkles size={10} className={cn("absolute top-2 text-indigo-200 animate-pulse", isRtl ? "left-2" : "right-2")} />
+                      {t('home.workspace.aiDemoReply')}
                     </div>
-                    <span className="text-[8px] text-slate-500 font-semibold pr-1">AI Copilot Draft • 10:41 AM</span>
+                    <span className="text-[8px] text-slate-500 font-semibold pr-1">{t('home.workspace.aiDraftTime')}</span>
                   </div>
 
                 </div>
@@ -745,12 +758,12 @@ export function OmnichannelInbox() {
                 <div className="flex items-center gap-2 border-t border-white/5 pt-2">
                   <input
                     type="text"
-                    placeholder="Send auto-reply or type response..."
+                    placeholder={isRtl ? "إرسال رد تلقائي..." : "Send auto-reply or type response..."}
                     className="flex-1 bg-[#12263A] border border-white/5 rounded-xl h-8 px-3 text-[10px] placeholder-slate-650 focus:outline-none focus:border-indigo-650"
                     disabled
                   />
                   <button className="h-8 px-3 bg-[#166534] hover:bg-[#14532d] text-white font-bold text-[10px] rounded-xl flex items-center justify-center cursor-default">
-                    Send
+                    {t('shared.actions.send')}
                   </button>
                 </div>
 
@@ -762,19 +775,19 @@ export function OmnichannelInbox() {
         </div>
 
         {/* Text Area */}
-        <div className="lg:col-span-6 space-y-8 text-left">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">WhatsApp Automation</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Scale your business on WhatsApp</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Stop manually replying to repetitive queries. Automate responses, route conversations to the right team, and send targeted broadcast campaigns on the world's most popular messaging app.</p>
+        <div className="lg:col-span-6 space-y-8 text-start">
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">{t('home.automation.eyebrow')}</span>
+          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">{t('home.automation.title')}</h2>
+          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">{t('home.automation.description')}</p>
 
           <div className="grid grid-cols-2 gap-6 pt-4">
             <div className="space-y-2">
               <span className="block text-2xl font-black text-slate-900">98%</span>
-              <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Message Open Rate</span>
+              <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest">{t('home.metrics.messageOpenRate')}</span>
             </div>
             <div className="space-y-2">
               <span className="block text-2xl font-black text-slate-900">24/7</span>
-              <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Automated Support</span>
+              <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest">{t('home.metrics.automatedSupport')}</span>
             </div>
           </div>
         </div>
@@ -787,58 +800,59 @@ export function OmnichannelInbox() {
 // CRM DASHBOARD PREVIEW
 // ==========================================
 export function CRMDashboardPreview() {
+  const { t, isRtl } = useI18n();
   const columns = [
     {
-      title: 'Qualification',
-      count: '1 Lead',
+      title: t('home.crm.board.qualification'),
+      count: t('home.crm.board.leadCount'),
       value: '$4,500',
       color: 'border-t-indigo-500',
       deals: [
         {
           initials: 'AK',
           name: 'Ahmad Khan Support',
-          deal: '$4,500 CRM Integration',
-          time: 'Active 2m ago',
-          channel: '💬 WhatsApp API',
-          tag: 'High Priority',
+          deal: t('home.crm.board.integrationDeal'),
+          time: t('home.crm.board.activeTwoMinutes'),
+          channel: t('home.crm.board.whatsappChannel'),
+          tag: t('home.crm.board.highPriority'),
           tagColor: 'bg-rose-50 text-rose-600 border-rose-100',
-          desc: 'Needs segment routing and automated follow-ups configuration.'
+          desc: t('home.crm.board.integrationDescription')
         }
       ]
     },
     {
-      title: 'Proposal & AI Review',
-      count: '1 Lead',
+      title: t('home.crm.board.proposalReview'),
+      count: t('home.crm.board.leadCount'),
       value: '$1,200',
       color: 'border-t-purple-500',
       deals: [
         {
           initials: 'SM',
           name: 'Sarah Miller Retail',
-          deal: '$1,200 Campaign Setup',
-          time: 'Active 15m ago',
-          channel: '📸 Instagram DM',
-          tag: 'AI Replied',
+          deal: t('home.crm.board.campaignDeal'),
+          time: t('home.crm.board.activeFifteenMinutes'),
+          channel: t('home.crm.board.instagramChannel'),
+          tag: t('home.crm.board.aiReplied'),
           tagColor: 'bg-purple-50 text-purple-600 border-purple-100',
-          desc: 'AI suggested birthday auto-coupon template has been drafted.'
+          desc: t('home.crm.board.campaignDescription')
         }
       ]
     },
     {
-      title: 'Closed Won',
-      count: '1 Lead',
+      title: t('home.crm.board.closedWon'),
+      count: t('home.crm.board.leadCount'),
       value: '$8,900',
       color: 'border-t-emerald-500',
       deals: [
         {
           initials: 'ZM',
           name: 'Zayn Malik Labs',
-          deal: '$8,900 Enterprise Hub',
-          time: 'Completed 1h ago',
-          channel: '👥 Messenger Chat',
-          tag: 'API Integrated',
+          deal: t('home.crm.board.enterpriseDeal'),
+          time: t('home.crm.board.completedHour'),
+          channel: t('home.crm.board.messengerChannel'),
+          tag: t('home.crm.board.apiIntegrated'),
           tagColor: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-          desc: 'Database fields synced. REST webhook callbacks are operational.'
+          desc: t('home.crm.board.enterpriseDescription')
         }
       ]
     }
@@ -848,9 +862,9 @@ export function CRMDashboardPreview() {
     <section className="py-32 px-6 bg-slate-50/50">
       <div className="max-w-7xl mx-auto space-y-16">
         <div className="text-center max-w-xl mx-auto space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">Core Engine</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Complete Customer Relationship Pipeline</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Monitor deals, track lead status, view active customer profiles, and review task timelines from one central workspace.</p>
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">{t('home.crm.eyebrow')}</span>
+          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">{t('home.crm.title')}</h2>
+          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">{t('home.crm.description')}</p>
         </div>
 
         {/* Kanban Board Interface Mockup */}
@@ -861,15 +875,15 @@ export function CRMDashboardPreview() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#166534] animate-pulse" />
-                <h3 className="text-base font-bold text-slate-900 tracking-tight">Throb Active Deals Board</h3>
+                <h3 className="text-base font-bold text-slate-900 tracking-tight">{t('home.crm.board.title')}</h3>
               </div>
-              <span className="text-[11px] font-semibold text-slate-450 mt-0.5 block">Pipeline Value: <strong className="text-[#166534]">$14,600 USD</strong> • 3 active customer profiles</span>
+              <span className="text-[11px] font-semibold text-slate-450 mt-0.5 block">{t('home.crm.board.summary')}</span>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">REST API: Active</span>
+              <span className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">{t('home.crm.board.apiStatus')}</span>
               <a href="#contact" className="px-4 py-2 bg-slate-900 hover:bg-indigo-650 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">
-                Open CRM Workspace <ArrowRight size={12} />
+                {t('home.crm.board.openWorkspace')} <ArrowRight size={12} className={cn(isRtl && "rotate-180")} />
               </a>
             </div>
           </div>
@@ -918,7 +932,7 @@ export function CRMDashboardPreview() {
                       {/* Card Footer actions */}
                       <div className="pt-2.5 border-t border-slate-100 flex justify-between items-center text-[9px] text-slate-450 font-semibold">
                         <span>{deal.time}</span>
-                        <span className="text-indigo-650 group-hover:underline cursor-pointer flex items-center gap-0.5">Edit Deal <ArrowUpRight size={10} /></span>
+                        <span className="text-indigo-650 group-hover:underline cursor-pointer flex items-center gap-0.5">{t('home.crm.board.editDeal')} <ArrowUpRight size={10} className={cn(isRtl && "rotate-90")} /></span>
                       </div>
 
                     </div>
@@ -931,7 +945,7 @@ export function CRMDashboardPreview() {
 
           {/* Quick interactive note */}
           <div className="pt-2 flex justify-between items-center text-[10.5px] text-slate-400 font-semibold">
-            <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-indigo-500" /> Database profiles update in real-time as users enter landing forms or chat webhooks.</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-indigo-500" /> {t('home.crm.board.realtimeNote')}</span>
           </div>
 
         </div>
@@ -1137,21 +1151,22 @@ export function IntegrationsGrid() {
 // TESTIMONIALS SECTION
 // ==========================================
 export function Testimonials() {
+  const { t } = useI18n();
   const reviews = [
     {
-      text: "Switching from standard template CRM tools was an instant growth catalyst. Our sales teams responded in minutes instead of hours, completely scaling our marketing conversion metrics.",
+      text: t('home.testimonials.first.quote'),
       author: "Jessica Lin",
-      role: "VP of Support, TechCorp",
-      stats: "300% Higher Conversion",
+      role: t('home.testimonials.first.role'),
+      stats: t('home.testimonials.first.metric'),
       logo: "TechCorp",
       avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
       gradient: "from-indigo-500/5 to-purple-500/5"
     },
     {
-      text: "Our marketing workflows became unified in minutes. The WhatsApp Graph API integration is compliant, robust, and performs flawlessly during high-volume promo sales events.",
+      text: t('home.testimonials.second.quote'),
       author: "Marcus Aurel",
-      role: "Founder, NexxDigital",
-      stats: "4x Faster Response",
+      role: t('home.testimonials.second.role'),
+      stats: t('home.testimonials.second.metric'),
       logo: "NexxDigital",
       avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
       gradient: "from-purple-500/5 to-pink-500/5"
@@ -1170,13 +1185,13 @@ export function Testimonials() {
         <div className="text-center max-w-2xl mx-auto space-y-6">
           <span className="font-sans font-[600] text-[13px] uppercase tracking-[1.5px] text-[#166534] bg-white px-4 py-2 rounded-full border border-[#bbf7d0] shadow-sm shadow-indigo-100/50 inline-flex items-center gap-2">
             <Star size={14} className="fill-indigo-600 text-[#166534]" />
-            Success Stories
+            {t('home.testimonials.eyebrow')}
           </span>
           <h2 className="font-display font-[800] text-[36px] md:text-[48px] lg:text-[56px] leading-[1.1] tracking-[-1.5px] text-slate-900">
-            Hear it from teams who <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#166534] to-[#22C55E]">build on Throb</span>
+            {t('home.testimonials.title')}
           </h2>
           <p className="font-sans font-medium text-[18px] leading-[1.8] max-w-[620px] mx-auto text-slate-500">
-            See how high-growth startups and local businesses streamline customer support, scale marketing outreach, and automate replies.
+            {t('home.testimonials.description')}
           </p>
         </div>
 
@@ -1236,6 +1251,7 @@ export function Testimonials() {
 // PRICING SECTION WITH BILLING TOGGLE
 // ==========================================
 export function Pricing() {
+  const { t, isRtl } = useI18n();
   const [plans, setPlans] = useState<any[]>([]);
   const [isYearly, setIsYearly] = useState(false);
 
@@ -1255,26 +1271,41 @@ export function Pricing() {
 
   const defaultPlans = [
     {
-      name: 'Starter',
+      name: t('pricing.starter.name'),
       price: 0,
-      desc: 'Perfect for small businesses starting out.',
-      features: ['1 WhatsApp Number', '100 AI Auto-Replies / mo', 'Basic WhatsApp Broadcasts', 'Standard Team Inbox'],
+      desc: t('pricing.starter.description'),
+      features: [
+        t('pricing.starter.whatsapp_number'),
+        t('pricing.starter.ai_replies'),
+        t('pricing.starter.broadcasts'),
+        t('pricing.starter.team_inbox')
+      ],
       highlighted: false,
       key: 'free'
     },
     {
-      name: 'Business',
+      name: t('pricing.business.name'),
       price: 49,
-      desc: 'For high-growth teams scaling their reach.',
-      features: ['Official WhatsApp API', 'Unlimited AI Copilot Replies', 'Advanced Sequence Flows', 'Full CRM & Store Sync'],
+      desc: t('pricing.business.description'),
+      features: [
+        t('pricing.business.official_api'),
+        t('pricing.business.ai_replies'),
+        t('pricing.business.sequence_flows'),
+        t('pricing.business.crm_store_sync')
+      ],
       highlighted: true,
       key: 'pro'
     },
     {
-      name: 'Enterprise',
-      price: 'Custom',
-      desc: 'Custom workflows and dedicated support.',
-      features: ['Unlimited WhatsApp Numbers', 'Meta Green Tick Assistance', 'Custom Interactive Flows', 'Dedicated Success Manager'],
+      name: t('pricing.enterprise.name'),
+      price: t('pricing.enterprise.price_custom'),
+      desc: t('pricing.enterprise.description'),
+      features: [
+        t('pricing.enterprise.whatsapp_numbers'),
+        t('pricing.enterprise.green_tick'),
+        t('pricing.enterprise.interactive_flows'),
+        t('pricing.enterprise.success_manager')
+      ],
       highlighted: false,
       key: 'enterprise'
     }
@@ -1284,7 +1315,7 @@ export function Pricing() {
     let rawPrice = p.price.toLowerCase().includes('/month')
       ? p.price.replace(/\/month/i, '')
       : p.price.toLowerCase().includes('custom')
-        ? 'Custom'
+        ? t('pricing.enterprise.price_custom')
         : p.price;
 
     let numericPrice = parseFloat(rawPrice.replace(/[^0-9.]/g, ''));
@@ -1294,7 +1325,7 @@ export function Pricing() {
 
     return {
       name: p.name,
-      desc: p.key === 'pro' ? 'For high-growth teams scaling their reach.' : p.key === 'enterprise' ? 'Custom workflows and dedicated support.' : 'Perfect for small businesses starting out.',
+      desc: p.key === 'pro' ? t('pricing.business.description') : p.key === 'enterprise' ? t('pricing.enterprise.description') : t('pricing.starter.description'),
       price: numericPrice,
       features: [
         `${p.limits.contacts} Contacts Ceiling`,
@@ -1309,7 +1340,7 @@ export function Pricing() {
   }) : defaultPlans;
 
   const getPriceLabel = (p: any) => {
-    if (p.price === 'Custom') return 'Custom';
+    if (p.price === 'Custom' || p.price === t('pricing.enterprise.price_custom')) return t('pricing.enterprise.price_custom');
     const numPrice = typeof p.price === 'string' ? parseFloat(p.price) : p.price;
     const finalPrice = isYearly ? Math.floor(numPrice * 0.8) : numPrice;
     return `$${finalPrice}`;
@@ -1323,23 +1354,23 @@ export function Pricing() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-16 max-w-2xl mx-auto space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">Pricing Plans</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Scale your WhatsApp operations</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] text-slate-500">Choose a plan that fits your business scale. Unlock unlimited contacts, advanced AI auto-replies, and seamless CRM integrations.</p>
+          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">{t('pricing.plans.eyebrow')}</span>
+          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">{t('pricing.plans.title')}</h2>
+          <p className="font-sans font-normal text-[18px] leading-[1.8] text-slate-500">{t('pricing.plans.description')}</p>
         </div>
 
         {/* Monthly / Yearly billing Toggle Switch */}
         <div className="flex items-center justify-center gap-4 mb-20">
-          <span className={cn("text-xs font-black uppercase tracking-wider", !isYearly ? "text-slate-900" : "text-slate-400")}>Monthly Billing</span>
+          <span className={cn("text-xs font-black uppercase tracking-wider", !isYearly ? "text-slate-900" : "text-slate-400")}>{t('pricing.billing.monthly')}</span>
           <button
             onClick={() => setIsYearly(!isYearly)}
             className="w-14 h-7 bg-[#F0FDF4] border border-[#bbf7d0] rounded-full p-1 transition-all duration-300 relative focus:outline-none cursor-pointer hover:bg-[#dcfce7]"
           >
-            <div className={cn("w-5 h-5 bg-[#166534] rounded-full transition-all duration-300 shadow-sm", isYearly ? "translate-x-7" : "translate-x-0")} />
+            <div className={cn("w-5 h-5 bg-[#166534] rounded-full transition-all duration-300 shadow-sm", isYearly ? (isRtl ? "-translate-x-7" : "translate-x-7") : "translate-x-0")} />
           </button>
           <div className="flex items-center gap-2">
-            <span className={cn("text-xs font-black uppercase tracking-wider", isYearly ? "text-slate-900" : "text-slate-400")}>Yearly Billing</span>
-            <span className="text-[9px] font-black uppercase tracking-widest bg-[#dcfce7] text-[#166534] px-2.5 py-1 rounded-md border border-[#bbf7d0]">Save 20%</span>
+            <span className={cn("text-xs font-black uppercase tracking-wider", isYearly ? "text-slate-900" : "text-slate-400")}>{t('pricing.billing.yearly')}</span>
+            <span className="text-[9px] font-black uppercase tracking-widest bg-[#dcfce7] text-[#166534] px-2.5 py-1 rounded-md border border-[#bbf7d0]">{t('pricing.billing.saving')}</span>
           </div>
         </div>
 
@@ -1353,8 +1384,8 @@ export function Pricing() {
             )}>
 
               {plan.highlighted && (
-                <div className="absolute top-6 right-6 bg-[#F0FDF4] text-[#166534] border border-[#bbf7d0] text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
-                  <Sparkles size={12} className="text-[#166534]" /> Most Popular
+                <div className={cn("absolute top-6 bg-[#F0FDF4] text-[#166534] border border-[#bbf7d0] text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm", isRtl ? "left-6" : "right-6")}>
+                  <Sparkles size={12} className="text-[#166534]" /> {t('pricing.business.badge')}
                 </div>
               )}
 
@@ -1363,12 +1394,12 @@ export function Pricing() {
 
               <div className="flex items-baseline gap-2 mb-2">
                 <span className="text-5xl font-black tracking-tight text-slate-900">{getPriceLabel(plan)}</span>
-                {plan.price !== 'Custom' && <span className="text-sm font-medium text-slate-400">/mo</span>}
+                {plan.price !== 'Custom' && plan.price !== t('pricing.enterprise.price_custom') && <span className="text-sm font-medium text-slate-400">{t('pricing.billing.per_month')}</span>}
               </div>
 
               <div className="h-6 mb-8">
-                {isYearly && plan.price !== 'Custom' && (
-                  <span className="block text-[10.5px] font-bold text-[#166534] uppercase tracking-wider bg-[#F0FDF4] w-fit px-2.5 py-1 rounded-md border border-[#bbf7d0]">Billed annually</span>
+                {isYearly && plan.price !== 'Custom' && plan.price !== t('pricing.enterprise.price_custom') && (
+                  <span className="block text-[10.5px] font-bold text-[#166534] uppercase tracking-wider bg-[#F0FDF4] w-fit px-2.5 py-1 rounded-md border border-[#bbf7d0]">{t('pricing.billing.saving')}</span>
                 )}
               </div>
 
@@ -1390,7 +1421,7 @@ export function Pricing() {
                     : "bg-slate-50 border border-slate-200 text-slate-800 hover:border-[#166534] hover:text-[#166534] hover:bg-white"
                 )}
               >
-                <span className="relative z-10">Get Started</span>
+                <span className="relative z-10">{t('pricing.plans.get_started')}</span>
               </NavLink>
             </div>
           ))}
@@ -1404,28 +1435,29 @@ export function Pricing() {
 // FAQ ACCORDION SECTION
 // ==========================================
 export function FAQ() {
+  const { t, isRtl } = useI18n();
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   const faqs = [
     {
-      q: "How do I connect my WhatsApp number to the AI automation platform?",
-      a: "We use Meta's official WhatsApp Business Cloud API. You simply verify your business and link your phone number ID. It's 100% secure, fully compliant, and ensures maximum message delivery rates."
+      q: t('pricing.faq.connect.question'),
+      a: t('pricing.faq.connect.answer')
     },
     {
-      q: "Can the AI copilot handle customer support and bookings simultaneously?",
-      a: "Yes! Our AI is trained to understand context. It can answer FAQs, route complex queries to your human agents, and instantly trigger WhatsApp booking flows right inside the chat."
+      q: t('pricing.faq.support_bookings.question'),
+      a: t('pricing.faq.support_bookings.answer')
     },
     {
-      q: "Is there a limit to how many WhatsApp broadcast messages I can send?",
-      a: "Broadcast limits are determined by your Meta API tier (starting at 1,000 to 100K+ messages/day). Our platform seamlessly supports high-volume broadcasts for your marketing campaigns without throttling."
+      q: t('pricing.faq.broadcast_limits.question'),
+      a: t('pricing.faq.broadcast_limits.answer')
     },
     {
-      q: "Can I integrate my existing CRM with your WhatsApp automation?",
-      a: "Absolutely. We offer native integrations for HubSpot, Salesforce, and custom webhooks. Whenever a lead interacts with your WhatsApp bot, their profile and chat history automatically sync to your CRM."
+      q: t('pricing.faq.crm.question'),
+      a: t('pricing.faq.crm.answer')
     },
     {
-      q: "Will my WhatsApp account get banned for using automation?",
-      a: "No. Because we use the official Meta Cloud API, you are fully compliant with WhatsApp's terms of service. You will not risk being banned, unlike unofficial web scraping tools."
+      q: t('pricing.faq.ban.question'),
+      a: t('pricing.faq.ban.answer')
     }
   ];
 
@@ -1443,13 +1475,13 @@ export function FAQ() {
           <div className="space-y-4">
             <span className="font-sans font-[600] text-[13px] uppercase tracking-[1.5px] text-[#166534] bg-white px-4 py-2 rounded-full border border-[#bbf7d0] shadow-sm shadow-indigo-100/50 inline-flex items-center gap-2">
               <HelpCircle size={14} className="text-[#166534]" />
-              Support Center
+              {t('pricing.faq.eyebrow')}
             </span>
             <h2 className="font-display font-[800] text-[36px] md:text-[44px] leading-[1.1] tracking-[-1px] text-slate-900">
-              Got questions about <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#166534] to-[#22C55E]">WhatsApp AI?</span>
+              {t('pricing.faq.title')}
             </h2>
             <p className="font-sans font-medium text-[18px] leading-[1.7] text-slate-500">
-              Everything you need to know about setting up your WhatsApp Business API, automation limits, compliance, and CRM integrations.
+              {t('pricing.faq.description')}
             </p>
           </div>
 
@@ -1458,10 +1490,10 @@ export function FAQ() {
               <MessageCircle size={24} className="text-[#166534]" />
             </div>
             <div>
-              <h4 className="font-bold text-slate-900 mb-1">Still have questions?</h4>
-              <p className="text-sm text-slate-500 mb-3">Our WhatsApp automation experts are ready to help you build the perfect workflow.</p>
+              <h4 className="font-bold text-slate-900 mb-1">{t('pricing.faq.help_title')}</h4>
+              <p className="text-sm text-slate-500 mb-3">{t('pricing.faq.help_description')}</p>
               <a href="#contact" className="text-sm font-bold text-[#166534] hover:text-[#166534] flex items-center gap-1.5 transition-colors">
-                Chat with our team <ArrowRight size={14} />
+                {t('pricing.faq.chat_cta')} <ArrowRight size={14} className={cn(isRtl && "rotate-180")} />
               </a>
             </div>
           </div>
@@ -1483,7 +1515,7 @@ export function FAQ() {
               >
                 <button
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
-                  className="w-full p-6 text-left flex items-start justify-between gap-4 cursor-pointer focus:outline-none"
+                  className="w-full p-6 text-start flex items-start justify-between gap-4 cursor-pointer focus:outline-none"
                 >
                   <div className="flex gap-4">
                     <span className={cn(
@@ -1515,7 +1547,7 @@ export function FAQ() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                      <div className="px-6 pb-6 pl-[52px] text-[14px] md:text-[15px] font-medium text-slate-500 leading-relaxed">
+                      <div className="px-6 pb-6 text-start text-[14px] md:text-[15px] font-medium text-slate-500 leading-relaxed">
                         {faq.a}
                       </div>
                     </motion.div>
@@ -1534,6 +1566,8 @@ export function FAQ() {
 // FINAL CTA SECTION
 // ==========================================
 export function FinalCTA() {
+  const { t } = useI18n();
+
   return (
     <section id="contact" className="py-36 px-6 bg-[#12263A] text-white text-center relative overflow-hidden">
       {/* Mesh Grid & Radial Glow overlays */}
@@ -1545,36 +1579,36 @@ export function FinalCTA() {
         {/* Sparkles tag */}
         <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#22C55E] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30 flex items-center gap-1.5">
           <Sparkles size={12} className="text-[#22C55E] animate-pulse" />
-          Get Started Today
+          {t('home.finalCta.eyebrow')}
         </span>
 
         {/* Header */}
         <h2 className="font-display font-[800] text-[38px] md:text-[48px] lg:text-[60px] xl:text-[68px] leading-[1.05] tracking-[-2px] text-white max-w-3xl">
-          Ready to Transform Customer <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] via-[#86efac] to-[#bbf7d0]">Communication?</span>
+          {t('home.finalCta.title')}
         </h2>
 
         {/* Description */}
         <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-400">
-          Join thousands of high-growth teams who automate WhatsApp messages, nurture leads, and scale conversion pipelines automatically.
+          {t('home.finalCta.description')}
         </p>
 
         {/* Glassmorphic Checklist Bar */}
         <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-8 text-[12px] font-semibold text-slate-300 font-sans uppercase tracking-[0.5px] bg-white/5 border border-white/10 px-8 py-3.5 rounded-full backdrop-blur-md">
           <div className="flex items-center gap-2">
             <CheckCircle2 size={13} className="text-[#22C55E]" />
-            <span>Unlimited Messaging</span>
+            <span>{t('home.finalCta.unlimitedMessaging')}</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle2 size={13} className="text-[#22C55E]" />
-            <span>AI Included</span>
+            <span>{t('home.finalCta.aiIncluded')}</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle2 size={13} className="text-[#22C55E]" />
-            <span>CRM Included</span>
+            <span>{t('home.finalCta.crmIncluded')}</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle2 size={13} className="text-[#22C55E]" />
-            <span>No Credit Card</span>
+            <span>{t('home.finalCta.noCard')}</span>
           </div>
         </div>
 
@@ -1584,13 +1618,13 @@ export function FinalCTA() {
             to="/signup"
             className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(22,101,52,0.35)] active:scale-97 text-center shadow-lg"
           >
-            Start Free Trial
+            {t('shared.actions.startFreeTrial')}
           </NavLink>
           <NavLink
             to="/contact"
             className="w-full sm:w-auto px-8 py-4 bg-slate-900 border border-slate-800 text-slate-200 font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:bg-slate-850 hover:text-white active:scale-95 text-center shadow-sm"
           >
-            Book Demo
+            {t('shared.actions.bookDemo')}
           </NavLink>
         </div>
       </div>
@@ -1602,63 +1636,64 @@ export function FinalCTA() {
 // AI WHATSAPP AUTOMATION SECTION
 // ==========================================
 export function WhatsAppAutomation() {
+  const { t, isRtl } = useI18n();
   const sectionRef = useRef<HTMLElement>(null);
 
   const features = [
     {
       icon: Bot,
-      title: '24/7 AI Customer Replies',
-      desc: 'Automatically answer customer messages day and night using predefined intelligent workflows.',
+      title: t('home.businessAi.features.replies.title'),
+      desc: t('home.businessAi.features.replies.description'),
       color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
     },
     {
       icon: MessageCircle,
-      title: 'Instant Welcome Message',
-      desc: 'Send personalized greetings immediately when a customer starts a WhatsApp conversation.',
+      title: t('home.businessAi.features.welcome.title'),
+      desc: t('home.businessAi.features.welcome.description'),
       color: 'bg-blue-500/10 text-blue-600 border-blue-500/20'
     },
     {
       icon: FileText,
-      title: 'Interactive Service Selection',
-      desc: 'Display business services as clickable WhatsApp buttons so customers can quickly navigate to the service they need.',
+      title: t('home.businessAi.features.services.title'),
+      desc: t('home.businessAi.features.services.description'),
       color: 'bg-[#F0FDF4]0/10 text-[#166534] border-indigo-500/20'
     },
     {
       icon: Calendar,
-      title: 'Appointment Booking Automation',
-      desc: 'Automatically collect customer information, preferred date, available time slots, and confirm appointments without staff involvement.',
+      title: t('home.businessAi.features.booking.title'),
+      desc: t('home.businessAi.features.booking.description'),
       color: 'bg-purple-500/10 text-purple-600 border-purple-500/20'
     },
     {
       icon: MousePointerClick,
-      title: 'Click-to-WhatsApp Advertising',
-      desc: 'Integrate TikTok, Facebook, Instagram, Snapchat, and Google Ads so customers who click ads land directly into a WhatsApp conversation.',
+      title: t('home.businessAi.features.ads.title'),
+      desc: t('home.businessAi.features.ads.description'),
       color: 'bg-rose-500/10 text-rose-600 border-rose-500/20'
     },
     {
       icon: Database,
-      title: 'CRM & Lead Management',
-      desc: 'Automatically save customer information, create leads, notify sales representatives, and synchronize conversations with the CRM.',
+      title: t('home.businessAi.features.crm.title'),
+      desc: t('home.businessAi.features.crm.description'),
       color: 'bg-amber-500/10 text-amber-600 border-amber-500/20'
     }
   ];
 
   const workflowSteps = [
-    { label: 'Customer Clicks Ad', sub: 'TikTok • Facebook • Instagram • Snapchat • Google', icon: MousePointerClick },
-    { label: 'WhatsApp Opens Instantly', sub: 'Direct deep-link conversation', icon: MessageCircle },
-    { label: 'Automatic Welcome Message', sub: '"Welcome to ThrobTech 👋"', icon: Send },
-    { label: 'Customer Selects Service', sub: 'Book • Quote • Services • Support', icon: FileText },
-    { label: 'AI Asks Required Questions', sub: 'Smart contextual follow-ups', icon: Bot },
-    { label: 'Booking Confirmed', sub: 'Appointment or quote locked in', icon: Calendar },
-    { label: 'Info Saved & Lead Created', sub: 'CRM auto-sync & lead pipeline', icon: Database },
-    { label: 'Sales Team Notified', sub: 'Instant alerts to account managers', icon: BellRing }
+    { label: t('home.pipeline.ad.title'), sub: 'TikTok • Facebook • Instagram • Snapchat • Google', icon: MousePointerClick },
+    { label: t('home.pipeline.whatsapp.title'), sub: t('home.pipeline.whatsapp.description'), icon: MessageCircle },
+    { label: t('home.pipeline.welcome.title'), sub: t('home.pipeline.welcome.message'), icon: Send },
+    { label: t('home.pipeline.service.title'), sub: t('home.pipeline.service.options'), icon: FileText },
+    { label: t('home.pipeline.questions.title'), sub: t('home.pipeline.questions.description'), icon: Bot },
+    { label: t('home.pipeline.booking.title'), sub: t('home.pipeline.booking.description'), icon: Calendar },
+    { label: t('home.pipeline.lead.title'), sub: t('home.pipeline.lead.description'), icon: Database },
+    { label: t('home.pipeline.sales.title'), sub: t('home.pipeline.sales.description'), icon: BellRing }
   ];
 
   const stats = [
-    { value: '24/7', label: 'AI Availability', sub: 'Non-stop coverage' },
-    { value: '98%', label: 'Instant Response Rate', sub: 'Under 3 seconds' },
-    { value: '3X', label: 'Higher Conversion', sub: 'vs traditional forms' },
-    { value: '0', label: 'Manual Intervention', sub: 'Fully automated' }
+    { value: '24/7', label: t('home.metrics.aiAvailability'), sub: t('home.metrics.nonStopCoverage') },
+    { value: '98%', label: t('home.metrics.instantResponseRate'), sub: t('home.metrics.underThreeSeconds') },
+    { value: '3X', label: t('home.metrics.higherConversion'), sub: t('home.metrics.versusForms') },
+    { value: '0', label: t('home.metrics.manualIntervention'), sub: t('home.metrics.fullyAutomated') }
   ];
 
   return (
@@ -1675,13 +1710,13 @@ export function WhatsAppAutomation() {
           <div className="text-center mb-20 max-w-2xl mx-auto space-y-4 flex flex-col items-center">
             <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50 flex items-center gap-1.5 w-fit">
               <MessageCircle size={14} className="text-indigo-500" />
-              WhatsApp Automation
+              {t('home.automation.eyebrow')}
             </span>
             <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">
-              AI WhatsApp Automation for <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] via-[#86efac] to-[#bbf7d0]">Businesses & Clinics</span>
+              {t('home.businessAi.title')}
             </h2>
             <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[700px] text-slate-500">
-              Transform customer communication with intelligent WhatsApp automation that replies instantly, guides customers through services, books appointments, captures leads, and integrates directly with your marketing campaigns.
+              {t('home.businessAi.description')}
             </p>
           </div>
 
@@ -1692,10 +1727,10 @@ export function WhatsAppAutomation() {
             <div className="lg:col-span-5 space-y-10">
               <div className="space-y-5">
                 <h3 className="font-display font-[700] text-[24px] md:text-[28px] leading-[1.2] tracking-[-0.5px] text-slate-900">
-                  Automate every customer touchpoint from ad click to appointment booking
+                  {t('home.businessAi.touchpointsTitle')}
                 </h3>
                 <p className="font-sans font-normal text-[16px] leading-[1.8] text-slate-500">
-                  Deploy AI-powered WhatsApp workflows that handle lead capture, service inquiries, appointment scheduling, and CRM synchronization — completely hands-free.
+                  {t('home.businessAi.touchpointsDescription')}
                 </p>
               </div>
 
@@ -1730,8 +1765,8 @@ export function WhatsAppAutomation() {
                   to="/contact"
                   className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-sans font-semibold text-[15px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(22,101,52,0.35)] active:scale-97 shadow-lg"
                 >
-                  Get Started with WhatsApp AI
-                  <ArrowRight size={16} />
+                  {t('home.businessAi.cta')}
+                  <ArrowRight size={16} className={cn(isRtl && "rotate-180")} />
                 </NavLink>
               </motion.div>
             </div>
@@ -1748,10 +1783,10 @@ export function WhatsAppAutomation() {
                 <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-6 relative z-10">
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full bg-[#F0FDF4]0 animate-pulse" />
-                    <span className="text-xs font-bold tracking-tight text-slate-200">WhatsApp Automation Pipeline</span>
+                    <span className="text-xs font-bold tracking-tight text-slate-200">{t('home.pipeline.title')}</span>
                   </div>
                   <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1 rounded-lg border border-white/5 text-[9px] font-mono text-[#22C55E]">
-                    <span>LIVE • 8 STEPS</span>
+                    <span>{t('home.pipeline.liveSteps')}</span>
                   </div>
                 </div>
 
@@ -1810,9 +1845,9 @@ export function WhatsAppAutomation() {
                 <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] relative z-10">
                   <span className="flex items-center gap-1.5 text-slate-400 font-semibold">
                     <CheckCircle2 size={11} className="text-[#22C55E]" />
-                    End-to-end automation • Zero manual intervention
+                    {t('home.pipeline.summary')}
                   </span>
-                  <span className="text-[#22C55E] font-bold uppercase tracking-wider text-[9px]">Active</span>
+                  <span className="text-[#22C55E] font-bold uppercase tracking-wider text-[9px]">{t('home.pipeline.active')}</span>
                 </div>
               </div>
             </div>
@@ -1865,34 +1900,34 @@ export function WhatsAppAutomation() {
         <div className="max-w-3xl mx-auto space-y-8 relative z-10 flex flex-col items-center">
           <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#22C55E] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30 flex items-center gap-1.5">
             <Sparkles size={12} className="text-[#22C55E] animate-pulse" />
-            WhatsApp AI
+            {t('home.aiCta.eyebrow')}
           </span>
 
           <h2 className="font-display font-[800] text-[32px] md:text-[42px] lg:text-[52px] leading-[1.08] tracking-[-2px] text-white max-w-2xl">
-            Ready to Automate Your Customer <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] via-[#86efac] to-[#bbf7d0]">Conversations?</span>
+            {t('home.aiCta.title')}
           </h2>
 
           <p className="font-sans font-normal text-[17px] leading-[1.8] max-w-[600px] text-slate-400">
-            Deploy AI-powered WhatsApp automation for your business or clinic and never miss another customer again.
+            {t('home.aiCta.description')}
           </p>
 
           {/* Glassmorphic Features Bar */}
           <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-8 text-[12px] font-semibold text-slate-300 font-sans uppercase tracking-[0.5px] bg-white/5 border border-white/10 px-8 py-3.5 rounded-full backdrop-blur-md">
             <div className="flex items-center gap-2">
               <CheckCircle2 size={13} className="text-[#22C55E]" />
-              <span>Click-to-WhatsApp Ads</span>
+              <span>{t('home.aiCta.adsBadge')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 size={13} className="text-[#22C55E]" />
-              <span>AI Booking</span>
+              <span>{t('home.aiCta.bookingBadge')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 size={13} className="text-[#22C55E]" />
-              <span>CRM Sync</span>
+              <span>{t('home.aiCta.crmBadge')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 size={13} className="text-[#22C55E]" />
-              <span>24/7 Auto-Reply</span>
+              <span>{t('home.aiCta.replyBadge')}</span>
             </div>
           </div>
 
@@ -1902,13 +1937,13 @@ export function WhatsAppAutomation() {
               to="/signup"
               className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(22,101,52,0.35)] active:scale-97 text-center shadow-lg"
             >
-              Get Started
+              {t('shared.actions.getStarted')}
             </NavLink>
             <NavLink
               to="/contact"
               className="w-full sm:w-auto px-8 py-4 bg-slate-900 border border-slate-800 text-slate-200 font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:bg-slate-850 hover:text-white active:scale-95 text-center shadow-sm"
             >
-              Book a Live Demo
+              {t('shared.actions.bookLiveDemo')}
             </NavLink>
           </div>
         </div>

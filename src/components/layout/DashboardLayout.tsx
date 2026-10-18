@@ -47,28 +47,30 @@ import { crmApi } from '../../services/crmApi';
 import { whatsappApi } from '../../services/whatsappApi';
 import { Contact, Campaign } from '../../types';
 import { WhatsAppTemplate } from '../../types/whatsapp';
+import { useI18n } from '../../i18n';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 
-const menuItems = [
-  { group: 'Main', items: [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-    { icon: MessageSquare, label: 'Conversations', path: '/inbox' },
-    { icon: Users, label: 'Contacts', path: '/contacts' },
-    { icon: Compass, label: 'Business Scraper', path: '/scraper' },
+const getMenuItems = (t: (key: string, params?: any, fallback?: string) => string) => [
+  { group: t('app.dashboard.main_eb814b', undefined, 'Main'), items: [
+    { icon: LayoutDashboard, label: t('app.dashboard.dashboard_67b696', undefined, 'Dashboard'), path: '/dashboard' },
+    { icon: MessageSquare, label: t('app.dashboard.conversations_1d432f', undefined, 'Conversations'), path: '/inbox' },
+    { icon: Users, label: t('app.dashboard.contacts_b45064', undefined, 'Contacts'), path: '/contacts' },
+    { icon: Compass, label: t('app.dashboard.business_scraper_198a88', undefined, 'Business Scraper'), path: '/scraper' },
   ]},
-  { group: 'Email Marketing', items: [
-    { icon: Sparkles, label: 'AI Marketing Agent', path: '/email-campaigns/ai-agent' },
-    { icon: Mail, label: 'Email Campaigns', path: '/email-campaigns' },
-    { icon: FileText, label: 'Email Templates', path: '/email-templates' },
-    { icon: Globe, label: 'Sending Domains', path: '/settings/email' },
+  { group: t('app.dashboard.email_marketing_e6eecf', undefined, 'Email Marketing'), items: [
+    { icon: Sparkles, label: t('app.dashboard.ai_marketing_agent_d02ae6', undefined, 'AI Marketing Agent'), path: '/email-campaigns/ai-agent' },
+    { icon: Mail, label: t('app.dashboard.email_campaigns_bca45a', undefined, 'Email Campaigns'), path: '/email-campaigns' },
+    { icon: FileText, label: t('app.dashboard.email_templates_d83b17', undefined, 'Email Templates'), path: '/email-templates' },
+    { icon: Globe, label: t('app.dashboard.sending_domains_7a4d67', undefined, 'Sending Domains'), path: '/settings/email' },
   ]},
-  { group: 'WhatsApp Marketing', items: [
-    { icon: Send, label: 'WhatsApp Campaigns', path: '/campaigns' },
-    { icon: LayoutIcon, label: 'WhatsApp Templates', path: '/templates' },
-    { icon: Smartphone, label: 'WhatsApp Numbers', path: '/whatsapp/connect' },
-    { icon: Settings, label: 'WhatsApp Settings', path: '/settings/whatsapp' },
+  { group: t('app.dashboard.whatsapp_marketing_b93ac6', undefined, 'WhatsApp Marketing'), items: [
+    { icon: Send, label: t('app.dashboard.whatsapp_campaigns_c8204e', undefined, 'WhatsApp Campaigns'), path: '/campaigns' },
+    { icon: LayoutIcon, label: t('app.dashboard.whatsapp_templates_431349', undefined, 'WhatsApp Templates'), path: '/templates' },
+    { icon: Smartphone, label: t('app.dashboard.whatsapp_numbers_53ab7d', undefined, 'WhatsApp Numbers'), path: '/whatsapp/connect' },
+    { icon: Settings, label: t('app.dashboard.whatsapp_settings_37faf3', undefined, 'WhatsApp Settings'), path: '/settings/whatsapp' },
   ]},
-  { group: 'Automation', items: [
-    { icon: Zap, label: 'Workflows & Automation', path: '/automation' },
+  { group: t('app.dashboard.automation_d90975', undefined, 'Automation'), items: [
+    { icon: Zap, label: t('app.dashboard.workflows_automation_daecf7', undefined, 'Workflows & Automation'), path: '/automation' },
   ]}
 ];
 
@@ -97,6 +99,8 @@ export function Sidebar({
   const location = useLocation();
   const { logout, user, updateProfile } = useAuthStore();
   const { websiteName, websiteLogo, websiteFavicon } = useBrandingStore();
+  const { t, isRtl } = useI18n();
+  const menuItems = getMenuItems(t);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const isItemActive = (isActive: boolean, itemPath: string) => {
@@ -292,16 +296,24 @@ export function Sidebar({
       </button>
 
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-[110] bg-white transform transition-all duration-300 ease-in-out lg:translate-x-0 border-r border-slate-200 flex flex-col overflow-visible",
-        isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
+        "fixed inset-y-0 z-[110] bg-white transform transition-all duration-300 ease-in-out lg:translate-x-0 flex flex-col overflow-visible",
+        isRtl ? "right-0 border-l border-slate-200" : "left-0 border-r border-slate-200",
+        isMobileMenuOpen ? "translate-x-0" : (isRtl ? "translate-x-full" : "-translate-x-full"),
         isCollapsed ? "w-20" : "w-72"
       )}>
         {/* Collapsible Trigger for Desktop */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden lg:flex absolute right-[-12px] top-9 z-[120] w-6 h-6 bg-white hover:bg-slate-50 border border-slate-200 rounded-full text-slate-400 hover:text-slate-700 items-center justify-center cursor-pointer transition-all hover:scale-110 active:scale-95 shadow-sm"
+          className={cn(
+            "hidden lg:flex absolute top-9 z-[120] w-6 h-6 bg-white hover:bg-slate-50 border border-slate-200 rounded-full text-slate-400 hover:text-slate-700 items-center justify-center cursor-pointer transition-all hover:scale-110 active:scale-95 shadow-sm",
+            isRtl ? "left-[-12px]" : "right-[-12px]"
+          )}
         >
-          <ChevronLeft size={12} className={cn("transition-transform duration-300", isCollapsed && "rotate-180")} />
+          {isRtl ? (
+            <ChevronRight size={12} className={cn("transition-transform duration-300", isCollapsed && "rotate-180")} />
+          ) : (
+            <ChevronLeft size={12} className={cn("transition-transform duration-300", isCollapsed && "rotate-180")} />
+          )}
         </button>
 
         {/* 1. Logo Section */}
@@ -393,7 +405,10 @@ export function Sidebar({
 
                             {/* Hover Tooltips for Collapsed state */}
                             {isCollapsed && (
-                              <div className="absolute left-[64px] top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-[#12263A] text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]">
+                              <div className={cn(
+                                "absolute top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-[#12263A] text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]",
+                                isRtl ? "right-[64px]" : "left-[64px]"
+                              )}>
                                 {item.label}
                               </div>
                             )}
@@ -408,7 +423,9 @@ export function Sidebar({
             {user?.role === 'superadmin' && (
               <div className="space-y-0.5 pt-1">
                 {!isCollapsed ? (
-                  <p className="px-3 mb-1 text-[11px] font-bold uppercase tracking-wider text-[#166534] select-none">Administration</p>
+                  <p className="px-3 mb-1 text-[11px] font-bold uppercase tracking-wider text-[#166534] select-none">
+                    {isRtl ? 'الإدارة' : 'Administration'}
+                  </p>
                 ) : (
                   <div className="w-full h-px bg-[#e7e5e4] my-2" />
                 )}
@@ -424,10 +441,13 @@ export function Sidebar({
                     )}
                   >
                     <Cpu size={17} strokeWidth={2} className="shrink-0 text-[#166534] group-hover:text-[#14532d]" />
-                    {!isCollapsed && <span className="flex-1">Admin Panel</span>}
+                    {!isCollapsed && <span className="flex-1">{isRtl ? 'لوحة الإدارة' : 'Admin Panel'}</span>}
                     {isCollapsed && (
-                      <div className="absolute left-[64px] top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-[#12263A] text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]">
-                        Admin Panel
+                      <div className={cn(
+                        "absolute top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-[#12263A] text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]",
+                        isRtl ? "right-[64px]" : "left-[64px]"
+                      )}>
+                        {isRtl ? 'لوحة الإدارة' : 'Admin Panel'}
                       </div>
                     )}
                   </NavLink>
@@ -445,8 +465,8 @@ export function Sidebar({
                     <FileText size={14} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-[#12263A] truncate">Help & Docs</p>
-                    <p className="text-[10px] text-[#57534E] truncate">Guides & resources</p>
+                    <p className="text-xs font-bold text-[#12263A] truncate">{isRtl ? 'المساعدة والوثائق' : 'Help & Docs'}</p>
+                    <p className="text-[10px] text-[#57534E] truncate">{isRtl ? 'أدلة ومراجع شاملة' : 'Guides & resources'}</p>
                   </div>
                 </div>
                 <button
@@ -454,7 +474,7 @@ export function Sidebar({
                   onClick={() => navigate('/resources')}
                   className="h-7 px-3 text-[11px] font-bold text-[#166534] hover:text-[#14532d] bg-white hover:bg-[#F0FDF4] border border-slate-200 hover:border-[#bbf7d0] rounded-lg transition-all shadow-xs active:scale-95 cursor-pointer shrink-0"
                 >
-                  View
+                  {isRtl ? 'عرض' : 'View'}
                 </button>
               </div>
             </div>
@@ -469,7 +489,7 @@ export function Sidebar({
               className="w-full flex items-center gap-2.5 px-3 py-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50/80 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer active:scale-98"
             >
               <LogOut size={16} strokeWidth={2} className="shrink-0" />
-              Sign Out
+              {t('app.dashboard.sign_out_0b184b', undefined, 'Sign Out')}
             </button>
           ) : (
             <button
@@ -477,8 +497,11 @@ export function Sidebar({
               className="w-9 h-9 mx-auto flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all cursor-pointer group relative active:scale-90"
             >
               <LogOut size={16} strokeWidth={2} />
-              <div className="absolute left-[52px] top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-slate-900 text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]">
-                Sign Out
+              <div className={cn(
+                "absolute top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-slate-900 text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]",
+                isRtl ? "right-[52px]" : "left-[52px]"
+              )}>
+                {t('app.dashboard.sign_out_0b184b', undefined, 'Sign Out')}
               </div>
             </button>
           )}
@@ -527,8 +550,8 @@ export function Sidebar({
                   <div className="flex items-center gap-3">
                     <span className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-650"><Settings size={16} /></span>
                     <div>
-                      <h3 className="text-sm font-bold text-slate-900">Profile Settings</h3>
-                      <p className="text-xs text-slate-400 font-medium mt-0.5">Update your name, business and avatar</p>
+                      <h3 className="text-sm font-bold text-slate-900">{t('account.profile.title')}</h3>
+                      <p className="text-xs text-slate-400 font-medium mt-0.5">{t('account.profile.description')}</p>
                     </div>
                   </div>
                   <button 
@@ -556,10 +579,10 @@ export function Sidebar({
                         )}
                       </div>
                       <div className="flex-1 w-full space-y-2">
-                        <p className="text-xs font-bold text-slate-500 text-center sm:text-left">Profile Picture</p>
-                        <div className="flex gap-2 justify-center sm:justify-start">
+                        <p className={cn("text-xs font-bold text-slate-500", isRtl ? "text-center sm:text-right" : "text-center sm:text-left")}>{t('account.profile.picture_label')}</p>
+                        <div className={cn("flex gap-2 justify-center", isRtl ? "sm:justify-start" : "sm:justify-start")}>
                           <label className="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm">
-                            Upload Photo
+                            {t('account.profile.upload_photo')}
                             <input 
                               type="file" 
                               accept="image/*" 
@@ -577,7 +600,7 @@ export function Sidebar({
                               }}
                               className="px-4 py-2 border border-red-200 bg-red-50 hover:bg-red-105 text-red-650 rounded-xl text-xs font-bold transition-all cursor-pointer"
                             >
-                              Remove Photo
+                              {isRtl ? 'إزالة الصورة' : 'Remove Photo'}
                             </button>
                           )}
                         </div>
@@ -587,7 +610,7 @@ export function Sidebar({
                     {/* Gradient color option if not uploaded image */}
                     {!tempAvatar && (
                       <div className="space-y-2">
-                        <p className="text-xs font-bold text-slate-500">Or select a color theme</p>
+                        <p className="text-xs font-bold text-slate-500">{t('account.profile.color_theme')}</p>
                         <div className="flex flex-wrap gap-2">
                           {Object.keys(GRADIENTS).map((key) => (
                             <button
@@ -611,60 +634,61 @@ export function Sidebar({
                   {/* Form Inputs */}
                   <div className="space-y-4">
                     <div>
-                      <label className="block mb-2 text-xs font-semibold text-slate-500">Full Name</label>
+                      <label className="block mb-2 text-xs font-semibold text-slate-500">{t('account.profile.full_name')}</label>
                       <div className="relative">
-                        <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                        <UserIcon className={cn("absolute top-1/2 -translate-y-1/2 text-slate-400", isRtl ? "right-4" : "left-4")} size={14} />
                         <input
                           type="text"
                           required
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          placeholder="E.g. Jane Doe"
-                          className="w-full bg-slate-50 border border-slate-200/65 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
+                          placeholder={t('account.profile.full_name_placeholder', undefined, 'E.g. Jane Doe')}
+                          className={`w-full bg-slate-50 border border-slate-200/65 rounded-xl py-3 ${isRtl ? 'pr-11 pl-4 text-right' : 'pl-11 pr-4 text-left'} text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all`}
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block mb-2 text-xs font-semibold text-slate-500">Business Name</label>
+                      <label className="block mb-2 text-xs font-semibold text-slate-500">{isRtl ? 'اسم المؤسسة / العمل' : 'Business Name'}</label>
                       <div className="relative">
-                        <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                        <Briefcase className={cn("absolute top-1/2 -translate-y-1/2 text-slate-400", isRtl ? "right-4" : "left-4")} size={14} />
                         <input
                           type="text"
                           required
                           value={businessName}
                           onChange={(e) => setBusinessName(e.target.value)}
-                          placeholder="Corporate Organization"
-                          className="w-full bg-slate-50 border border-slate-200/65 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
+                          placeholder={t('account.profile.business_placeholder', undefined, 'Corporate Organization')}
+                          className={`w-full bg-slate-50 border border-slate-200/65 rounded-xl py-3 ${isRtl ? 'pr-11 pl-4 text-right' : 'pl-11 pr-4 text-left'} text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all`}
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block mb-1.5 text-xs font-semibold text-slate-500">Email</label>
+                        <label className="block mb-1.5 text-xs font-semibold text-slate-500">{isRtl ? 'البريد الإلكتروني' : 'Email'}</label>
                         <div className="relative">
-                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={13} />
+                          <Mail className={cn("absolute top-1/2 -translate-y-1/2 text-slate-400", isRtl ? "right-4" : "left-4")} size={13} />
                           <input
                             type="email"
                             disabled
                             value={email}
-                            className="w-full bg-slate-100/80 border border-slate-200/40 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-[#555] cursor-not-allowed"
+                            dir="ltr"
+                            className={`w-full bg-slate-100/80 border border-slate-200/40 rounded-xl py-3 ${isRtl ? 'pr-11 pl-4 text-right' : 'pl-11 pr-4 text-left'} text-xs font-bold text-[#555] cursor-not-allowed`}
                           />
-                          <Lock className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 opacity-60" size={10} />
+                          <Lock className={cn("absolute top-1/2 -translate-y-1/2 text-slate-400 opacity-60", isRtl ? "left-4" : "right-4")} size={10} />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block mb-1.5 text-xs font-semibold text-slate-500">Tenant ID</label>
+                        <label className="block mb-1.5 text-xs font-semibold text-slate-500">{t('account.profile.tenant_id')}</label>
                         <button
                           type="button"
                           onClick={handleCopyTenantId}
                           className="w-full bg-slate-100/80 hover:bg-slate-200/50 border border-slate-200/40 rounded-xl py-3 px-4 text-xs font-bold text-[#555] flex items-center justify-between transition-all group cursor-pointer"
                         >
-                          <span className="font-mono text-slate-500">{user?.tenantId || 'Tenant-1'}</span>
+                          <span className="font-mono text-slate-500" dir="ltr">{user?.tenantId || 'Tenant-1'}</span>
                           {isCopied ? (
-                            <span className="text-[8.5px] font-black text-indigo-600 uppercase tracking-widest">Copied</span>
+                            <span className="text-[8.5px] font-black text-indigo-600 uppercase tracking-widest">{isRtl ? 'تم النسخ' : 'Copied'}</span>
                           ) : (
                             <Copy size={11} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
                           )}
@@ -680,40 +704,43 @@ export function Sidebar({
                       onClick={() => setShowPasswordFields(!showPasswordFields)}
                       className="flex items-center justify-between w-full text-left text-xs font-black text-[#166534] hover:text-[#14532d] uppercase tracking-widest cursor-pointer hover:underline"
                     >
-                      <span>🔒 Change Password</span>
-                      <span>{showPasswordFields ? 'Hide' : 'Show'}</span>
+                      <span>🔒 {t('account.profile.change_password')}</span>
+                      <span>{showPasswordFields ? t('account.profile.hide') : t('account.profile.show')}</span>
                     </button>
 
                     {showPasswordFields && (
                       <div className="space-y-4 pt-1 animate-none">
                         <div>
-                          <label className="block mb-2 text-xs font-semibold text-slate-500">Current Password</label>
+                          <label className="block mb-2 text-xs font-semibold text-slate-500">{t('account.profile.current_password')}</label>
                           <input
                             type="password"
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
                             placeholder="••••••••"
+                            dir="ltr"
                             className="w-full bg-slate-50 border border-slate-200/65 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
                           />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
-                            <label className="block mb-2 text-xs font-semibold text-slate-500">New Password</label>
+                            <label className="block mb-2 text-xs font-semibold text-slate-500">{t('account.profile.new_password')}</label>
                             <input
                               type="password"
                               value={newPassword}
                               onChange={(e) => setNewPassword(e.target.value)}
-                              placeholder="Min. 6 characters"
+                              placeholder={t('account.profile.password_minimum_placeholder', undefined, 'Min. 6 characters')}
+                              dir="ltr"
                               className="w-full bg-slate-50 border border-slate-200/65 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
                             />
                           </div>
                           <div>
-                            <label className="block mb-2 text-xs font-semibold text-slate-500">Confirm New Password</label>
+                            <label className="block mb-2 text-xs font-semibold text-slate-500">{t('account.profile.confirm_new_password')}</label>
                             <input
                               type="password"
                               value={confirmPassword}
                               onChange={(e) => setConfirmPassword(e.target.value)}
-                              placeholder="Confirm password"
+                              placeholder={t('account.profile.confirm_password_placeholder', undefined, 'Confirm password')}
+                              dir="ltr"
                               className="w-full bg-slate-50 border border-slate-200/65 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
                             />
                           </div>
@@ -730,7 +757,7 @@ export function Sidebar({
                           {isChangingPassword ? (
                             <Loader2 size={13} className="animate-spin" />
                           ) : (
-                            "Update Password"
+                            t('account.profile.update_password')
                           )}
                         </button>
                       </div>
@@ -744,17 +771,17 @@ export function Sidebar({
                     {showStatus === 'success' && (
                       <p className="text-xs font-semibold text-emerald-600 flex items-center gap-1.5">
                         <CheckCircle2 size={14} />
-                        Profile saved
+                        {isRtl ? 'تم حفظ الملف الشخصي بنجاح' : 'Profile saved'}
                       </p>
                     )}
                     {showStatus === 'error' && (
                       <p className="text-xs font-semibold text-red-500 flex items-center gap-1.5">
                         <X size={14} />
-                        Update failed
+                        {isRtl ? 'فشل التحديث' : 'Update failed'}
                       </p>
                     )}
                     {!showStatus && (
-                      <span className="text-xs text-slate-400 font-medium">Changes are saved automatically</span>
+                      <span className="text-xs text-slate-400 font-medium">{t('account.profile.auto_save_hint')}</span>
                     )}
                   </div>
                   <div className="flex items-center gap-3">
@@ -764,7 +791,7 @@ export function Sidebar({
                       onClick={() => setIsProfileModalOpen(false)}
                       className="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all cursor-pointer"
                     >
-                      Cancel
+                      {isRtl ? 'إلغاء' : 'Cancel'}
                     </button>
                     <button
                       type="submit"
@@ -774,7 +801,7 @@ export function Sidebar({
                       {isSaving ? (
                         <Loader2 size={14} className="animate-spin text-white" />
                       ) : (
-                        "Save Changes"
+                        isRtl ? 'حفظ التغييرات' : "Save Changes"
                       )}
                     </button>
                   </div>
@@ -791,6 +818,7 @@ export function Sidebar({
 export function Header() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+  const { t, isRtl, formatDate } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -1245,10 +1273,13 @@ export function Header() {
       )}
 
       <div className="flex items-center gap-3 relative z-50">
+        {/* Language Switcher */}
+        <LanguageSwitcher variant="dropdown" />
+
         {/* Date selector */}
         <button className="hidden lg:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-[13px] font-medium text-slate-600 transition-all cursor-pointer">
           <Calendar size={15} className="text-slate-400" />
-          <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          <span>{formatDate(new Date(), { month: 'short', day: 'numeric', year: 'numeric' })}</span>
           <ChevronDown size={13} className="text-slate-400" />
         </button>
 
@@ -1277,12 +1308,17 @@ export function Header() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 15, scale: 0.95 }}
                 transition={{ duration: 0.18, ease: "easeOut" }}
-                className="absolute right-0 mt-3 w-96 bg-white border border-[#e7e5e4] rounded-2xl shadow-floating overflow-hidden z-50 flex flex-col"
+                className={cn(
+                  "absolute mt-3 w-96 bg-white border border-[#e7e5e4] rounded-2xl shadow-floating overflow-hidden z-50 flex flex-col",
+                  isRtl ? "left-0" : "right-0"
+                )}
               >
                 {/* Header */}
                 <div className="px-5 py-3.5 border-b border-[#e7e5e4] bg-white flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#12263A]">Notifications</span>
+                    <span className="text-xs font-bold text-[#12263A]">
+                      {isRtl ? 'الإشعارات' : 'Notifications'}
+                    </span>
                     {unreadCount > 0 && (
                       <span className="bg-[#166534] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
                         {unreadCount}
@@ -1294,7 +1330,7 @@ export function Header() {
                       onClick={markAllAsRead}
                       className="text-xs font-semibold text-[#166534] hover:text-[#14532d] transition-colors cursor-pointer"
                     >
-                      Mark all as read
+                      {isRtl ? 'تحديد الكل كمقروء' : 'Mark all as read'}
                     </button>
                   )}
                 </div>
@@ -1410,7 +1446,10 @@ export function Header() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                 transition={{ duration: 0.15, ease: "easeOut" }}
-                className="absolute right-0 mt-3 w-56 bg-white border border-slate-200/90 rounded-2xl shadow-floating overflow-hidden z-[60] py-1"
+                className={cn(
+                  "absolute mt-3 w-56 bg-white border border-slate-200/90 rounded-2xl shadow-floating overflow-hidden z-[60] py-1",
+                  isRtl ? "left-0" : "right-0"
+                )}
               >
                 <div className="px-4 py-3 border-b border-slate-100">
                   <p className="text-sm font-bold text-slate-900 truncate">{user?.name || 'User'}</p>
@@ -1425,7 +1464,7 @@ export function Header() {
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors"
                   >
                     <LogOut size={16} />
-                    Sign Out
+                    {t('app.dashboard.sign_out_0b184b', undefined, 'Sign Out')}
                   </button>
                 </div>
               </motion.div>
@@ -1440,6 +1479,7 @@ export function Header() {
 export function Layout({ children }: { children?: ReactNode }) {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { isRtl } = useI18n();
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const stored = localStorage.getItem('sidebar_is_collapsed');
     return stored === 'true';
@@ -1461,7 +1501,9 @@ export function Layout({ children }: { children?: ReactNode }) {
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={toggleCollapsed} />
       <div className={cn(
         "flex flex-col min-h-screen transition-all duration-300 ease-in-out",
-        isCollapsed ? "lg:pl-20" : "lg:pl-72"
+        isRtl
+          ? (isCollapsed ? "lg:pr-20 lg:pl-0" : "lg:pr-72 lg:pl-0")
+          : (isCollapsed ? "lg:pl-20 lg:pr-0" : "lg:pl-72 lg:pr-0")
       )}>
         <Header />
         <main className="p-5 md:p-6 xl:p-8 max-w-[1600px] w-full mx-auto">

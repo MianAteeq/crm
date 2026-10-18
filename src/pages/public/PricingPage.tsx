@@ -2,8 +2,11 @@ import React, { useEffect } from 'react';
 import Navbar from '../../components/public/Navbar';
 import Footer from '../../components/public/Footer';
 import { Pricing, FAQ, FinalCTA } from '../../components/public/LandingSections';
+import { useI18n } from '../../i18n';
 
 export default function PricingPage() {
+  const { t } = useI18n();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -20,9 +23,9 @@ export default function PricingPage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.1),transparent_70%)] pointer-events-none z-0" />
 
           <div className="max-w-4xl mx-auto space-y-6 relative z-10">
-            <span className="text-[10px] font-black text-[#F0FDF4] uppercase tracking-[0.2em] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30">Simple & Transparent</span>
-            <h1 className="font-display font-[800] text-4xl md:text-6xl tracking-tight text-white">Flexible Plans for Every Scale</h1>
-            <p className="font-sans font-normal text-stone-300 text-sm md:text-base max-w-xl mx-auto leading-relaxed">No hidden fees, no complex setups. Connect your phone number ID and start sending campaigns instantly.</p>
+            <span className="text-[10px] font-black text-[#F0FDF4] uppercase tracking-[0.2em] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30">{t('pricing.hero.eyebrow')}</span>
+            <h1 className="font-display font-[800] text-4xl md:text-6xl tracking-tight text-white">{t('pricing.hero.title')}</h1>
+            <p className="font-sans font-normal text-stone-300 text-sm md:text-base max-w-xl mx-auto leading-relaxed">{t('pricing.hero.description')}</p>
           </div>
         </section>
 

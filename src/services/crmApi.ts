@@ -272,13 +272,14 @@ class CrmApiService {
     }
   }
 
-  async saveAiSettings(openaiKey: string | undefined, companyPrompt: string): Promise<{ success: boolean; message: string; data?: any }> {
+  async saveAiSettings(openaiKey: string | undefined, companyPrompt: string, replyLanguage: string = 'ar-SA'): Promise<{ success: boolean; message: string; data?: any }> {
     try {
       return await this.request('/whatsapp/settings/ai', {
         method: 'POST',
         body: JSON.stringify({
           openai_key: openaiKey || undefined,
-          company_prompt: companyPrompt
+          company_prompt: companyPrompt,
+          reply_language: replyLanguage,
         })
       });
     } catch (error: any) {

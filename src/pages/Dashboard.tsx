@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '@/src/lib/utils';
+import { useI18n } from '../i18n';
 import { mockCampaigns } from '../data/mockCampaigns';
 import { KpiSkeleton, ChartSkeleton } from '../components/ui/Skeleton';
 import { contacts } from '../data/contactsMock';
@@ -173,6 +174,7 @@ function SectionHeader({ title, subtitle, action }: { title: string; subtitle?: 
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { t, isRtl, formatNumber } = useI18n();
   const [apiData, setApiData] = useState<any>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -261,7 +263,7 @@ export default function Dashboard() {
     spark: number[];
   }[] = [
     {
-      label: 'Total Conversations',
+      label: t('app.dashboard.total_conversations_76ba39', undefined, 'Total Conversations'),
       value: conversationsCount.toLocaleString(),
       change: isLive ? '0%' : '+12.4%',
       positive: true,
@@ -270,7 +272,7 @@ export default function Dashboard() {
       spark: isLive ? [0, 0, 0, 0, 0, 0, 0, conversationsCount] : [12, 18, 14, 22, 19, 28, 26, 34],
     },
     {
-      label: 'Active Contacts',
+      label: t('app.dashboard.active_contacts_b2b9f6', undefined, 'Active Contacts'),
       value: totalContacts.toLocaleString(),
       change: isLive ? '0%' : '+8.1%',
       positive: true,
@@ -279,7 +281,7 @@ export default function Dashboard() {
       spark: isLive ? [0, 0, 0, 0, 0, 0, 0, totalContacts] : [20, 22, 21, 26, 30, 28, 33, 38],
     },
     {
-      label: 'Campaigns Sent',
+      label: t('app.dashboard.campaigns_sent_3596d4', undefined, 'Campaigns Sent'),
       value: totalCampaigns.toLocaleString(),
       change: isLive ? '0' : '+3',
       positive: true,
@@ -288,7 +290,7 @@ export default function Dashboard() {
       spark: isLive ? [0, 0, 0, 0, 0, 0, 0, totalCampaigns] : [4, 6, 5, 8, 7, 9, 11, 12],
     },
     {
-      label: 'Delivered Messages',
+      label: t('app.dashboard.delivered_messages_0ac843', undefined, 'Delivered Messages'),
       value: Number(totalDelivered).toLocaleString(),
       change: isLive ? '0%' : '+15.2%',
       positive: true,
@@ -297,7 +299,7 @@ export default function Dashboard() {
       spark: isLive ? [0, 0, 0, 0, 0, 0, 0, totalDelivered] : [30, 34, 32, 40, 44, 42, 50, 56],
     },
     {
-      label: 'Response Rate',
+      label: t('app.dashboard.response_rate_536c05', undefined, 'Response Rate'),
       value: responseRate,
       change: isLive ? '0%' : '+3.1%',
       positive: true,
@@ -306,7 +308,7 @@ export default function Dashboard() {
       spark: isLive ? [0, 0, 0, 0, 0, 0, 0, parseFloat(responseRate) || 0] : [60, 62, 58, 66, 70, 68, 72, 74],
     },
     {
-      label: 'Revenue Generated',
+      label: t('app.dashboard.revenue_generated_58ddc0', undefined, 'Revenue Generated'),
       value: isLive ? `$${revenueGenerated.toLocaleString()}` : `${(Number(revenueGenerated) / 1000).toFixed(1)}K`,
       change: isLive ? '0%' : '+22.2%',
       positive: true,
@@ -438,13 +440,13 @@ export default function Dashboard() {
   // Customer journey funnel (derived; uses live numbers where present)
   const baseLeads = totalContacts;
   const funnel = [
-    { label: 'Lead Generated', icon: Megaphone, count: baseLeads, pct: 100 },
-    { label: 'WhatsApp Contacted', icon: MessageSquare, count: conversationsCount, pct: baseLeads > 0 ? Math.round((conversationsCount / baseLeads) * 100) : 0 },
-    { label: 'Conversation Started', icon: Radio, count: conversationsCount, pct: 100 },
-    { label: 'Qualified Lead', icon: UserCheck, count: isLive ? (heroCards.leads_count ?? 0) : Math.round(baseLeads * 0.214), pct: isLive ? (baseLeads > 0 ? Math.round(((heroCards.leads_count ?? 0) / baseLeads) * 100) : 0) : 74.9 },
-    { label: 'Appointment Booked', icon: CalendarCheck, count: isLive ? 0 : Math.round(baseLeads * 0.194), pct: isLive ? 0 : 90.7 },
-    { label: 'Follow-Up', icon: Repeat, count: isLive ? 0 : Math.round(baseLeads * 0.158), pct: isLive ? 0 : 81.5 },
-    { label: 'Customer Converted', icon: Award, count: isLive ? (heroCards.converted_count ?? 0) : Math.round(baseLeads * 0.066), pct: isLive ? (baseLeads > 0 ? Math.round(((heroCards.converted_count ?? 0) / baseLeads) * 100) : 0) : 85.4 },
+    { label: t('app.dashboard.lead_generated_8aff58', undefined, 'Lead Generated'), icon: Megaphone, count: baseLeads, pct: 100 },
+    { label: t('app.dashboard.whatsapp_contacted_3dc1c0', undefined, 'WhatsApp Contacted'), icon: MessageSquare, count: conversationsCount, pct: baseLeads > 0 ? Math.round((conversationsCount / baseLeads) * 100) : 0 },
+    { label: t('app.dashboard.conversation_started_f83f32', undefined, 'Conversation Started'), icon: Radio, count: conversationsCount, pct: 100 },
+    { label: t('app.dashboard.qualified_lead_111a21', undefined, 'Qualified Lead'), icon: UserCheck, count: isLive ? (heroCards.leads_count ?? 0) : Math.round(baseLeads * 0.214), pct: isLive ? (baseLeads > 0 ? Math.round(((heroCards.leads_count ?? 0) / baseLeads) * 100) : 0) : 74.9 },
+    { label: t('app.dashboard.appointment_booked_079da5', undefined, 'Appointment Booked'), icon: CalendarCheck, count: isLive ? 0 : Math.round(baseLeads * 0.194), pct: isLive ? 0 : 90.7 },
+    { label: t('app.dashboard.follow_up_4f6d9f', undefined, 'Follow-Up'), icon: Repeat, count: isLive ? 0 : Math.round(baseLeads * 0.158), pct: isLive ? 0 : 81.5 },
+    { label: t('app.dashboard.customer_converted_6f8786', undefined, 'Customer Converted'), icon: Award, count: isLive ? (heroCards.converted_count ?? 0) : Math.round(baseLeads * 0.066), pct: isLive ? (baseLeads > 0 ? Math.round(((heroCards.converted_count ?? 0) / baseLeads) * 100) : 0) : 85.4 },
   ];
 
   // Live conversations (uses real data when in live mode)
@@ -457,21 +459,28 @@ export default function Dashboard() {
         const diffMs = Date.now() - new Date(c.lastMessage.timestamp).getTime();
         const diffMins = Math.round(diffMs / 60000);
         if (diffMins < 1) {
-          timeStr = 'Now';
+          timeStr = isRtl ? 'الآن' : 'Now';
         } else if (diffMins < 60) {
-          timeStr = `${diffMins} min`;
+          timeStr = isRtl ? `${diffMins} د` : `${diffMins} min`;
         } else if (diffMins < 1440) {
           const hrs = Math.round(diffMins / 60);
-          timeStr = `${hrs} ${hrs === 1 ? 'hr' : 'hrs'}`;
+          timeStr = isRtl ? `${hrs} س` : `${hrs} ${hrs === 1 ? 'hr' : 'hrs'}`;
         } else {
           const days = Math.round(diffMins / 1440);
-          timeStr = `${days} ${days === 1 ? 'd' : 'ds'}`;
+          timeStr = isRtl ? `${days} ي` : `${days} ${days === 1 ? 'd' : 'ds'}`;
         }
       } catch (e) {
-        timeStr = 'Earlier';
+        timeStr = isRtl ? 'سابقاً' : 'Earlier';
       }
     } else {
-      timeStr = ['Now', '1 min', '3 min', '5 min', '7 min', '12 min'][i] || 'Earlier';
+      timeStr = [
+        isRtl ? 'الآن' : 'Now',
+        isRtl ? '١ د' : '1 min',
+        isRtl ? '٣ د' : '3 min',
+        isRtl ? '٥ د' : '5 min',
+        isRtl ? '٧ د' : '7 min',
+        isRtl ? '١٢ د' : '12 min'
+      ][i] || (isRtl ? 'سابقاً' : 'Earlier');
     }
 
     const last = (() => {
@@ -480,12 +489,12 @@ export default function Dashboard() {
         const icon = c.lastMessage.type === 'image' ? '📷 ' : c.lastMessage.type === 'video' ? '🎥 ' : c.lastMessage.type === 'audio' ? '🎵 ' : '📁 ';
         return `${icon}${typeStr}`;
       }
-      return c.lastMessage?.content || 'No messages yet';
+      return c.lastMessage?.content || (isRtl ? 'لا توجد رسائل بعد' : 'No messages yet');
     })();
 
     return {
       id: c.id ?? String(i),
-      name: c.contact?.name || 'Unknown Contact',
+      name: c.contact?.name || (isRtl ? 'جهة اتصال غير معروفة' : 'Unknown Contact'),
       last: last,
       time: timeStr,
       unread: c.unreadCount || 0,
@@ -494,12 +503,12 @@ export default function Dashboard() {
   });
 
   const quickActions = [
-    { label: 'Create Campaign', icon: Megaphone, accent: '#12263A', to: '/campaigns/create' },
-    { label: 'Send Broadcast', icon: Send, accent: '#166534', to: '/campaigns/create' },
-    { label: 'Import Contacts', icon: Upload, accent: '#57534E', to: '/contacts' },
-    { label: 'Add Contact', icon: UserPlus, accent: '#22C55E', to: '/contacts/add' },
-    { label: 'Create Template', icon: LayoutTemplate, accent: '#166534', to: '/templates/builder' },
-    { label: 'AI Reply Assistant', icon: Bot, accent: '#12263A', to: '/inbox' },
+    { label: t('app.dashboard.create_campaign_539332', undefined, 'Create Campaign'), icon: Megaphone, accent: '#12263A', to: '/campaigns/create' },
+    { label: t('app.dashboard.send_broadcast_3e172c', undefined, 'Send Broadcast'), icon: Send, accent: '#166534', to: '/campaigns/create' },
+    { label: t('app.dashboard.import_contacts_9d5dae', undefined, 'Import Contacts'), icon: Upload, accent: '#57534E', to: '/contacts' },
+    { label: t('app.dashboard.add_contact_aeb71d', undefined, 'Add Contact'), icon: UserPlus, accent: '#22C55E', to: '/contacts/add' },
+    { label: t('app.dashboard.create_template_b79296', undefined, 'Create Template'), icon: LayoutTemplate, accent: '#166534', to: '/templates/builder' },
+    { label: t('app.dashboard.ai_generated_reply_ee896f', undefined, 'AI Reply Assistant'), icon: Bot, accent: '#12263A', to: '/inbox' },
   ];
 
   const statusDot = (s: string) =>
@@ -510,14 +519,18 @@ export default function Dashboard() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Dashboard Overview</h1>
-          <p className="text-[13px] text-slate-500 mt-1">Track conversations, campaigns and conversions in real time.</p>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            {t('app.dashboard.dashboard_overview_5a0e11', undefined, 'Dashboard Overview')}
+          </h1>
+          <p className="text-[13px] text-slate-500 mt-1">
+            {t('app.dashboard.track_conversations_campaigns_and_conversions_in_rea_2afc5f', undefined, 'Track conversations, campaigns and conversions in real time.')}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           {isLoading && (
             <div className="flex items-center gap-2 text-[#166534] text-xs font-medium">
               <div className="w-3.5 h-3.5 border-2 border-[#166534] border-t-transparent rounded-full animate-spin" />
-              Syncing
+              {t('app.dashboard.syncing_5c8b9e', undefined, 'Syncing')}
             </div>
           )}
           <div className="flex items-center gap-1 p-1 bg-white border border-slate-200 rounded-xl shadow-xs">
@@ -532,7 +545,7 @@ export default function Dashboard() {
                     : 'text-[#57534E] hover:text-[#12263A] hover:bg-[#F0FDF4]'
                 )}
               >
-                {d} Days
+                {d} {isRtl ? 'يوم' : 'Days'}
               </button>
             ))}
           </div>
@@ -563,8 +576,8 @@ export default function Dashboard() {
       {/* Customer Journey Funnel */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
         <SectionHeader
-          title="Customer Journey"
-          subtitle="From first contact to converted customer"
+          title={t('app.dashboard.customer_journey_a2fde3', undefined, 'Customer Journey')}
+          subtitle={t('app.dashboard.from_first_contact_to_converted_customer_423e8d', undefined, 'From first contact to converted customer')}
           action={
             <span className="px-3 py-1 rounded-full bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 text-xs font-semibold">
               {activePipelineStatus}
@@ -587,7 +600,7 @@ export default function Dashboard() {
                 <p className="text-xl font-bold text-slate-900 mt-1">{step.count.toLocaleString()}</p>
                 {i > 0 && <p className="text-[11px] font-semibold text-emerald-600 mt-0.5">{step.pct}%</p>}
               </motion.div>
-              {i < funnel.length - 1 && <ArrowRight size={16} className="text-slate-300 shrink-0" />}
+              {i < funnel.length - 1 && <ArrowRight size={16} className={cn("text-slate-300 shrink-0", isRtl && "rotate-180")} />}
             </div>
           ))}
         </div>
@@ -603,19 +616,19 @@ export default function Dashboard() {
         ) : (
           <div className="xl:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col min-h-[420px]">
             <SectionHeader
-              title="Conversations Trend"
-            subtitle="Reach vs engagement over time"
-            action={
-              <div className="flex items-center gap-4 text-xs font-medium">
-                <span className="flex items-center gap-1.5 text-[#57534E]">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#12263A]" /> Reach
-                </span>
-                <span className="flex items-center gap-1.5 text-[#57534E]">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#166534]" /> Engagement
-                </span>
-              </div>
-            }
-          />
+              title={t('app.dashboard.conversations_trend_d3ac13', undefined, 'Conversations Trend')}
+              subtitle={t('app.dashboard.reach_vs_engagement_over_time_2cf722', undefined, 'Reach vs engagement over time')}
+              action={
+                <div className="flex items-center gap-4 text-xs font-medium">
+                  <span className="flex items-center gap-1.5 text-[#57534E]">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#12263A]" /> {t('app.dashboard.reach_2068b8', undefined, 'Reach')}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-[#57534E]">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#166534]" /> {t('app.dashboard.engagement_ea6877', undefined, 'Engagement')}
+                  </span>
+                </div>
+              }
+            />
           <div className="flex-1 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={activePerformanceData}>
@@ -633,8 +646,8 @@ export default function Dashboard() {
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#57534E' }} dy={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#57534E' }} />
                 <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="reach" stroke="#12263A" strokeWidth={3} fillOpacity={1} fill="url(#colorReach)" name="Reach" />
-                <Area type="monotone" dataKey="engagement" stroke="#166534" strokeWidth={3} fillOpacity={1} fill="url(#colorEngage)" name="Engagement" />
+                <Area type="monotone" dataKey="reach" stroke="#12263A" strokeWidth={3} fillOpacity={1} fill="url(#colorReach)" name={t('app.dashboard.reach_2068b8', undefined, 'Reach')} />
+                <Area type="monotone" dataKey="engagement" stroke="#166534" strokeWidth={3} fillOpacity={1} fill="url(#colorEngage)" name={t('app.dashboard.engagement_ea6877', undefined, 'Engagement')} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -645,9 +658,9 @@ export default function Dashboard() {
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col min-h-[420px]">
           <div className="p-6 pb-4 flex items-center justify-between border-b border-slate-100">
             <div>
-              <h3 className="text-base font-semibold text-slate-900">Live Conversations</h3>
+              <h3 className="text-base font-semibold text-slate-900">{t('app.dashboard.live_conversations_c0d621', undefined, 'Live Conversations')}</h3>
               <p className="text-[13px] text-slate-500 mt-0.5 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Online
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> {t('app.dashboard.online_0d21bd', undefined, 'Online')}
               </p>
             </div>
           </div>
@@ -657,8 +670,8 @@ export default function Dashboard() {
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-300 mb-3">
                   <MessageSquare size={20} />
                 </div>
-                <p className="text-sm font-semibold text-slate-700">No live conversations</p>
-                <p className="text-xs text-slate-400 mt-1">Active chats will appear here.</p>
+                <p className="text-sm font-semibold text-slate-700">{t('app.dashboard.no_live_conversations_ce4186', undefined, 'No live conversations')}</p>
+                <p className="text-xs text-slate-400 mt-1">{t('app.dashboard.active_chats_will_appear_here_bf9d96', undefined, 'Active chats will appear here.')}</p>
               </div>
             ) : (
               liveConversations.map((c) => (
@@ -694,7 +707,7 @@ export default function Dashboard() {
               onClick={() => navigate('/inbox')}
               className="w-full h-10 rounded-xl bg-white hover:bg-[#F0FDF4] border border-slate-200 hover:border-[#bbf7d0] text-xs font-bold text-[#12263A] hover:text-[#166534] transition-all flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.98] cursor-pointer"
             >
-              View all conversations <ArrowRight size={14} />
+              {t('app.dashboard.view_all_conversations_2bdd45', undefined, 'View all conversations')} <ArrowRight size={14} className={cn(isRtl && "rotate-180")} />
             </button>
           </div>
         </div>
@@ -702,7 +715,10 @@ export default function Dashboard() {
 
       {/* Quick Actions */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-        <SectionHeader title="Quick Actions" subtitle="Jump into your most common workflows" />
+        <SectionHeader
+          title={t('app.dashboard.quick_actions_2cc2b6', undefined, 'Quick Actions')}
+          subtitle={t('app.dashboard.jump_into_your_most_common_workflows_64f0e0', undefined, 'Jump into your most common workflows')}
+        />
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {quickActions.map((a) => (
             <button
@@ -728,18 +744,18 @@ export default function Dashboard() {
         <div className="xl:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
           <div className="p-6 pb-4 flex items-center justify-between">
             <div>
-              <h3 className="text-base font-semibold text-slate-900">Campaign Performance</h3>
-              <p className="text-[13px] text-slate-500 mt-0.5">Real-time status of active campaigns</p>
+              <h3 className="text-base font-semibold text-slate-900">{t('app.dashboard.campaign_performance_09c256', undefined, 'Campaign Performance')}</h3>
+              <p className="text-[13px] text-slate-500 mt-0.5">{t('app.dashboard.real_time_status_of_active_campaigns_bb14c4', undefined, 'Real-time status of active campaigns')}</p>
             </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="text-[11px] font-semibold uppercase text-slate-400 tracking-wide border-y border-slate-100 bg-slate-50/50">
-                  <th className="px-6 py-3">Campaign</th>
-                  <th className="px-6 py-3">Reach</th>
-                  <th className="px-6 py-3">Conversion</th>
-                  <th className="px-6 py-3 text-right">Status</th>
+                  <th className="px-6 py-3">{t('app.dashboard.campaign_ae81e5', undefined, 'Campaign')}</th>
+                  <th className="px-6 py-3">{t('app.dashboard.reach_48cef9', undefined, 'Reach')}</th>
+                  <th className="px-6 py-3">{t('app.dashboard.conversion_b27cc9', undefined, 'Conversion')}</th>
+                  <th className="px-6 py-3 text-right">{t('app.dashboard.status_8c2e4a', undefined, 'Status')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -751,8 +767,8 @@ export default function Dashboard() {
                           <Activity size={20} />
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-slate-700">No active campaigns</p>
-                          <p className="text-xs text-slate-400 mt-1">Deploy a campaign to start streaming performance data.</p>
+                          <p className="text-sm font-semibold text-slate-700">{t('app.dashboard.no_active_campaigns_5a1fd7', undefined, 'No active campaigns')}</p>
+                          <p className="text-xs text-slate-400 mt-1">{t('app.dashboard.deploy_a_campaign_to_start_streaming_performance_dat_2591c8', undefined, 'Deploy a campaign to start streaming performance data.')}</p>
                         </div>
                       </div>
                     </td>
@@ -808,14 +824,17 @@ export default function Dashboard() {
               onClick={() => navigate('/campaigns')}
               className="w-full sm:w-auto h-10 px-5 rounded-xl bg-white hover:bg-[#F0FDF4] border border-slate-200 hover:border-[#bbf7d0] text-xs font-bold text-[#12263A] hover:text-[#166534] transition-all flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.98] cursor-pointer"
             >
-              View all campaigns <ArrowRight size={14} />
+              {t('app.dashboard.view_all_campaigns_df2046', undefined, 'View all campaigns')} <ArrowRight size={14} className={cn(isRtl && "rotate-180")} />
             </button>
           </div>
         </div>
 
         {/* Contact Sources (Pie) */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col">
-          <SectionHeader title="Contact Sources" subtitle="Allocation by category" />
+          <SectionHeader
+            title={t('app.dashboard.contact_sources_0c2005', undefined, 'Contact Sources')}
+            subtitle={t('app.dashboard.allocation_by_category_807a7f', undefined, 'Allocation by category')}
+          />
           <div className="relative flex-1 min-h-[220px] flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -832,7 +851,7 @@ export default function Dashboard() {
                 <p className="text-2xl font-bold text-slate-900">
                   {totalDistributionNodes >= 1000 ? `${(totalDistributionNodes / 1000).toFixed(1)}K` : totalDistributionNodes}
                 </p>
-                <p className="text-[11px] font-medium text-slate-400">Total</p>
+                <p className="text-[11px] font-medium text-slate-400">{t('app.dashboard.total_c9b3c3', undefined, 'Total')}</p>
               </div>
             </div>
           </div>
@@ -858,7 +877,10 @@ export default function Dashboard() {
 
       {/* Revenue Trend */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col min-h-[300px]">
-        <SectionHeader title="Revenue Trend" subtitle="Generated revenue across the period" />
+        <SectionHeader
+          title={t('app.dashboard.revenue_trend_4729fa', undefined, 'Revenue Trend')}
+          subtitle={t('app.dashboard.generated_revenue_across_the_period_58e612', undefined, 'Generated revenue across the period')}
+        />
         <div className="flex-1 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={activePerformanceData}>

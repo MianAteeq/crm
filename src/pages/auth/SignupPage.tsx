@@ -25,6 +25,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useBrandingStore } from '../../store/brandingStore';
 import { crmApi } from '../../services/crmApi';
 import logoImg from '../../assets/logo-2.png';
+import { useI18n } from '../../i18n';
+import { LanguageSwitcher } from '../../components/common/LanguageSwitcher';
+import { cn } from '../../lib/utils';
 
 const signupSchema = z.object({
   name: z.string().trim().min(2, 'Full name must be at least 2 characters'),
@@ -48,6 +51,7 @@ interface DbPlan {
 
 export default function SignupPage() {
   const { websiteName, websiteLogo } = useBrandingStore();
+  const { t, isRtl } = useI18n();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -144,13 +148,15 @@ export default function SignupPage() {
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/10 text-xs font-semibold text-[#F0FDF4]">
               <Sparkles size={13} className="text-[#22C55E]" />
-              <span>All-In-One Revenue Operations</span>
+              <span>{t('auth.signup.heroDescription')}</span>
             </div>
             <h2 className="text-3xl xl:text-4xl font-extrabold tracking-tight leading-tight text-white">
-              Discover leads, automate campaigns, and manage customer conversations.
+              {t('auth.signup.heroTitle')}
             </h2>
             <p className="text-stone-300 text-sm leading-relaxed max-w-md">
-              A unified platform designed for modern sales teams to prospect, reach decision-makers, and track deal stages with automated precision.
+              {isRtl 
+                ? 'منصة موحدة مصممة لفرق المبيعات والنمو لأتمتة التواصل والوصول لصناع القرار وإدارة المحادثات بدقة متناهية.' 
+                : 'A unified platform designed for modern sales teams to prospect, reach decision-makers, and track deal stages with automated precision.'}
             </p>
           </div>
 
@@ -227,18 +233,21 @@ export default function SignupPage() {
             to="/" 
             className="inline-flex items-center gap-2 text-xs font-bold text-[#57534E] hover:text-[#12263A] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] rounded-lg p-1"
           >
-            <ArrowLeft size={16} />
-            <span>Back to Home</span>
+            <ArrowLeft size={16} className={cn(isRtl && "rotate-180")} />
+            <span>{isRtl ? 'العودة إلى الرئيسية' : 'Back to Home'}</span>
           </Link>
 
-          <div className="text-xs font-medium text-[#57534E]">
-            Already have an account?{' '}
-            <Link 
-              to="/login" 
-              className="font-bold text-[#166534] hover:text-[#12263A] hover:underline ml-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] rounded"
-            >
-              Sign In
-            </Link>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher variant="auth" />
+            <div className="text-xs font-medium text-[#57534E]">
+              {isRtl ? 'لديك حساب بالفعل؟' : 'Already have an account?'}{' '}
+              <Link 
+                to="/login" 
+                className="font-bold text-[#166534] hover:text-[#12263A] hover:underline ml-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] rounded"
+              >
+                {isRtl ? 'تسجيل الدخول' : 'Sign In'}
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -250,14 +259,14 @@ export default function SignupPage() {
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 rounded-full text-[11px] font-bold">
                 <Sparkles size={12} className="text-[#22C55E]" />
-                {activePlan ? `Selected: ${activePlan.name} Trial` : '14-Day Free Trial • No Credit Card'}
+                {activePlan ? `Selected: ${activePlan.name} Trial` : (isRtl ? 'تجربة مجانية لمدة 14 يومًا • دون بطاقة ائتمان' : '14-Day Free Trial • No Credit Card')}
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#12263A] tracking-tight">
-              Create your account
+              {t('auth.signup.heroTitle')}
             </h1>
             <p className="text-xs sm:text-sm font-medium text-[#57534E]">
-              Get started with your dedicated CRM and automated lead generation tools.
+              {t('auth.signup.heroDescription')}
             </p>
           </div>
 
@@ -267,11 +276,11 @@ export default function SignupPage() {
             {/* Full Name Field */}
             <div className="space-y-1.5">
               <label htmlFor="name-input" className="block text-[11px] font-bold text-[#57534E] uppercase tracking-wider pl-1">
-                Full Name <span className="text-red-500" aria-hidden="true">*</span>
+                {t('auth.signup.fullNameLabel')} <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <div className="relative group/input">
                 <User 
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors pointer-events-none" 
+                  className={cn("absolute top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors pointer-events-none", isRtl ? "right-4" : "left-4")}
                   size={18} 
                   aria-hidden="true"
                 />
@@ -280,10 +289,10 @@ export default function SignupPage() {
                   {...register('name')}
                   type="text"
                   autoComplete="name"
-                  placeholder="Your full name"
+                  placeholder={isRtl ? "اسمك الكامل" : "Your full name"}
                   aria-invalid={Boolean(errors.name)}
                   aria-describedby={errors.name ? 'name-error' : undefined}
-                  className={`w-full h-12 bg-white border rounded-xl p-3.5 pl-11 text-sm font-semibold text-[#12263A] placeholder:text-stone-400 focus:outline-none transition-all ${
+                  className={`w-full h-12 bg-white border rounded-xl p-3.5 ${isRtl ? 'pr-11 pl-4' : 'pl-11 pr-4'} text-sm font-semibold text-[#12263A] placeholder:text-stone-400 focus:outline-none transition-all ${
                     errors.name 
                       ? 'border-rose-300 bg-rose-50/40 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10' 
                       : 'border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/15'
@@ -300,11 +309,11 @@ export default function SignupPage() {
             {/* Work Email Field */}
             <div className="space-y-1.5">
               <label htmlFor="email-input" className="block text-[11px] font-bold text-[#57534E] uppercase tracking-wider pl-1">
-                Work Email <span className="text-red-500" aria-hidden="true">*</span>
+                {t('auth.signup.workEmailLabel')} <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <div className="relative group/input">
                 <Mail 
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors pointer-events-none" 
+                  className={cn("absolute top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors pointer-events-none", isRtl ? "right-4" : "left-4")}
                   size={18} 
                   aria-hidden="true"
                 />
@@ -314,9 +323,10 @@ export default function SignupPage() {
                   type="email"
                   autoComplete="email"
                   placeholder="name@company.com"
+                  dir="ltr"
                   aria-invalid={Boolean(errors.email)}
                   aria-describedby={errors.email ? 'email-error' : undefined}
-                  className={`w-full h-12 bg-white border rounded-xl p-3.5 pl-11 text-sm font-semibold text-[#12263A] placeholder:text-stone-400 focus:outline-none transition-all ${
+                  className={`w-full h-12 bg-white border rounded-xl p-3.5 ${isRtl ? 'pr-11 pl-4 text-right' : 'pl-11 pr-4 text-left'} text-sm font-semibold text-[#12263A] placeholder:text-stone-400 focus:outline-none transition-all ${
                     errors.email 
                       ? 'border-rose-300 bg-rose-50/40 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10' 
                       : 'border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/15'
@@ -336,11 +346,11 @@ export default function SignupPage() {
               {/* Password */}
               <div className="space-y-1.5">
                 <label htmlFor="password-input" className="block text-[11px] font-bold text-[#57534E] uppercase tracking-wider pl-1">
-                  Password <span className="text-red-500" aria-hidden="true">*</span>
+                  {t('auth.fields.passwordLabel')} <span className="text-red-500" aria-hidden="true">*</span>
                 </label>
                 <div className="relative group/input">
                   <Lock 
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors pointer-events-none" 
+                    className={cn("absolute top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors pointer-events-none", isRtl ? "right-4" : "left-4")}
                     size={17} 
                     aria-hidden="true"
                   />
@@ -349,10 +359,11 @@ export default function SignupPage() {
                     {...register('password')}
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="new-password"
-                    placeholder="Min. 6 chars"
+                    placeholder={isRtl ? "٦ خانات كحد أدنى" : "Min. 6 chars"}
+                    dir="ltr"
                     aria-invalid={Boolean(errors.password)}
                     aria-describedby={errors.password ? 'password-error' : undefined}
-                    className={`w-full h-12 bg-white border rounded-xl p-3.5 pl-11 pr-10 text-sm font-semibold text-[#12263A] placeholder:text-stone-400 focus:outline-none transition-all ${
+                    className={`w-full h-12 bg-white border rounded-xl p-3.5 ${isRtl ? 'pr-11 pl-10 text-right' : 'pl-11 pr-10 text-left'} text-sm font-semibold text-[#12263A] placeholder:text-stone-400 focus:outline-none transition-all ${
                       errors.password 
                         ? 'border-rose-300 bg-rose-50/40 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10' 
                         : 'border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/15'
@@ -362,7 +373,7 @@ export default function SignupPage() {
                     type="button" 
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-[#12263A] transition-colors cursor-pointer p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534]"
+                    className={cn("absolute top-1/2 -translate-y-1/2 text-stone-400 hover:text-[#12263A] transition-colors cursor-pointer p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534]", isRtl ? "left-3.5" : "right-3.5")}
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -372,11 +383,11 @@ export default function SignupPage() {
               {/* Confirm Password */}
               <div className="space-y-1.5">
                 <label htmlFor="confirm-password-input" className="block text-[11px] font-bold text-[#57534E] uppercase tracking-wider pl-1">
-                  Confirm Password <span className="text-red-500" aria-hidden="true">*</span>
+                  {t('auth.signup.confirmPasswordLabel')} <span className="text-red-500" aria-hidden="true">*</span>
                 </label>
                 <div className="relative group/input">
                   <Lock 
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors pointer-events-none" 
+                    className={cn("absolute top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#166534] transition-colors pointer-events-none", isRtl ? "right-4" : "left-4")}
                     size={17} 
                     aria-hidden="true"
                   />
@@ -385,10 +396,11 @@ export default function SignupPage() {
                     {...register('confirmPassword')}
                     type={showConfirmPassword ? 'text' : 'password'}
                     autoComplete="new-password"
-                    placeholder="Repeat password"
+                    placeholder={isRtl ? "كرر كلمة المرور" : "Repeat password"}
+                    dir="ltr"
                     aria-invalid={Boolean(errors.confirmPassword)}
                     aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
-                    className={`w-full h-12 bg-white border rounded-xl p-3.5 pl-11 pr-10 text-sm font-semibold text-[#12263A] placeholder:text-stone-400 focus:outline-none transition-all ${
+                    className={`w-full h-12 bg-white border rounded-xl p-3.5 ${isRtl ? 'pr-11 pl-10 text-right' : 'pl-11 pr-10 text-left'} text-sm font-semibold text-[#12263A] placeholder:text-stone-400 focus:outline-none transition-all ${
                       errors.confirmPassword 
                         ? 'border-rose-300 bg-rose-50/40 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10' 
                         : 'border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/15'
@@ -398,7 +410,7 @@ export default function SignupPage() {
                     type="button" 
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-[#12263A] transition-colors cursor-pointer p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534]"
+                    className={cn("absolute top-1/2 -translate-y-1/2 text-stone-400 hover:text-[#12263A] transition-colors cursor-pointer p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534]", isRtl ? "left-3.5" : "right-3.5")}
                   >
                     {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -427,12 +439,16 @@ export default function SignupPage() {
                 </div>
                 <div className="flex items-center justify-between text-[11px] font-semibold text-[#57534E] px-0.5">
                   <span>
-                    Password Strength:{' '}
+                    {isRtl ? 'قوة كلمة المرور: ' : 'Password Strength: '}
                     <strong className={strength === 3 ? 'text-[#166534]' : strength === 2 ? 'text-emerald-600' : 'text-amber-600'}>
-                      {strength === 3 ? 'Strong' : strength === 2 ? 'Medium' : 'Weak'}
+                      {strength === 3 
+                        ? (isRtl ? 'قوية' : 'Strong') 
+                        : strength === 2 
+                          ? (isRtl ? 'متوسطة' : 'Medium') 
+                          : (isRtl ? 'ضعيفة' : 'Weak')}
                     </strong>
                   </span>
-                  <span>Min. 6 chars with letters & numbers</span>
+                  <span>{isRtl ? '٦ خانات كحد أدنى تحتوي حروفًا وأرقامًا' : 'Min. 6 chars with letters & numbers'}</span>
                 </div>
               </div>
             )}
@@ -453,10 +469,7 @@ export default function SignupPage() {
 
             {/* Terms and Privacy Policy Note */}
             <p className="text-[11px] font-medium text-[#57534E] leading-relaxed pt-1">
-              By creating an account, you agree to our{' '}
-              <Link to="/terms" className="text-[#166534] font-bold hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-[#166534] rounded">Terms of Service</Link>{' '}
-              and{' '}
-              <Link to="/privacy" className="text-[#166534] font-bold hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-[#166534] rounded">Privacy Policy</Link>.
+              {t('auth.signup.consent')}
             </p>
 
             {/* Submit Action Button */}
@@ -475,7 +488,7 @@ export default function SignupPage() {
                     className="flex items-center gap-2"
                   >
                     <Loader2 size={16} className="animate-spin" />
-                    <span>Creating Your Account...</span>
+                    <span>{isRtl ? 'جارٍ إنشاء حسابك...' : 'Creating Your Account...'}</span>
                   </motion.div>
                 ) : (
                   <motion.div
@@ -485,8 +498,8 @@ export default function SignupPage() {
                     exit={{ opacity: 0 }}
                     className="flex items-center gap-2"
                   >
-                    <span>Create Free Account</span>
-                    <ArrowRight size={15} />
+                    <span>{t('auth.signup.submit')}</span>
+                    <ArrowRight size={15} className={cn(isRtl && "rotate-180")} />
                   </motion.div>
                 )}
               </AnimatePresence>

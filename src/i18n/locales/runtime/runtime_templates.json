@@ -1,0 +1,347 @@
+[
+  {
+    "key": "runtime.dashboard.activeClusters",
+    "english": "{{count}} Clusters Active",
+    "arabic": "المجموعات النشطة: {{count}}",
+    "source_observed": [
+      "0 Clusters Active"
+    ],
+    "observed_keys": [
+      "app.dashboard.0_clusters_active_385460"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": "Confirm the meaning of Clusters before using this label."
+  },
+  {
+    "key": "runtime.contacts.count",
+    "english": "CONTACTS: {{count}}",
+    "arabic": "جهات الاتصال: {{count}}",
+    "source_observed": [
+      "CONTACTS: 0",
+      "CONTACTS: 2"
+    ],
+    "observed_keys": [
+      "app.contacts.contacts_0_a774ee",
+      "app.contacts.contacts_2_788ae4"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": ""
+  },
+  {
+    "key": "runtime.contacts.targetReach",
+    "english": "TARGET REACH: {{rate}}",
+    "arabic": "الوصول المستهدف: {{rate}}",
+    "source_observed": [
+      "TARGET REACH: 92%"
+    ],
+    "observed_keys": [
+      "app.contacts.target_reach_92_c3607e"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": "Confirm the metric definition. Pass a locale-formatted percentage."
+  },
+  {
+    "key": "runtime.scraper.importSelected",
+    "english": "Import Selected ({{count}})",
+    "arabic": "استيراد المحدد ({{count}})",
+    "source_observed": [
+      "Import Selected (0)"
+    ],
+    "observed_keys": [
+      "app.scraper.import_selected_0_2f0a9a"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": ""
+  },
+  {
+    "key": "runtime.scraper.importAll",
+    "english": "Import All to CRM ({{count}})",
+    "arabic": "استيراد الكل إلى إدارة علاقات العملاء ({{count}})",
+    "source_observed": [
+      "Import All to CRM (0)"
+    ],
+    "observed_keys": [
+      "app.scraper.import_all_to_crm_0_147715"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": ""
+  },
+  {
+    "key": "runtime.contacts.emailHistory",
+    "english": "Email History ({{count}})",
+    "arabic": "سجل البريد الإلكتروني ({{count}})",
+    "source_observed": [
+      "Email History (0)"
+    ],
+    "observed_keys": [
+      "app.contacts.email_history_0_72c37d"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": ""
+  },
+  {
+    "key": "runtime.contacts.scraperProvenance",
+    "english": "Scraper Provenance ({{count}})",
+    "arabic": "مصادر بيانات البحث ({{count}})",
+    "source_observed": [
+      "Scraper Provenance (0)"
+    ],
+    "observed_keys": [
+      "app.contacts.scraper_provenance_0_db2486"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": ""
+  },
+  {
+    "key": "runtime.contacts.firstDiscovered",
+    "english": "First Discovered: {{date}}",
+    "arabic": "أول اكتشاف: {{date}}",
+    "source_observed": [
+      "First Discovered: 15‏/1‏/2024"
+    ],
+    "observed_keys": [
+      "app.contacts.first_discovered_15_1_2024_82e6d2"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": "Format the underlying date; do not embed the observed demo date."
+  },
+  {
+    "key": "runtime.contacts.lastEnriched",
+    "english": "Last Enriched: {{value}}",
+    "arabic": "آخر استكمال للبيانات: {{value}}",
+    "source_observed": [
+      "Last Enriched: N/A"
+    ],
+    "observed_keys": [
+      "app.contacts.last_enriched_n_a_715351"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": "Localize the unavailable-value label separately."
+  },
+  {
+    "key": "runtime.contacts.allEmailHistory",
+    "english": "GLOBAL EMAIL CAMPAIGN HISTORY ({{count}})",
+    "arabic": "سجل جميع حملات البريد الإلكتروني ({{count}})",
+    "source_observed": [
+      "GLOBAL EMAIL CAMPAIGN HISTORY (0)"
+    ],
+    "observed_keys": [
+      "app.contacts.global_email_campaign_history_0_69f84a"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": ""
+  },
+  {
+    "key": "runtime.contacts.discoveryProvenance",
+    "english": "DISCOVERY PROVENANCE ({{count}})",
+    "arabic": "مصادر بيانات البحث ({{count}})",
+    "source_observed": [
+      "DISCOVERY PROVENANCE (0)"
+    ],
+    "observed_keys": [
+      "app.contacts.discovery_provenance_0_40f4df"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": ""
+  },
+  {
+    "key": "runtime.contacts.whatsappEnrollment",
+    "english": "WHATSAPP ENROLLMENT ({{count}})",
+    "arabic": "المشاركة في حملات واتساب ({{count}})",
+    "source_observed": [
+      "WHATSAPP ENROLLMENT (0)"
+    ],
+    "observed_keys": [
+      "app.contacts.whatsapp_enrollment_0_1d61af"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": ""
+  },
+  {
+    "key": "runtime.email.servicesCount",
+    "english": "{{count}} Services",
+    "arabic": "الخدمات: {{count}}",
+    "source_observed": [
+      "0 Services"
+    ],
+    "observed_keys": [
+      "email.agent.knowledge.serviceCount"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": ""
+  },
+  {
+    "key": "runtime.email.personalizedFields",
+    "english": "{{count}} Personalized Fields",
+    "arabic": "الحقول المخصصة: {{count}}",
+    "source_observed": [
+      "4 Personalized Fields"
+    ],
+    "observed_keys": [
+      "email.preview.personalizedFieldsCount"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": ""
+  },
+  {
+    "key": "runtime.whatsapp.complianceProgress",
+    "english": "{{verified}}/{{total}} VERIFIED",
+    "arabic": "تم التحقق من {{verified}}/{{total}}",
+    "source_observed": [
+      "3/4 VERIFIED"
+    ],
+    "observed_keys": [
+      "whatsapp.campaign_create.compliance_count"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": "Values are runtime counts, not a fixed compliance claim."
+  },
+  {
+    "key": "runtime.whatsapp.activeTags",
+    "english": "{{count}} Tags Active",
+    "arabic": "الوسوم النشطة: {{count}}",
+    "source_observed": [
+      "0 Tags Active"
+    ],
+    "observed_keys": [
+      "whatsapp.campaign_create.selected_tags_count"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": ""
+  },
+  {
+    "key": "runtime.whatsapp.activeContacts",
+    "english": "{{count}} Contacts Active",
+    "arabic": "جهات الاتصال النشطة: {{count}}",
+    "source_observed": [
+      "0 Contacts Active"
+    ],
+    "observed_keys": [
+      "whatsapp.campaign_create.manual_count"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": ""
+  },
+  {
+    "key": "runtime.whatsapp.connectionStatus",
+    "english": "> Connection Status: {{status}}",
+    "arabic": "> حالة الاتصال: {{status}}",
+    "source_observed": [
+      "> Connection Status: DISCONNECTED"
+    ],
+    "observed_keys": [
+      "whatsapp.settings.sandbox_log_disconnected"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": "Translate the display status from its stored code."
+  },
+  {
+    "key": "runtime.whatsapp.overallQuality",
+    "english": "Overall Quality Score: {{quality}}",
+    "arabic": "التقييم العام للجودة: {{quality}}",
+    "source_observed": [
+      "Overall Quality Score is \"Calculating...\""
+    ],
+    "observed_keys": [
+      "whatsapp.performance.quality_calculating"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": "Translate the quality state separately. Calculating... = جارٍ الحساب...",
+    "value_labels": [
+      {
+        "english": "Calculating...",
+        "arabic": "جارٍ الحساب..."
+      }
+    ]
+  },
+  {
+    "key": "runtime.whatsapp.performanceStatus",
+    "english": "STATUS: {{status}}",
+    "arabic": "الحالة: {{status}}",
+    "source_observed": [
+      "STATUS: STANDARD"
+    ],
+    "observed_keys": [
+      "whatsapp.performance.standard_status"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": "Translate status display from its code. STANDARD = قياسي; confirm the product meaning of this tier.",
+    "value_labels": [
+      {
+        "english": "STANDARD",
+        "arabic": "قياسي"
+      }
+    ]
+  },
+  {
+    "key": "runtime.whatsapp.messagesSent",
+    "english": "Messages sent successfully: {{count}}",
+    "arabic": "الرسائل المرسلة بنجاح: {{count}}",
+    "source_observed": [
+      "500 messages sent successfully."
+    ],
+    "observed_keys": [
+      "whatsapp.campaign_detail.messages_sent_log"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": "Read the count from the execution result; 500 was an observed snapshot."
+  },
+  {
+    "key": "runtime.contacts.selected",
+    "english": "{{count}} Selected",
+    "arabic": "المحدد: {{count}}",
+    "source_observed": [
+      "1 Selected"
+    ],
+    "observed_keys": [
+      "contacts.grid.one_selected"
+    ],
+    "status": "proposed_runtime_template",
+    "notes": "Count changes with the selected contacts; do not freeze 1."
+  },
+  {
+    "key": "runtime.whatsapp.deliveryFailurePhone",
+    "english": "Failed to deliver to {{phone}}: User phone number not on WhatsApp.",
+    "arabic": "تعذر تسليم الرسالة إلى {{phone}}: هذا الرقم غير مسجل في واتساب.",
+    "source_observed_redacted": "Failed to deliver to [phone]: User phone number not on WhatsApp.",
+    "source_url": "https://website.throbtech.com/campaigns/1",
+    "notes": "Derived from a visible execution log. Recorded phone omitted; preserve the actual phone value and isolate it LTR.",
+    "status": "proposed_runtime_template",
+    "observed_keys": [],
+    "source_observed": []
+  },
+  {
+    "key": "runtime.charts.valueTooltip",
+    "english": "VALUE: {{value}}",
+    "arabic": "القيمة: {{value}}",
+    "source_observed": [
+      "VALUE : 840"
+    ],
+    "source_url": "https://website.throbtech.com/campaigns/3",
+    "notes": "Derived from the observed chart tooltip. Format the underlying value for the locale.",
+    "status": "proposed_runtime_template",
+    "observed_keys": []
+  },
+  {
+    "key": "runtime.whatsapp.campaignCreated",
+    "english": "CREATED {{date}}",
+    "arabic": "تاريخ الإنشاء: {{date}}",
+    "source_observed_redacted": "CREATED [date]",
+    "source_url": "https://website.throbtech.com/campaigns/1",
+    "notes": "Derived from the visible campaign header. Format the underlying timestamp without changing account timezone.",
+    "status": "proposed_runtime_template",
+    "observed_keys": [],
+    "source_observed": []
+  },
+  {
+    "key": "runtime.whatsapp.campaignAudience",
+    "english": "{{count}} AUDIENCE",
+    "arabic": "الجمهور: {{count}}",
+    "source_observed_redacted": "[count] AUDIENCE",
+    "source_url": "https://website.throbtech.com/campaigns/1",
+    "notes": "Derived from the visible campaign header; confirm the count represents the target audience.",
+    "status": "proposed_runtime_template",
+    "observed_keys": [],
+    "source_observed": []
+  }
+]
