@@ -162,45 +162,65 @@ export default function SignupPage() {
 
           {/* Genuine Product Feature Highlights */}
           <div className="space-y-4 pt-1">
-            <div className="flex items-start gap-3.5">
+            <div className={cn("flex items-start gap-3.5", isRtl ? "text-right" : "text-left")}>
               <div className="w-9 h-9 rounded-xl bg-[#166534]/40 border border-[#22C55E]/30 flex items-center justify-center shrink-0 mt-0.5 text-[#22C55E]">
                 <Compass size={18} />
               </div>
               <div>
-                <h3 className="text-xs font-bold text-white">Google Places & Website Scraper</h3>
-                <p className="text-[11px] text-stone-300 mt-0.5 leading-relaxed">Extract public company profiles, normalize verified addresses, and inspect contact pages.</p>
+                <h3 className="text-xs font-bold text-white">
+                  {isRtl ? 'البحث عن الأنشطة التجارية واستخراج المواقع' : 'Google Places & Website Scraper'}
+                </h3>
+                <p className="text-[11px] text-stone-300 mt-0.5 leading-relaxed">
+                  {isRtl 
+                    ? 'استخرج ملفات الشركات العامة، وتحقق من العناوين، وافحص صفحات التواصل تلقائيًا.' 
+                    : 'Extract public company profiles, normalize verified addresses, and inspect contact pages.'}
+                </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3.5">
+            <div className={cn("flex items-start gap-3.5", isRtl ? "text-right" : "text-left")}>
               <div className="w-9 h-9 rounded-xl bg-[#166534]/40 border border-[#22C55E]/30 flex items-center justify-center shrink-0 mt-0.5 text-[#22C55E]">
                 <Bot size={18} />
               </div>
               <div>
-                <h3 className="text-xs font-bold text-white">AI Email Marketing Agent</h3>
-                <p className="text-[11px] text-stone-300 mt-0.5 leading-relaxed">Orchestrate personalized B2B outreach with verified sending domains, DKIM, and safety limits.</p>
+                <h3 className="text-xs font-bold text-white">
+                  {isRtl ? 'مساعد التسويق عبر البريد الإلكتروني بالذكاء الاصطناعي' : 'AI Email Marketing Agent'}
+                </h3>
+                <p className="text-[11px] text-stone-300 mt-0.5 leading-relaxed">
+                  {isRtl 
+                    ? 'أطلق حملات تواصل مخصصة للشركات بنطاقات إرسال موثقة، وإعدادات DKIM، وضوابط أمان متكاملة.' 
+                    : 'Orchestrate personalized B2B outreach with verified sending domains, DKIM, and safety limits.'}
+                </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3.5">
+            <div className={cn("flex items-start gap-3.5", isRtl ? "text-right" : "text-left")}>
               <div className="w-9 h-9 rounded-xl bg-[#166534]/40 border border-[#22C55E]/30 flex items-center justify-center shrink-0 mt-0.5 text-[#22C55E]">
                 <Users size={18} />
               </div>
               <div>
-                <h3 className="text-xs font-bold text-white">Centralized Audience Management</h3>
-                <p className="text-[11px] text-stone-300 mt-0.5 leading-relaxed">Manage contacts, tags, custom attributes, and multi-channel message histories in one place.</p>
+                <h3 className="text-xs font-bold text-white">
+                  {isRtl ? 'إدارة مركزية لشرائح الجمهور' : 'Centralized Audience Management'}
+                </h3>
+                <p className="text-[11px] text-stone-300 mt-0.5 leading-relaxed">
+                  {isRtl 
+                    ? 'أدر جهات الاتصال، والتصنيفات، والسمات المخصصة، وسجل المحادثات متعدد القنوات من مكان واحد.' 
+                    : 'Manage contacts, tags, custom attributes, and multi-channel message histories in one place.'}
+                </p>
               </div>
             </div>
           </div>
 
           {/* Transparent Security & Trust Assurance */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4.5 space-y-2">
+          <div className={cn("bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4.5 space-y-2", isRtl ? "text-right" : "text-left")}>
             <div className="flex items-center gap-2 text-xs font-bold text-white">
               <ShieldCheck size={16} className="text-[#22C55E]" />
-              <span>Enterprise Privacy & Platform Security</span>
+              <span>{isRtl ? 'خصوصية المؤسسات وأمان المنصة' : 'Enterprise Privacy & Platform Security'}</span>
             </div>
             <p className="text-[11px] text-stone-300 leading-relaxed">
-              Every organization receives dedicated tenant isolation, automated encryption at rest and in transit, and DNS ownership validation before sending.
+              {isRtl 
+                ? 'تحصل كل منشأة على عزل مخصص لبياناتها، وتشفير تلقائي أثناء النقل والتخزين، والتحقق من ملكية نطاقات DNS قبل بدء الإرسال.' 
+                : 'Every organization receives dedicated tenant isolation, automated encryption at rest and in transit, and DNS ownership validation before sending.'}
             </p>
           </div>
         </div>
@@ -208,16 +228,22 @@ export default function SignupPage() {
         {/* Bottom Capabilities Pill Bar */}
         <div className="relative z-10 pt-6 border-t border-white/10 grid grid-cols-3 gap-4 text-center">
           <div>
-            <p className="text-xs font-bold text-white">Verified</p>
-            <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold mt-0.5">Domain DNS</p>
+            <p className="text-xs font-bold text-white">{isRtl ? 'موثّق' : 'Verified'}</p>
+            <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold mt-0.5">
+              {isRtl ? 'نطاق DNS' : 'Domain DNS'}
+            </p>
           </div>
           <div>
-            <p className="text-xs font-bold text-[#22C55E]">Isolated</p>
-            <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold mt-0.5">Tenant Data</p>
+            <p className="text-xs font-bold text-[#22C55E]">{isRtl ? 'معزول' : 'Isolated'}</p>
+            <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold mt-0.5">
+              {isRtl ? 'بيانات المشترك' : 'Tenant Data'}
+            </p>
           </div>
           <div>
-            <p className="text-xs font-bold text-white">Built-In</p>
-            <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold mt-0.5">Lead Scraper</p>
+            <p className="text-xs font-bold text-white">{isRtl ? 'مدمج' : 'Built-In'}</p>
+            <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold mt-0.5">
+              {isRtl ? 'استخراج العملاء' : 'Lead Scraper'}
+            </p>
           </div>
         </div>
       </aside>
@@ -510,13 +536,16 @@ export default function SignupPage() {
         {/* Security & Verification Guarantees */}
         <footer className="pt-6 mt-8 border-t border-stone-200/80 flex flex-wrap items-center justify-center gap-6 text-[11px] font-bold text-[#57534E]">
           <span className="flex items-center gap-1.5">
-            <ShieldCheck size={14} className="text-[#166534]" /> 256-Bit SSL Encryption
+            <ShieldCheck size={14} className="text-[#166534]" /> 
+            <span>{isRtl ? 'تشفير SSL بقوة 256 بت' : '256-Bit SSL Encryption'}</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <CheckCircle2 size={14} className="text-[#166534]" /> Dedicated Tenant Isolation
+            <CheckCircle2 size={14} className="text-[#166534]" /> 
+            <span>{isRtl ? 'عزل مخصص لبيانات المشترك' : 'Dedicated Tenant Isolation'}</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <CheckCircle2 size={14} className="text-[#166534]" /> No Credit Card Required
+            <CheckCircle2 size={14} className="text-[#166534]" /> 
+            <span>{isRtl ? 'دون الحاجة لبطاقة ائتمان' : 'No Credit Card Required'}</span>
           </span>
         </footer>
       </main>

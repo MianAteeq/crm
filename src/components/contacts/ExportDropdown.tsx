@@ -1,12 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Download, FileText, FileSpreadsheet, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useI18n } from '../../i18n';
+import { cn } from '../../lib/utils';
 
 interface ExportDropdownProps {
   onExport: (format: 'csv' | 'excel') => void;
 }
 
 export default function ExportDropdown({ onExport }: ExportDropdownProps) {
+  const { t, isRtl } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -25,9 +28,10 @@ export default function ExportDropdown({ onExport }: ExportDropdownProps) {
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="h-10 px-4 bg-white border border-slate-200 hover:border-[#bbf7d0] rounded-xl text-xs sm:text-sm font-semibold text-[#57534E] hover:text-[#166534] hover:bg-[#F0FDF4] transition-all shadow-xs active:scale-95 flex items-center gap-2 cursor-pointer"
+        aria-label={t('app.contacts.export_366489', 'Export')}
       >
         <Download size={15} />
-        <span>Export</span>
+        <span>{t('app.contacts.export_366489', 'Export')}</span>
         <ChevronDown size={14} className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
@@ -37,30 +41,35 @@ export default function ExportDropdown({ onExport }: ExportDropdownProps) {
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden"
+            className={cn(
+              "absolute mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden",
+              isRtl ? "left-0" : "right-0"
+            )}
           >
             <div className="p-2 space-y-1">
                <button 
                 onClick={() => { onExport('csv'); setIsOpen(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all"
+                className={cn("w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all cursor-pointer", isRtl ? "text-right" : "text-left")}
                >
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">
                      <FileText size={16} />
                   </div>
-                  <span>Export as CSV</span>
+                  <span>{isRtl ? 'تصدير كملف CSV' : 'Export as CSV'}</span>
                </button>
                <button 
                 onClick={() => { onExport('excel'); setIsOpen(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all"
+                className={cn("w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all cursor-pointer", isRtl ? "text-right" : "text-left")}
                >
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
                      <FileSpreadsheet size={16} />
                   </div>
-                  <span>Export as Excel</span>
+                  <span>{isRtl ? 'تصدير كملف Excel' : 'Export as Excel'}</span>
                </button>
             </div>
             <div className="p-3 bg-slate-50 border-t border-slate-100">
-               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center">Includes custom fields</p>
+               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center">
+                 {isRtl ? 'يتضمن الحقول المخصصة' : 'Includes custom fields'}
+               </p>
             </div>
           </motion.div>
         )}

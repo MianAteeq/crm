@@ -122,6 +122,8 @@ export default function App() {
         <Route path="/services/lead-forms" element={<LeadFormsPage />} />
         <Route path="/services/ai-responses" element={<AIResponsesPage />} />
         <Route path="/services/page-builder" element={<PageBuilderPage />} />
+        <Route path="/services/flow-builder" element={<AutomationPage />} />
+        <Route path="/services/team-inbox" element={<RetargetingPage />} />
         <Route path="/services/media-storage" element={<MediaStoragePage />} />
         <Route path="/services/analytics" element={<WhatsAppAnalyticsPage />} />
         <Route path="/login" element={<LoginPage />} />

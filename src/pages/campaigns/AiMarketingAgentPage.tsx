@@ -15,6 +15,7 @@ import {
   RotateCcw, 
   Calendar, 
   ChevronRight, 
+  ChevronLeft,
   Settings, 
   BookOpen, 
   TrendingUp, 
@@ -65,8 +66,11 @@ import {
   EmailTemplateTheme
 } from '../../utils/emailTemplateFrames';
 import { toast } from '../../components/ui/Toast';
+import { useI18n } from '../../i18n';
+import { cn } from '../../lib/utils';
 
 export default function AiMarketingAgentPage() {
+  const { t, isRtl } = useI18n();
   const [activeTab, setActiveTab] = useState<'console' | 'history' | 'knowledge' | 'settings'>('console');
   
   // Prompt & Run state
@@ -119,13 +123,44 @@ export default function AiMarketingAgentPage() {
   const [isSavingKnowledge, setIsSavingKnowledge] = useState(false);
 
   // Sample quick prompts
-  const samplePrompts = [
+  const samplePrompts = isRtl ? [
+    "أرسل بريداً إلكترونياً إلى شركات العقارات حول خدمة الشات بوت بالذكاء الاصطناعي.",
+    "أنشئ حملة تسويقية لعيادات الأسنان للترويج لموظف الاستقبال الافتراضي الذكي.",
+    "تواصل مع منشآت قطاع السيارات التي لم يسبق لها استلام بريد تسويقي منا.",
+    "أرسل رسالة متابعة لجهات اتصال العقارات التي استلمت حملتنا السابقة.",
+    "روّج لخدمة أتمتة الردود على الواتساب للمراكز الطبية والعيادات المحلية.",
+  ] : [
     "Send an email to real estate businesses about our AI chatbot service.",
     "Create a campaign for dental clinics promoting our AI receptionist.",
     "Contact businesses in the Automotive category that have never received an email from us.",
     "Send a follow-up to real estate contacts who received our previous campaign.",
     "Promote our WhatsApp automation service to local clinics in Lahore.",
   ];
+
+  const getThemeLabel = (themeId: string, fallback: string) => {
+    if (!isRtl) return fallback;
+    switch (themeId) {
+      case 'executive': return 'تنفيذي حديث';
+      case 'minimal': return 'بسيط وأنيق';
+      case 'corporate': return 'شركات رسمي';
+      case 'bold': return 'جريء وبارز';
+      case 'modern': return 'عصري متطور';
+      default: return fallback;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    if (!isRtl) return status.replace('_', ' ');
+    switch (status) {
+      case 'awaiting_approval': return 'بانتظار الموافقة';
+      case 'running': return 'قيد التنفيذ';
+      case 'completed': return 'مكتمل';
+      case 'failed': return 'فشل';
+      case 'scheduled': return 'مجدول';
+      case 'cancelled': return 'ملغي';
+      default: return status;
+    }
+  };
 
   // Fetch initial knowledge and past runs
   useEffect(() => {
@@ -475,7 +510,7 @@ export default function AiMarketingAgentPage() {
     : activeFramedHtml;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div className={cn("space-y-6 max-w-7xl mx-auto pb-12", isRtl && "font-arabic")}>
       {/* Page Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-2">
         <div className="flex items-start sm:items-center gap-4">
@@ -485,21 +520,23 @@ export default function AiMarketingAgentPage() {
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-[#12263A] tracking-tight">
-                AI Email Marketing Agent
+                {isRtl ? 'مساعد التسويق بالذكاء الاصطناعي' : 'AI Email Marketing Agent'}
               </h1>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
-                AI Engine • Verified Delivery Pipeline
+                {isRtl ? 'محرك ذكاء اصطناعي • مسار تسليم موثق ومعتمد' : 'AI Engine • Verified Delivery Pipeline'}
               </span>
             </div>
             <p className="text-xs sm:text-sm font-medium text-[#57534E] max-w-2xl leading-relaxed">
-              Type a marketing objective. The AI agent inspects your CRM audience, selects verified domains, crafts personalized emails, checks safety limits, and delivers campaigns.
+              {isRtl
+                ? 'اكتب هدفك التسويقي باللغة الطبيعية. يقوم المساعد الذكي بفحص جمهورك في CRM، واختيار النطاقات الموثقة، وصياغة رسائل B2B مخصصة، ومراجعة ضوابط الأمان، ثم جدولة وإرسال الحملة.'
+                : 'Type a marketing objective. The AI agent inspects your CRM audience, selects verified domains, crafts personalized emails, checks safety limits, and delivers campaigns.'}
             </p>
           </div>
         </div>
 
         {/* Tab Switcher Pills */}
-        <div className="flex items-center gap-1 bg-stone-100 p-1.5 rounded-2xl border border-stone-200/80 self-start lg:self-center shadow-xs">
+        <div className="flex items-center gap-1 bg-stone-100 p-1.5 rounded-2xl border border-stone-200/80 self-start lg:self-center shadow-xs flex-wrap">
           <button
             onClick={() => setActiveTab('console')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
@@ -508,7 +545,7 @@ export default function AiMarketingAgentPage() {
                 : 'text-[#57534E] hover:text-[#12263A] hover:bg-stone-200/50'
             }`}
           >
-            Agent Console
+            {isRtl ? 'لوحة تحكم الوكيل' : 'Agent Console'}
           </button>
           <button
             onClick={() => setActiveTab('history')}
@@ -518,7 +555,7 @@ export default function AiMarketingAgentPage() {
                 : 'text-[#57534E] hover:text-[#12263A] hover:bg-stone-200/50'
             }`}
           >
-            Run History
+            {isRtl ? 'سجل العمليات' : 'Run History'}
           </button>
           <button
             onClick={() => setActiveTab('knowledge')}
@@ -528,7 +565,7 @@ export default function AiMarketingAgentPage() {
                 : 'text-[#57534E] hover:text-[#12263A] hover:bg-stone-200/50'
             }`}
           >
-            Knowledge & Services
+            {isRtl ? 'المعرفة والخدمات' : 'Knowledge & Services'}
           </button>
           <button
             onClick={() => setActiveTab('settings')}
@@ -538,7 +575,7 @@ export default function AiMarketingAgentPage() {
                 : 'text-[#57534E] hover:text-[#12263A] hover:bg-stone-200/50'
             }`}
           >
-            Safety Limits
+            {isRtl ? 'ضوابط الأمان' : 'Safety Limits'}
           </button>
         </div>
       </div>
@@ -551,10 +588,17 @@ export default function AiMarketingAgentPage() {
             <div className="flex items-center justify-between">
               <label className="text-sm font-semibold text-[#12263A] flex items-center gap-2">
                 <Bot className="w-4 h-4 text-[#166534]" />
-                What marketing campaign would you like me to create?
+                {isRtl ? 'ما هي الحملة التسويقية التي ترغب في إنشائها؟' : 'What marketing campaign would you like me to create?'}
               </label>
               <span className="text-xs text-[#57534E]">
-                Mode: <strong className="text-[#166534] uppercase font-semibold">{knowledge?.approval_mode || 'Approval'}</strong>
+                {isRtl ? 'الوضع: ' : 'Mode: '}
+                <strong className="text-[#166534] uppercase font-semibold">
+                  {knowledge?.approval_mode === 'manual'
+                    ? (isRtl ? 'يدوي' : 'Manual')
+                    : knowledge?.approval_mode === 'autonomous'
+                    ? (isRtl ? 'تلقائي بالكامل' : 'Autonomous')
+                    : (isRtl ? 'موافقة' : 'Approval')}
+                </strong>
               </span>
             </div>
 
@@ -562,12 +606,15 @@ export default function AiMarketingAgentPage() {
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Example: Send an email to real estate businesses about our AI chatbot service..."
+                placeholder={isRtl ? 'مثال: أرسل بريداً إلى شركات العقارات حول خدمة الشات بوت بالذكاء الاصطناعي...' : 'Example: Send an email to real estate businesses about our AI chatbot service...'}
                 rows={3}
                 disabled={isPlanning}
-                className="w-full rounded-xl border border-stone-200 p-4 pr-32 text-[#12263A] placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534] text-sm resize-none bg-[#FAFAF9]"
+                className={cn(
+                  "w-full rounded-xl border border-stone-200 p-4 text-[#12263A] placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534] text-sm resize-none bg-[#FAFAF9]",
+                  isRtl ? "pl-36 pr-4 text-right" : "pr-36 pl-4"
+                )}
               />
-              <div className="absolute right-3 bottom-4 flex items-center gap-2">
+              <div className={cn("absolute bottom-4 flex items-center gap-2", isRtl ? "left-3" : "right-3")}>
                 <button
                   type="submit"
                   disabled={isPlanning || !prompt.trim()}
@@ -576,12 +623,12 @@ export default function AiMarketingAgentPage() {
                   {isPlanning ? (
                     <>
                       <RotateCcw className="w-3.5 h-3.5 animate-spin" />
-                      Analyzing...
+                      {isRtl ? 'جارٍ التحليل والتخطيط...' : 'Analyzing...'}
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-3.5 h-3.5 text-[#22C55E]" />
-                      Create Campaign
+                      {isRtl ? 'إنشاء الحملة' : 'Create Campaign'}
                     </>
                   )}
                 </button>
@@ -590,7 +637,7 @@ export default function AiMarketingAgentPage() {
 
             {/* Quick Inspiration Chips */}
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="text-xs text-slate-400 font-medium">Try:</span>
+              <span className="text-xs text-slate-400 font-medium">{isRtl ? 'جرّب:' : 'Try:'}</span>
               {samplePrompts.map((p, idx) => (
                 <button
                   key={idx}
@@ -599,7 +646,10 @@ export default function AiMarketingAgentPage() {
                     setPrompt(p);
                     handlePlanCampaign(undefined, p);
                   }}
-                  className="px-3 py-1 bg-[#FAFAF9] hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#166534]/30 text-[#57534E] rounded-lg text-xs border border-stone-200/80 transition-colors text-left"
+                  className={cn(
+                    "px-3 py-1 bg-[#FAFAF9] hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#166534]/30 text-[#57534E] rounded-lg text-xs border border-stone-200/80 transition-colors",
+                    isRtl ? "text-right" : "text-left"
+                  )}
                 >
                   {p}
                 </button>
@@ -614,9 +664,13 @@ export default function AiMarketingAgentPage() {
                 <Sparkles className="w-6 h-6 animate-spin text-[#22C55E]" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-semibold text-[#12263A]">AI Agent Orchestrator Running</h3>
+                <h3 className="text-base font-semibold text-[#12263A]">
+                  {isRtl ? 'محرك الذكاء الاصطناعي قيد المعالجة والتخطيط' : 'AI Agent Orchestrator Running'}
+                </h3>
                 <p className="text-xs text-[#57534E] max-w-md mx-auto">
-                  Understanding intent • Filtering CRM categories • Checking sending domain • Generating B2B copy with AI...
+                  {isRtl
+                    ? 'فهم القصد التسويقي • تصفية فئات CRM • فحص نطاقات الإرسال المعتمدة • صياغة محتوى تسويقي B2B متقدم...'
+                    : 'Understanding intent • Filtering CRM categories • Checking sending domain • Generating B2B copy with AI...'}
                 </p>
               </div>
             </div>
@@ -628,7 +682,7 @@ export default function AiMarketingAgentPage() {
               {currentRun.errors && (
                 <div className="mb-4 p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
                   <XCircle className="w-4 h-4 text-rose-500 shrink-0" />
-                  <span><strong>Error:</strong> {currentRun.errors}</span>
+                  <span><strong>{isRtl ? 'خطأ:' : 'Error:'}</strong> {currentRun.errors}</span>
                 </div>
               )}
 
@@ -639,14 +693,14 @@ export default function AiMarketingAgentPage() {
                     <div>
                       <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 rounded-md text-xs font-semibold mb-1">
                         <Sparkles className="w-3 h-3 text-[#22C55E]" />
-                        AI CAMPAIGN PLAN
+                        {isRtl ? 'خطة الحملة الذكية' : 'AI CAMPAIGN PLAN'}
                       </div>
                       <h2 className="text-lg font-bold text-[#12263A]">{plan.campaign_name}</h2>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-[#57534E]">Status:</span>
+                      <span className="text-xs text-[#57534E]">{isRtl ? 'الحالة:' : 'Status:'}</span>
                       <span className="px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-xs font-semibold">
-                        Ready for Review
+                        {isRtl ? 'جاهز للمراجعة والاعتماد' : 'Ready for Review'}
                       </span>
                       <button
                         type="button"
@@ -655,7 +709,7 @@ export default function AiMarketingAgentPage() {
                           setIsEditingEmail(false);
                         }}
                         className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors ml-1"
-                        title="Dismiss Plan"
+                        title={isRtl ? 'إغلاق الخطة' : 'Dismiss Plan'}
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -665,19 +719,19 @@ export default function AiMarketingAgentPage() {
                   {/* Summary Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
                     <div>
-                      <span className="text-[11px] text-slate-400 block">Industry</span>
+                      <span className="text-[11px] text-slate-400 block">{isRtl ? 'القطاع' : 'Industry'}</span>
                       <span className="text-xs font-semibold text-slate-800">{plan.category}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] text-slate-400 block">Service</span>
+                      <span className="text-[11px] text-slate-400 block">{isRtl ? 'الخدمة' : 'Service'}</span>
                       <span className="text-xs font-semibold text-slate-800">{plan.service}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] text-slate-400 block">Objective</span>
+                      <span className="text-[11px] text-slate-400 block">{isRtl ? 'الهدف' : 'Objective'}</span>
                       <span className="text-xs font-semibold text-slate-800">{plan.objective}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] text-slate-400 block">Location</span>
+                      <span className="text-[11px] text-slate-400 block">{isRtl ? 'الموقع' : 'Location'}</span>
                       <span className="text-xs font-semibold text-slate-800">{plan.location}</span>
                     </div>
                   </div>
@@ -687,36 +741,37 @@ export default function AiMarketingAgentPage() {
                     <div className="flex items-center justify-between">
                       <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                         <Users className="w-3.5 h-3.5 text-indigo-600" />
-                        Audience Eligibility Breakdown
+                        {isRtl ? 'تفصيل أهلية واستحقاق الجمهور' : 'Audience Eligibility Breakdown'}
                       </h4>
                       <button
                         onClick={() => setShowAudienceModal(true)}
-                        className="text-xs text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-1"
+                        className="text-xs text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-1 cursor-pointer"
                       >
-                        View Sample Contacts <ChevronRight className="w-3 h-3" />
+                        <span>{isRtl ? 'عرض عينة من جهات الاتصال' : 'View Sample Contacts'}</span>
+                        {isRtl ? <ChevronLeft className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
                       </button>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
                       <div className="p-2.5 bg-slate-50 rounded-lg">
-                        <span className="text-[10px] text-slate-400 block">Total In Category</span>
-                        <span className="text-sm font-bold text-slate-800">{plan.total_contacts.toLocaleString()}</span>
+                        <span className="text-[10px] text-slate-400 block">{isRtl ? 'الإجمالي في الفئة' : 'Total In Category'}</span>
+                        <span className="text-sm font-bold text-slate-800">{plan.total_contacts.toLocaleString(isRtl ? 'ar-SA' : 'en-US')}</span>
                       </div>
                       <div className="p-2.5 bg-slate-50 rounded-lg">
-                        <span className="text-[10px] text-slate-400 block">With Email</span>
-                        <span className="text-sm font-bold text-slate-800">{plan.contacts_with_email.toLocaleString()}</span>
+                        <span className="text-[10px] text-slate-400 block">{isRtl ? 'يتوفر بريد إلكتروني' : 'With Email'}</span>
+                        <span className="text-sm font-bold text-slate-800">{plan.contacts_with_email.toLocaleString(isRtl ? 'ar-SA' : 'en-US')}</span>
                       </div>
                       <div className="p-2.5 bg-amber-50 rounded-lg text-amber-800">
-                        <span className="text-[10px] text-amber-600 block">Suppressed / Invalid</span>
-                        <span className="text-sm font-bold">{((plan.exclusion_reasons?.suppressed || 0) + (plan.exclusion_reasons?.unsubscribed || 0)).toLocaleString()}</span>
+                        <span className="text-[10px] text-amber-600 block">{isRtl ? 'مستبعد / غير صالح' : 'Suppressed / Invalid'}</span>
+                        <span className="text-sm font-bold">{((plan.exclusion_reasons?.suppressed || 0) + (plan.exclusion_reasons?.unsubscribed || 0)).toLocaleString(isRtl ? 'ar-SA' : 'en-US')}</span>
                       </div>
                       <div className="p-2.5 bg-slate-50 rounded-lg text-slate-700">
-                        <span className="text-[10px] text-slate-400 block">Cooldown Excluded</span>
-                        <span className="text-sm font-bold">{(plan.exclusion_reasons?.recently_contacted_cooldown || 0).toLocaleString()}</span>
+                        <span className="text-[10px] text-slate-400 block">{isRtl ? 'مستبعد بفترة التهدئة' : 'Cooldown Excluded'}</span>
+                        <span className="text-sm font-bold">{(plan.exclusion_reasons?.recently_contacted_cooldown || 0).toLocaleString(isRtl ? 'ar-SA' : 'en-US')}</span>
                       </div>
                       <div className="p-2.5 bg-emerald-50 rounded-lg text-emerald-800 border border-emerald-200">
-                        <span className="text-[10px] text-emerald-600 block font-semibold">Eligible To Send</span>
-                        <span className="text-base font-extrabold">{plan.eligible_count.toLocaleString()}</span>
+                        <span className="text-[10px] text-emerald-600 block font-semibold">{isRtl ? 'مؤهل للإرسال' : 'Eligible To Send'}</span>
+                        <span className="text-base font-extrabold">{plan.eligible_count.toLocaleString(isRtl ? 'ar-SA' : 'en-US')}</span>
                       </div>
                     </div>
                   </div>
@@ -727,7 +782,7 @@ export default function AiMarketingAgentPage() {
                       <div className="flex items-center gap-2">
                         <FileText className="w-4 h-4 text-indigo-600" />
                         <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                          Personalized Email Template
+                          {isRtl ? 'قالب البريد الإلكتروني المخصص' : 'Personalized Email Template'}
                         </h4>
                       </div>
 
@@ -744,7 +799,7 @@ export default function AiMarketingAgentPage() {
                                 : 'text-slate-500 hover:text-slate-800'
                             }`}
                           >
-                            Simulated View
+                            {isRtl ? 'عرض محاكاة' : 'Simulated View'}
                           </button>
                           <button
                             type="button"
@@ -755,7 +810,7 @@ export default function AiMarketingAgentPage() {
                                 : 'text-slate-500 hover:text-slate-800'
                             }`}
                           >
-                            Merge Tags View
+                            {isRtl ? 'عرض علامات الدمج' : 'Merge Tags View'}
                           </button>
                         </div>
 
@@ -770,7 +825,9 @@ export default function AiMarketingAgentPage() {
                           }`}
                         >
                           <Edit3 className="w-3.5 h-3.5" />
-                          {isEditingEmail ? 'Close Editor' : 'Edit Email'}
+                          {isEditingEmail 
+                            ? (isRtl ? 'إغلاق المحرر' : 'Close Editor') 
+                            : (isRtl ? 'تعديل البريد' : 'Edit Email')}
                         </button>
 
                         {/* Full screen */}
@@ -778,7 +835,7 @@ export default function AiMarketingAgentPage() {
                           type="button"
                           onClick={() => setShowEmailPreviewModal(true)}
                           className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-slate-50 border border-slate-200"
-                          title="Full Screen Preview"
+                          title={isRtl ? 'معاينة ملء الشاشة' : 'Full Screen Preview'}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -788,7 +845,7 @@ export default function AiMarketingAgentPage() {
                     {/* Template Theme Selector Chips */}
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
-                        <Palette className="w-3 h-3" /> Template Style:
+                        <Palette className="w-3 h-3" /> {isRtl ? 'نمط القالب:' : 'Template Style:'}
                       </span>
                       {EMAIL_TEMPLATE_THEMES.map((theme) => (
                         <button
@@ -801,12 +858,12 @@ export default function AiMarketingAgentPage() {
                               : 'bg-white text-slate-600 hover:bg-slate-50 border-slate-200'
                           }`}
                         >
-                          {theme.name}
+                          {getThemeLabel(theme.id, theme.name)}
                         </button>
                       ))}
                     </div>
 
-                    {/* EDIT MODE: Visual WYSIWYG Editor (Requirement: Do not give HTML editor, give visual editor; variables should be name, business name) */}
+                    {/* EDIT MODE: Visual WYSIWYG Editor */}
                     {isEditingEmail ? (
                       <div className="bg-white border-2 border-indigo-500/30 rounded-2xl p-5 shadow-xl space-y-5">
                         {/* Editor Header */}
@@ -814,10 +871,12 @@ export default function AiMarketingAgentPage() {
                           <div>
                             <span className="font-bold text-slate-900 text-sm flex items-center gap-2">
                               <Edit3 className="w-4 h-4 text-indigo-600" />
-                              Visual Email Editor & Template Customizer
+                              {isRtl ? 'محرر البريد المرئي ومخصص القالب' : 'Visual Email Editor & Template Customizer'}
                             </span>
                             <p className="text-xs text-slate-500 mt-0.5">
-                              Click directly in the email body below to write and format visually. Use Name and Business Name variables to personalize.
+                              {isRtl 
+                                ? 'انقر مباشرة داخل نص البريد الإلكتروني أدناه للكتابة والتنسيق بصرياً. استخدم متغيرات الاسم واسم الشركة للتخصيص.' 
+                                : 'Click directly in the email body below to write and format visually. Use Name and Business Name variables to personalize.'}
                             </p>
                           </div>
                           <div className="flex items-center gap-2">
@@ -826,7 +885,7 @@ export default function AiMarketingAgentPage() {
                               onClick={() => setIsEditingEmail(false)}
                               className="px-3.5 py-1.5 border border-slate-200 text-slate-600 hover:bg-slate-100 rounded-lg text-xs font-semibold"
                             >
-                              Cancel
+                              {isRtl ? 'إلغاء' : 'Cancel'}
                             </button>
                             <button
                               type="button"
@@ -835,7 +894,9 @@ export default function AiMarketingAgentPage() {
                               className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-md shadow-indigo-600/20"
                             >
                               <Save className="w-3.5 h-3.5" />
-                              {isSavingEmailEdits ? 'Saving...' : 'Save & Update Campaign'}
+                              {isSavingEmailEdits 
+                                ? (isRtl ? 'جارٍ الحفظ...' : 'Saving...') 
+                                : (isRtl ? 'حفظ وتحديث الحملة' : 'Save & Update Campaign')}
                             </button>
                           </div>
                         </div>
@@ -844,23 +905,25 @@ export default function AiMarketingAgentPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div>
                             <div className="flex items-center justify-between mb-1">
-                              <label className="text-xs font-semibold text-slate-700">Subject Line</label>
+                              <label className="text-xs font-semibold text-slate-700">
+                                {isRtl ? 'سطر الموضوع' : 'Subject Line'}
+                              </label>
                               <div className="flex items-center gap-1">
                                 <button
                                   type="button"
                                   onClick={() => setEditSubject(prev => prev + ' {{name}}')}
                                   className="text-[10px] text-indigo-600 hover:text-indigo-800 font-semibold px-1 rounded hover:bg-indigo-50"
-                                  title="Add {{name}} to subject"
+                                  title={isRtl ? 'إضافة {{name}} إلى الموضوع' : 'Add {{name}} to subject'}
                                 >
-                                  + Name
+                                  {isRtl ? '+ الاسم' : '+ Name'}
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => setEditSubject(prev => prev + ' {{business_name}}')}
                                   className="text-[10px] text-indigo-600 hover:text-indigo-800 font-semibold px-1 rounded hover:bg-indigo-50"
-                                  title="Add {{business_name}} to subject"
+                                  title={isRtl ? 'إضافة {{business_name}} إلى الموضوع' : 'Add {{business_name}} to subject'}
                                 >
-                                  + Business
+                                  {isRtl ? '+ الشركة' : '+ Business'}
                                 </button>
                               </div>
                             </div>
@@ -868,24 +931,28 @@ export default function AiMarketingAgentPage() {
                               type="text"
                               value={editSubject}
                               onChange={(e) => setEditSubject(e.target.value)}
-                              placeholder="e.g. Quick question regarding {{business_name}}"
+                              placeholder={isRtl ? 'مثال: استفسار سريع بخصوص {{business_name}}' : 'e.g. Quick question regarding {{business_name}}'}
                               className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 text-xs focus:ring-1 focus:ring-indigo-500"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">Preheader Text</label>
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              {isRtl ? 'نص المعاينة (Preheader)' : 'Preheader Text'}
+                            </label>
                             <input
                               type="text"
                               value={editPreheader}
                               onChange={(e) => setEditPreheader(e.target.value)}
-                              placeholder="Preview snippet in recipient's inbox..."
+                              placeholder={isRtl ? 'مقتطف المعاينة في صندوق وارد المستلم...' : "Preview snippet in recipient's inbox..."}
                               className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 text-xs focus:ring-1 focus:ring-indigo-500"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">Sender From Name</label>
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              {isRtl ? 'اسم المرسل' : 'Sender From Name'}
+                            </label>
                             <input
                               type="text"
                               value={editFromName}
@@ -897,19 +964,19 @@ export default function AiMarketingAgentPage() {
 
                         {/* VISUAL FORMATTING & MERGE VARIABLE TOOLBAR */}
                         <div className="p-3 bg-slate-100 border border-slate-200 rounded-xl flex flex-wrap items-center gap-2">
-                          {/* HERO MERGE VARIABLES (Requirement: variable should be Name, Business Name) */}
+                          {/* HERO MERGE VARIABLES */}
                           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mr-1 flex items-center gap-1">
-                            <Tag className="w-3 h-3 text-indigo-600" /> Insert Variable:
+                            <Tag className="w-3 h-3 text-indigo-600" /> {isRtl ? 'إدراج متغير:' : 'Insert Variable:'}
                           </span>
                           <button
                             type="button"
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => insertVariableIntoEditor('{{name}}', 'Name')}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition-all active:scale-95"
-                            title="Insert contact's personal name"
+                            title={isRtl ? 'إدراج اسم جهة الاتصال الشخصي' : "Insert contact's personal name"}
                           >
                             <User className="w-3.5 h-3.5" />
-                            <span>Name</span>
+                            <span>{isRtl ? 'الاسم' : 'Name'}</span>
                             <code className="text-[10px] bg-white/20 px-1 py-0.5 rounded font-mono font-normal">{"{{name}}"}</code>
                           </button>
 
@@ -918,10 +985,10 @@ export default function AiMarketingAgentPage() {
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => insertVariableIntoEditor('{{business_name}}', 'Business Name')}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-sm transition-all active:scale-95"
-                            title="Insert recipient's business / company name"
+                            title={isRtl ? 'إدراج اسم شركة المستلم' : "Insert recipient's business / company name"}
                           >
                             <Building className="w-3.5 h-3.5" />
-                            <span>Business Name</span>
+                            <span>{isRtl ? 'اسم الشركة' : 'Business Name'}</span>
                             <code className="text-[10px] bg-white/20 px-1 py-0.5 rounded font-mono font-normal">{"{{business_name}}"}</code>
                           </button>
                           <div className="h-5 w-px bg-slate-300 mx-1 hidden sm:block" />
@@ -933,7 +1000,7 @@ export default function AiMarketingAgentPage() {
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => applyVisualFormat('bold')}
                               className="p-1.5 rounded hover:bg-slate-100 text-slate-700"
-                              title="Bold"
+                              title={isRtl ? 'عريض' : 'Bold'}
                             >
                               <Bold size={14} />
                             </button>
@@ -942,7 +1009,7 @@ export default function AiMarketingAgentPage() {
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => applyVisualFormat('italic')}
                               className="p-1.5 rounded hover:bg-slate-100 text-slate-700"
-                              title="Italic"
+                              title={isRtl ? 'مائل' : 'Italic'}
                             >
                               <Italic size={14} />
                             </button>
@@ -951,7 +1018,7 @@ export default function AiMarketingAgentPage() {
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => applyVisualFormat('underline')}
                               className="p-1.5 rounded hover:bg-slate-100 text-slate-700"
-                              title="Underline"
+                              title={isRtl ? 'تسطير' : 'Underline'}
                             >
                               <Underline size={14} />
                             </button>
@@ -963,7 +1030,7 @@ export default function AiMarketingAgentPage() {
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => applyVisualFormat('insertUnorderedList')}
                               className="p-1.5 rounded hover:bg-slate-100 text-slate-700"
-                              title="Bullet List"
+                              title={isRtl ? 'قائمة نقطية' : 'Bullet List'}
                             >
                               <List size={14} />
                             </button>
@@ -972,7 +1039,7 @@ export default function AiMarketingAgentPage() {
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => applyVisualFormat('insertOrderedList')}
                               className="p-1.5 rounded hover:bg-slate-100 text-slate-700"
-                              title="Numbered List"
+                              title={isRtl ? 'قائمة مرقمة' : 'Numbered List'}
                             >
                               <ListOrdered size={14} />
                             </button>
@@ -984,7 +1051,7 @@ export default function AiMarketingAgentPage() {
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => applyVisualFormat('justifyLeft')}
                               className="p-1.5 rounded hover:bg-slate-100 text-slate-700"
-                              title="Align Left"
+                              title={isRtl ? 'محاذاة لليسار' : 'Align Left'}
                             >
                               <AlignLeft size={14} />
                             </button>
@@ -993,7 +1060,7 @@ export default function AiMarketingAgentPage() {
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => applyVisualFormat('justifyCenter')}
                               className="p-1.5 rounded hover:bg-slate-100 text-slate-700"
-                              title="Align Center"
+                              title={isRtl ? 'محاذاة للوسط' : 'Align Center'}
                             >
                               <AlignCenter size={14} />
                             </button>
@@ -1002,7 +1069,7 @@ export default function AiMarketingAgentPage() {
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => applyVisualFormat('justifyRight')}
                               className="p-1.5 rounded hover:bg-slate-100 text-slate-700"
-                              title="Align Right"
+                              title={isRtl ? 'محاذاة لليمين' : 'Align Right'}
                             >
                               <AlignRight size={14} />
                             </button>
@@ -1018,7 +1085,7 @@ export default function AiMarketingAgentPage() {
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-indigo-400 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-2xs"
                           >
                             <MousePointerClick size={14} className="text-indigo-600" />
-                            <span>+ Add CTA Button</span>
+                            <span>{isRtl ? '+ إضافة زر إجراء (CTA)' : '+ Add CTA Button'}</span>
                           </button>
                         </div>
 
@@ -1038,9 +1105,12 @@ export default function AiMarketingAgentPage() {
                             {/* Locked Header */}
                             <div className="relative group select-none">
                               <div dangerouslySetInnerHTML={{ __html: renderThemeHeader(selectedTheme, knowledge?.company_name || 'Our Company') }} />
-                              <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-xs text-white px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1">
+                              <div className={cn(
+                                "absolute top-2 bg-black/60 backdrop-blur-xs text-white px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1",
+                                isRtl ? "left-2" : "right-2"
+                              )}>
                                 <Lock size={10} />
-                                Locked Template Header
+                                {isRtl ? 'رأس القالب المحمي' : 'Locked Template Header'}
                               </div>
                             </div>
 
@@ -1071,9 +1141,12 @@ export default function AiMarketingAgentPage() {
                             {/* Locked Footer */}
                             <div className="relative group select-none">
                               <div dangerouslySetInnerHTML={{ __html: renderThemeFooter(selectedTheme, knowledge?.company_name || 'Our Company', editFromName || plan.from_name, '#unsubscribe') }} />
-                              <div className="absolute bottom-2 right-2 bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1">
+                              <div className={cn(
+                                "absolute bottom-2 bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1",
+                                isRtl ? "left-2" : "right-2"
+                              )}>
                                 <Lock size={10} />
-                                Locked Compliance Footer
+                                {isRtl ? 'تذييل الامتثال المحمي' : 'Locked Compliance Footer'}
                               </div>
                             </div>
                           </div>
@@ -1082,7 +1155,9 @@ export default function AiMarketingAgentPage() {
                         {/* Bottom Save & Cancel Bar */}
                         <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                           <span className="text-xs text-slate-400">
-                            Template edits will be rendered for all recipients upon approval.
+                            {isRtl 
+                              ? 'سيتم تطبيق تعديلات القالب على جميع المستلمين فور الموافقة.' 
+                              : 'Template edits will be rendered for all recipients upon approval.'}
                           </span>
                           <div className="flex items-center gap-2">
                             <button
@@ -1090,7 +1165,7 @@ export default function AiMarketingAgentPage() {
                               onClick={() => setIsEditingEmail(false)}
                               className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-100 rounded-lg text-xs font-semibold"
                             >
-                              Cancel
+                              {isRtl ? 'إلغاء' : 'Cancel'}
                             </button>
                             <button
                               type="button"
@@ -1099,7 +1174,9 @@ export default function AiMarketingAgentPage() {
                               className="inline-flex items-center gap-1.5 px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-md shadow-indigo-600/20"
                             >
                               <Save className="w-3.5 h-3.5" />
-                              {isSavingEmailEdits ? 'Saving Changes...' : 'Save & Update Campaign'}
+                              {isSavingEmailEdits 
+                                ? (isRtl ? 'جارٍ حفظ التغييرات...' : 'Saving Changes...') 
+                                : (isRtl ? 'حفظ وتحديث الحملة' : 'Save & Update Campaign')}
                             </button>
                           </div>
                         </div>
@@ -1116,28 +1193,28 @@ export default function AiMarketingAgentPage() {
                               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
                             </div>
                             <span className="text-slate-300 font-mono text-[11px] truncate max-w-sm">
-                              Subject: {isEditingEmail ? editSubject : plan.subject}
+                              {isRtl ? 'الموضوع:' : 'Subject:'} {isEditingEmail ? editSubject : plan.subject}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 text-[11px] text-slate-400">
                             <Lock className="w-3 h-3 text-emerald-400" />
-                            <span>TLS 1.3 • SPF/DKIM Verified</span>
+                            <span>{isRtl ? 'TLS 1.3 • تم التحقق من SPF/DKIM' : 'TLS 1.3 • SPF/DKIM Verified'}</span>
                           </div>
                         </div>
 
                         {/* Client Envelope Meta */}
                         <div className="bg-white px-6 py-3 border-b border-slate-200 text-xs space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-slate-400 w-14 shrink-0">From:</span>
+                            <span className="text-slate-400 w-14 shrink-0">{isRtl ? 'من:' : 'From:'}</span>
                             <span className="font-semibold text-slate-800">
                               {isEditingEmail ? editFromName : plan.from_name} &lt;{plan.from_email}&gt;
                             </span>
                             <span className="px-1.5 py-0.2 bg-emerald-50 text-emerald-700 rounded text-[10px] font-semibold border border-emerald-200">
-                              Verified Sending Domain
+                              {isRtl ? 'نطاق إرسال موثوق' : 'Verified Sending Domain'}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-slate-400 w-14 shrink-0">To:</span>
+                            <span className="text-slate-400 w-14 shrink-0">{isRtl ? 'إلى:' : 'To:'}</span>
                             <span className="text-slate-600">
                               {previewMode === 'simulated' ? 'Sarah Sterling <prospect.realestate@brickandmortar.pk>' : '{{name}} <{{email}}>'}
                             </span>
@@ -1161,7 +1238,7 @@ export default function AiMarketingAgentPage() {
                       onClick={handleCancelRun}
                       className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-xs font-semibold transition-colors"
                     >
-                      Cancel Run
+                      {isRtl ? 'إلغاء التشغيل' : 'Cancel Run'}
                     </button>
 
                     <div className="flex items-center gap-3">
@@ -1171,7 +1248,7 @@ export default function AiMarketingAgentPage() {
                         className="inline-flex items-center gap-1.5 px-4 py-2 border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold transition-colors"
                       >
                         <Calendar className="w-3.5 h-3.5" />
-                        Schedule Later
+                        {isRtl ? 'جدولة لاحقاً' : 'Schedule Later'}
                       </button>
 
                       <button
@@ -1182,12 +1259,14 @@ export default function AiMarketingAgentPage() {
                         {isApproving ? (
                           <>
                             <RotateCcw className="w-3.5 h-3.5 animate-spin" />
-                            Dispatching...
+                            {isRtl ? 'جارٍ الإرسال...' : 'Dispatching...'}
                           </>
                         ) : (
                           <>
                             <Check className="w-4 h-4" />
-                            Approve & Send Now ({plan.eligible_count.toLocaleString()})
+                            {isRtl 
+                              ? `الموافقة والإرسال الآن (${plan.eligible_count.toLocaleString('ar-SA')})` 
+                              : `Approve & Send Now (${plan.eligible_count.toLocaleString('en-US')})`}
                           </>
                         )}
                       </button>
@@ -1201,29 +1280,33 @@ export default function AiMarketingAgentPage() {
                   </div>
                   <div className="space-y-1.5 max-w-md">
                     <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold uppercase tracking-wider">
-                      {currentRun.status === 'running' ? 'Campaign Dispatching' : 'Campaign Dispatched'}
+                      {currentRun.status === 'running' 
+                        ? (isRtl ? 'جارٍ إرسال الحملة' : 'Campaign Dispatching') 
+                        : (isRtl ? 'تم إرسال الحملة' : 'Campaign Dispatched')}
                     </span>
                     <h3 className="text-xl font-bold text-slate-900 mt-2">
-                      {currentRun.campaign_name || 'Campaign Dispatched Successfully'}
+                      {currentRun.campaign_name || (isRtl ? 'تم إرسال الحملة بنجاح' : 'Campaign Dispatched Successfully')}
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Your campaign has been approved and queued for delivery. The plan view has been closed. You can track performance metrics in the Run History tab.
+                      {isRtl 
+                        ? 'تمت الموافقة على حملتك وإدراجها في قائمة انتظار التسليم. تم إغلاق عرض الخطة. يمكنك متابعة مؤشرات الأداء في سجل التشغيل.' 
+                        : 'Your campaign has been approved and queued for delivery. The plan view has been closed. You can track performance metrics in the Run History tab.'}
                     </p>
                   </div>
 
                   {currentRun.campaign_plan && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full max-w-md text-left">
+                    <div className={cn("grid grid-cols-2 sm:grid-cols-3 gap-3 w-full max-w-md", isRtl ? "text-right" : "text-left")}>
                       <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] text-slate-400 block">Recipients</span>
-                        <span className="text-sm font-bold text-slate-800">{currentRun.campaign_plan.eligible_count.toLocaleString()}</span>
+                        <span className="text-[10px] text-slate-400 block">{isRtl ? 'المستلمون' : 'Recipients'}</span>
+                        <span className="text-sm font-bold text-slate-800">{currentRun.campaign_plan.eligible_count.toLocaleString(isRtl ? 'ar-SA' : 'en-US')}</span>
                       </div>
                       <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] text-slate-400 block">Category</span>
+                        <span className="text-[10px] text-slate-400 block">{isRtl ? 'الفئة' : 'Category'}</span>
                         <span className="text-sm font-bold text-slate-800">{currentRun.campaign_plan.category}</span>
                       </div>
                       <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 col-span-2 sm:col-span-1">
-                        <span className="text-[10px] text-slate-400 block">Delivery Engine</span>
-                        <span className="text-sm font-bold text-emerald-600">Verified Pipeline</span>
+                        <span className="text-[10px] text-slate-400 block">{isRtl ? 'محرك التسليم' : 'Delivery Engine'}</span>
+                        <span className="text-sm font-bold text-emerald-600">{isRtl ? 'مسار تسليم موثوق' : 'Verified Pipeline'}</span>
                       </div>
                     </div>
                   )}
@@ -1233,7 +1316,7 @@ export default function AiMarketingAgentPage() {
                       onClick={() => setActiveTab('history')}
                       className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold transition-colors"
                     >
-                      View in Run History
+                      {isRtl ? 'عرض في سجل التشغيل' : 'View in Run History'}
                     </button>
                     <button
                       onClick={() => {
@@ -1244,7 +1327,7 @@ export default function AiMarketingAgentPage() {
                       className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
-                      Create Another Campaign
+                      {isRtl ? 'إنشاء حملة أخرى' : 'Create Another Campaign'}
                     </button>
                   </div>
                 </div>
@@ -1255,13 +1338,15 @@ export default function AiMarketingAgentPage() {
                   </div>
                   <div className="space-y-1.5 max-w-md">
                     <span className="px-2.5 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-semibold uppercase tracking-wider">
-                      Campaign Scheduled
+                      {isRtl ? 'تمت جدولة الحملة' : 'Campaign Scheduled'}
                     </span>
                     <h3 className="text-xl font-bold text-slate-900 mt-2">
-                      {currentRun.campaign_name || 'Campaign Scheduled'}
+                      {currentRun.campaign_name || (isRtl ? 'تمت جدولة الحملة' : 'Campaign Scheduled')}
                     </h3>
                     <p className="text-xs text-slate-500">
-                      The plan view is now closed. This campaign will automatically be dispatched on {currentRun.campaign_plan?.scheduled_at || scheduleDate || 'the scheduled date'}.
+                      {isRtl 
+                        ? `تم إغلاق عرض الخطة. سيتم إرسال هذه الحملة تلقائياً في ${currentRun.campaign_plan?.scheduled_at || scheduleDate || 'الموعد المحدد'}.`
+                        : `The plan view is now closed. This campaign will automatically be dispatched on ${currentRun.campaign_plan?.scheduled_at || scheduleDate || 'the scheduled date'}.`}
                     </p>
                   </div>
 
@@ -1270,7 +1355,7 @@ export default function AiMarketingAgentPage() {
                       onClick={() => setActiveTab('history')}
                       className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold transition-colors"
                     >
-                      View in Run History
+                      {isRtl ? 'عرض في سجل التشغيل' : 'View in Run History'}
                     </button>
                     <button
                       onClick={() => {
@@ -1281,7 +1366,7 @@ export default function AiMarketingAgentPage() {
                       className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
-                      Create Another Campaign
+                      {isRtl ? 'إنشاء حملة أخرى' : 'Create Another Campaign'}
                     </button>
                   </div>
                 </div>
@@ -1292,13 +1377,15 @@ export default function AiMarketingAgentPage() {
                   </div>
                   <div className="space-y-1.5 max-w-md">
                     <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-semibold uppercase tracking-wider">
-                      Run Cancelled
+                      {isRtl ? 'تم إلغاء التشغيل' : 'Run Cancelled'}
                     </span>
                     <h3 className="text-xl font-bold text-slate-900 mt-2">
-                      Campaign Plan Cancelled
+                      {isRtl ? 'تم إلغاء خطة الحملة' : 'Campaign Plan Cancelled'}
                     </h3>
                     <p className="text-xs text-slate-500">
-                      The campaign plan has been cancelled and closed. No emails were sent.
+                      {isRtl 
+                        ? 'تم إلغاء خطة الحملة وإغلاقها. لم يتم إرسال أي رسائل بريد إلكتروني.' 
+                        : 'The campaign plan has been cancelled and closed. No emails were sent.'}
                     </p>
                   </div>
 
@@ -1312,7 +1399,7 @@ export default function AiMarketingAgentPage() {
                       className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
-                      Start New Campaign
+                      {isRtl ? 'بدء حملة جديدة' : 'Start New Campaign'}
                     </button>
                   </div>
                 </div>
@@ -1327,30 +1414,34 @@ export default function AiMarketingAgentPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <div>
-              <h2 className="text-base font-bold text-slate-900">AI Agent Campaign Run History</h2>
+              <h2 className="text-base font-bold text-slate-900">
+                {isRtl ? 'سجل تشغيل حملات مساعد الذكاء الاصطناعي' : 'AI Agent Campaign Run History'}
+              </h2>
               <p className="text-xs text-slate-500">
-                Auditable execution records of all natural-language requests, plans, and deliveries.
+                {isRtl 
+                  ? 'سجلات تنفيذ قابلة للتدقيق لجميع الطلبات الطبيعية والخطط وعمليات التسليم.' 
+                  : 'Auditable execution records of all natural-language requests, plans, and deliveries.'}
               </p>
             </div>
             <button
               onClick={loadRuns}
               className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5"
             >
-              <RotateCcw className="w-3 h-3" /> Refresh
+              <RotateCcw className="w-3 h-3" /> {isRtl ? 'تحديث' : 'Refresh'}
             </button>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className={cn("w-full text-xs", isRtl ? "text-right" : "text-left")}>
               <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider font-semibold border-y border-slate-200">
                 <tr>
-                  <th className="py-3 px-4">Run ID</th>
-                  <th className="py-3 px-4">Instruction</th>
-                  <th className="py-3 px-4">Category / Service</th>
-                  <th className="py-3 px-4">Eligible Recipients</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Delivery Results</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-4">{isRtl ? 'معرف التشغيل' : 'Run ID'}</th>
+                  <th className="py-3 px-4">{isRtl ? 'الطلب / التعليمات' : 'Instruction'}</th>
+                  <th className="py-3 px-4">{isRtl ? 'الفئة / الخدمة' : 'Category / Service'}</th>
+                  <th className="py-3 px-4">{isRtl ? 'المستلمون المؤهلون' : 'Eligible Recipients'}</th>
+                  <th className="py-3 px-4">{isRtl ? 'الحالة' : 'Status'}</th>
+                  <th className="py-3 px-4">{isRtl ? 'نتائج التسليم' : 'Delivery Results'}</th>
+                  <th className={cn("py-3 px-4", isRtl ? "text-left" : "text-right")}>{isRtl ? 'الإجراءات' : 'Actions'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -1366,7 +1457,7 @@ export default function AiMarketingAgentPage() {
                         {r.interpreted_intent?.category || '—'} / {r.interpreted_intent?.service || '—'}
                       </td>
                       <td className="py-3 px-4 font-semibold text-slate-800">
-                        {r.recipients_selected?.toLocaleString() || '0'}
+                        {(r.recipients_selected || 0).toLocaleString(isRtl ? 'ar-SA' : 'en-US')}
                       </td>
                       <td className="py-3 px-4">
                         <span className={`inline-flex px-2 py-0.5 rounded-full font-semibold text-[10px] uppercase ${
@@ -1376,22 +1467,30 @@ export default function AiMarketingAgentPage() {
                           r.status === 'failed' ? 'bg-rose-100 text-rose-800' :
                           'bg-slate-100 text-slate-700'
                         }`}>
-                          {r.status.replace('_', ' ')}
+                          {getStatusBadge(r.status)}
                         </span>
                       </td>
                       <td className="py-3 px-4">
                         {camp ? (
                           <div className="space-y-0.5 text-[11px]">
-                            <span>Sent: {camp.sent_count} | Delivered: {camp.delivered_count}</span>
+                            <span>
+                              {isRtl 
+                                ? `أُرسلت: ${camp.sent_count.toLocaleString('ar-SA')} | سُلّمت: ${camp.delivered_count.toLocaleString('ar-SA')}` 
+                                : `Sent: ${camp.sent_count.toLocaleString('en-US')} | Delivered: ${camp.delivered_count.toLocaleString('en-US')}`}
+                            </span>
                             {camp.bounced_count > 0 && (
-                              <span className="text-rose-600 block">Bounced: {camp.bounced_count}</span>
+                              <span className="text-rose-600 block">
+                                {isRtl 
+                                  ? `مرتدة: ${camp.bounced_count.toLocaleString('ar-SA')}` 
+                                  : `Bounced: ${camp.bounced_count.toLocaleString('en-US')}`}
+                              </span>
                             )}
                           </div>
                         ) : (
                           <span className="text-slate-400">—</span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-right space-x-2">
+                      <td className={cn("py-3 px-4 space-x-2", isRtl ? "text-left space-x-reverse" : "text-right")}>
                         <button
                           onClick={() => {
                             setCurrentRun(r);
@@ -1399,7 +1498,7 @@ export default function AiMarketingAgentPage() {
                           }}
                           className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded font-semibold"
                         >
-                          View Plan
+                          {isRtl ? 'عرض الخطة' : 'View Plan'}
                         </button>
 
                         {camp && (
@@ -1412,7 +1511,9 @@ export default function AiMarketingAgentPage() {
                             className="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded font-semibold inline-flex items-center gap-1"
                           >
                             <TrendingUp className="w-3 h-3" />
-                            {analyzingRunId === r.id ? 'Analyzing...' : 'AI Insights'}
+                            {analyzingRunId === r.id 
+                              ? (isRtl ? 'جارٍ التحليل...' : 'Analyzing...') 
+                              : (isRtl ? 'رؤى الذكاء الاصطناعي' : 'AI Insights')}
                           </button>
                         )}
                       </td>
@@ -1429,44 +1530,46 @@ export default function AiMarketingAgentPage() {
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-purple-900 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-purple-600" />
-                  AI Post-Campaign Performance Analysis (Run #{selectedRunForAnalysis.id})
+                  {isRtl 
+                    ? `تحليل أداء الحملة بالذكاء الاصطناعي (تشغيل #${selectedRunForAnalysis.id})` 
+                    : `AI Post-Campaign Performance Analysis (Run #${selectedRunForAnalysis.id})`}
                 </h3>
                 <button
                   onClick={() => setSelectedRunForAnalysis(null)}
                   className="text-xs text-purple-600 hover:text-purple-800 font-semibold"
                 >
-                  Close
+                  {isRtl ? 'إغلاق' : 'Close'}
                 </button>
               </div>
 
               {/* Rates */}
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 <div className="p-3 bg-white rounded-xl shadow-xs">
-                  <span className="text-[10px] text-slate-400 block">Delivery Rate</span>
+                  <span className="text-[10px] text-slate-400 block">{isRtl ? 'معدل التسليم' : 'Delivery Rate'}</span>
                   <span className="text-base font-bold text-slate-800">
                     {selectedRunForAnalysis.performance_analysis.metrics.delivery_rate}%
                   </span>
                 </div>
                 <div className="p-3 bg-white rounded-xl shadow-xs">
-                  <span className="text-[10px] text-slate-400 block">Bounce Rate</span>
+                  <span className="text-[10px] text-slate-400 block">{isRtl ? 'معدل الارتداد' : 'Bounce Rate'}</span>
                   <span className="text-base font-bold text-slate-800">
                     {selectedRunForAnalysis.performance_analysis.metrics.bounce_rate}%
                   </span>
                 </div>
                 <div className="p-3 bg-white rounded-xl shadow-xs">
-                  <span className="text-[10px] text-slate-400 block">Open Rate</span>
+                  <span className="text-[10px] text-slate-400 block">{isRtl ? 'معدل الفتح' : 'Open Rate'}</span>
                   <span className="text-base font-bold text-slate-800">
                     {selectedRunForAnalysis.performance_analysis.metrics.open_rate}%
                   </span>
                 </div>
                 <div className="p-3 bg-white rounded-xl shadow-xs">
-                  <span className="text-[10px] text-slate-400 block">Click Rate</span>
+                  <span className="text-[10px] text-slate-400 block">{isRtl ? 'معدل النقر' : 'Click Rate'}</span>
                   <span className="text-base font-bold text-slate-800">
                     {selectedRunForAnalysis.performance_analysis.metrics.click_rate}%
                   </span>
                 </div>
                 <div className="p-3 bg-white rounded-xl shadow-xs">
-                  <span className="text-[10px] text-slate-400 block">Unsubscribe Rate</span>
+                  <span className="text-[10px] text-slate-400 block">{isRtl ? 'معدل إلغاء الاشتراك' : 'Unsubscribe Rate'}</span>
                   <span className="text-base font-bold text-slate-800">
                     {selectedRunForAnalysis.performance_analysis.metrics.unsubscribe_rate}%
                   </span>
@@ -1482,9 +1585,9 @@ export default function AiMarketingAgentPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   <div>
                     <h5 className="font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">
-                      Key Learnings
+                      {isRtl ? 'الدروس المستفادة الرئيسية' : 'Key Learnings'}
                     </h5>
-                    <ul className="list-disc pl-4 space-y-1 text-slate-600">
+                    <ul className={cn("space-y-1 text-slate-600", isRtl ? "list-disc pr-4" : "list-disc pl-4")}>
                       {selectedRunForAnalysis.performance_analysis.ai_insights.key_learnings?.map((l: string, i: number) => (
                         <li key={i}>{l}</li>
                       ))}
@@ -1493,9 +1596,9 @@ export default function AiMarketingAgentPage() {
 
                   <div>
                     <h5 className="font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">
-                      Recommended Changes
+                      {isRtl ? 'التعديلات الموصى بها' : 'Recommended Changes'}
                     </h5>
-                    <ul className="list-disc pl-4 space-y-1 text-slate-600">
+                    <ul className={cn("space-y-1 text-slate-600", isRtl ? "list-disc pr-4" : "list-disc pl-4")}>
                       {selectedRunForAnalysis.performance_analysis.ai_insights.recommended_changes?.map((c: string, i: number) => (
                         <li key={i}>{c}</li>
                       ))}
@@ -1507,7 +1610,9 @@ export default function AiMarketingAgentPage() {
                 {selectedRunForAnalysis.performance_analysis.ai_insights.follow_up_recommendation?.recommended && (
                   <div className="mt-4 p-3 bg-indigo-50 border border-indigo-100 rounded-lg flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-bold text-indigo-800 uppercase block">Follow-Up Opportunity</span>
+                      <span className="text-[10px] font-bold text-indigo-800 uppercase block">
+                        {isRtl ? 'فرصة المتابعة' : 'Follow-Up Opportunity'}
+                      </span>
                       <span className="text-indigo-900">
                         {selectedRunForAnalysis.performance_analysis.ai_insights.follow_up_recommendation.suggested_angle}
                       </span>
@@ -1515,13 +1620,15 @@ export default function AiMarketingAgentPage() {
                     <button
                       onClick={() => {
                         const rec = selectedRunForAnalysis.performance_analysis?.ai_insights.follow_up_recommendation;
-                        const p = `Follow up with contacts who received our ${selectedRunForAnalysis.interpreted_intent?.category} campaign using angle: ${rec?.suggested_angle}`;
+                        const p = isRtl
+                          ? `أرسل رسالة متابعة لجهات الاتصال التي استلمت حملة ${selectedRunForAnalysis.interpreted_intent?.category || ''} باستخدام الزاوية: ${rec?.suggested_angle}`
+                          : `Follow up with contacts who received our ${selectedRunForAnalysis.interpreted_intent?.category} campaign using angle: ${rec?.suggested_angle}`;
                         setPrompt(p);
                         setActiveTab('console');
                       }}
                       className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-xs font-semibold shrink-0"
                     >
-                      Draft Follow-Up
+                      {isRtl ? 'صياغة المتابعة' : 'Draft Follow-Up'}
                     </button>
                   </div>
                 )}
@@ -1539,13 +1646,17 @@ export default function AiMarketingAgentPage() {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
                 <Briefcase className="w-4 h-4 text-indigo-600" />
-                Active Services Catalog
+                {isRtl ? 'دليل الخدمات النشطة' : 'Active Services Catalog'}
               </h3>
-              <span className="text-xs text-slate-400">{services.length} Services</span>
+              <span className="text-xs text-slate-400">
+                {isRtl ? `${services.length} خدمة` : `${services.length} Services`}
+              </span>
             </div>
 
             <p className="text-xs text-slate-500">
-              The AI Marketing Agent references these services to avoid inventing features, fake pricing, or false claims.
+              {isRtl 
+                ? 'يرجع مساعد التسويق بالذكاء الاصطناعي إلى هذه الخدمات لتجنب اختلاق ميزات أو أسعار وهمية أو ادعاءات غير دقيقة.' 
+                : 'The AI Marketing Agent references these services to avoid inventing features, fake pricing, or false claims.'}
             </p>
 
             <div className="space-y-3">
@@ -1575,10 +1686,12 @@ export default function AiMarketingAgentPage() {
             <div className="border-b border-slate-100 pb-4">
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-indigo-600" />
-                Company Marketing Knowledge Base
+                {isRtl ? 'قاعدة المعرفة التسويقية للشركة' : 'Company Marketing Knowledge Base'}
               </h2>
               <p className="text-xs text-slate-500">
-                Ground the AI agent in your authentic brand voice, links, and value propositions.
+                {isRtl 
+                  ? 'توجيه مساعد الذكاء الاصطناعي بنبرة علامتك التجارية الحقيقية وروابطها وقيمتها المقترحة.' 
+                  : 'Ground the AI agent in your authentic brand voice, links, and value propositions.'}
               </p>
             </div>
 
@@ -1586,7 +1699,9 @@ export default function AiMarketingAgentPage() {
               <form onSubmit={handleSaveKnowledge} className="space-y-4 text-xs">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Company / Brand Name</label>
+                    <label className="block text-slate-700 font-semibold mb-1">
+                      {isRtl ? 'اسم الشركة / العلامة التجارية' : 'Company / Brand Name'}
+                    </label>
                     <input
                       type="text"
                       value={knowledge.company_name || ''}
@@ -1595,19 +1710,23 @@ export default function AiMarketingAgentPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Brand Voice</label>
+                    <label className="block text-slate-700 font-semibold mb-1">
+                      {isRtl ? 'نبرة العلامة التجارية' : 'Brand Voice'}
+                    </label>
                     <input
                       type="text"
                       value={knowledge.brand_voice || ''}
                       onChange={(e) => setKnowledge({ ...knowledge, brand_voice: e.target.value })}
-                      placeholder="e.g. Consultative, authoritative, outcome-oriented"
+                      placeholder={isRtl ? 'مثال: استشارية، موثوقة، موجهة نحو النتائج' : 'e.g. Consultative, authoritative, outcome-oriented'}
                       className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 font-semibold mb-1">Company Description</label>
+                  <label className="block text-slate-700 font-semibold mb-1">
+                    {isRtl ? 'وصف الشركة' : 'Company Description'}
+                  </label>
                   <textarea
                     rows={2}
                     value={knowledge.company_description || ''}
@@ -1618,7 +1737,9 @@ export default function AiMarketingAgentPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Website URL</label>
+                    <label className="block text-slate-700 font-semibold mb-1">
+                      {isRtl ? 'رابط الموقع الإلكتروني' : 'Website URL'}
+                    </label>
                     <input
                       type="url"
                       value={knowledge.website || ''}
@@ -1627,7 +1748,9 @@ export default function AiMarketingAgentPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Demo / Booking Link</label>
+                    <label className="block text-slate-700 font-semibold mb-1">
+                      {isRtl ? 'رابط العرض التوضيحي / الحجز' : 'Demo / Booking Link'}
+                    </label>
                     <input
                       type="url"
                       value={knowledge.demo_link || ''}
@@ -1636,7 +1759,9 @@ export default function AiMarketingAgentPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Inquiry Reply Email</label>
+                    <label className="block text-slate-700 font-semibold mb-1">
+                      {isRtl ? 'بريد استلام الاستفسارات' : 'Inquiry Reply Email'}
+                    </label>
                     <input
                       type="email"
                       value={knowledge.contact_email || ''}
@@ -1647,23 +1772,27 @@ export default function AiMarketingAgentPage() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 font-semibold mb-1">Pricing Overview / Rules</label>
+                  <label className="block text-slate-700 font-semibold mb-1">
+                    {isRtl ? 'نظرة عامة على الأسعار / القواعد' : 'Pricing Overview / Rules'}
+                  </label>
                   <textarea
                     rows={2}
                     value={knowledge.pricing_overview || ''}
                     onChange={(e) => setKnowledge({ ...knowledge, pricing_overview: e.target.value })}
-                    placeholder="e.g. Growth tier starts at $199/mo; custom quotes for enterprise."
+                    placeholder={isRtl ? 'مثال: باقة النمو تبدأ من 199 دولار/شهر؛ عروض مخصصة للمؤسسات.' : 'e.g. Growth tier starts at $199/mo; custom quotes for enterprise.'}
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs resize-none"
                   />
                 </div>
 
-                <div className="flex justify-end pt-2">
+                <div className={cn("flex pt-2", isRtl ? "justify-start" : "justify-end")}>
                   <button
                     type="submit"
                     disabled={isSavingKnowledge}
                     className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-xs transition-colors"
                   >
-                    {isSavingKnowledge ? 'Saving...' : 'Save Knowledge Base'}
+                    {isSavingKnowledge 
+                      ? (isRtl ? 'جارٍ الحفظ...' : 'Saving...') 
+                      : (isRtl ? 'حفظ قاعدة المعرفة' : 'Save Knowledge Base')}
                   </button>
                 </div>
               </form>
@@ -1678,10 +1807,12 @@ export default function AiMarketingAgentPage() {
           <div className="border-b border-slate-100 pb-4">
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              Autonomous Mode & Safety Limits
+              {isRtl ? 'الوضع الذاتي وحدود الأمان' : 'Autonomous Mode & Safety Limits'}
             </h2>
             <p className="text-xs text-slate-500">
-              Control AI campaign sending autonomy, duplicate send protections, and daily recipient safeguards.
+              {isRtl 
+                ? 'التحكم في استقلالية إرسال حملات الذكاء الاصطناعي، وحماية منع التكرار، وضوابط المستلمين اليومية.' 
+                : 'Control AI campaign sending autonomy, duplicate send protections, and daily recipient safeguards.'}
             </p>
           </div>
 
@@ -1690,7 +1821,7 @@ export default function AiMarketingAgentPage() {
               {/* Approval Modes */}
               <div className="space-y-3">
                 <label className="block font-bold text-slate-800 uppercase tracking-wider text-[11px]">
-                  Approval Mode
+                  {isRtl ? 'وضع الموافقة' : 'Approval Mode'}
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <label className={`p-4 rounded-xl border cursor-pointer transition-all ${
@@ -1706,9 +1837,13 @@ export default function AiMarketingAgentPage() {
                       onChange={() => setKnowledge({ ...knowledge, approval_mode: 'manual' })}
                       className="sr-only"
                     />
-                    <div className="font-bold text-slate-800 mb-1">MODE 1: MANUAL</div>
+                    <div className="font-bold text-slate-800 mb-1">
+                      {isRtl ? 'الوضع 1: يدوي' : 'MODE 1: MANUAL'}
+                    </div>
                     <p className="text-[11px] text-slate-500">
-                      AI crafts campaign draft. You must manually review and hit send every time.
+                      {isRtl 
+                        ? 'يقوم الذكاء الاصطناعي بصياغة مسودة الحملة. يجب عليك المراجعة والضغط على إرسال يدوياً في كل مرة.' 
+                        : 'AI crafts campaign draft. You must manually review and hit send every time.'}
                     </p>
                   </label>
 
@@ -1725,9 +1860,13 @@ export default function AiMarketingAgentPage() {
                       onChange={() => setKnowledge({ ...knowledge, approval_mode: 'approval' })}
                       className="sr-only"
                     />
-                    <div className="font-bold text-slate-800 mb-1">MODE 2: APPROVAL (Default)</div>
+                    <div className="font-bold text-slate-800 mb-1">
+                      {isRtl ? 'الوضع 2: بالموافقة (افتراضي)' : 'MODE 2: APPROVAL (Default)'}
+                    </div>
                     <p className="text-[11px] text-slate-500">
-                      AI plans and validates campaign. Awaits one-click human approval before dispatch.
+                      {isRtl 
+                        ? 'يقوم الذكاء الاصطناعي بتخطيط الحملة والتحقق منها. ينتظر موافقة بشرية بنقرة واحدة قبل الإرسال.' 
+                        : 'AI plans and validates campaign. Awaits one-click human approval before dispatch.'}
                     </p>
                   </label>
 
@@ -1744,9 +1883,13 @@ export default function AiMarketingAgentPage() {
                       onChange={() => setKnowledge({ ...knowledge, approval_mode: 'autonomous' })}
                       className="sr-only"
                     />
-                    <div className="font-bold text-slate-800 mb-1">MODE 3: AUTONOMOUS</div>
+                    <div className="font-bold text-slate-800 mb-1">
+                      {isRtl ? 'الوضع 3: تلقائي بالكامل' : 'MODE 3: AUTONOMOUS'}
+                    </div>
                     <p className="text-[11px] text-slate-500">
-                      AI plans, generates, validates, and automatically dispatches if within safety limits.
+                      {isRtl 
+                        ? 'يقوم الذكاء الاصطناعي بالتخطيط والتوليد والتحقق والإرسال تلقائياً إذا كانت ضمن حدود الأمان.' 
+                        : 'AI plans, generates, validates, and automatically dispatches if within safety limits.'}
                     </p>
                   </label>
                 </div>
@@ -1755,18 +1898,24 @@ export default function AiMarketingAgentPage() {
               {/* Safety Caps */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div>
-                  <label className="block text-slate-700 font-semibold mb-1">Max Emails Per Campaign</label>
+                  <label className="block text-slate-700 font-semibold mb-1">
+                    {isRtl ? 'الحد الأقصى للرسائل لكل حملة' : 'Max Emails Per Campaign'}
+                  </label>
                   <input
                     type="number"
                     value={knowledge.max_emails_per_campaign}
                     onChange={(e) => setKnowledge({ ...knowledge, max_emails_per_campaign: parseInt(e.target.value) || 500 })}
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs"
                   />
-                  <span className="text-[10px] text-slate-400">Hard stop cap if audience exceeds this size.</span>
+                  <span className="text-[10px] text-slate-400">
+                    {isRtl ? 'إيقاف إلزامي إذا تجاوز حجم الجمهور هذا الحد.' : 'Hard stop cap if audience exceeds this size.'}
+                  </span>
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 font-semibold mb-1">Max Emails Per Day</label>
+                  <label className="block text-slate-700 font-semibold mb-1">
+                    {isRtl ? 'الحد الأقصى للرسائل يومياً' : 'Max Emails Per Day'}
+                  </label>
                   <input
                     type="number"
                     value={knowledge.max_emails_per_day}
@@ -1776,35 +1925,49 @@ export default function AiMarketingAgentPage() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 font-semibold mb-1">Require Approval Above X Recipients</label>
+                  <label className="block text-slate-700 font-semibold mb-1">
+                    {isRtl ? 'طلب موافقة إذا تجاوز المستلمون هذا الرقم' : 'Require Approval Above X Recipients'}
+                  </label>
                   <input
                     type="number"
                     value={knowledge.require_approval_above_recipients}
                     onChange={(e) => setKnowledge({ ...knowledge, require_approval_above_recipients: parseInt(e.target.value) || 250 })}
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs"
                   />
-                  <span className="text-[10px] text-slate-400">Even in autonomous mode, human approval will be forced above this.</span>
+                  <span className="text-[10px] text-slate-400">
+                    {isRtl 
+                      ? 'حتى في الوضع التلقائي، ستفرض الموافقة البشرية إذا تم تجاوز هذا العدد.' 
+                      : 'Even in autonomous mode, human approval will be forced above this.'}
+                  </span>
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 font-semibold mb-1">Contact Cooldown Period (Days)</label>
+                  <label className="block text-slate-700 font-semibold mb-1">
+                    {isRtl ? 'فترة التهدئة للجهات الاتصال (بالأيام)' : 'Contact Cooldown Period (Days)'}
+                  </label>
                   <input
                     type="number"
                     value={knowledge.cooldown_days_per_contact}
                     onChange={(e) => setKnowledge({ ...knowledge, cooldown_days_per_contact: parseInt(e.target.value) || 7 })}
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs"
                   />
-                  <span className="text-[10px] text-slate-400">Prevents contacting the same lead repeatedly within X days.</span>
+                  <span className="text-[10px] text-slate-400">
+                    {isRtl 
+                      ? 'يمنع مراسلة نفس العميل المحتمل بشكل متكرر خلال عدد الأيام المحدد.' 
+                      : 'Prevents contacting the same lead repeatedly within X days.'}
+                  </span>
                 </div>
               </div>
 
-              <div className="flex justify-end pt-4 border-t border-slate-100">
+              <div className={cn("flex pt-4 border-t border-slate-100", isRtl ? "justify-start" : "justify-end")}>
                 <button
                   type="submit"
                   disabled={isSavingKnowledge}
                   className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-xs transition-colors"
                 >
-                  {isSavingKnowledge ? 'Saving...' : 'Save Safety Limits'}
+                  {isSavingKnowledge 
+                    ? (isRtl ? 'جارٍ الحفظ...' : 'Saving...') 
+                    : (isRtl ? 'حفظ حدود الأمان' : 'Save Safety Limits')}
                 </button>
               </div>
             </form>
@@ -1819,7 +1982,9 @@ export default function AiMarketingAgentPage() {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <Mail className="w-5 h-5 text-indigo-600" />
-                <h3 className="text-base font-bold text-slate-900">Email Campaign Template Preview</h3>
+                <h3 className="text-base font-bold text-slate-900">
+                  {isRtl ? 'معاينة قالب حملة البريد الإلكتروني' : 'Email Campaign Template Preview'}
+                </h3>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -1828,13 +1993,15 @@ export default function AiMarketingAgentPage() {
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 flex items-center gap-1.5"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
-                  {isEditingEmail ? 'Close Editor' : 'Edit Email'}
+                  {isEditingEmail 
+                    ? (isRtl ? 'إغلاق المحرر' : 'Close Editor') 
+                    : (isRtl ? 'تعديل البريد' : 'Edit Email')}
                 </button>
                 <button
                   onClick={() => setShowEmailPreviewModal(false)}
                   className="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-600"
                 >
-                  Close
+                  {isRtl ? 'إغلاق' : 'Close'}
                 </button>
               </div>
             </div>
@@ -1848,13 +2015,16 @@ export default function AiMarketingAgentPage() {
 
             <div className="flex justify-between items-center pt-2 border-t border-slate-100">
               <div className="text-xs text-slate-400">
-                Template Theme: <strong className="text-slate-700 capitalize">{selectedTheme}</strong>
+                {isRtl ? 'نمط القالب:' : 'Template Theme:'}{' '}
+                <strong className="text-slate-700 capitalize">
+                  {getThemeLabel(selectedTheme, selectedTheme)}
+                </strong>
               </div>
               <button
                 onClick={() => setShowEmailPreviewModal(false)}
                 className="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold"
               >
-                Close Preview
+                {isRtl ? 'إغلاق المعاينة' : 'Close Preview'}
               </button>
             </div>
           </div>
@@ -1866,12 +2036,14 @@ export default function AiMarketingAgentPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-sm font-bold text-slate-900">Sample Eligible Contacts</h3>
+              <h3 className="text-sm font-bold text-slate-900">
+                {isRtl ? 'عينة من جهات الاتصال المؤهلة' : 'Sample Eligible Contacts'}
+              </h3>
               <button
                 onClick={() => setShowAudienceModal(false)}
                 className="text-xs text-slate-400 hover:text-slate-600"
               >
-                Close
+                {isRtl ? 'إغلاق' : 'Close'}
               </button>
             </div>
             <div className="space-y-2 text-xs">
@@ -1879,7 +2051,9 @@ export default function AiMarketingAgentPage() {
                 plan.sample_eligible.map((c) => (
                   <div key={c.id} className="p-2.5 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-between">
                     <div>
-                      <span className="font-semibold text-slate-800 block">{c.name || 'Anonymous Contact'}</span>
+                      <span className="font-semibold text-slate-800 block">
+                        {c.name || (isRtl ? 'جهة اتصال غير محددة' : 'Anonymous Contact')}
+                      </span>
                       <span className="text-slate-500 text-[11px]">{c.email}</span>
                     </div>
                     {c.company && (
@@ -1890,15 +2064,17 @@ export default function AiMarketingAgentPage() {
                   </div>
                 ))
               ) : (
-                <p className="text-slate-400 text-xs">No sample contacts available.</p>
+                <p className="text-slate-400 text-xs">
+                  {isRtl ? 'لا توجد جهات اتصال تجريبية متاحة.' : 'No sample contacts available.'}
+                </p>
               )}
             </div>
-            <div className="flex justify-end pt-2">
+            <div className={cn("flex pt-2", isRtl ? "justify-start" : "justify-end")}>
               <button
                 onClick={() => setShowAudienceModal(false)}
                 className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold"
               >
-                Done
+                {isRtl ? 'تم' : 'Done'}
               </button>
             </div>
           </div>
@@ -1909,12 +2085,18 @@ export default function AiMarketingAgentPage() {
       {showScheduleModal && plan && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4">
-            <h3 className="text-sm font-bold text-slate-900">Schedule AI Campaign</h3>
+            <h3 className="text-sm font-bold text-slate-900">
+              {isRtl ? 'جدولة حملة الذكاء الاصطناعي' : 'Schedule AI Campaign'}
+            </h3>
             <p className="text-xs text-slate-500">
-              Pick the date and time when this campaign should automatically be dispatched.
+              {isRtl 
+                ? 'اختر التاريخ والوقت الذي يجب إرسال هذه الحملة فيه تلقائياً.' 
+                : 'Pick the date and time when this campaign should automatically be dispatched.'}
             </p>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Dispatch Date & Time</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                {isRtl ? 'تاريخ ووقت الإرسال' : 'Dispatch Date & Time'}
+              </label>
               <input
                 type="datetime-local"
                 value={scheduleDate}
@@ -1922,24 +2104,25 @@ export default function AiMarketingAgentPage() {
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs"
               />
             </div>
-            <div className="flex items-center justify-end gap-2 pt-2">
+            <div className={cn("flex items-center gap-2 pt-2", isRtl ? "justify-start" : "justify-end")}>
               <button
                 onClick={() => setShowScheduleModal(false)}
                 className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg font-semibold"
               >
-                Cancel
+                {isRtl ? 'إلغاء' : 'Cancel'}
               </button>
               <button
                 onClick={() => handleApproveAndSend(false)}
                 disabled={!scheduleDate || isApproving}
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold disabled:opacity-50"
               >
-                Confirm Schedule
+                {isRtl ? 'تأكيد الجدولة' : 'Confirm Schedule'}
               </button>
             </div>
           </div>
         </div>
       )}
+
       {/* MODAL 4: INSERT CTA BUTTON MODAL */}
       {isButtonModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
@@ -1947,7 +2130,9 @@ export default function AiMarketingAgentPage() {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <MousePointerClick className="w-5 h-5 text-indigo-600" />
-                <h3 className="text-sm font-bold text-slate-900">Add Call-To-Action Button</h3>
+                <h3 className="text-sm font-bold text-slate-900">
+                  {isRtl ? 'إضافة زر إجراء (CTA)' : 'Add Call-To-Action Button'}
+                </h3>
               </div>
               <button
                 type="button"
@@ -1960,19 +2145,23 @@ export default function AiMarketingAgentPage() {
 
             <form onSubmit={handleInsertButtonSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Button Label</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  {isRtl ? 'نص الزر' : 'Button Label'}
+                </label>
                 <input
                   type="text"
                   value={buttonText}
                   onChange={(e) => setButtonText(e.target.value)}
-                  placeholder="e.g. Book a Demo"
+                  placeholder={isRtl ? 'مثال: حجز موعد استشاري' : 'e.g. Book a Demo'}
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Destination URL</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  {isRtl ? 'الرابط المقصود' : 'Destination URL'}
+                </label>
                 <input
                   type="url"
                   value={buttonUrl}
@@ -1985,7 +2174,9 @@ export default function AiMarketingAgentPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Button Color</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    {isRtl ? 'لون الزر' : 'Button Color'}
+                  </label>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
@@ -2003,7 +2194,9 @@ export default function AiMarketingAgentPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Alignment</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    {isRtl ? 'المحاذاة' : 'Alignment'}
+                  </label>
                   <div className="flex rounded-lg border border-slate-200 p-0.5 bg-slate-50 text-xs">
                     <button
                       type="button"
@@ -2012,7 +2205,7 @@ export default function AiMarketingAgentPage() {
                         buttonAlign === 'left' ? 'bg-white shadow-xs font-bold text-slate-900' : 'text-slate-500'
                       }`}
                     >
-                      Left
+                      {isRtl ? 'يسار' : 'Left'}
                     </button>
                     <button
                       type="button"
@@ -2021,7 +2214,7 @@ export default function AiMarketingAgentPage() {
                         buttonAlign === 'center' ? 'bg-white shadow-xs font-bold text-slate-900' : 'text-slate-500'
                       }`}
                     >
-                      Center
+                      {isRtl ? 'وسط' : 'Center'}
                     </button>
                   </div>
                 </div>
@@ -2030,7 +2223,7 @@ export default function AiMarketingAgentPage() {
               {/* Live Preview */}
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                  Preview in Email:
+                  {isRtl ? 'معاينة في البريد:' : 'Preview in Email:'}
                 </span>
                 <div style={{ textAlign: buttonAlign }}>
                   <span
@@ -2045,24 +2238,24 @@ export default function AiMarketingAgentPage() {
                       fontFamily: 'sans-serif'
                     }}
                   >
-                    {buttonText || 'Button Text'} &rarr;
+                    {buttonText || (isRtl ? 'نص الزر' : 'Button Text')} {isRtl ? '←' : '→'}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <div className={cn("flex items-center gap-2 pt-2 border-t border-slate-100", isRtl ? "justify-start" : "justify-end")}>
                 <button
                   type="button"
                   onClick={() => setIsButtonModalOpen(false)}
                   className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg font-semibold"
                 >
-                  Cancel
+                  {isRtl ? 'إلغاء' : 'Cancel'}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm"
                 >
-                  Insert Button
+                  {isRtl ? 'إدراج الزر' : 'Insert Button'}
                 </button>
               </div>
             </form>

@@ -86,6 +86,8 @@ export interface AudienceFilter {
   audience_type?: 'all' | 'selected' | 'filtered';
   contact_ids?: number[];
   tag_ids?: number[];
+  category_id?: number;
+  email_history?: string;
   source?: string;
   lead_quality_grades?: string[];
   min_lead_score?: number;

@@ -15,16 +15,10 @@ import { emailCampaignApi } from '../../services/emailCampaignApi';
 import { crmApi } from '../../services/crmApi';
 import { AudienceFilter, AudienceEstimate, EmailTemplate, EmailSendingDomain } from '../../types/emailCampaign';
 import { toast } from '../../components/ui/Toast';
+import { useI18n } from '../../i18n';
+import { cn } from '../../lib/utils';
 
 type Step = 'audience' | 'email' | 'personalization' | 'preview_test' | 'schedule_send';
-
-const STEPS: { id: Step; label: string; icon: any }[] = [
-  { id: 'audience', label: 'Audience & Filters', icon: Users },
-  { id: 'email', label: 'Compose Message', icon: Mail },
-  { id: 'personalization', label: 'Personalization Preview', icon: Sparkles },
-  { id: 'preview_test', label: 'Review & Test', icon: Eye },
-  { id: 'schedule_send', label: 'Launch Campaign', icon: Calendar },
-];
 
 export interface SampleContact {
   id: number | string;
@@ -475,7 +469,16 @@ export function parseMergeTags(
 export default function EmailCampaignBuilderPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { t, isRtl, locale } = useI18n();
   const [currentStep, setCurrentStep] = useState<Step>('audience');
+
+  const STEPS: { id: Step; label: string; icon: any }[] = useMemo(() => [
+    { id: 'audience', label: isRtl ? 'الجمهور والتصفيات' : 'Audience & Filters', icon: Users },
+    { id: 'email', label: isRtl ? 'صياغة الرسالة' : 'Compose Message', icon: Mail },
+    { id: 'personalization', label: isRtl ? 'معاينة التخصيص' : 'Personalization Preview', icon: Sparkles },
+    { id: 'preview_test', label: isRtl ? 'المراجعة والاختبار' : 'Review & Test', icon: Eye },
+    { id: 'schedule_send', label: isRtl ? 'إطلاق الحملة' : 'Launch Campaign', icon: Calendar },
+  ], [isRtl]);
 
   // Input Refs for cursor-based insertion
   const subjectInputRef = useRef<HTMLInputElement>(null);
@@ -730,7 +733,7 @@ export default function EmailCampaignBuilderPage() {
         visualBodyEditorRef.current.innerHTML = found.defaultBody;
       }
     }
-    toast.success(`Switched to "${found.name}" Template Frame`);
+    toast.success(isRtl ? `تم التبديل إلى قالب "${found.name}"` : `Switched to "${found.name}" Template Frame`);
   };
 
   // 1-Click Visual formatting
@@ -761,13 +764,14 @@ export default function EmailCampaignBuilderPage() {
 
   const handleInsertButtonSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    const label = buttonText.trim() || 'Click Here';
+    const label = buttonText.trim() || (isRtl ? 'اضغط هنا' : 'Click Here');
     const url = buttonUrl.trim() || 'https://';
     const color = buttonColor || '#2563eb';
     const align = buttonAlign || 'left';
+    const arrow = isRtl ? '&larr;' : '&rarr;';
 
     // Bulletproof Cross-Client HTML Email Button (Gmail, Outlook, Apple Mail)
-    const buttonHtml = `&nbsp;<table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin: 16px ${align === 'center' ? 'auto' : '0'}; border-collapse: separate; display: inline-table;"><tr><td align="center" bgcolor="${color}" style="border-radius: 8px; background-color: ${color};"><a href="${url}" target="_blank" style="font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: bold; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; display: inline-block; mso-padding-alt: 0; border: 1px solid ${color};">${label} &rarr;</a></td></tr></table>&nbsp;`;
+    const buttonHtml = `&nbsp;<table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin: 16px ${align === 'center' ? 'auto' : '0'}; border-collapse: separate; display: inline-table;"><tr><td align="center" bgcolor="${color}" style="border-radius: 8px; background-color: ${color};"><a href="${url}" target="_blank" style="font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: bold; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; display: inline-block; mso-padding-alt: 0; border: 1px solid ${color};">${label} ${arrow}</a></td></tr></table>&nbsp;`;
 
     if (visualBodyEditorRef.current) {
       visualBodyEditorRef.current.focus();
@@ -787,7 +791,7 @@ export default function EmailCampaignBuilderPage() {
         visualBodyEditorRef.current.innerHTML += `<p><br/>${buttonHtml}<br/></p>`;
       }
       setUserBodyMessage(visualBodyEditorRef.current.innerHTML);
-      toast.success('CTA Button inserted into message body');
+      toast.success(isRtl ? 'تم إدراج زر الإجراء في نص الرسالة بنجاح' : 'CTA Button inserted into message body');
     }
     setIsButtonModalOpen(false);
   };
@@ -798,7 +802,7 @@ export default function EmailCampaignBuilderPage() {
       visualBodyEditorRef.current.focus();
       document.execCommand('insertText', false, ' ' + tag + ' ');
       setUserBodyMessage(visualBodyEditorRef.current.innerHTML);
-      toast.success(`Inserted ${tag}`);
+      toast.success(isRtl ? `تم إدراج الوسم ${tag}` : `Inserted ${tag}`);
     }
   };
 
@@ -807,7 +811,7 @@ export default function EmailCampaignBuilderPage() {
     const input = subjectInputRef.current;
     if (!input) {
       setSubject(prev => prev + ' ' + tag);
-      toast.success(`Added ${tag} to Subject`);
+      toast.success(isRtl ? `تمت إضافة ${tag} إلى الموضوع` : `Added ${tag} to Subject`);
       return;
     }
     const start = input.selectionStart ?? subject.length;
@@ -821,17 +825,17 @@ export default function EmailCampaignBuilderPage() {
       const newPos = start + prefix.length + tag.length + suffix.length;
       input.setSelectionRange(newPos, newPos);
     }, 20);
-    toast.success(`Inserted ${tag}`);
+    toast.success(isRtl ? `تم إدراج الوسم ${tag}` : `Inserted ${tag}`);
   };
 
   // Send test email
   const handleSendTest = async () => {
     if (!testEmailAddress) {
-      toast.error('Please enter a test recipient email.');
+      toast.error(isRtl ? 'يرجى إدخال بريد إلكتروني تجريبي.' : 'Please enter a test recipient email.');
       return;
     }
     if (!subject) {
-      toast.error('Please enter a subject line first.');
+      toast.error(isRtl ? 'يرجى كتابة عنوان الموضوع أولاً.' : 'Please enter a subject line first.');
       return;
     }
     setIsSendingTest(true);
@@ -846,9 +850,9 @@ export default function EmailCampaignBuilderPage() {
         text_body: textBody || undefined,
       });
       setTestSentSuccess(true);
-      toast.success(`Test email dispatched to ${testEmailAddress}`);
+      toast.success(isRtl ? `تم إرسال البريد التجريبي إلى ${testEmailAddress}` : `Test email dispatched to ${testEmailAddress}`);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || err.message || 'Failed to send test email');
+      toast.error(err.response?.data?.message || err.message || (isRtl ? 'فشل إرسال البريد التجريبي' : 'Failed to send test email'));
     } finally {
       setIsSendingTest(false);
     }
@@ -857,34 +861,34 @@ export default function EmailCampaignBuilderPage() {
   // Launch campaign
   const handleLaunchCampaign = async (asDraft = false) => {
     if (!name.trim()) {
-      toast.error('Campaign Name is required.');
+      toast.error(isRtl ? 'اسم الحملة مطلوب.' : 'Campaign Name is required.');
       setCurrentStep('audience');
       return;
     }
     if (!fromEmail.trim()) {
-      toast.error('From Email is required.');
+      toast.error(isRtl ? 'البريد الإلكتروني للمرسل مطلوب.' : 'From Email is required.');
       setCurrentStep('email');
       return;
     }
     if (!subject.trim()) {
-      toast.error('Subject is required.');
+      toast.error(isRtl ? 'عنوان الموضوع مطلوب.' : 'Subject is required.');
       setCurrentStep('email');
       return;
     }
     if (!userBodyMessage.trim()) {
-      toast.error('Message body is required.');
+      toast.error(isRtl ? 'نص الرسالة مطلوب.' : 'Message body is required.');
       setCurrentStep('email');
       return;
     }
 
     if (!asDraft && (!estimate || estimate.eligible_count === 0)) {
-      toast.error('There are no eligible recipients matching your audience criteria.');
+      toast.error(isRtl ? 'لا توجد جهات اتصال مؤهلة تطابق معايير الجمهور المحددة.' : 'There are no eligible recipients matching your audience criteria.');
       setCurrentStep('audience');
       return;
     }
 
     if (!asDraft && verifiedDomains.length === 0) {
-      toast.error('Before you can send emails, you must verify a sending domain.');
+      toast.error(isRtl ? 'قبل إرسال رسائل البريد الإلكتروني، يجب عليك إثبات ملكية نطاق إرسال.' : 'Before you can send emails, you must verify a sending domain.');
       navigate('/settings/email?tab=domains');
       return;
     }
@@ -913,12 +917,14 @@ export default function EmailCampaignBuilderPage() {
       await emailCampaignApi.createCampaign(payload);
       toast.success(
         asDraft 
-          ? 'Campaign saved as draft' 
-          : (sendOption === 'now' ? 'Campaign launched successfully!' : 'Campaign scheduled!')
+          ? (isRtl ? 'تم حفظ الحملة كمسودة' : 'Campaign saved as draft')
+          : (sendOption === 'now' 
+              ? (isRtl ? 'تم إطلاق الحملة بنجاح!' : 'Campaign launched successfully!') 
+              : (isRtl ? 'تمت جدولة الحملة بنجاح!' : 'Campaign scheduled!'))
       );
       navigate('/email-campaigns');
     } catch (err: any) {
-      toast.error(err.response?.data?.message || err.message || 'Failed to process campaign');
+      toast.error(err.response?.data?.message || err.message || (isRtl ? 'فشلت معالجة الحملة' : 'Failed to process campaign'));
     } finally {
       setIsLaunching(false);
     }
@@ -927,7 +933,7 @@ export default function EmailCampaignBuilderPage() {
   // DeepSeek AI Generation
   const handleGenerateWithAi = async () => {
     if (!aiTopic.trim()) {
-      toast.error('Please enter what this email is about.');
+      toast.error(isRtl ? 'يرجى كتابة موضوع الرسالة أولاً.' : 'Please enter what this email is about.');
       return;
     }
     setIsGeneratingAi(true);
@@ -941,9 +947,9 @@ export default function EmailCampaignBuilderPage() {
         api_key: aiApiKeyOverride || undefined,
       });
       setAiGeneratedResult(res.data);
-      toast.success('AI drafted your email body!');
+      toast.success(isRtl ? 'تمت صياغة مسودة البريد بالذكاء الاصطناعي!' : 'AI drafted your email body!');
     } catch (err: any) {
-      const errorMsg = err.response?.data?.error || err.message || 'AI Generation failed';
+      const errorMsg = err.response?.data?.error || err.message || (isRtl ? 'فشل التوليد بالذكاء الاصطناعي' : 'AI Generation failed');
       toast.error(errorMsg);
     } finally {
       setIsGeneratingAi(false);
@@ -961,7 +967,7 @@ export default function EmailCampaignBuilderPage() {
       setTextBody(aiGeneratedResult.text_body);
     }
     setIsAiModalOpen(false);
-    toast.success('AI draft applied to your body message!');
+    toast.success(isRtl ? 'تم تطبيق مسودة الذكاء الاصطناعي على رسالتك!' : 'AI draft applied to your body message!');
   };
 
   // Helper for step progression
@@ -978,15 +984,15 @@ export default function EmailCampaignBuilderPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-8 pb-24">
+    <div className={cn("p-6 lg:p-8 max-w-6xl mx-auto space-y-8 pb-24", isRtl && "font-arabic")}>
       {/* Top Bar */}
       <div className="flex items-center justify-between">
         <button
           onClick={() => navigate('/email-campaigns')}
           className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors"
         >
-          <ArrowLeft size={16} />
-          Back to Campaigns
+          {isRtl ? <ArrowRight size={16} /> : <ArrowLeft size={16} />}
+          {isRtl ? 'العودة إلى الحملات' : 'Back to Campaigns'}
         </button>
 
         <div className="flex items-center gap-3">
@@ -995,7 +1001,7 @@ export default function EmailCampaignBuilderPage() {
             disabled={isLaunching}
             className="h-10 px-4.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-[#57534E] hover:text-[#166534] hover:bg-[#F0FDF4] hover:border-[#bbf7d0] transition-all shadow-xs active:scale-95 cursor-pointer disabled:opacity-50"
           >
-            Save as Draft
+            {isRtl ? 'حفظ كمسودة' : 'Save as Draft'}
           </button>
         </div>
       </div>
@@ -1008,8 +1014,12 @@ export default function EmailCampaignBuilderPage() {
               <AlertTriangle size={20} />
             </div>
             <div>
-              <p className="text-xs font-bold text-amber-900">Before you can send emails, you must verify a sending domain.</p>
-              <p className="text-[11px] text-amber-700">Add your domain and configure DNS records to authorize campaigns.</p>
+              <p className="text-xs font-bold text-amber-900">
+                {isRtl ? 'قبل أن تتمكن من إرسال رسائل البريد، يجب عليك توثيق نطاق الإرسال.' : 'Before you can send emails, you must verify a sending domain.'}
+              </p>
+              <p className="text-[11px] text-amber-700">
+                {isRtl ? 'أضف نطاقك وقم بتهيئة سجلات DNS لتفويض إرسال الحملات.' : 'Add your domain and configure DNS records to authorize campaigns.'}
+              </p>
             </div>
           </div>
           <button
@@ -1017,7 +1027,7 @@ export default function EmailCampaignBuilderPage() {
             onClick={() => navigate('/settings/email?tab=domains')}
             className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold whitespace-nowrap transition-all shadow-sm"
           >
-            Add Sending Domain &rarr;
+            {isRtl ? 'إضافة نطاق إرسال ←' : 'Add Sending Domain →'}
           </button>
         </div>
       )}
@@ -1057,19 +1067,24 @@ export default function EmailCampaignBuilderPage() {
       {currentStep === 'audience' && (
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-            <h2 className="text-lg font-bold text-slate-900 tracking-tight">Campaign Setup & Sender Identity</h2>
+            <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+              {isRtl ? 'إعداد الحملة وهوية المرسل' : 'Campaign Setup & Sender Identity'}
+            </h2>
 
             {/* Campaign Name */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                Campaign Name *
+                {isRtl ? 'اسم الحملة *' : 'Campaign Name *'}
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. October Outreach, Q4 Dental Clinics Follow-up"
-                className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534] font-medium text-slate-900"
+                placeholder={isRtl ? 'مثال: حملة أكتوبر، متابعة عيادات الأسنان' : 'e.g. October Outreach, Q4 Dental Clinics Follow-up'}
+                className={cn(
+                  "w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534] font-medium text-slate-900",
+                  isRtl && "text-right"
+                )}
               />
             </div>
 
@@ -1078,7 +1093,7 @@ export default function EmailCampaignBuilderPage() {
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                   <ShieldCheck size={16} className="text-emerald-600" />
-                  Verified Sender Identity & Domain
+                  {isRtl ? 'هوية المرسل والنطاق الموثق' : 'Verified Sender Identity & Domain'}
                 </h3>
 
                 <button
@@ -1086,7 +1101,7 @@ export default function EmailCampaignBuilderPage() {
                   onClick={() => navigate('/settings/email?tab=domains')}
                   className="text-[11px] font-bold text-[#166534] hover:text-[#12263A] flex items-center gap-1"
                 >
-                  Manage Domains &rarr;
+                  {isRtl ? 'إدارة النطاقات ←' : 'Manage Domains →'}
                 </button>
               </div>
 
@@ -1094,11 +1109,14 @@ export default function EmailCampaignBuilderPage() {
                 {/* Sending Domain dropdown */}
                 <div>
                   <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
-                    Verified Sending Domain *
+                    {isRtl ? 'نطاق الإرسال الموثق *' : 'Verified Sending Domain *'}
                   </label>
                   {verifiedDomains.length === 0 ? (
                     <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold">
-                      No verified domain. <button type="button" onClick={() => navigate('/settings/email?tab=domains')} className="underline">Add & verify</button>
+                      {isRtl ? 'لا يوجد نطاق موثق. ' : 'No verified domain. '}
+                      <button type="button" onClick={() => navigate('/settings/email?tab=domains')} className="underline">
+                        {isRtl ? 'أضف وثّق النطاق' : 'Add & verify'}
+                      </button>
                     </div>
                   ) : (
                     <select
@@ -1112,11 +1130,11 @@ export default function EmailCampaignBuilderPage() {
                           setFromEmail(`${username}@${dom.domain}`);
                         }
                       }}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white font-mono"
+                      className={cn("w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white font-mono", isRtl && "text-right")}
                     >
                       {verifiedDomains.map((d) => (
                         <option key={d.id} value={d.id}>
-                          {d.domain} (Verified)
+                          {d.domain} ({isRtl ? 'موثق' : 'Verified'})
                         </option>
                       ))}
                     </select>
@@ -1124,7 +1142,7 @@ export default function EmailCampaignBuilderPage() {
 
                   {unverifiedDomains.length > 0 && (
                     <div className="mt-1.5 flex flex-wrap items-center gap-1 text-[10px] text-slate-400">
-                      <span>Pending:</span>
+                      <span>{isRtl ? 'قيد الانتظار:' : 'Pending:'}</span>
                       {unverifiedDomains.map(u => (
                         <span key={u.id} className="text-amber-700 font-mono">
                           {u.domain} ({u.status})
@@ -1135,7 +1153,7 @@ export default function EmailCampaignBuilderPage() {
                         onClick={() => navigate('/settings/email?tab=domains')}
                         className="text-[#166534] underline font-semibold ml-1"
                       >
-                        Fix Verification
+                        {isRtl ? 'تصحيح التوثيق' : 'Fix Verification'}
                       </button>
                     </div>
                   )}
@@ -1144,22 +1162,22 @@ export default function EmailCampaignBuilderPage() {
                 {/* From Name */}
                 <div>
                   <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
-                    From Name *
+                    {isRtl ? 'اسم المرسل *' : 'From Name *'}
                   </label>
                   <input
                     type="text"
                     required
                     value={fromName}
                     onChange={(e) => setFromName(e.target.value)}
-                    placeholder="e.g. Acme Marketing"
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
+                    placeholder={isRtl ? 'مثال: تسويق المنشأة' : 'e.g. Acme Marketing'}
+                    className={cn("w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white", isRtl && "text-right")}
                   />
                 </div>
 
                 {/* From Email */}
                 <div>
                   <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
-                    From Email *
+                    {isRtl ? 'بريد المرسل *' : 'From Email *'}
                   </label>
                   <input
                     type="email"
@@ -1168,9 +1186,10 @@ export default function EmailCampaignBuilderPage() {
                     onChange={(e) => setFromEmail(e.target.value)}
                     placeholder="e.g. outreach@yourdomain.com"
                     className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white font-mono"
+                    dir="ltr"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">
-                    Must match your verified sending domain.
+                    {isRtl ? 'يجب أن يطابق نطاق الإرسال الموثق الخاص بك.' : 'Must match your verified sending domain.'}
                   </p>
                 </div>
               </div>
@@ -1178,33 +1197,41 @@ export default function EmailCampaignBuilderPage() {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
-                Audience Scope
+                {isRtl ? 'نطاق الجمهور' : 'Audience Scope'}
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <button
                   type="button"
                   onClick={() => setAudienceType('all')}
-                  className={`p-4 rounded-xl border text-left transition-all ${
+                  className={`p-4 rounded-xl border transition-all ${isRtl ? 'text-right' : 'text-left'} ${
                     audienceType === 'all' 
                       ? 'border-[#166534] bg-[#F0FDF4]/30 ring-2 ring-indigo-600/10' 
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
-                  <p className="font-bold text-slate-900 text-sm">All CRM Contacts</p>
-                  <p className="text-xs text-slate-500 mt-1">Send to all contacts in your CRM with valid email addresses.</p>
+                  <p className="font-bold text-slate-900 text-sm">
+                    {isRtl ? 'جميع جهات اتصال النظام' : 'All CRM Contacts'}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {isRtl ? 'الإرسال لجميع جهات الاتصال في النظام التي تمتلك عناوين بريد إلكتروني صالحة.' : 'Send to all contacts in your CRM with valid email addresses.'}
+                  </p>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setAudienceType('filtered')}
-                  className={`p-4 rounded-xl border text-left transition-all ${
+                  className={`p-4 rounded-xl border transition-all ${isRtl ? 'text-right' : 'text-left'} ${
                     audienceType === 'filtered' 
                       ? 'border-[#166534] bg-[#F0FDF4]/30 ring-2 ring-indigo-600/10' 
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
-                  <p className="font-bold text-slate-900 text-sm">Filtered / Segmented Audience</p>
-                  <p className="text-xs text-slate-500 mt-1">Filter by Scraper leads, Industry, City/Location, Quality Grade, or Score.</p>
+                  <p className="font-bold text-slate-900 text-sm">
+                    {isRtl ? 'جمهور مخصص ومصنف' : 'Filtered / Segmented Audience'}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {isRtl ? 'التصفية حسب عملاء أداة السحب، أو المجال، أو المدينة، أو تقييم الجودة.' : 'Filter by Scraper leads, Industry, City/Location, Quality Grade, or Score.'}
+                  </p>
                 </button>
               </div>
             </div>
@@ -1213,19 +1240,21 @@ export default function EmailCampaignBuilderPage() {
               <div className="p-5 rounded-2xl bg-slate-50/70 border border-slate-200 space-y-4">
                 <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
                   <Filter size={14} className="text-[#166534]" />
-                  Audience Filters (Scraper & CRM Leads)
+                  {isRtl ? 'تصفيات الجمهور (عملاء أداة السحب وجهات الاتصال)' : 'Audience Filters (Scraper & CRM Leads)'}
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {/* Category Dropdown (Requirement 17) */}
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">CRM Category</label>
+                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                      {isRtl ? 'تصنيف النظام' : 'CRM Category'}
+                    </label>
                     <select
                       value={selectedCategoryId}
                       onChange={(e) => setSelectedCategoryId(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
+                      className={cn("w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white", isRtl && "text-right")}
                     >
-                      <option value="">All Categories</option>
+                      <option value="">{isRtl ? 'جميع التصنيفات' : 'All Categories'}</option>
                       {categories.map((c) => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
@@ -1234,59 +1263,69 @@ export default function EmailCampaignBuilderPage() {
 
                   {/* Email History Filter (Requirement 14 & 17) */}
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">Email History</label>
+                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                      {isRtl ? 'سجل البريد الإلكتروني' : 'Email History'}
+                    </label>
                     <select
                       value={emailHistoryFilter}
                       onChange={(e) => setEmailHistoryFilter(e.target.value as any)}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white font-semibold text-slate-900"
+                      className={cn("w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white font-semibold text-slate-900", isRtl && "text-right")}
                     >
-                      <option value="never_sent">Never Sent (Cold Outreach)</option>
-                      <option value="all">All Contacts (Regardless of prior emails)</option>
-                      <option value="previously_sent">Previously Sent</option>
-                      <option value="delivered">Delivered Before</option>
-                      <option value="bounced">Bounced Before</option>
+                      <option value="never_sent">{isRtl ? 'لم يتم الإرسال له من قبل (عملاء جدد)' : 'Never Sent (Cold Outreach)'}</option>
+                      <option value="all">{isRtl ? 'جميع جهات الاتصال (بغض النظر عن السجل السابق)' : 'All Contacts (Regardless of prior emails)'}</option>
+                      <option value="previously_sent">{isRtl ? 'أُرسل لهم سابقاً' : 'Previously Sent'}</option>
+                      <option value="delivered">{isRtl ? 'تم التسليم لهم سابقاً' : 'Delivered Before'}</option>
+                      <option value="bounced">{isRtl ? 'ارتد بريدهم سابقاً' : 'Bounced Before'}</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">Source</label>
+                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                      {isRtl ? 'المصدر' : 'Source'}
+                    </label>
                     <select
                       value={sourceFilter}
                       onChange={(e) => setSourceFilter(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
+                      className={cn("w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white", isRtl && "text-right")}
                     >
-                      <option value="">All Sources</option>
-                      <option value="Business Scraper">Business Scraper</option>
-                      <option value="CRM">Manual CRM</option>
+                      <option value="">{isRtl ? 'جميع المصادر' : 'All Sources'}</option>
+                      <option value="Business Scraper">{isRtl ? 'أداة سحب الأنشطة التجارية' : 'Business Scraper'}</option>
+                      <option value="CRM">{isRtl ? 'نظام CRM اليدوي' : 'Manual CRM'}</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">Industry Keyword</label>
+                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                      {isRtl ? 'الكلمة المفتاحية للمجال' : 'Industry Keyword'}
+                    </label>
                     <input
                       type="text"
                       value={industryFilter}
                       onChange={(e) => setIndustryFilter(e.target.value)}
-                      placeholder="e.g. Dental, Real Estate, Clinic"
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
+                      placeholder={isRtl ? 'مثال: أسنان، عقارات، عيادات' : 'e.g. Dental, Real Estate, Clinic'}
+                      className={cn("w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white", isRtl && "text-right")}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">City / Location</label>
+                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                      {isRtl ? 'المدينة / الموقع' : 'City / Location'}
+                    </label>
                     <input
                       type="text"
                       value={locationFilter}
                       onChange={(e) => setLocationFilter(e.target.value)}
-                      placeholder="e.g. Lahore, Karachi, Islamabad"
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
+                      placeholder={isRtl ? 'مثال: الرياض، جدة، الدمام' : 'e.g. Lahore, Karachi, Islamabad'}
+                      className={cn("w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white", isRtl && "text-right")}
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-2">Lead Quality Grades</label>
+                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-2">
+                      {isRtl ? 'درجات جودة العميل' : 'Lead Quality Grades'}
+                    </label>
                     <div className="flex gap-2">
                       {['A', 'B', 'C', 'D'].map((grade) => {
                         const isSelected = selectedGrades.includes(grade);
@@ -1313,7 +1352,9 @@ export default function EmailCampaignBuilderPage() {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-2">Requirements</label>
+                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-2">
+                      {isRtl ? 'المتطلبات' : 'Requirements'}
+                    </label>
                     <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
                       <input
                         type="checkbox"
@@ -1321,7 +1362,7 @@ export default function EmailCampaignBuilderPage() {
                         onChange={(e) => setWebsiteAvailable(e.target.checked)}
                         className="rounded border-slate-300 text-[#166534] focus:ring-[#22C55E]"
                       />
-                      Website Available Only
+                      {isRtl ? 'فقط من يمتلك موقعاً إلكترونياً' : 'Website Available Only'}
                     </label>
                   </div>
                 </div>
@@ -1333,8 +1374,12 @@ export default function EmailCampaignBuilderPage() {
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold text-slate-900 tracking-tight">Audience Deliverability Count</h3>
-                <p className="text-xs text-slate-500">Excludes invalid emails, unsubscribes, and global suppression records</p>
+                <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+                  {isRtl ? 'حصر قابلية تسليم الجمهور' : 'Audience Deliverability Count'}
+                </h3>
+                <p className="text-xs text-slate-500">
+                  {isRtl ? 'يستبعد البريد غير الصالح، والملغين لاشتراكهم، وسجلات الحظر' : 'Excludes invalid emails, unsubscribes, and global suppression records'}
+                </p>
               </div>
               <button
                 type="button"
@@ -1343,7 +1388,7 @@ export default function EmailCampaignBuilderPage() {
                 className="flex items-center gap-1.5 text-xs font-bold text-[#166534] hover:text-[#14532d]"
               >
                 <RefreshCw size={12} className={isEstimating ? 'animate-spin' : ''} />
-                Refresh Count
+                {isRtl ? 'تحديث العدد' : 'Refresh Count'}
               </button>
             </div>
 
@@ -1351,35 +1396,41 @@ export default function EmailCampaignBuilderPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Ready to Send</span>
+                    <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                      {isRtl ? 'جاهز للإرسال' : 'Ready to Send'}
+                    </span>
                     <CheckCircle2 size={18} className="text-emerald-600" />
                   </div>
                   <p className="text-3xl font-extrabold text-emerald-700 mt-2">
-                    {estimate.eligible_count.toLocaleString()}
+                    {estimate.eligible_count.toLocaleString(isRtl ? 'ar-SA' : 'en-US')}
                   </p>
                   <p className="text-[11px] text-emerald-600 font-medium mt-1">
-                    Valid email recipients
+                    {isRtl ? 'مستلم ببريد إلكتروني صالح' : 'Valid email recipients'}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-rose-50/60 border border-rose-200">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-rose-800 uppercase tracking-wider">Filtered Out</span>
+                    <span className="text-xs font-bold text-rose-800 uppercase tracking-wider">
+                      {isRtl ? 'مستبعد بالتصفية' : 'Filtered Out'}
+                    </span>
                     <ShieldCheck size={18} className="text-rose-600" />
                   </div>
                   <p className="text-3xl font-extrabold text-rose-700 mt-2">
-                    {estimate.excluded_count.toLocaleString()}
+                    {estimate.excluded_count.toLocaleString(isRtl ? 'ar-SA' : 'en-US')}
                   </p>
                   <div className="mt-2 text-[11px] text-rose-700 grid grid-cols-2 gap-x-3 gap-y-0.5">
-                    <span>Missing email: <b>{estimate.reasons?.missing_email || 0}</b></span>
-                    <span>Invalid syntax: <b>{estimate.reasons?.invalid_syntax || 0}</b></span>
-                    <span>Unsubscribed: <b>{estimate.reasons?.unsubscribed || 0}</b></span>
-                    <span>Suppressed: <b>{estimate.reasons?.suppressed || 0}</b></span>
+                    <span>{isRtl ? 'بريد مفقود: ' : 'Missing email: '}<b>{estimate.reasons?.missing_email || 0}</b></span>
+                    <span>{isRtl ? 'صيغة غير صحيحة: ' : 'Invalid syntax: '}<b>{estimate.reasons?.invalid_syntax || 0}</b></span>
+                    <span>{isRtl ? 'إلغاء اشتراك: ' : 'Unsubscribed: '}<b>{estimate.reasons?.unsubscribed || 0}</b></span>
+                    <span>{isRtl ? 'محظور / مستبعد: ' : 'Suppressed: '}<b>{estimate.reasons?.suppressed || 0}</b></span>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="py-6 text-center text-xs text-slate-400">Evaluating audience...</div>
+              <div className="py-6 text-center text-xs text-slate-400">
+                {isRtl ? 'جارٍ تقييم الجمهور...' : 'Evaluating audience...'}
+              </div>
             )}
           </div>
         </div>
@@ -1396,10 +1447,10 @@ export default function EmailCampaignBuilderPage() {
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
                     <Layout size={16} className="text-[#166534]" />
-                    Select Professional Template Style
+                    {isRtl ? 'اختر نمط القالب الاحترافي' : 'Select Professional Template Style'}
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Header & Footer stay styled and branded. You only type and edit the message body!
+                    {isRtl ? 'الترويسة والتذييل منسقان ومحميان بهويتك، وما عليك سوى كتابة وتنسيق نص الرسالة!' : 'Header & Footer stay styled and branded. You only type and edit the message body!'}
                   </p>
                 </div>
               </div>
@@ -1413,7 +1464,7 @@ export default function EmailCampaignBuilderPage() {
                       key={frame.id}
                       type="button"
                       onClick={() => handleSelectFrame(frame.id)}
-                      className={`p-3.5 rounded-xl border text-left transition-all ${
+                      className={`p-3.5 rounded-xl border transition-all ${isRtl ? 'text-right' : 'text-left'} ${
                         isSelected 
                           ? 'border-[#166534] bg-[#F0FDF4]/40 ring-2 ring-indigo-600/10 shadow-xs' 
                           : 'border-slate-200 hover:border-slate-300 bg-white'
@@ -1434,35 +1485,43 @@ export default function EmailCampaignBuilderPage() {
             {/* Sender Info Row */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Your Name (Sender) *</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  {isRtl ? 'اسم المرسل *' : 'Your Name (Sender) *'}
+                </label>
                 <input
                   type="text"
                   value={fromName}
                   onChange={(e) => setFromName(e.target.value)}
-                  placeholder="e.g. Ali Khan"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
+                  placeholder={isRtl ? 'مثال: محمد السعيد' : 'e.g. Ali Khan'}
+                  className={cn("w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white", isRtl && "text-right")}
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Sender Email *</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  {isRtl ? 'بريد المرسل *' : 'Sender Email *'}
+                </label>
                 <input
                   type="email"
                   value={fromEmail}
                   onChange={(e) => setFromEmail(e.target.value)}
                   placeholder="e.g. sales@company.com"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white font-mono"
+                  dir="ltr"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Reply-To (Optional)</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  {isRtl ? 'عنوان الرد (اختياري)' : 'Reply-To (Optional)'}
+                </label>
                 <input
                   type="email"
                   value={replyTo}
                   onChange={(e) => setReplyTo(e.target.value)}
                   placeholder="e.g. support@company.com"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white font-mono"
+                  dir="ltr"
                 />
               </div>
             </div>
@@ -1470,7 +1529,7 @@ export default function EmailCampaignBuilderPage() {
             {/* SUBJECT LINE SECTION */}
             <div className="space-y-2 p-4 rounded-2xl bg-slate-50/80 border border-slate-200">
               <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider">
-                Email Subject Line *
+                {isRtl ? 'عنوان / موضوع البريد الإلكتروني *' : 'Email Subject Line *'}
               </label>
 
               <input
@@ -1478,17 +1537,17 @@ export default function EmailCampaignBuilderPage() {
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="e.g. Quick question for {{first_name}} regarding {{business_name}}"
-                className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white font-medium text-slate-900"
+                placeholder={isRtl ? 'مثال: استفسار سريع لـ {{first_name}} بخصوص {{business_name}}' : 'e.g. Quick question for {{first_name}} regarding {{business_name}}'}
+                className={cn("w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white font-medium text-slate-900", isRtl && "text-right")}
               />
 
               <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                <span className="text-[11px] font-bold text-slate-500 mr-1 flex items-center gap-1">
-                  <Plus size={12} className="text-[#166534]" /> Insert in Subject:
+                <span className={cn("text-[11px] font-bold text-slate-500 flex items-center gap-1", isRtl ? "ml-1" : "mr-1")}>
+                  <Plus size={12} className="text-[#166534]" /> {isRtl ? 'إدراج في الموضوع:' : 'Insert in Subject:'}
                 </span>
                 {[
-                  { label: '+ Name', tag: '{{first_name | default: "there"}}' },
-                  { label: '+ Business Name', tag: '{{business_name}}' },
+                  { label: isRtl ? '+ الاسم' : '+ Name', tag: '{{first_name | default: "there"}}' },
+                  { label: isRtl ? '+ اسم المنشأة' : '+ Business Name', tag: '{{business_name}}' },
                 ].map((p, idx) => (
                   <button
                     key={idx}
@@ -1507,7 +1566,7 @@ export default function EmailCampaignBuilderPage() {
               <div className="flex items-center gap-2.5">
                 <Sparkles size={18} className="text-purple-600" />
                 <span className="text-xs font-bold text-purple-950">
-                  Need inspiration? Let AI write the message body for you.
+                  {isRtl ? 'تحتاج إلى أفكار ملهمة؟ دع الذكاء الاصطناعي يصيغ نص الرسالة لك.' : 'Need inspiration? Let AI write the message body for you.'}
                 </span>
               </div>
               <button
@@ -1515,7 +1574,7 @@ export default function EmailCampaignBuilderPage() {
                 onClick={() => setIsAiModalOpen(true)}
                 className="px-4 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-700 shadow-sm transition-all"
               >
-                Write with AI
+                {isRtl ? 'كتابة بالذكاء الاصطناعي' : 'Write with AI'}
               </button>
             </div>
 
@@ -1523,10 +1582,10 @@ export default function EmailCampaignBuilderPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                  Email Message Canvas
+                  {isRtl ? 'مساحة تصميم الرسالة' : 'Email Message Canvas'}
                 </span>
                 <span className="text-[11px] text-slate-400">
-                  Header and Footer are locked and styled &bull; Type only in the white body area
+                  {isRtl ? 'الترويسة والتذييل محميان ومنسقان • اكتب فقط في مساحة النص البيضاء' : 'Header and Footer are locked and styled • Type only in the white body area'}
                 </span>
               </div>
 
@@ -1538,7 +1597,7 @@ export default function EmailCampaignBuilderPage() {
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => applyVisualFormat('bold')}
                     className="p-1.5 rounded-lg hover:bg-white text-slate-700 border border-transparent hover:border-slate-200 font-bold"
-                    title="Bold"
+                    title={isRtl ? 'عريض' : 'Bold'}
                   >
                     <Bold size={15} />
                   </button>
@@ -1547,7 +1606,7 @@ export default function EmailCampaignBuilderPage() {
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => applyVisualFormat('italic')}
                     className="p-1.5 rounded-lg hover:bg-white text-slate-700 border border-transparent hover:border-slate-200"
-                    title="Italic"
+                    title={isRtl ? 'مائل' : 'Italic'}
                   >
                     <Italic size={15} />
                   </button>
@@ -1556,7 +1615,7 @@ export default function EmailCampaignBuilderPage() {
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => applyVisualFormat('underline')}
                     className="p-1.5 rounded-lg hover:bg-white text-slate-700 border border-transparent hover:border-slate-200"
-                    title="Underline"
+                    title={isRtl ? 'تسطير' : 'Underline'}
                   >
                     <Underline size={15} />
                   </button>
@@ -1566,7 +1625,7 @@ export default function EmailCampaignBuilderPage() {
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => applyVisualFormat('insertUnorderedList')}
                     className="p-1.5 rounded-lg hover:bg-white text-slate-700 border border-transparent hover:border-slate-200"
-                    title="Bullet List"
+                    title={isRtl ? 'قائمة نقطية' : 'Bullet List'}
                   >
                     <List size={15} />
                   </button>
@@ -1575,7 +1634,7 @@ export default function EmailCampaignBuilderPage() {
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => applyVisualFormat('insertOrderedList')}
                     className="p-1.5 rounded-lg hover:bg-white text-slate-700 border border-transparent hover:border-slate-200"
-                    title="Numbered List"
+                    title={isRtl ? 'قائمة رقمية' : 'Numbered List'}
                   >
                     <ListOrdered size={15} />
                   </button>
@@ -1587,7 +1646,7 @@ export default function EmailCampaignBuilderPage() {
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => applyVisualFormat('justifyLeft')}
                     className="p-1.5 rounded-lg hover:bg-white text-slate-700 border border-transparent hover:border-slate-200"
-                    title="Align Left"
+                    title={isRtl ? 'محاذاة لليسار' : 'Align Left'}
                   >
                     <AlignLeft size={15} />
                   </button>
@@ -1596,7 +1655,7 @@ export default function EmailCampaignBuilderPage() {
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => applyVisualFormat('justifyCenter')}
                     className="p-1.5 rounded-lg hover:bg-white text-slate-700 border border-transparent hover:border-slate-200"
-                    title="Align Center"
+                    title={isRtl ? 'محاذاة للوسط' : 'Align Center'}
                   >
                     <AlignCenter size={15} />
                   </button>
@@ -1605,7 +1664,7 @@ export default function EmailCampaignBuilderPage() {
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => applyVisualFormat('justifyRight')}
                     className="p-1.5 rounded-lg hover:bg-white text-slate-700 border border-transparent hover:border-slate-200"
-                    title="Align Right"
+                    title={isRtl ? 'محاذاة لليمين' : 'Align Right'}
                   >
                     <AlignRight size={15} />
                   </button>
@@ -1614,7 +1673,7 @@ export default function EmailCampaignBuilderPage() {
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => applyVisualFormat('justifyFull')}
                     className="p-1.5 rounded-lg hover:bg-white text-slate-700 border border-transparent hover:border-slate-200"
-                    title="Justify"
+                    title={isRtl ? 'ضبط المحاذاة' : 'Justify'}
                   >
                     <AlignJustify size={15} />
                   </button>
@@ -1629,15 +1688,15 @@ export default function EmailCampaignBuilderPage() {
                     className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-200 hover:border-[#166534] text-xs font-bold text-slate-700 shadow-2xs transition-all hover:bg-slate-50"
                   >
                     <MousePointerClick size={14} className="text-[#166534]" />
-                    <span>+ Add Button</span>
+                    <span>{isRtl ? '+ إضافة زر إجراء' : '+ Add Button'}</span>
                   </button>
                 </div>
 
                 <div className="flex items-center gap-1 text-[11px] text-slate-500">
-                  <span className="font-semibold">Insert Tag:</span>
+                  <span className="font-semibold">{isRtl ? 'إدراج وسم:' : 'Insert Tag:'}</span>
                   {[
-                    { label: 'Name', tag: '{{first_name | default: "there"}}' },
-                    { label: 'Business Name', tag: '{{business_name}}' },
+                    { label: isRtl ? 'الاسم' : 'Name', tag: '{{first_name | default: "there"}}' },
+                    { label: isRtl ? 'اسم المنشأة' : 'Business Name', tag: '{{business_name}}' },
                   ].map((item, idx) => (
                     <button
                       key={idx}
@@ -1661,9 +1720,12 @@ export default function EmailCampaignBuilderPage() {
                     <div 
                       dangerouslySetInnerHTML={{ __html: activeFrame.renderHeader(fromName) }} 
                     />
-                    <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-xs text-white px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1">
+                    <div className={cn(
+                      "absolute top-2 bg-black/60 backdrop-blur-xs text-white px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1",
+                      isRtl ? "left-2" : "right-2"
+                    )}>
                       <Lock size={10} />
-                      Header Frame
+                      {isRtl ? 'ترويسة معتمدة' : 'Header Frame'}
                     </div>
                   </div>
 
@@ -1672,9 +1734,11 @@ export default function EmailCampaignBuilderPage() {
                     <div className="mb-2 flex items-center justify-between text-[11px] text-[#14532d] font-bold bg-[#F0FDF4]/80 px-3 py-1 rounded-lg border border-[#bbf7d0] select-none">
                       <span className="flex items-center gap-1.5">
                         <Type size={13} />
-                        Your Message Body (Click below to edit freely)
+                        {isRtl ? 'محتوى رسالتك (انقر بالأسفل للكتابة بحرية)' : 'Your Message Body (Click below to edit freely)'}
                       </span>
-                      <span className="text-[#22C55E] font-normal">Auto-formats for Gmail & Outlook</span>
+                      <span className="text-[#22C55E] font-normal">
+                        {isRtl ? 'تنسيق تلقائي متوافق مع Gmail وOutlook' : 'Auto-formats for Gmail & Outlook'}
+                      </span>
                     </div>
 
                     <div
@@ -1685,8 +1749,12 @@ export default function EmailCampaignBuilderPage() {
                           setUserBodyMessage(visualBodyEditorRef.current.innerHTML);
                         }
                       }}
-                      className="email-canvas-body min-h-[280px] text-slate-800 text-sm leading-relaxed focus:outline-none py-2"
+                      className={cn(
+                        "email-canvas-body min-h-[280px] text-slate-800 text-sm leading-relaxed focus:outline-none py-2",
+                        isRtl && "text-right font-arabic"
+                      )}
                       style={{ minHeight: '260px' }}
+                      dir={isRtl ? "rtl" : "ltr"}
                     />
                   </div>
 
@@ -1695,9 +1763,12 @@ export default function EmailCampaignBuilderPage() {
                     <div 
                       dangerouslySetInnerHTML={{ __html: activeFrame.renderFooter(fromName) }} 
                     />
-                    <div className="absolute bottom-2 right-2 bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1">
+                    <div className={cn(
+                      "absolute bottom-2 bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1",
+                      isRtl ? "left-2" : "right-2"
+                    )}>
                       <Lock size={10} />
-                      Compliance Footer
+                      {isRtl ? 'تذييل الامتثال' : 'Compliance Footer'}
                     </div>
                   </div>
 
@@ -1718,21 +1789,23 @@ export default function EmailCampaignBuilderPage() {
               <div>
                 <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
                   <Sparkles size={20} className="text-[#166534]" />
-                  Personalization Simulator
+                  {isRtl ? 'محاكي التخصيص' : 'Personalization Simulator'}
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Check how your assembled email (Header + Personalized Body + Footer) looks for real contacts in your list.
+                  {isRtl 
+                    ? 'تحقق من مظهر بريدك الكامل (الترويسة + النص المخصص + التذييل) لجهات الاتصال الحقيقية في قائمتك.'
+                    : 'Check how your assembled email (Header + Personalized Body + Footer) looks for real contacts in your list.'}
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
                 <span className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-1.5">
                   <CheckCheck size={14} className="text-emerald-600" />
-                  {detectedMergeTags.length} Personalized Fields
+                  {isRtl ? `${detectedMergeTags.length} حقول مخصصة` : `${detectedMergeTags.length} Personalized Fields`}
                 </span>
                 <span className="px-3 py-1.5 rounded-xl bg-[#F0FDF4] border border-[#bbf7d0] text-[#12263A] text-xs font-bold flex items-center gap-1.5">
                   <ShieldCheck size={14} className="text-[#166534]" />
-                  {activeFrame.name} Frame Active
+                  {activeFrame.name} {isRtl ? 'قالب نشط' : 'Frame Active'}
                 </span>
               </div>
             </div>
@@ -1741,7 +1814,7 @@ export default function EmailCampaignBuilderPage() {
             <div className="space-y-2 p-5 rounded-2xl bg-gradient-to-r from-slate-50 via-[#F0FDF4]/50 to-slate-50 border border-slate-200">
               <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
                 <Users size={14} className="text-[#166534]" />
-                Select a Recipient to Test:
+                {isRtl ? 'اختر مستلماً للاختبار:' : 'Select a Recipient to Test:'}
               </span>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
@@ -1753,7 +1826,7 @@ export default function EmailCampaignBuilderPage() {
                       key={contact.id || idx}
                       type="button"
                       onClick={() => setSelectedSampleIndex(idx)}
-                      className={`p-3 rounded-xl border text-left transition-all ${
+                      className={`p-3 rounded-xl border transition-all ${isRtl ? 'text-right' : 'text-left'} ${
                         isSelected 
                           ? 'border-[#166534] bg-white ring-2 ring-indigo-600/10 shadow-sm' 
                           : 'border-slate-200 bg-white/70 hover:border-slate-300 hover:bg-white'
@@ -1761,19 +1834,21 @@ export default function EmailCampaignBuilderPage() {
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-slate-900 truncate">
-                          {contact.name || (isEdgeCase ? '⚠️ Incomplete Info Test' : 'Unnamed Contact')}
+                          {contact.name || (isEdgeCase 
+                            ? (isRtl ? '⚠️ اختبار بيانات غير مكتملة' : '⚠️ Incomplete Info Test') 
+                            : (isRtl ? 'جهة اتصال بدون اسم' : 'Unnamed Contact'))}
                         </span>
                         {contact.lead_quality_grade && (
                           <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-[#dcfce7] text-[#14532d]">
-                            Grade {contact.lead_quality_grade}
+                            {isRtl ? `درجة ${contact.lead_quality_grade}` : `Grade ${contact.lead_quality_grade}`}
                           </span>
                         )}
                       </div>
                       <p className="text-[11px] text-slate-500 mt-1 truncate">
-                        {contact.company || '(No Business Name)'}
+                        {contact.company || (isRtl ? '(بدون اسم منشأة)' : '(No Business Name)')}
                       </p>
                       <div className="flex items-center gap-2 mt-1.5 text-[10px] text-slate-400">
-                        <span className="truncate">{contact.email}</span>
+                        <span className="truncate" dir="ltr">{contact.email}</span>
                       </div>
                     </button>
                   );
@@ -1787,7 +1862,7 @@ export default function EmailCampaignBuilderPage() {
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <Eye size={14} className="text-[#166534]" />
-                    How Your Recipient Sees It:
+                    {isRtl ? 'كيف يرى المستلم رسالتك:' : 'How Your Recipient Sees It:'}
                   </span>
                   
                   <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-600 select-none">
@@ -1797,7 +1872,7 @@ export default function EmailCampaignBuilderPage() {
                       onChange={(e) => setHighlightVariables(e.target.checked)}
                       className="rounded border-slate-300 text-[#166534] focus:ring-[#22C55E]"
                     />
-                    Highlight Personalized Words
+                    {isRtl ? 'تمييز الكلمات المخصصة' : 'Highlight Personalized Words'}
                   </label>
                 </div>
 
@@ -1810,7 +1885,7 @@ export default function EmailCampaignBuilderPage() {
                     }`}
                   >
                     <Monitor size={13} />
-                    Desktop View
+                    {isRtl ? 'معاينة سطح المكتب' : 'Desktop View'}
                   </button>
                   <button
                     type="button"
@@ -1820,7 +1895,7 @@ export default function EmailCampaignBuilderPage() {
                     }`}
                   >
                     <Smartphone size={13} />
-                    Mobile (375px)
+                    {isRtl ? 'معاينة الجوال (375 بكسل)' : 'Mobile (375px)'}
                   </button>
                 </div>
               </div>
@@ -1831,18 +1906,18 @@ export default function EmailCampaignBuilderPage() {
                   previewDevice === 'desktop' ? 'w-full max-w-2xl' : 'w-[375px] max-w-full'
                 }`}>
                   {/* Email Header */}
-                  <div className="p-4 bg-slate-50 border-b border-slate-100 space-y-2 text-xs">
+                  <div className={cn("p-4 bg-slate-50 border-b border-slate-100 space-y-2 text-xs", isRtl && "text-right")}>
                     <div className="space-y-1">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-slate-400 font-medium w-14">From:</span>
+                        <span className="text-slate-400 font-medium w-14">{isRtl ? 'من:' : 'From:'}</span>
                         <span className="font-semibold text-slate-800">{fromName} &lt;{fromEmail || 'you@domain.com'}&gt;</span>
                       </div>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-slate-400 font-medium w-14">To:</span>
-                        <span className="font-semibold text-slate-800">{activeContact.email}</span>
+                        <span className="text-slate-400 font-medium w-14">{isRtl ? 'إلى:' : 'To:'}</span>
+                        <span className="font-semibold text-slate-800" dir="ltr">{activeContact.email}</span>
                       </div>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-slate-400 font-medium w-14">Subject:</span>
+                        <span className="text-slate-400 font-medium w-14">{isRtl ? 'الموضوع:' : 'Subject:'}</span>
                         <span 
                           className="font-bold text-slate-900"
                           dangerouslySetInnerHTML={{ 
@@ -1855,7 +1930,10 @@ export default function EmailCampaignBuilderPage() {
 
                   {/* Rendered Full Email Body Canvas */}
                   <div 
-                    className="p-6 flex-1 overflow-y-auto prose prose-sm max-w-none text-slate-800 text-xs leading-relaxed"
+                    className={cn(
+                      "p-6 flex-1 overflow-y-auto prose prose-sm max-w-none text-slate-800 text-xs leading-relaxed",
+                      isRtl && "text-right"
+                    )}
                     dangerouslySetInnerHTML={{ 
                       __html: renderPersonalizedText(fullAssembledEmailHtml, activeVariables, highlightVariables) 
                     }} 
@@ -1874,19 +1952,19 @@ export default function EmailCampaignBuilderPage() {
             <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
               <div className="p-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                  Final Email Preview ({activeFrame.name})
+                  {isRtl ? `المعاينة النهائية للبريد (${activeFrame.name})` : `Final Email Preview (${activeFrame.name})`}
                 </span>
                 <span className="text-xs text-slate-500">
-                  Recipient: <strong>{activeContact.name || activeContact.email}</strong>
+                  {isRtl ? 'المستلم: ' : 'Recipient: '}<strong>{activeContact.name || activeContact.email}</strong>
                 </span>
               </div>
 
               <div className="p-6 space-y-4 flex-1">
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1">
-                  <div><span className="text-slate-400 font-medium">From:</span> <span className="font-bold text-slate-800">{fromName} &lt;{fromEmail}&gt;</span></div>
-                  <div><span className="text-slate-400 font-medium">To:</span> <span className="font-bold text-slate-800">{activeContact.email}</span></div>
+                <div className={cn("p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1", isRtl && "text-right")}>
+                  <div><span className="text-slate-400 font-medium">{isRtl ? 'من:' : 'From:'}</span> <span className="font-bold text-slate-800">{fromName} &lt;{fromEmail}&gt;</span></div>
+                  <div><span className="text-slate-400 font-medium">{isRtl ? 'إلى:' : 'To:'}</span> <span className="font-bold text-slate-800" dir="ltr">{activeContact.email}</span></div>
                   <div>
-                    <span className="text-slate-400 font-medium">Subject:</span>{' '}
+                    <span className="text-slate-400 font-medium">{isRtl ? 'الموضوع:' : 'Subject:'}</span>{' '}
                     <span className="font-bold text-slate-900">
                       {renderPersonalizedText(subject, activeVariables, false)}
                     </span>
@@ -1894,9 +1972,12 @@ export default function EmailCampaignBuilderPage() {
                 </div>
 
                 <div 
-                  className="prose prose-sm max-w-none p-4 rounded-xl border border-slate-100 bg-white min-h-[260px]"
+                  className={cn(
+                    "prose prose-sm max-w-none p-4 rounded-xl border border-slate-100 bg-white min-h-[260px]",
+                    isRtl && "text-right"
+                  )}
                   dangerouslySetInnerHTML={{ 
-                    __html: renderPersonalizedText(fullAssembledEmailHtml, activeVariables, false)
+                    __html: renderPersonalizedText(fullAssembledEmailHtml, activeVariables, false) 
                   }} 
                 />
               </div>
@@ -1906,22 +1987,25 @@ export default function EmailCampaignBuilderPage() {
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 h-fit">
               <h3 className="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
                 <Send size={16} className="text-[#166534]" />
-                Send a Live Test Email
+                {isRtl ? 'إرسال بريد تجريبي حي' : 'Send a Live Test Email'}
               </h3>
               <p className="text-xs text-slate-500">
-                Send a test copy to your inbox to check how it looks before launching.
+                {isRtl 
+                  ? 'أرسل نسخة تجريبية إلى صندوق بريدك لمعاينتها بدقة قبل الإطلاق.'
+                  : 'Send a test copy to your inbox to check how it looks before launching.'}
               </p>
 
               <div>
                 <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
-                  Your Email Address
+                  {isRtl ? 'عنوان بريدك الإلكتروني' : 'Your Email Address'}
                 </label>
                 <input
                   type="email"
                   value={testEmailAddress}
                   onChange={(e) => setTestEmailAddress(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20"
+                  className={cn("w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20", isRtl && "text-right")}
+                  dir="ltr"
                 />
               </div>
 
@@ -1932,13 +2016,13 @@ export default function EmailCampaignBuilderPage() {
                 className="w-full py-2.5 px-4 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-sm"
               >
                 {isSendingTest ? <RefreshCw size={14} className="animate-spin" /> : <Send size={14} />}
-                Send Test Email
+                {isRtl ? 'إرسال بريد تجريبي' : 'Send Test Email'}
               </button>
 
               {testSentSuccess && (
                 <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
                   <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-                  <span>Test email sent successfully!</span>
+                  <span>{isRtl ? 'تم إرسال البريد التجريبي بنجاح!' : 'Test email sent successfully!'}</span>
                 </div>
               )}
             </div>
@@ -1950,69 +2034,79 @@ export default function EmailCampaignBuilderPage() {
       {currentStep === 'schedule_send' && (
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-            <h2 className="text-lg font-bold text-slate-900 tracking-tight">Review & Launch Campaign</h2>
+            <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+              {isRtl ? 'مراجعة وإطلاق الحملة' : 'Review & Launch Campaign'}
+            </h2>
 
             <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div>
-                  <span className="text-slate-400 font-semibold uppercase">Campaign:</span>
-                  <p className="font-bold text-slate-900 text-sm mt-0.5">{name || '(Untitled Campaign)'}</p>
+                  <span className="text-slate-400 font-semibold uppercase">{isRtl ? 'الحملة:' : 'Campaign:'}</span>
+                  <p className="font-bold text-slate-900 text-sm mt-0.5">{name || (isRtl ? '(حملة بدون عنوان)' : '(Untitled Campaign)')}</p>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 font-semibold uppercase">Template Frame:</span>
+                  <span className="text-slate-400 font-semibold uppercase">{isRtl ? 'قالب التنسيق:' : 'Template Frame:'}</span>
                   <p className="font-bold text-slate-900 text-sm mt-0.5">{activeFrame.name} ({activeFrame.badge})</p>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 font-semibold uppercase">From:</span>
+                  <span className="text-slate-400 font-semibold uppercase">{isRtl ? 'المرسل:' : 'From:'}</span>
                   <p className="font-bold text-slate-900 text-sm mt-0.5">{fromName} &lt;{fromEmail}&gt;</p>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 font-semibold uppercase">Subject:</span>
+                  <span className="text-slate-400 font-semibold uppercase">{isRtl ? 'الموضوع:' : 'Subject:'}</span>
                   <p className="font-bold text-slate-900 text-sm mt-0.5 truncate">{subject}</p>
                 </div>
               </div>
 
               {estimate && (
                 <div className="pt-3 border-t border-slate-200 flex items-center gap-6 text-xs font-bold">
-                  <span className="text-emerald-700">Recipients Ready: {estimate.eligible_count.toLocaleString()}</span>
-                  <span className="text-rose-600">Excluded: {estimate.excluded_count.toLocaleString()}</span>
+                  <span className="text-emerald-700">
+                    {isRtl ? 'المستلمون الجاهزون: ' : 'Recipients Ready: '}{estimate.eligible_count.toLocaleString(isRtl ? 'ar-SA' : 'en-US')}
+                  </span>
+                  <span className="text-rose-600">
+                    {isRtl ? 'المستبعدون: ' : 'Excluded: '}{estimate.excluded_count.toLocaleString(isRtl ? 'ar-SA' : 'en-US')}
+                  </span>
                 </div>
               )}
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
-                Send Options
+                {isRtl ? 'خيارات الإرسال' : 'Send Options'}
               </label>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <button
                   type="button"
                   onClick={() => setSendOption('now')}
-                  className={`p-4 rounded-xl border text-left transition-all ${
+                  className={`p-4 rounded-xl border transition-all ${isRtl ? 'text-right' : 'text-left'} ${
                     sendOption === 'now' 
                       ? 'border-[#166534] bg-[#F0FDF4]/30 ring-2 ring-indigo-600/10' 
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
-                  <p className="font-bold text-slate-900 text-sm">Send Now</p>
-                  <p className="text-xs text-slate-500 mt-1">Start delivery immediately in the background.</p>
+                  <p className="font-bold text-slate-900 text-sm">{isRtl ? 'الإرسال الآن' : 'Send Now'}</p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {isRtl ? 'بدء التسليم الفوري في الخلفية.' : 'Start delivery immediately in the background.'}
+                  </p>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setSendOption('schedule')}
-                  className={`p-4 rounded-xl border text-left transition-all ${
+                  className={`p-4 rounded-xl border transition-all ${isRtl ? 'text-right' : 'text-left'} ${
                     sendOption === 'schedule' 
                       ? 'border-[#166534] bg-[#F0FDF4]/30 ring-2 ring-indigo-600/10' 
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
-                  <p className="font-bold text-slate-900 text-sm">Schedule for Later</p>
-                  <p className="text-xs text-slate-500 mt-1">Choose a specific date and time.</p>
+                  <p className="font-bold text-slate-900 text-sm">{isRtl ? 'الجدولة لوقت لاحق' : 'Schedule for Later'}</p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {isRtl ? 'تحديد تاريخ ووقت محددين.' : 'Choose a specific date and time.'}
+                  </p>
                 </button>
               </div>
             </div>
@@ -2020,7 +2114,9 @@ export default function EmailCampaignBuilderPage() {
             {sendOption === 'schedule' && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Date *</label>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    {isRtl ? 'التاريخ *' : 'Date *'}
+                  </label>
                   <input
                     type="date"
                     value={scheduledDate}
@@ -2030,7 +2126,9 @@ export default function EmailCampaignBuilderPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Time *</label>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    {isRtl ? 'الوقت *' : 'Time *'}
+                  </label>
                   <input
                     type="time"
                     value={scheduledTime}
@@ -2054,8 +2152,8 @@ export default function EmailCampaignBuilderPage() {
             currentStepIdx === 0 ? 'opacity-40 cursor-not-allowed' : ''
           }`}
         >
-          <ArrowLeft size={16} />
-          Back
+          {isRtl ? <ArrowRight size={16} /> : <ArrowLeft size={16} />}
+          {isRtl ? 'السابق' : 'Back'}
         </button>
 
         {currentStepIdx < STEPS.length - 1 ? (
@@ -2064,8 +2162,8 @@ export default function EmailCampaignBuilderPage() {
             onClick={nextStep}
             className="flex items-center gap-2 h-10 px-6 rounded-xl bg-[#166534] text-white text-xs sm:text-sm font-semibold hover:bg-[#14532d] transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer"
           >
-            Continue
-            <ArrowRight size={16} />
+            {isRtl ? 'المتابعة' : 'Continue'}
+            {isRtl ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
           </button>
         ) : (
           <button
@@ -2081,7 +2179,9 @@ export default function EmailCampaignBuilderPage() {
             ) : (
               <Calendar size={16} />
             )}
-            {sendOption === 'now' ? 'Launch Campaign Now' : 'Schedule Campaign'}
+            {sendOption === 'now' 
+              ? (isRtl ? 'إطلاق الحملة الآن' : 'Launch Campaign Now') 
+              : (isRtl ? 'جدولة الحملة' : 'Schedule Campaign')}
           </button>
         )}
       </div>
@@ -2089,20 +2189,22 @@ export default function EmailCampaignBuilderPage() {
       {/* DEEPSEEK AI MODAL */}
       {isAiModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+          <div className={`bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden ${isRtl ? 'font-arabic text-right' : 'text-left'}`} dir={isRtl ? 'rtl' : 'ltr'}>
             <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-[#F0FDF4] via-[#FAFAF9] to-white">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center shadow-lg shadow-purple-600/30">
+                <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center shadow-lg shadow-purple-600/30 shrink-0">
                   <Sparkles size={20} />
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    AI Email Writer
+                    {isRtl ? 'كاتب البريد بالذكاء الاصطناعي' : 'AI Email Writer'}
                     <span className="px-2 py-0.5 rounded-full text-[9px] bg-purple-100 text-purple-700 font-extrabold uppercase">
-                      AI Engine
+                      {isRtl ? 'محرك الذكاء الاصطناعي' : 'AI Engine'}
                     </span>
                   </h3>
-                  <p className="text-xs text-slate-500">Describe what you want to say, AI writes your message body</p>
+                  <p className="text-xs text-slate-500">
+                    {isRtl ? 'صف ما تريد قوله، وسيتولى الذكاء الاصطناعي صياغة محتوى الرسالة' : 'Describe what you want to say, AI writes your message body'}
+                  </p>
                 </div>
               </div>
               <button 
@@ -2117,13 +2219,15 @@ export default function EmailCampaignBuilderPage() {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  What is this email about? *
+                  {isRtl ? 'عن ماذا تدور هذه الرسالة؟ *' : 'What is this email about? *'}
                 </label>
                 <textarea
                   rows={3}
                   value={aiTopic}
                   onChange={(e) => setAiTopic(e.target.value)}
-                  placeholder="e.g. Outreach to clinics offering our booking software to reduce missed appointments by 40%."
+                  placeholder={isRtl 
+                    ? 'مثال: التواصل مع العيادات الطبية لعرض برنامج تنظيم المواعيد وتقليل التخلف عن الحضور بنسبة 40%.'
+                    : 'e.g. Outreach to clinics offering our booking software to reduce missed appointments by 40%.'}
                   className="w-full p-3.5 text-xs rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
                 />
               </div>
@@ -2131,32 +2235,32 @@ export default function EmailCampaignBuilderPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Goal / Purpose
+                    {isRtl ? 'الهدف / الغرض' : 'Goal / Purpose'}
                   </label>
                   <select
                     value={aiPurpose}
                     onChange={(e) => setAiPurpose(e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
                   >
-                    <option value="Cold Outreach">Cold Outreach</option>
-                    <option value="Follow-up">Follow-up</option>
-                    <option value="Product Promotion">Special Offer</option>
-                    <option value="Appointment Request">Meeting Request</option>
+                    <option value="Cold Outreach">{isRtl ? 'تواصل مع عملاء جدد (Cold Outreach)' : 'Cold Outreach'}</option>
+                    <option value="Follow-up">{isRtl ? 'متابعة وتذكير (Follow-up)' : 'Follow-up'}</option>
+                    <option value="Product Promotion">{isRtl ? 'عرض ترويجي خاص (Special Offer)' : 'Special Offer'}</option>
+                    <option value="Appointment Request">{isRtl ? 'طلب اجتماع أو موعد (Meeting Request)' : 'Meeting Request'}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Tone
+                    {isRtl ? 'نبرة الخطاب' : 'Tone'}
                   </label>
                   <select
                     value={aiTone}
                     onChange={(e) => setAiTone(e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
                   >
-                    <option value="Professional and Persuasive">Professional & Persuasive</option>
-                    <option value="Warm and Friendly">Warm & Friendly</option>
-                    <option value="Short and Direct">Short & Direct</option>
+                    <option value="Professional and Persuasive">{isRtl ? 'مهني ومقنع' : 'Professional & Persuasive'}</option>
+                    <option value="Warm and Friendly">{isRtl ? 'ودود ودافئ' : 'Warm & Friendly'}</option>
+                    <option value="Short and Direct">{isRtl ? 'موجز ومباشر' : 'Short & Direct'}</option>
                   </select>
                 </div>
               </div>
@@ -2170,20 +2274,20 @@ export default function EmailCampaignBuilderPage() {
                 {isGeneratingAi ? (
                   <>
                     <RefreshCw size={15} className="animate-spin" />
-                    AI is writing your email...
+                    {isRtl ? 'جارٍ صياغة الرسالة بواسطة الذكاء الاصطناعي...' : 'AI is writing your email...'}
                   </>
                 ) : (
                   <>
                     <Sparkles size={15} />
-                    Generate Message with AI
+                    {isRtl ? 'توليد الرسالة بالذكاء الاصطناعي' : 'Generate Message with AI'}
                   </>
                 )}
               </button>
 
               {aiGeneratedResult && (
                 <div className="p-5 rounded-2xl border border-purple-200 bg-purple-50/30 space-y-3">
-                  <div className="p-3 bg-white rounded-xl border border-purple-100 text-xs">
-                    <span className="text-slate-400 font-semibold">Subject: </span>
+                  <div className="p-3 bg-white rounded-xl border border-purple-100 text-xs flex items-center gap-2">
+                    <span className="text-slate-400 font-semibold">{isRtl ? 'الموضوع: ' : 'Subject: '}</span>
                     <span className="font-bold text-slate-900">{aiGeneratedResult.subject}</span>
                   </div>
 
@@ -2192,14 +2296,14 @@ export default function EmailCampaignBuilderPage() {
                     dangerouslySetInnerHTML={{ __html: aiGeneratedResult.html_body }}
                   />
 
-                  <div className="flex items-center justify-end gap-3 pt-2">
+                  <div className={`flex items-center ${isRtl ? 'justify-start' : 'justify-end'} gap-3 pt-2`}>
                     <button
                       type="button"
                       onClick={applyAiGeneratedEmail}
                       className="px-6 py-2.5 rounded-xl bg-purple-600 text-white text-xs font-bold hover:bg-purple-700 shadow-md shadow-purple-600/20 flex items-center gap-2"
                     >
                       <Check size={14} />
-                      Insert into Message Body
+                      {isRtl ? 'إدراج في نص الرسالة' : 'Insert into Message Body'}
                     </button>
                   </div>
                 </div>
@@ -2212,17 +2316,19 @@ export default function EmailCampaignBuilderPage() {
       {/* CTA BUTTON MODAL */}
       {isButtonModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full flex flex-col overflow-hidden">
+          <div className={`bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full flex flex-col overflow-hidden ${isRtl ? 'font-arabic text-right' : 'text-left'}`} dir={isRtl ? 'rtl' : 'ltr'}>
             <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-[#F0FDF4] via-[#FAFAF9] to-white">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-[#166534] text-white flex items-center justify-center shadow-lg shadow-[#166534]/20">
+                <div className="w-10 h-10 rounded-2xl bg-[#166534] text-white flex items-center justify-center shadow-lg shadow-[#166534]/20 shrink-0">
                   <MousePointerClick size={20} />
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    Insert Call-to-Action Button
+                    {isRtl ? 'إدراج زر دعوة لاتخاذ إجراء' : 'Insert Call-to-Action Button'}
                   </h3>
-                  <p className="text-xs text-slate-500">Bulletproof email button compatible with Gmail, Outlook & Apple Mail</p>
+                  <p className="text-xs text-slate-500">
+                    {isRtl ? 'زر بريدي متوافق تماماً مع Gmail وOutlook وApple Mail' : 'Bulletproof email button compatible with Gmail, Outlook & Apple Mail'}
+                  </p>
                 </div>
               </div>
               <button 
@@ -2237,25 +2343,33 @@ export default function EmailCampaignBuilderPage() {
             <form onSubmit={handleInsertButtonSubmit} className="p-6 space-y-5">
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Button Text *
+                  {isRtl ? 'نص الزر *' : 'Button Text *'}
                 </label>
                 <input
                   type="text"
                   required
                   value={buttonText}
                   onChange={(e) => setButtonText(e.target.value)}
-                  placeholder="e.g. Schedule a 10-Minute Call"
+                  placeholder={isRtl ? 'مثال: حجز مكالمة 10 دقائق' : 'e.g. Schedule a 10-Minute Call'}
                   className="w-full px-3.5 py-2.5 text-xs font-medium rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534]"
                 />
                 <div className="flex flex-wrap gap-1.5 mt-2">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase py-0.5">Presets:</span>
-                  {[
+                  <span className="text-[10px] text-slate-400 font-bold uppercase py-0.5">
+                    {isRtl ? 'نماذج جاهزة:' : 'Presets:'}
+                  </span>
+                  {(isRtl ? [
+                    'حجز مكالمة 10 دقائق',
+                    'طلب استشارة مجانية',
+                    'الاستفادة من العرض الخاص',
+                    'زيارة الموقع الإلكتروني',
+                    'عرض سابقة الأعمال'
+                  ] : [
                     'Schedule a 10-Minute Call',
                     'Book Free Consultation',
                     'Claim Special Offer',
                     'Visit Website',
                     'View Portfolio'
-                  ].map((preset) => (
+                  ]).map((preset) => (
                     <button
                       key={preset}
                       type="button"
@@ -2270,17 +2384,18 @@ export default function EmailCampaignBuilderPage() {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Button Destination Link (URL) *
+                  {isRtl ? 'رابط وجهة الزر (URL) *' : 'Button Destination Link (URL) *'}
                 </label>
                 <div className="relative">
-                  <ExternalLink size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <ExternalLink size={14} className={`absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-slate-400`} />
                   <input
                     type="url"
                     required
                     value={buttonUrl}
                     onChange={(e) => setButtonUrl(e.target.value)}
                     placeholder="https://calendly.com/your-name/meeting"
-                    className="w-full pl-10 pr-3.5 py-2.5 text-xs font-medium rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534]"
+                    dir="ltr"
+                    className={`w-full ${isRtl ? 'pr-10 pl-3.5 text-right' : 'pl-10 pr-3.5 text-left'} py-2.5 text-xs font-medium rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#166534]`}
                   />
                 </div>
               </div>
@@ -2288,16 +2403,16 @@ export default function EmailCampaignBuilderPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Button Color
+                    {isRtl ? 'لون الزر' : 'Button Color'}
                   </label>
                   <div className="flex items-center gap-2">
                     {[
-                      { name: 'Blue', color: '#2563eb' },
-                      { name: 'Indigo', color: '#4f46e5' },
-                      { name: 'Green', color: '#059669' },
-                      { name: 'Dark', color: '#0f172a' },
-                      { name: 'Purple', color: '#7c3aed' },
-                      { name: 'Rose', color: '#e11d48' },
+                      { name: 'Blue', nameAr: 'أزرق', color: '#2563eb' },
+                      { name: 'Indigo', nameAr: 'نيلي', color: '#4f46e5' },
+                      { name: 'Green', nameAr: 'أخضر', color: '#059669' },
+                      { name: 'Dark', nameAr: 'داكن', color: '#0f172a' },
+                      { name: 'Purple', nameAr: 'بنفسجي', color: '#7c3aed' },
+                      { name: 'Rose', nameAr: 'وردي', color: '#e11d48' },
                     ].map((col) => (
                       <button
                         key={col.color}
@@ -2307,7 +2422,7 @@ export default function EmailCampaignBuilderPage() {
                           buttonColor === col.color ? 'scale-115 border-slate-900 shadow-sm' : 'border-white hover:scale-105'
                         }`}
                         style={{ backgroundColor: col.color }}
-                        title={col.name}
+                        title={isRtl ? col.nameAr : col.name}
                       />
                     ))}
                   </div>
@@ -2315,7 +2430,7 @@ export default function EmailCampaignBuilderPage() {
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Alignment
+                    {isRtl ? 'المحاذاة' : 'Alignment'}
                   </label>
                   <div className="flex items-center gap-2">
                     <button
@@ -2327,7 +2442,7 @@ export default function EmailCampaignBuilderPage() {
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
-                      Left
+                      {isRtl ? 'البداية' : 'Left'}
                     </button>
                     <button
                       type="button"
@@ -2338,7 +2453,7 @@ export default function EmailCampaignBuilderPage() {
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
-                      Center
+                      {isRtl ? 'توسيط' : 'Center'}
                     </button>
                   </div>
                 </div>
@@ -2347,7 +2462,7 @@ export default function EmailCampaignBuilderPage() {
               {/* Live Button Preview */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
                 <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                  Preview in Email:
+                  {isRtl ? 'معاينة في البريد:' : 'Preview in Email:'}
                 </span>
                 <div style={{ textAlign: buttonAlign }}>
                   <span
@@ -2359,10 +2474,10 @@ export default function EmailCampaignBuilderPage() {
                       borderRadius: '8px',
                       fontSize: '13px',
                       fontWeight: 'bold',
-                      fontFamily: 'sans-serif'
+                      fontFamily: isRtl ? 'Cairo, sans-serif' : 'sans-serif'
                     }}
                   >
-                    {buttonText || 'Button Text'} &rarr;
+                    {buttonText || (isRtl ? 'نص الزر' : 'Button Text')} {isRtl ? '←' : '→'}
                   </span>
                 </div>
               </div>
@@ -2373,14 +2488,14 @@ export default function EmailCampaignBuilderPage() {
                   onClick={() => setIsButtonModalOpen(false)}
                   className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-all"
                 >
-                  Cancel
+                  {isRtl ? 'إلغاء' : 'Cancel'}
                 </button>
                 <button
                   type="submit"
                   className="px-5 py-2.5 rounded-xl bg-[#166534] text-white text-xs font-bold hover:bg-[#14532d] transition-all shadow-md shadow-[#166534]/20 flex items-center gap-1.5"
                 >
                   <Plus size={14} />
-                  <span>Insert Button</span>
+                  <span>{isRtl ? 'إدراج الزر' : 'Insert Button'}</span>
                 </button>
               </div>
             </form>

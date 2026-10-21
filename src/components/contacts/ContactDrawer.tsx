@@ -11,6 +11,8 @@ import { formatSafeDate } from '../../lib/utils';
 import { emailCampaignApi } from '../../services/emailCampaignApi';
 import { crmApi } from '../../services/crmApi';
 import { ContactEmailActivity } from '../../types/emailCampaign';
+import { useI18n } from '../../i18n';
+import { cn } from '../../lib/utils';
 
 interface ContactDrawerProps {
   contact: Contact | null;
@@ -31,6 +33,7 @@ export default function ContactDrawer({
   onDelete, 
   availableTags 
 }: ContactDrawerProps) {
+  const { t, isRtl } = useI18n();
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('profile');
   const [emailActivities, setEmailActivities] = useState<ContactEmailActivity[]>([]);
@@ -81,21 +84,24 @@ export default function ContactDrawer({
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
           />
           <motion.div 
-            initial={{ x: '100%' }}
+            initial={{ x: isRtl ? '-100%' : '100%' }}
             animate={{ x: 0 }}
-            exit={{ x: '100%' }}
+            exit={{ x: isRtl ? '-100%' : '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed top-0 right-0 w-full max-w-xl h-full bg-white border-l border-slate-200 z-[101] flex flex-col shadow-2xl"
+            className={cn(
+              "fixed top-0 w-full max-w-xl h-full bg-white z-[101] flex flex-col shadow-2xl",
+              isRtl ? "left-0 border-r border-slate-200" : "right-0 border-l border-slate-200"
+            )}
           >
             {/* Header */}
             <div className="p-6 border-b border-stone-200 flex items-center justify-between bg-[#FAFAF9]">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-[#12263A] border border-[#166534]/30 flex items-center justify-center text-xl font-bold text-white shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-[#12263A] border border-[#166534]/30 flex items-center justify-center text-xl font-bold text-white shadow-sm shrink-0">
                   {(contact.name || 'C').charAt(0).toUpperCase()}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-bold text-[#12263A] tracking-tight">{contact.name || 'Unnamed Contact'}</h2>
+                    <h2 className="text-lg font-bold text-[#12263A] tracking-tight">{contact.name || (isRtl ? 'جهة اتصال غير مسمّاة' : 'Unnamed Contact')}</h2>
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30">
                       {contactType}
                     </span>
@@ -119,14 +125,14 @@ export default function ContactDrawer({
                 <button 
                   onClick={() => onEdit(contact)} 
                   className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-stone-500 hover:text-[#166534] transition-all flex items-center justify-center cursor-pointer shadow-xs active:scale-90"
-                  title="Edit Contact"
+                  title={isRtl ? 'تعديل جهة الاتصال' : 'Edit Contact'}
                 >
                   <Edit3 size={15} />
                 </button>
                 <button 
                   onClick={onClose} 
                   className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-stone-500 hover:text-[#166534] transition-all flex items-center justify-center cursor-pointer shadow-xs active:scale-90"
-                  title="Close"
+                  title={isRtl ? 'إغلاق' : 'Close'}
                 >
                   <X size={17} />
                 </button>
@@ -136,17 +142,17 @@ export default function ContactDrawer({
             {/* Navigation Tabs */}
             <div className="flex border-b border-stone-200 bg-white px-6 overflow-x-auto no-scrollbar gap-6">
               {[
-                { key: 'profile', label: 'Profile' },
-                { key: 'business', label: 'Business' },
-                { key: 'email_activity', label: `Email History (${emailActivities.length})` },
-                { key: 'scraper_history', label: `Scraper Provenance (${scraperHistory.length})` },
+                { key: 'profile', label: isRtl ? 'الملف الشخصي' : 'Profile' },
+                { key: 'business', label: isRtl ? 'المنشأة' : 'Business' },
+                { key: 'email_activity', label: isRtl ? `سجل البريد (${emailActivities.length})` : `Email History (${emailActivities.length})` },
+                { key: 'scraper_history', label: isRtl ? `مصدر الاستخراج (${scraperHistory.length})` : `Scraper Provenance (${scraperHistory.length})` },
                 { key: 'campaigns', label: 'WhatsApp' },
-                { key: 'notes', label: 'Notes' },
+                { key: 'notes', label: isRtl ? 'ملاحظات' : 'Notes' },
               ].map(({ key, label }) => (
                 <button
                   key={key}
                   onClick={() => setActiveTab(key as Tab)}
-                  className={`py-3.5 text-xs font-bold transition-all whitespace-nowrap relative ${
+                  className={`py-3.5 text-xs font-bold transition-all whitespace-nowrap relative cursor-pointer ${
                     activeTab === key ? 'text-[#166534]' : 'text-[#57534E]/60 hover:text-[#12263A]'
                   }`}
                 >

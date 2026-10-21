@@ -3,6 +3,8 @@ import { Phone, Mail, Building, Tag as TagIcon, Sparkles, Trash2, Eye, ExternalL
 import { Contact, Tag as TagType } from '../../types';
 import TagBadge from './TagBadge';
 import { motion, AnimatePresence } from 'motion/react';
+import { useI18n } from '../../i18n';
+import { cn } from '../../lib/utils';
 
 interface ContactTableProps {
   contacts: Contact[];
@@ -23,6 +25,7 @@ export default function ContactTable({
   onView, 
   onDelete 
 }: ContactTableProps) {
+  const { t, isRtl } = useI18n();
   const allSelected = (contacts || []).length > 0 && selectedIds.length === (contacts || []).length;
 
   const getEmailStatusBadge = (status?: string) => {
@@ -31,7 +34,7 @@ export default function ContactTable({
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          Delivered
+          {t('app.contacts.delivered_906115', 'Delivered')}
         </span>
       );
     }
@@ -39,7 +42,7 @@ export default function ContactTable({
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
           <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-          Sent
+          {t('app.contacts.sent_c16bc8', 'Sent')}
         </span>
       );
     }
@@ -47,7 +50,7 @@ export default function ContactTable({
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-          Bounced
+          {t('app.contacts.bounced_b23b4c', 'Bounced')}
         </span>
       );
     }
@@ -55,7 +58,7 @@ export default function ContactTable({
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
           <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-          Failed
+          {t('app.contacts.failed_031a8f', 'Failed')}
         </span>
       );
     }
@@ -63,14 +66,14 @@ export default function ContactTable({
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200">
           <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-          Unsubscribed
+          {t('app.contacts.unsubscribed_ecd78e', 'Unsubscribed')}
         </span>
       );
     }
     return (
       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
         <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-        Never Sent
+        {t('app.contacts.never_sent_2eaf3b', 'Never Sent')}
       </span>
     );
   };
@@ -78,27 +81,41 @@ export default function ContactTable({
   return (
     <div className="bg-white border border-stone-200 rounded-xl overflow-hidden shadow-sm">
       <div className="overflow-x-auto overflow-y-hidden custom-scrollbar">
-        <table className="w-full text-left border-collapse min-w-[1000px]">
+        <table className={cn("w-full border-collapse min-w-[1000px]", isRtl ? "text-right" : "text-left")}>
           <thead>
             <tr className="border-b border-stone-200 bg-[#FAFAF9]">
               <th className="p-4 w-12 text-center">
                 <button 
                   onClick={onSelectAll}
-                  className={`w-4 h-4 rounded border transition-all flex items-center justify-center mx-auto ${
+                  className={`w-4 h-4 rounded border transition-all flex items-center justify-center mx-auto cursor-pointer ${
                     allSelected ? 'bg-[#12263A] border-[#12263A]' : 'border-stone-300 bg-white hover:border-[#166534]'
                   }`}
-                  aria-label="Select all"
+                  aria-label={t('app.contacts.select_all_1fc9a3', 'Select all')}
                 >
                   {allSelected && <div className="w-1.5 h-1.5 bg-white rounded-sm" />}
                 </button>
               </th>
-              <th className="p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider">Contact & Type</th>
-              <th className="p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider">Business</th>
-              <th className="p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider">Category</th>
-              <th className="p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider text-center">Email Status</th>
-              <th className="p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider">Last Campaign</th>
-              <th className="p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider text-center">Lead Score</th>
-              <th className="p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider text-right pr-6">Actions</th>
+              <th className={cn("p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider", isRtl ? "text-right" : "text-left")}>
+                {t('app.contacts.contact_type_3d4732', 'Contact & Type')}
+              </th>
+              <th className={cn("p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider", isRtl ? "text-right" : "text-left")}>
+                {t('app.contacts.business_8eb6a7', 'Business')}
+              </th>
+              <th className={cn("p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider", isRtl ? "text-right" : "text-left")}>
+                {t('app.contacts.category_cef706', 'Category')}
+              </th>
+              <th className="p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider text-center">
+                {t('app.contacts.email_status_8eab8a', 'Email Status')}
+              </th>
+              <th className={cn("p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider", isRtl ? "text-right" : "text-left")}>
+                {t('app.contacts.last_campaign_a0a0db', 'Last Campaign')}
+              </th>
+              <th className="p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider text-center">
+                {t('app.contacts.lead_score_f68362', 'Lead Score')}
+              </th>
+              <th className={cn("p-4 text-[11px] font-bold text-[#57534E] uppercase tracking-wider", isRtl ? "text-left pl-6" : "text-right pr-6")}>
+                {t('app.contacts.actions_1ba13a', 'Actions')}
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
@@ -110,8 +127,12 @@ export default function ContactTable({
                       <div className="w-12 h-12 rounded-xl bg-[#FAFAF9] flex items-center justify-center text-stone-400 border border-stone-200 shadow-inner">
                         <Building size={22} />
                       </div>
-                      <h3 className="text-sm font-bold text-[#12263A]">No matching contacts</h3>
-                      <p className="text-xs text-[#57534E] max-w-sm">Try refining your category, email status, or campaign filter to see results.</p>
+                      <h3 className="text-sm font-bold text-[#12263A]">
+                        {t('app.contacts.no_matching_contacts_83c30e', 'No matching contacts')}
+                      </h3>
+                      <p className="text-xs text-[#57534E] max-w-sm">
+                        {t('app.contacts.try_refining_your_category_email_status_or_campaign__7eea9a', 'Try refining your category, email status, or campaign filter to see results.')}
+                      </p>
                     </div>
                   </td>
                 </tr>
@@ -237,10 +258,12 @@ export default function ContactTable({
                           {contact.last_campaign ? (
                             <>
                               <p className="text-xs font-semibold text-[#12263A] truncate">{contact.last_campaign}</p>
-                              <p className="text-[10px] text-[#57534E] mt-0.5">{contact.last_email || 'Recent'}</p>
+                              <p className="text-[10px] text-[#57534E] mt-0.5">{contact.last_email || (isRtl ? 'مؤخراً' : 'Recent')}</p>
                             </>
                           ) : (
-                            <span className="text-[11px] text-stone-400 italic">Never emailed</span>
+                            <span className="text-[11px] text-stone-400 italic">
+                              {t('app.contacts.never_emailed_8ed68a', 'Never emailed')}
+                            </span>
                           )}
                         </div>
                       </td>
@@ -254,12 +277,12 @@ export default function ContactTable({
                       </td>
 
                       {/* Actions */}
-                      <td className="p-4 text-right pr-6" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-end gap-1.5">
+                      <td className={cn("p-4", isRtl ? "text-left pl-6" : "text-right pr-6")} onClick={(e) => e.stopPropagation()}>
+                        <div className={cn("flex items-center gap-1.5", isRtl ? "justify-start" : "justify-end")}>
                           <button 
                             onClick={() => onView(contact)}
                             className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#166534] bg-white hover:bg-[#F0FDF4] border border-slate-200 hover:border-[#bbf7d0] transition-all cursor-pointer active:scale-90 shadow-xs"
-                            title="View Contact & Email History"
+                            title={isRtl ? 'عرض تفاصيل وسجل جهة الاتصال' : 'View Contact & Email History'}
                           >
                             <Eye size={15} />
                           </button>
@@ -267,7 +290,7 @@ export default function ContactTable({
                             <button 
                               onClick={() => onDelete(contact.id)}
                               className="w-8 h-8 rounded-lg flex items-center justify-center text-rose-500 hover:text-white bg-rose-50/60 hover:bg-rose-600 border border-rose-100 hover:border-rose-600 transition-all cursor-pointer active:scale-90 shadow-xs"
-                              title="Delete Contact"
+                              title={isRtl ? 'حذف جهة الاتصال' : 'Delete Contact'}
                             >
                               <Trash2 size={15} />
                             </button>

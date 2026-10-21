@@ -1010,17 +1010,23 @@ export function Header() {
 
       <div className="flex items-center gap-6 flex-1 relative z-50">
         <div className="relative max-w-xl w-full hidden md:block group">
-          <Sparkles size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#166534] transition-all" strokeWidth={2.2}/>
+          <Sparkles size={16} className={cn("absolute top-1/2 -translate-y-1/2 text-[#166534] transition-all", isRtl ? "right-4" : "left-4")} strokeWidth={2.2}/>
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setIsFocused(true)}
-            placeholder="Search contacts, campaigns, or ask a question..."
-            className="w-full bg-[#FAFAF9] border border-[#e7e5e4] rounded-full py-2.5 pl-11 pr-12 text-[13px] font-medium text-[#12263A] focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 shadow-sm transition-all placeholder:text-[#57534E]/60"
+            placeholder={isRtl ? "البحث في جهات الاتصال والحملات أو طرح سؤال..." : "Search contacts, campaigns, or ask a question..."}
+            className={cn(
+              "w-full bg-[#FAFAF9] border border-[#e7e5e4] rounded-full py-2.5 text-[13px] font-medium text-[#12263A] focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 shadow-sm transition-all placeholder:text-[#57534E]/60",
+              isRtl ? "pr-11 pl-12 text-right" : "pl-11 pr-12 text-left"
+            )}
           />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-white px-2 py-1 rounded-lg text-[10px] font-semibold text-slate-400 border border-slate-200 pointer-events-none">
+          <div className={cn(
+            "absolute top-1/2 -translate-y-1/2 flex items-center gap-1 bg-white px-2 py-1 rounded-lg text-[10px] font-semibold text-slate-400 border border-slate-200 pointer-events-none",
+            isRtl ? "left-3" : "right-3"
+          )}>
             <Command size={10} strokeWidth={3} className="-mt-0.5" />
             <span>K</span>
           </div>
@@ -1064,14 +1070,14 @@ export function Header() {
                             <span>Add Contact</span>
                           </button>
                           <button 
-                            onClick={() => handleSelectResult('/campaigns/add')}
+                            onClick={() => handleSelectResult('/campaigns/create')}
                             className="flex items-center gap-3 p-3 text-left rounded-xl bg-slate-50 hover:bg-indigo-50/50 border border-slate-100 hover:border-indigo-100 text-[11px] font-bold text-slate-700 hover:text-indigo-950 transition-all duration-300"
                           >
                             <span className="w-6 h-6 rounded-lg bg-white flex items-center justify-center border border-slate-100 text-purple-500 group-hover:scale-110 shadow-sm"><Send size={12} /></span>
                             <span>Broadcast Setup</span>
                           </button>
                           <button 
-                            onClick={() => handleSelectResult('/templates/add')}
+                            onClick={() => handleSelectResult('/templates/builder')}
                             className="flex items-center gap-3 p-3 text-left rounded-xl bg-slate-50 hover:bg-indigo-50/50 border border-slate-100 hover:border-indigo-100 text-[11px] font-bold text-slate-700 hover:text-indigo-950 transition-all duration-300"
                           >
                             <span className="w-6 h-6 rounded-lg bg-white flex items-center justify-center border border-slate-100 text-emerald-500 group-hover:scale-110 shadow-sm"><LayoutIcon size={12} /></span>
@@ -1497,7 +1503,7 @@ export function Layout({ children }: { children?: ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF9] text-[#12263A] selection:bg-[#F0FDF4] selection:text-[#166534] overflow-x-hidden">
+    <div className={cn("min-h-screen bg-[#FAFAF9] text-[#12263A] selection:bg-[#F0FDF4] selection:text-[#166534] overflow-x-hidden", isRtl && "font-arabic")}>
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={toggleCollapsed} />
       <div className={cn(
         "flex flex-col min-h-screen transition-all duration-300 ease-in-out",

@@ -46,6 +46,17 @@ class CrmApiService {
     }
   }
 
+  // Campaigns API
+  async getCampaigns(): Promise<any[]> {
+    try {
+      const data = await this.request<any>('/campaigns');
+      const list = Array.isArray(data) ? data : (data?.data || data?.campaigns || []);
+      return Array.isArray(list) ? list : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
   // Contacts API
   async getContacts(params?: { 
     search?: string; 
@@ -854,7 +865,12 @@ class CrmApiService {
   }
 
   async getPublicPlans(): Promise<any> {
-    return this.request<any>('/plans');
+    return this.request<any>('/plans', {
+      headers: {
+        'X-Skip-Toast': 'true',
+        'X-Skip-Loader': 'true'
+      } as any
+    });
   }
 
   async createAdminPlan(payload: any): Promise<any> {

@@ -128,13 +128,16 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
     );
   }
 
-  // 3. Sidebar / Settings compact button
+  // 3. Sidebar / Dropdown / Settings compact button
+  const isDropdown = variant === 'dropdown';
+
   return (
     <div className={cn("relative inline-block text-start", className)} ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 border border-slate-200/80 transition-all cursor-pointer"
+        className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 border border-slate-200/80 transition-all cursor-pointer shadow-xs bg-white"
+        aria-label="Select Language"
       >
         <span className="flex items-center gap-2">
           <Globe size={14} className="text-emerald-600" />
@@ -144,7 +147,13 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
       </button>
 
       {isOpen && (
-        <div className="absolute bottom-full mb-1 z-[100] w-full min-w-[140px] rounded-xl p-1.5 shadow-xl bg-white border border-slate-200 text-slate-800 animate-in fade-in">
+        <div
+          className={cn(
+            "absolute z-[100] min-w-[150px] rounded-xl p-1.5 shadow-xl bg-white border border-slate-200 text-slate-800 animate-in fade-in zoom-in-95",
+            isDropdown ? "top-full mt-1.5" : "bottom-full mb-1",
+            isArabic ? "right-0" : "left-0"
+          )}
+        >
           {(Object.keys(SUPPORTED_LOCALES) as SupportedLocale[]).map((loc) => {
             const info = SUPPORTED_LOCALES[loc];
             const isSelected = locale === loc;

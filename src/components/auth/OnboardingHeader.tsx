@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Sparkles, LogOut, ShieldCheck, Mail } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useBrandingStore } from '../../store/brandingStore';
-
+import { useI18n } from '../../i18n';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import darkLogoImg from '../../assets/logo.png';
 
 interface OnboardingHeaderProps {
@@ -13,6 +14,7 @@ interface OnboardingHeaderProps {
 export default function OnboardingHeader({ showLogout = true }: OnboardingHeaderProps) {
   const { user, logout } = useAuthStore();
   const { websiteName } = useBrandingStore();
+  const { t, isRtl } = useI18n();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -33,8 +35,10 @@ export default function OnboardingHeader({ showLogout = true }: OnboardingHeader
           />
         </Link>
 
-        {/* User Context & Sign Out */}
+        {/* User Context, Language Switcher & Sign Out */}
         <div className="flex items-center gap-3">
+          <LanguageSwitcher variant="auth" />
+
           {user?.email && (
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAFAF9] border border-stone-200/80 text-xs font-semibold text-[#57534E]">
               <Mail size={13} className="text-stone-400" />
@@ -46,10 +50,10 @@ export default function OnboardingHeader({ showLogout = true }: OnboardingHeader
             <button
               onClick={handleLogout}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-stone-500 hover:text-rose-600 rounded-xl hover:bg-rose-50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
-              title="Sign out and return to login"
+              title={isRtl ? 'تسجيل الخروج والعودة لتسجيل الدخول' : 'Sign out and return to login'}
             >
-              <LogOut size={14} />
-              <span className="hidden sm:inline">Sign Out</span>
+              <LogOut size={14} className={isRtl ? "rotate-180" : ""} />
+              <span className="hidden sm:inline">{t('auth.onboarding.sign_out', 'Sign Out')}</span>
             </button>
           )}
         </div>

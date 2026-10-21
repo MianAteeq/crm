@@ -13,8 +13,11 @@ import ExportDropdown from '../components/contacts/ExportDropdown';
 import { crmApi } from '../services/crmApi';
 import { TableSkeleton, CardSkeleton } from '../components/ui/Skeleton';
 import { toast } from '../components/ui/Toast';
+import { useI18n } from '../i18n';
+import { cn } from '../lib/utils';
 
 export default function Contacts() {
+  const { t, isRtl } = useI18n();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const urlQuery = searchParams.get('search') || '';
@@ -191,33 +194,45 @@ export default function Contacts() {
   };
 
   const handleDeleteContact = async (id: string | number) => {
-    if (!confirm('Are you sure you want to delete this contact?')) return;
+    if (!confirm(isRtl ? 'هل أنت متأكد من رغبتك في حذف جهة الاتصال هذه؟' : 'Are you sure you want to delete this contact?')) return;
     try {
       await crmApi.deleteContact(id);
       setContacts(prev => prev.filter(c => String(c.id) !== String(id)));
       setViewingContact(null);
       setSelectedIds(prev => prev.filter(i => String(i) !== String(id)));
-      toast.success('Contact Deleted', 'The contact has been removed successfully.');
+      toast.success(
+        isRtl ? 'تم حذف جهة الاتصال' : 'Contact Deleted',
+        isRtl ? 'تمت إزالة جهة الاتصال بنجاح.' : 'The contact has been removed successfully.'
+      );
       fetchData();
     } catch (error: any) {
       console.error('Failed to delete contact', error);
-      toast.error('Delete Failed', error?.response?.data?.message || error.message || 'Error deleting contact.');
+      toast.error(
+        isRtl ? 'فشل الحذف' : 'Delete Failed',
+        error?.response?.data?.message || error.message || (isRtl ? 'حدث خطأ أثناء حذف جهة الاتصال.' : 'Error deleting contact.')
+      );
     }
   };
 
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
-    if (!confirm(`Are you sure you want to delete ${selectedIds.length} selected contacts?`)) return;
+    if (!confirm(isRtl ? `هل أنت متأكد من رغبتك في حذف ${selectedIds.length} من جهات الاتصال المحددة؟` : `Are you sure you want to delete ${selectedIds.length} selected contacts?`)) return;
     try {
       await crmApi.batchDeleteContacts(selectedIds);
       const strIds = selectedIds.map(String);
       setContacts(prev => prev.filter(c => !strIds.includes(String(c.id))));
       setSelectedIds([]);
-      toast.success('Contacts Deleted', `${selectedIds.length} contacts removed successfully.`);
+      toast.success(
+        isRtl ? 'تم حذف جهات الاتصال' : 'Contacts Deleted',
+        isRtl ? `تمت إزالة ${selectedIds.length} جهة اتصال بنجاح.` : `${selectedIds.length} contacts removed successfully.`
+      );
       fetchData();
     } catch (error: any) {
       console.error('Failed to delete contacts', error);
-      toast.error('Bulk Delete Failed', error?.response?.data?.message || error.message || 'Failed to delete selected contacts.');
+      toast.error(
+        isRtl ? 'فشل الحذف الجماعي' : 'Bulk Delete Failed',
+        error?.response?.data?.message || error.message || (isRtl ? 'فشل في حذف جهات الاتصال المحددة.' : 'Failed to delete selected contacts.')
+      );
     }
   };
 
@@ -244,30 +259,32 @@ export default function Contacts() {
       {/* Page Header */}
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 rounded-xl flex items-center justify-center shadow-sm">
+          <div className="w-12 h-12 bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 rounded-xl flex items-center justify-center shadow-sm shrink-0">
             <Users size={24} strokeWidth={2} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-[#12263A] tracking-tight">Contacts</h1>
+            <h1 className="text-2xl font-bold text-[#12263A] tracking-tight">
+              {t('app.contacts.audience_crm_7337ba', 'Contacts')}
+            </h1>
             <p className="text-xs font-medium text-[#57534E] mt-0.5">
-              Manage, segment, and engage your audience across all channels
+              {t('app.contacts.targeted_segmentation_management_edd504', 'Manage, segment, and engage your audience across all channels')}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <div className="hidden md:flex bg-stone-100 p-1 rounded-xl gap-0.5">
             <button 
               onClick={() => setViewMode('table')}
               className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${viewMode === 'table' ? 'bg-[#166534] text-white shadow-xs' : 'text-stone-400 hover:text-[#12263A] hover:bg-stone-200/50'}`}
-              title="Table view"
+              title={isRtl ? 'عرض الجدول' : 'Table view'}
             >
               <List size={18} />
             </button>
             <button 
               onClick={() => setViewMode('grid')}
               className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-[#166534] text-white shadow-xs' : 'text-stone-400 hover:text-[#12263A] hover:bg-stone-200/50'}`}
-              title="Grid view"
+              title={isRtl ? 'عرض الشبكة' : 'Grid view'}
             >
               <LayoutGrid size={18} />
             </button>
@@ -278,7 +295,7 @@ export default function Contacts() {
             className="h-10 px-4 bg-white border border-slate-200 hover:border-[#bbf7d0] rounded-xl text-xs sm:text-sm font-semibold text-[#57534E] hover:text-[#166534] hover:bg-[#F0FDF4] transition-all shadow-xs active:scale-95 flex items-center gap-2 cursor-pointer"
           >
             <Upload size={16} /> 
-            <span>Import</span>
+            <span>{t('app.contacts.import_2cff9b', 'Import')}</span>
           </button>
           
           <ExportDropdown onExport={handleExport} />
@@ -288,7 +305,7 @@ export default function Contacts() {
             className="h-10 px-5 bg-[#166534] hover:bg-[#14532d] text-white rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 flex items-center gap-2 cursor-pointer"
           >
             <UserPlus size={17} /> 
-            <span>Add Contact</span>
+            <span>{t('app.contacts.add_new_contact_6cf080', 'Add Contact')}</span>
           </button>
         </div>
       </header>
@@ -364,17 +381,30 @@ export default function Contacts() {
             {pagination && pagination.lastPage > 1 && (
               <div className="mt-6 bg-white border border-stone-200 rounded-xl px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                 <span className="text-xs font-semibold text-[#57534E]">
-                  Showing <strong className="text-[#12263A]">{(pagination.currentPage - 1) * pagination.perPage + 1}</strong> to{' '}
-                  <strong className="text-[#12263A]">
-                    {Math.min(pagination.currentPage * pagination.perPage, pagination.total)}
-                  </strong>{' '}
-                  of <strong className="text-[#12263A]">{pagination.total}</strong> entries
+                  {isRtl ? (
+                    <>
+                      عرض <strong className="text-[#12263A]">{(pagination.currentPage - 1) * pagination.perPage + 1}</strong> إلى{' '}
+                      <strong className="text-[#12263A]">
+                        {Math.min(pagination.currentPage * pagination.perPage, pagination.total)}
+                      </strong>{' '}
+                      من إجمالي <strong className="text-[#12263A]">{pagination.total}</strong> جهة اتصال
+                    </>
+                  ) : (
+                    <>
+                      Showing <strong className="text-[#12263A]">{(pagination.currentPage - 1) * pagination.perPage + 1}</strong> to{' '}
+                      <strong className="text-[#12263A]">
+                        {Math.min(pagination.currentPage * pagination.perPage, pagination.total)}
+                      </strong>{' '}
+                      of <strong className="text-[#12263A]">{pagination.total}</strong> entries
+                    </>
+                  )}
                 </span>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5" dir="ltr">
                   <button
                     disabled={currentPage === 1}
                     onClick={() => handlePageChange(currentPage - 1)}
                     className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-[#57534E] transition-all active:scale-95 shadow-xs"
+                    title={isRtl ? 'الصفحة السابقة' : 'Previous page'}
                   >
                     <ChevronLeft size={16} />
                   </button>
@@ -442,6 +472,7 @@ export default function Contacts() {
                     disabled={currentPage === pagination.lastPage}
                     onClick={() => handlePageChange(currentPage + 1)}
                     className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-[#57534E] transition-all active:scale-95 shadow-xs"
+                    title={isRtl ? 'الصفحة التالية' : 'Next page'}
                   >
                     <ChevronRight size={16} />
                   </button>
@@ -450,23 +481,29 @@ export default function Contacts() {
             )}
             
             {/* View Stats Footer */}
-            <div className="mt-6 flex items-center justify-between px-2">
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
                <div className="flex items-center gap-6">
                   <div className="flex items-center gap-2">
                      <Users size={14} className="text-[#166534]" />
                      <span className="text-[11px] font-bold text-[#57534E] uppercase tracking-wider">
-                       Contacts: {pagination?.total ?? filteredContacts.length}
+                       {t('app.dashboard.contacts_b45064', 'Contacts')}: {pagination?.total ?? filteredContacts.length}
                      </span>
                   </div>
                   <div className="flex items-center gap-2">
                      <Star size={14} className="text-[#22C55E]" />
-                     <span className="text-[11px] font-bold text-[#57534E] uppercase tracking-wider">Target Reach: 92%</span>
+                     <span className="text-[11px] font-bold text-[#57534E] uppercase tracking-wider">
+                       {isRtl ? 'نسبة الوصول المستهدفة: 92%' : 'Target Reach: 92%'}
+                     </span>
                   </div>
                </div>
                <div className="flex items-center gap-4">
-                  <button onClick={() => handleExport('csv')} className="text-[11px] font-bold text-[#12263A] hover:text-[#166534] hover:underline uppercase tracking-wider transition-colors">Download Export</button>
+                  <button onClick={() => handleExport('csv')} className="text-[11px] font-bold text-[#12263A] hover:text-[#166534] hover:underline uppercase tracking-wider transition-colors cursor-pointer">
+                    {t('app.contacts.download_export_111b3b', 'Download Export')}
+                  </button>
                   <div className="w-1 h-1 rounded-full bg-stone-300" />
-                  <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">North Region</span>
+                  <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+                    {t('app.contacts.north_region_3e0fb8', 'North Region')}
+                  </span>
                </div>
             </div>
           </motion.div>

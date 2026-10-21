@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -18,10 +18,13 @@ import {
 } from 'lucide-react';
 import OnboardingHeader from '../../components/auth/OnboardingHeader';
 import { crmApi } from '../../services/crmApi';
+import { useI18n } from '../../i18n';
+import { cn } from '../../lib/utils';
 
 export default function OnboardingPage() {
   const { user, updateOnboarding, updateProfile, verifyEmail, resendVerification } = useAuthStore();
   const navigate = useNavigate();
+  const { t, isRtl } = useI18n();
 
   // Determine initial step: if user's email is already verified, allow moving to workspace
   const isInitiallyVerified = Boolean(user?.emailVerified || user?.email_verified_at);
@@ -85,14 +88,12 @@ export default function OnboardingPage() {
 
   // OTP Input Handlers (Numeric only, auto-advance, backspace)
   const handleDigitChange = (index: number, value: string) => {
-    // Only accept numeric characters
     const numericChar = value.replace(/[^0-9]/g, '');
     const newOtp = [...otp];
     newOtp[index] = numericChar.slice(-1);
     setOtp(newOtp);
     setVerifyError(null);
 
-    // Auto-advance to next input if numeric digit entered
     if (numericChar && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -129,7 +130,7 @@ export default function OnboardingPage() {
   const handleConfirmVerification = async () => {
     const fullCode = otp.join('').trim();
     if (fullCode.length !== 6) {
-      setVerifyError('Please enter all 6 digits of your verification code.');
+      setVerifyError(isRtl ? 'يرجى إدخال جميع أرقام رمز التحقق الستة.' : 'Please enter all 6 digits of your verification code.');
       return;
     }
 
@@ -139,7 +140,6 @@ export default function OnboardingPage() {
     try {
       await verifyEmail(fullCode);
       setIsVerified(true);
-      // Advance to Workspace step upon confirmed verification
       setTimeout(() => {
         setStep(2);
       }, 600);
@@ -149,7 +149,7 @@ export default function OnboardingPage() {
         err.response?.data?.message || 
         err.response?.data?.error || 
         err.message || 
-        'Invalid or expired verification code. Please check your inbox and try again.';
+        (isRtl ? 'رمز التحقق غير صالح أو انتهت صلاحيته. يرجى التحقق من بريدك والمحاولة مجددًا.' : 'Invalid or expired verification code. Please check your inbox and try again.');
       setVerifyError(msg);
     } finally {
       setIsVerifying(false);
@@ -167,11 +167,11 @@ export default function OnboardingPage() {
       await resendVerification();
       setCanResend(false);
       setResendCooldown(60);
-      setResendMessage('A fresh verification code has been dispatched to your email.');
+      setResendMessage(isRtl ? 'تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني.' : 'A fresh verification code has been dispatched to your email.');
       setTimeout(() => setResendMessage(null), 5000);
     } catch (err: any) {
       console.error('Resend error:', err);
-      const msg = err.response?.data?.message || 'Failed to dispatch new verification code. Please try again.';
+      const msg = err.response?.data?.message || (isRtl ? 'فشل إرسال رمز التحقق. يرجى المحاولة مرة أخرى.' : 'Failed to dispatch new verification code. Please try again.');
       setResendError(msg);
     } finally {
       setIsResending(false);
@@ -182,7 +182,7 @@ export default function OnboardingPage() {
   const handleSaveWorkspace = async () => {
     const trimmed = businessName.trim();
     if (!trimmed) {
-      setWorkspaceError('Please enter a name for your workspace.');
+      setWorkspaceError(isRtl ? 'يرجى إدخال اسم لمساحة العمل الخاصة بك.' : 'Please enter a name for your workspace.');
       return;
     }
 
@@ -190,7 +190,6 @@ export default function OnboardingPage() {
     setWorkspaceError(null);
 
     try {
-      // Persist workspace name to backend
       if (user?.name) {
         await crmApi.updateProfile({
           name: user.name,
@@ -202,7 +201,6 @@ export default function OnboardingPage() {
       setStep(3);
     } catch (err: any) {
       console.error('Failed to update workspace profile:', err);
-      // Fallback: still update local store if network blips but proceed
       updateProfile({ businessName: trimmed });
       updateOnboarding(3, { businessName: trimmed });
       setStep(3);
@@ -218,46 +216,56 @@ export default function OnboardingPage() {
   };
 
   const steps = [
-    { number: 1, title: 'Email Verify', icon: Mail },
-    { number: 2, title: 'Workspace', icon: Building2 },
-    { number: 3, title: 'Ready', icon: CheckCircle2 },
+    { number: 1, title: t('auth.onboarding.step1_nav', 'Email Verify'), icon: Mail },
+    { number: 2, title: t('auth.onboarding.step2_nav', 'Workspace'), icon: Building2 },
+    { number: 3, title: t('auth.onboarding.step3_nav', 'Ready'), icon: CheckCircle2 },
   ];
 
-  const industries = [
-    'Technology & SaaS',
-    'Marketing & Advertising Agency',
-    'Real Estate & Property',
-    'E-Commerce & D2C',
-    'Healthcare, Medical & Clinics',
-    'Financial, Legal & Professional Services',
-    'Education & Training',
-    'Hospitality & Tourism',
-    'Other Business Services'
+  const industries = isRtl ? [
+    { key: 'Technology & SaaS', label: 'التكنولوجيا والبرمجيات كخدمة' },
+    { key: 'Marketing & Advertising Agency', label: 'وكالات التسويق والإعلانات' },
+    { key: 'Real Estate & Property', label: 'العقارات وإدارة الأملاك' },
+    { key: 'E-Commerce & D2C', label: 'التجارة الإلكترونية والبيع المباشر' },
+    { key: 'Healthcare, Medical & Clinics', label: 'الرعاية الصحية والمراكز الطبية والعيادات' },
+    { key: 'Financial, Legal & Professional Services', label: 'الخدمات المالية والقانونية والمهنية' },
+    { key: 'Education & Training', label: 'التعليم والتدريب' },
+    { key: 'Hospitality & Tourism', label: 'الضيافة والسياحة' },
+    { key: 'Other Business Services', label: 'خدمات الأعمال الأخرى' }
+  ] : [
+    { key: 'Technology & SaaS', label: 'Technology & SaaS' },
+    { key: 'Marketing & Advertising Agency', label: 'Marketing & Advertising Agency' },
+    { key: 'Real Estate & Property', label: 'Real Estate & Property' },
+    { key: 'E-Commerce & D2C', label: 'E-Commerce & D2C' },
+    { key: 'Healthcare, Medical & Clinics', label: 'Healthcare, Medical & Clinics' },
+    { key: 'Financial, Legal & Professional Services', label: 'Financial, Legal & Professional Services' },
+    { key: 'Education & Training', label: 'Education & Training' },
+    { key: 'Hospitality & Tourism', label: 'Hospitality & Tourism' },
+    { key: 'Other Business Services', label: 'Other Business Services' }
   ];
 
   const goals = [
     {
       id: 'Email Marketing & Lead Discovery',
-      title: 'Email Marketing & Lead Discovery',
-      desc: 'Discover business leads, inspect contact pages & launch verified email sequences.',
+      title: isRtl ? 'التسويق واكتشاف العملاء المحتملين' : 'Email Marketing & Lead Discovery',
+      desc: isRtl ? 'اكتشف فرص الأعمال، وافحص صفحات التواصل وأطلق مسارات تواصل موثقة.' : 'Discover business leads, inspect contact pages & launch verified email sequences.',
       icon: Compass
     },
     {
       id: 'Customer Relationship Management',
-      title: 'Customer Directory & Segmentation',
-      desc: 'Centralize contacts, organize tags, track activities & manage pipeline deals.',
+      title: isRtl ? 'دليل العملاء وتصنيف الشرائح' : 'Customer Directory & Segmentation',
+      desc: isRtl ? 'اجمع جهات الاتصال، ونظم التصنيفات، وتتبع الأنشطة وأدر صفقات مسار المبيعات.' : 'Centralize contacts, organize tags, track activities & manage pipeline deals.',
       icon: Users
     },
     {
       id: 'AI Marketing Automation',
-      title: 'AI Campaign Orchestration',
-      desc: 'Deploy AI agents to craft personalized B2B outreach with verified deliverability.',
+      title: isRtl ? 'أتمتة الحملات بالذكاء الاصطناعي' : 'AI Campaign Orchestration',
+      desc: isRtl ? 'فعّل مساعدي الذكاء الاصطناعي لصياغة تواصل مخصص للشركات بمعدلات تسليم موثوقة.' : 'Deploy AI agents to craft personalized B2B outreach with verified deliverability.',
       icon: Bot
     }
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAFAF9] flex flex-col justify-between font-sans selection:bg-[#F0FDF4] selection:text-[#166534]">
+    <div className={cn("min-h-screen bg-[#FAFAF9] flex flex-col justify-between font-sans selection:bg-[#F0FDF4] selection:text-[#166534]", isRtl && "font-arabic")}>
       {/* Unified Onboarding Header */}
       <OnboardingHeader showLogout={true} />
       
@@ -274,7 +282,10 @@ export default function OnboardingPage() {
               
               {/* Active Progress Fill Line */}
               <div 
-                className="absolute left-8 top-1/2 -translate-y-1/2 h-[2px] bg-[#166534] -z-10 transition-all duration-500 ease-out" 
+                className={cn(
+                  "absolute top-1/2 -translate-y-1/2 h-[2px] bg-[#166534] -z-10 transition-all duration-500 ease-out",
+                  isRtl ? "right-8" : "left-8"
+                )}
                 style={{ width: `calc(${(step - 1) / 2} * calc(100% - 64px))` }}
               />
               
@@ -284,7 +295,7 @@ export default function OnboardingPage() {
                 const Icon = s.icon;
                 return (
                   <li 
-                    key={s.title} 
+                    key={s.number} 
                     className="flex flex-col items-center gap-2 relative bg-[#FAFAF9] px-2"
                     aria-current={isCurrent ? 'step' : undefined}
                   >
@@ -338,27 +349,38 @@ export default function OnboardingPage() {
                   transition={{ duration: 0.25 }}
                   className="space-y-6"
                 >
-                  <div className="space-y-2 text-center sm:text-left">
-                    <div className="w-12 h-12 rounded-2xl bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 flex items-center justify-center mb-3 mx-auto sm:mx-0 shadow-xs">
+                  <div className={cn("space-y-2 text-center", isRtl ? "sm:text-right" : "sm:text-left")}>
+                    <div className={cn("w-12 h-12 rounded-2xl bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 flex items-center justify-center mb-3 mx-auto shadow-xs", isRtl ? "sm:mr-0 sm:ml-auto" : "sm:mx-0")}>
                       <Mail size={22} strokeWidth={2} />
                     </div>
                     <h2 className="text-2xl sm:text-3xl font-extrabold text-[#12263A] tracking-tight">
-                      Verify your email address
+                      {t('auth.onboarding.verify_title', 'Verify your email address')}
                     </h2>
                     <p className="text-xs sm:text-sm font-medium text-[#57534E] leading-relaxed">
-                      We've dispatched a 6-digit verification code to{' '}
-                      <strong className="text-[#12263A] font-bold break-all">{user?.email || 'your email'}</strong>.
-                      Enter it below to confirm your account ownership.
+                      {isRtl ? (
+                        <>
+                          أرسلنا رمز تحقق مكوّن من 6 أرقام إلى{' '}
+                          <strong className="text-[#12263A] font-bold break-all" dir="ltr">{user?.email || 'بريدك الإلكتروني'}</strong>.
+                          أدخله أدناه لتأكيد ملكية حسابك.
+                        </>
+                      ) : (
+                        <>
+                          We've dispatched a 6-digit verification code to{' '}
+                          <strong className="text-[#12263A] font-bold break-all">{user?.email || 'your email'}</strong>.
+                          Enter it below to confirm your account ownership.
+                        </>
+                      )}
                     </p>
                   </div>
 
                   {/* 6 Digit Numeric OTP Inputs */}
                   <div className="space-y-2 pt-2">
-                    <label className="block text-[11px] font-bold text-[#57534E] uppercase tracking-wider text-center sm:text-left">
-                      6-Digit Verification Code
+                    <label className={cn("block text-[11px] font-bold text-[#57534E] uppercase tracking-wider text-center", isRtl ? "sm:text-right" : "sm:text-left")}>
+                      {t('auth.onboarding.otp_label', '6-Digit Verification Code')}
                     </label>
                     <div 
-                      className="grid grid-cols-6 gap-2 sm:gap-3 max-w-sm mx-auto sm:mx-0"
+                      className={cn("grid grid-cols-6 gap-2 sm:gap-3 max-w-sm mx-auto", isRtl ? "sm:mr-0 sm:ml-auto" : "sm:mx-0")}
+                      dir="ltr"
                       onPaste={handlePaste}
                     >
                       {otp.map((digit, idx) => (
@@ -386,7 +408,7 @@ export default function OnboardingPage() {
 
                   {/* Error Notification */}
                   {verifyError && (
-                    <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-left flex items-start gap-2.5 animate-fade-in" role="alert">
+                    <div className={cn("p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2.5 animate-fade-in", isRtl ? "text-right" : "text-left")} role="alert">
                       <AlertCircle size={16} className="text-rose-600 shrink-0 mt-0.5" />
                       <p className="text-xs font-bold text-rose-700 leading-snug">{verifyError}</p>
                     </div>
@@ -394,14 +416,14 @@ export default function OnboardingPage() {
 
                   {/* Resend Success Notification */}
                   {resendMessage && (
-                    <div className="p-3.5 bg-[#F0FDF4] border border-[#22C55E]/30 rounded-xl text-left flex items-start gap-2.5 animate-fade-in" role="status">
+                    <div className={cn("p-3.5 bg-[#F0FDF4] border border-[#22C55E]/30 rounded-xl flex items-start gap-2.5 animate-fade-in", isRtl ? "text-right" : "text-left")} role="status">
                       <CheckCircle2 size={16} className="text-[#166534] shrink-0 mt-0.5" />
                       <p className="text-xs font-bold text-[#166534] leading-snug">{resendMessage}</p>
                     </div>
                   )}
 
                   {resendError && (
-                    <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-left flex items-start gap-2.5 animate-fade-in" role="alert">
+                    <div className={cn("p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2.5 animate-fade-in", isRtl ? "text-right" : "text-left")} role="alert">
                       <AlertCircle size={16} className="text-rose-600 shrink-0 mt-0.5" />
                       <p className="text-xs font-bold text-rose-700 leading-snug">{resendError}</p>
                     </div>
@@ -411,7 +433,7 @@ export default function OnboardingPage() {
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs border-t border-stone-100 mt-6">
                     <div className="flex items-center gap-1.5 font-medium text-[#57534E]">
                       <ShieldCheck size={16} className="text-[#166534]" />
-                      <span>Enterprise deliverability protection</span>
+                      <span>{t('auth.onboarding.security_protection', 'Enterprise deliverability protection')}</span>
                     </div>
                     <div>
                       {canResend ? (
@@ -421,11 +443,15 @@ export default function OnboardingPage() {
                           disabled={isResending}
                           className="font-bold text-[#166534] hover:text-[#12263A] underline cursor-pointer disabled:opacity-50"
                         >
-                          {isResending ? 'Dispatching...' : 'Resend Code'}
+                          {isResending ? t('auth.onboarding.resending', 'Dispatching...') : t('auth.onboarding.resend_code', 'Resend Code')}
                         </button>
                       ) : (
                         <span className="text-stone-400 font-medium">
-                          Resend code in <strong className="text-[#12263A] font-bold">{resendCooldown}s</strong>
+                          {isRtl ? (
+                            <>إعادة الإرسال خلال <strong className="text-[#12263A] font-bold">{resendCooldown} ثانية</strong></>
+                          ) : (
+                            <>Resend code in <strong className="text-[#12263A] font-bold">{resendCooldown}s</strong></>
+                          )}
                         </span>
                       )}
                     </div>
@@ -442,12 +468,12 @@ export default function OnboardingPage() {
                       {isVerifying ? (
                         <>
                           <RefreshCw size={15} className="animate-spin text-white" />
-                          <span>Verifying Code...</span>
+                          <span>{t('auth.onboarding.verifying', 'Verifying Code...')}</span>
                         </>
                       ) : (
                         <>
-                          <span>Verify & Continue</span>
-                          <ArrowRight size={15} />
+                          <span>{t('auth.onboarding.verify_button', 'Verify & Continue')}</span>
+                          <ArrowRight size={15} className={cn(isRtl && "rotate-180")} />
                         </>
                       )}
                     </button>
@@ -467,15 +493,15 @@ export default function OnboardingPage() {
                   transition={{ duration: 0.25 }}
                   className="space-y-6"
                 >
-                  <div className="space-y-2 text-center sm:text-left">
-                    <div className="w-12 h-12 rounded-2xl bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 flex items-center justify-center mb-3 mx-auto sm:mx-0 shadow-xs">
+                  <div className={cn("space-y-2 text-center", isRtl ? "sm:text-right" : "sm:text-left")}>
+                    <div className={cn("w-12 h-12 rounded-2xl bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30 flex items-center justify-center mb-3 mx-auto shadow-xs", isRtl ? "sm:mr-0 sm:ml-auto" : "sm:mx-0")}>
                       <Building2 size={22} strokeWidth={2} />
                     </div>
                     <h2 className="text-2xl sm:text-3xl font-extrabold text-[#12263A] tracking-tight">
-                      Configure your workspace
+                      {t('auth.onboarding.workspace_title', 'Configure your workspace')}
                     </h2>
                     <p className="text-xs sm:text-sm font-medium text-[#57534E] leading-relaxed">
-                      Set up your company workspace profile and choose your primary growth focus.
+                      {t('auth.onboarding.workspace_subtitle', 'Set up your company workspace profile and choose your primary growth focus.')}
                     </p>
                   </div>
 
@@ -483,8 +509,8 @@ export default function OnboardingPage() {
                     
                     {/* Workspace / Company Name */}
                     <div className="space-y-1.5">
-                      <label htmlFor="workspace-name-input" className="block text-[11px] font-bold text-[#57534E] uppercase tracking-wider pl-1">
-                        Workspace / Company Name <span className="text-red-500">*</span>
+                      <label htmlFor="workspace-name-input" className={cn("block text-[11px] font-bold text-[#57534E] uppercase tracking-wider", isRtl ? "text-right pr-1" : "text-left pl-1")}>
+                        {t('auth.onboarding.workspace_name_label', 'Workspace / Company Name')} <span className="text-red-500">*</span>
                       </label>
                       <input
                         id="workspace-name-input"
@@ -494,35 +520,35 @@ export default function OnboardingPage() {
                           setBusinessName(e.target.value);
                           setWorkspaceError(null);
                         }}
-                        placeholder="e.g. Acme Corporation"
-                        className="w-full h-12 bg-white border border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/15 rounded-xl px-4 text-sm font-semibold text-[#12263A] transition-all outline-none"
+                        placeholder={isRtl ? "مثال: شركة النجم للتجارة" : "e.g. Acme Corporation"}
+                        className={cn("w-full h-12 bg-white border border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/15 rounded-xl px-4 text-sm font-semibold text-[#12263A] transition-all outline-none", isRtl ? "text-right" : "text-left")}
                       />
                       {workspaceError && (
-                        <p className="text-[11px] font-bold text-rose-600 pl-1" role="alert">{workspaceError}</p>
+                        <p className={cn("text-[11px] font-bold text-rose-600", isRtl ? "pr-1 text-right" : "pl-1 text-left")} role="alert">{workspaceError}</p>
                       )}
                     </div>
 
                     {/* Industry Selector */}
                     <div className="space-y-1.5">
-                      <label htmlFor="industry-select" className="block text-[11px] font-bold text-[#57534E] uppercase tracking-wider pl-1">
-                        Industry / Business Category
+                      <label htmlFor="industry-select" className={cn("block text-[11px] font-bold text-[#57534E] uppercase tracking-wider", isRtl ? "text-right pr-1" : "text-left pl-1")}>
+                        {t('auth.onboarding.industry_label', 'Industry / Business Category')}
                       </label>
                       <select
                         id="industry-select"
                         value={industry}
                         onChange={(e) => setIndustry(e.target.value)}
-                        className="w-full h-12 bg-white border border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/15 rounded-xl px-4 text-sm font-semibold text-[#12263A] transition-all outline-none cursor-pointer"
+                        className={cn("w-full h-12 bg-white border border-stone-200 focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/15 rounded-xl px-4 text-sm font-semibold text-[#12263A] transition-all outline-none cursor-pointer", isRtl ? "text-right" : "text-left")}
                       >
                         {industries.map((ind) => (
-                          <option key={ind} value={ind}>{ind}</option>
+                          <option key={ind.key} value={ind.key}>{ind.label}</option>
                         ))}
                       </select>
                     </div>
 
                     {/* Primary Objective Options */}
                     <div className="space-y-2 pt-1">
-                      <label className="block text-[11px] font-bold text-[#57534E] uppercase tracking-wider pl-1">
-                        Primary Growth Focus
+                      <label className={cn("block text-[11px] font-bold text-[#57534E] uppercase tracking-wider", isRtl ? "text-right pr-1" : "text-left pl-1")}>
+                        {t('auth.onboarding.goal_label', 'Primary Growth Focus')}
                       </label>
                       <div className="space-y-2.5">
                         {goals.map((g) => {
@@ -533,11 +559,13 @@ export default function OnboardingPage() {
                               type="button"
                               key={g.id}
                               onClick={() => setPrimaryGoal(g.id)}
-                              className={`w-full p-3.5 rounded-xl border transition-all text-left flex items-center gap-3.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] ${
+                              className={cn(
+                                "w-full p-3.5 rounded-xl border transition-all flex items-center gap-3.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534]",
+                                isRtl ? "text-right flex-row-reverse" : "text-left",
                                 isSelected 
                                   ? 'border-[#166534] bg-[#F0FDF4] shadow-xs' 
                                   : 'border-stone-200 hover:border-stone-300 bg-white'
-                              }`}
+                              )}
                             >
                               <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
                                 isSelected ? 'bg-[#166534] text-white' : 'bg-stone-100 text-[#57534E]'
@@ -566,8 +594,8 @@ export default function OnboardingPage() {
                         onClick={() => setStep(1)}
                         className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-stone-500 hover:text-[#12263A] rounded-xl hover:bg-stone-50 transition-colors cursor-pointer"
                       >
-                        <ArrowLeft size={15} />
-                        <span>Back</span>
+                        <ArrowLeft size={15} className={cn(isRtl && "rotate-180")} />
+                        <span>{t('auth.onboarding.back', 'Back')}</span>
                       </button>
 
                       <button
@@ -578,12 +606,12 @@ export default function OnboardingPage() {
                         {isSavingWorkspace ? (
                           <>
                             <RefreshCw size={15} className="animate-spin text-white" />
-                            <span>Saving Workspace...</span>
+                            <span>{t('auth.onboarding.saving_workspace', 'Saving Workspace...')}</span>
                           </>
                         ) : (
                           <>
-                            <span>Continue to Launch</span>
-                            <ArrowRight size={15} />
+                            <span>{t('auth.onboarding.continue', 'Continue to Launch')}</span>
+                            <ArrowRight size={15} className={cn(isRtl && "rotate-180")} />
                           </>
                         )}
                       </button>
@@ -616,26 +644,30 @@ export default function OnboardingPage() {
 
                   <div className="space-y-2">
                     <h2 className="text-2xl sm:text-3xl font-extrabold text-[#12263A] tracking-tight">
-                      Workspace Ready!
+                      {t('auth.onboarding.ready_title', 'Workspace Ready!')}
                     </h2>
                     <p className="text-xs sm:text-sm font-medium text-[#57534E] max-w-sm mx-auto leading-relaxed">
-                      Your organization <strong className="text-[#12263A] font-bold">{businessName || user?.businessName || 'Workspace'}</strong> has been initialized successfully.
+                      {isRtl ? (
+                        <>تمت تهيئة منظمتك <strong className="text-[#12263A] font-bold">{businessName || user?.businessName || 'مساحة العمل'}</strong> بنجاح.</>
+                      ) : (
+                        <>Your organization <strong className="text-[#12263A] font-bold">{businessName || user?.businessName || 'Workspace'}</strong> has been initialized successfully.</>
+                      )}
                     </p>
                   </div>
 
                   {/* Confirmed Setup Checklist */}
-                  <div className="bg-[#FAFAF9] border border-stone-200/80 rounded-2xl p-4 sm:p-5 max-w-md mx-auto text-left space-y-3">
-                    <div className="flex items-center gap-2.5 text-xs font-semibold text-[#12263A]">
+                  <div className={cn("bg-[#FAFAF9] border border-stone-200/80 rounded-2xl p-4 sm:p-5 max-w-md mx-auto space-y-3", isRtl ? "text-right" : "text-left")}>
+                    <div className={cn("flex items-center gap-2.5 text-xs font-semibold text-[#12263A]", isRtl && "flex-row-reverse")}>
                       <CheckCircle2 size={16} className="text-[#166534] shrink-0" />
-                      <span>Email address verified & security confirmed</span>
+                      <span>{t('auth.onboarding.checklist_email', 'Email address verified & security confirmed')}</span>
                     </div>
-                    <div className="flex items-center gap-2.5 text-xs font-semibold text-[#12263A]">
+                    <div className={cn("flex items-center gap-2.5 text-xs font-semibold text-[#12263A]", isRtl && "flex-row-reverse")}>
                       <CheckCircle2 size={16} className="text-[#166534] shrink-0" />
-                      <span>Dedicated workspace tenant initialized in database</span>
+                      <span>{t('auth.onboarding.checklist_workspace', 'Dedicated workspace tenant initialized in database')}</span>
                     </div>
-                    <div className="flex items-center gap-2.5 text-xs font-semibold text-[#12263A]">
+                    <div className={cn("flex items-center gap-2.5 text-xs font-semibold text-[#12263A]", isRtl && "flex-row-reverse")}>
                       <CheckCircle2 size={16} className="text-[#166534] shrink-0" />
-                      <span>Lead Discovery & Email Campaign pipelines activated</span>
+                      <span>{t('auth.onboarding.checklist_campaigns', 'Lead Discovery & Email Campaign pipelines activated')}</span>
                     </div>
                   </div>
 
@@ -646,7 +678,7 @@ export default function OnboardingPage() {
                       onClick={handleLaunchDashboard}
                       className="w-full h-12 bg-[#166534] hover:bg-[#14532d] active:bg-[#0f3d21] text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-md hover:shadow-[#166534]/20 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534]"
                     >
-                      <span>Launch Workspace Dashboard</span>
+                      <span>{t('auth.onboarding.launch_button', 'Launch Workspace Dashboard')}</span>
                       <Sparkles size={16} className="text-[#22C55E]" />
                     </button>
                   </div>
@@ -658,7 +690,11 @@ export default function OnboardingPage() {
 
           {/* Accessible Step Counter Footnote */}
           <p className="text-center text-[11px] font-bold text-stone-400 uppercase tracking-widest">
-            Step {step} of 3 • {step === 1 ? 'Security Verification' : step === 2 ? 'Workspace Configuration' : 'Platform Launch'}
+            {isRtl ? (
+              <>الخطوة {step} من 3 • {step === 1 ? 'التحقق الأمني' : step === 2 ? 'تكوين مساحة العمل' : 'إطلاق المنصة'}</>
+            ) : (
+              <>Step {step} of 3 • {step === 1 ? 'Security Verification' : step === 2 ? 'Workspace Configuration' : 'Platform Launch'}</>
+            )}
           </p>
         </div>
       </main>
@@ -668,9 +704,13 @@ export default function OnboardingPage() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>&copy; {new Date().getFullYear()} ThrobTech. All rights reserved.</span>
           <div className="flex items-center gap-4">
-            <a href="/privacy" className="hover:text-stone-600 transition-colors">Privacy Policy</a>
+            <Link to="/privacy" className="hover:text-stone-600 transition-colors">
+              {isRtl ? 'سياسة الخصوصية' : 'Privacy Policy'}
+            </Link>
             <span className="text-stone-300">•</span>
-            <a href="/terms" className="hover:text-stone-600 transition-colors">Terms of Service</a>
+            <Link to="/terms" className="hover:text-stone-600 transition-colors">
+              {isRtl ? 'الشروط والأحكام' : 'Terms of Service'}
+            </Link>
           </div>
         </div>
       </footer>
