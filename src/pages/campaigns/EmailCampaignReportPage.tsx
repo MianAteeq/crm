@@ -16,6 +16,21 @@ export default function EmailCampaignReportPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [recipientFilter, setRecipientFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isRetrying, setIsRetrying] = useState(false);
+
+  const handleRetryFailed = async () => {
+    if (!id) return;
+    setIsRetrying(true);
+    try {
+      const res = await emailCampaignApi.retryFailed(Number(id));
+      toast.success(res.message || 'Queued failed recipients for retry');
+      await fetchReport(true);
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to retry recipients');
+    } finally {
+      setIsRetrying(false);
+    }
+  };
 
   const fetchReport = async (silent = false) => {
     if (!id) return;
@@ -135,14 +150,26 @@ export default function EmailCampaignReportPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => fetchReport(true)}
-          disabled={isRefreshing}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-sm disabled:opacity-50"
-        >
-          <RefreshCw size={14} className={isRefreshing ? 'animate-spin text-[#166534]' : ''} />
-          Refresh Stats
-        </button>
+        <div className="flex items-center gap-2">
+          {metrics.failed_count > 0 && (
+            <button
+              onClick={handleRetryFailed}
+              disabled={isRetrying}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-600 text-white text-xs font-bold hover:bg-amber-700 shadow-sm disabled:opacity-50 transition-colors"
+            >
+              <RefreshCw size={14} className={isRetrying ? 'animate-spin' : ''} />
+              Retry Failed ({metrics.failed_count})
+            </button>
+          )}
+          <button
+            onClick={() => fetchReport(true)}
+            disabled={isRefreshing}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-sm disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={isRefreshing ? 'animate-spin text-[#166534]' : ''} />
+            Refresh Stats
+          </button>
+        </div>
       </div>
 
       {/* Progress & Timeline Bar */}

@@ -83,6 +83,11 @@ export const emailCampaignApi = {
     return res.data;
   },
 
+  async retryFailed(id: number) {
+    const res = await apiClient.post<{ success: boolean; message: string; data: EmailCampaign }>(`/email/campaigns/${id}/retry-failed`);
+    return res.data;
+  },
+
   async getCampaignReport(id: number, params?: { recipient_status?: string; page?: number; per_page?: number }) {
     const res = await apiClient.get<{ success: boolean; data: CampaignReport }>(`/email/campaigns/${id}/report`, { params });
     return res.data;
