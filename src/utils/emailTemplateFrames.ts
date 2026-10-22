@@ -3,14 +3,20 @@
 export interface EmailFrame {
   id: string;
   name: string;
+  nameAr?: string;
   badge: string;
+  badgeAr?: string;
   accentBg: string;
   accentBorder: string;
   description: string;
+  descriptionAr?: string;
+  category?: string;
   defaultSubject: string;
+  defaultSubjectAr?: string;
   defaultBody: string;
-  renderHeader: (fromName: string) => string;
-  renderFooter: (fromName: string) => string;
+  defaultBodyAr?: string;
+  renderHeader: (fromName: string, isRtl?: boolean) => string;
+  renderFooter: (fromName: string, isRtl?: boolean) => string;
 }
 
 export const PROFESSIONAL_FRAMES: EmailFrame[] = [
@@ -167,26 +173,29 @@ export const PROFESSIONAL_FRAMES: EmailFrame[] = [
 export function assembleFullEmailHtml(
   frame: EmailFrame, 
   userBodyHtml: string, 
-  fromName: string
+  fromName: string,
+  isRtl: boolean = false
 ): string {
+  const dir = isRtl ? 'rtl' : 'ltr';
+  const align = isRtl ? 'right' : 'left';
   return `
-<table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 30px 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 30px 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; direction: ${dir};">
   <tr>
     <td align="center">
-      <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); direction: ${dir};">
         <tr>
           <td>
-            ${frame.renderHeader(fromName)}
+            ${frame.renderHeader(fromName, isRtl)}
           </td>
         </tr>
         <tr>
-          <td style="padding: 36px 32px; color: #334155; font-size: 15px; line-height: 1.6;">
+          <td style="padding: 36px 32px; color: #334155; font-size: 15px; line-height: 1.6; text-align: ${align}; direction: ${dir};">
             ${userBodyHtml}
           </td>
         </tr>
         <tr>
           <td>
-            ${frame.renderFooter(fromName)}
+            ${frame.renderFooter(fromName, isRtl)}
           </td>
         </tr>
       </table>

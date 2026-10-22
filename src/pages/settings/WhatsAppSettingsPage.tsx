@@ -17,6 +17,7 @@ import {
   ExternalLink,
   Info,
   ArrowRight,
+  ArrowLeft,
   Globe,
   Lock,
   Link as LinkIcon,
@@ -31,6 +32,8 @@ import { crmApi } from '../../services/crmApi';
 import { WhatsAppSettings } from '../../types';
 import { FormSkeleton } from '../../components/ui/Skeleton';
 import { useTranslation } from '../../i18n';
+import { LanguageSwitcher } from '../../components/common/LanguageSwitcher';
+import { cn } from '../../lib/utils';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Status = 'connected' | 'disconnected' | 'pending' | 'error';
@@ -54,11 +57,12 @@ const WEBHOOK_URL   = typeof window !== 'undefined' && window.location.hostname 
   ? `${window.location.origin}/api/webhook/whatsapp`
   : 'https://crm.throbtech.com/api/webhook/whatsapp';
 const VERIFY_TOKEN  = 'crm-throbtech-verify-token';
-const STEPS = [
-  { num: 1, label: 'Meta Developer Portal', desc: 'Create an app on developers.facebook.com' },
-  { num: 2, label: 'WhatsApp Product',       desc: 'Add WhatsApp to your Meta app' },
-  { num: 3, label: 'Get Credentials',        desc: 'Copy Access Token, Phone ID & WABA ID' },
-  { num: 4, label: 'Configure Here',         desc: 'Enter credentials below and save' },
+
+const getSteps = (isRtl: boolean) => [
+  { num: 1, label: isRtl ? 'بوابة مطوري Meta' : 'Meta Developer Portal', desc: isRtl ? 'إنشاء تطبيق عبر developers.facebook.com' : 'Create an app on developers.facebook.com' },
+  { num: 2, label: isRtl ? 'منتج واتساب (WhatsApp)' : 'WhatsApp Product', desc: isRtl ? 'إضافة منتج WhatsApp إلى تطبيق Meta' : 'Add WhatsApp to your Meta app' },
+  { num: 3, label: isRtl ? 'استخراج بيانات الاعتماد' : 'Get Credentials', desc: isRtl ? 'نسخ رمز الوصول، معرف الهاتف، ومعرف WABA' : 'Copy Access Token, Phone ID & WABA ID' },
+  { num: 4, label: isRtl ? 'التكوين والربط' : 'Configure Here', desc: isRtl ? 'إدخال البيانات واعتماد الربط التلقائي' : 'Enter credentials below and save' },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -78,26 +82,27 @@ function FieldLabel({ children, required }: { children: React.ReactNode; require
   return (
     <label className="block text-xs font-bold text-[#12263A] mb-1.5">
       {children}
-      {required && <span className="text-rose-500 ml-0.5">*</span>}
+      {required && <span className="text-rose-500 mx-1">*</span>}
     </label>
   );
 }
 
-function CopyField({ label, value, fieldKey, copied, onCopy }: {
+function CopyField({ label, value, fieldKey, copied, onCopy, isRtl }: {
   label: string;
   value: string;
   fieldKey: string;
   copied: string | null;
   onCopy: (v: string, k: string) => void;
+  isRtl?: boolean;
 }) {
   return (
-    <div className="space-y-1.5 text-left">
+    <div className={cn("space-y-1.5", isRtl ? "text-right" : "text-left")}>
       <label className="text-xs font-bold text-[#64748B]">{label}</label>
-      <div className="flex items-center gap-2 p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl group">
+      <div className="flex items-center gap-2 p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl group" dir="ltr">
         <code className="flex-1 text-xs font-mono text-[#12263A] truncate select-all">{value}</code>
         <button
           onClick={() => onCopy(value, fieldKey)}
-          className="shrink-0 p-1.5 rounded-lg hover:bg-white text-[#64748B] hover:text-[#12263A] transition-all border border-transparent hover:border-[#E2E8F0]"
+          className="shrink-0 p-1.5 rounded-lg hover:bg-white text-[#64748B] hover:text-[#12263A] transition-all border border-transparent hover:border-[#E2E8F0] cursor-pointer"
           title="Copy to clipboard"
         >
           {copied === fieldKey
@@ -109,12 +114,12 @@ function CopyField({ label, value, fieldKey, copied, onCopy }: {
   );
 }
 
-function StatusPill({ status }: { status: Status }) {
+function StatusPill({ status, isRtl }: { status: Status; isRtl?: boolean }) {
   const map: Record<Status, { bg: string; dot: string; label: string }> = {
-    connected:    { bg: 'bg-[#F0FDF4] text-[#166534] border-[#22C55E]/30', dot: 'bg-[#22C55E]', label: 'Connected' },
-    disconnected: { bg: 'bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0]',   dot: 'bg-slate-400',  label: 'Disconnected' },
-    pending:      { bg: 'bg-[#FFFBEB] text-[#B45309] border-amber-200',   dot: 'bg-amber-500',  label: 'Pending' },
-    error:        { bg: 'bg-rose-50 text-rose-700 border-rose-200',       dot: 'bg-rose-500',   label: 'Error' },
+    connected:    { bg: 'bg-[#F0FDF4] text-[#166534] border-[#22C55E]/30', dot: 'bg-[#22C55E]', label: isRtl ? 'متصل' : 'Connected' },
+    disconnected: { bg: 'bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0]',   dot: 'bg-slate-400',  label: isRtl ? 'غير متصل' : 'Disconnected' },
+    pending:      { bg: 'bg-[#FFFBEB] text-[#B45309] border-amber-200',   dot: 'bg-amber-500',  label: isRtl ? 'قيد الانتظار' : 'Pending' },
+    error:        { bg: 'bg-rose-50 text-rose-700 border-rose-200',       dot: 'bg-rose-500',   label: isRtl ? 'خطأ' : 'Error' },
   };
   const { bg, dot, label } = map[status] ?? map.disconnected;
   return (
@@ -168,7 +173,7 @@ export default function WhatsAppSettingsPage() {
       const saved = localStorage.getItem('throb_whatsapp_reply_language');
       if (saved === 'ar-SA' || saved === 'en') return saved;
     }
-    return 'ar-SA'; // Default to Arabic for new configurations
+    return 'ar-SA';
   });
   const [isSavingAi, setIsSavingAi] = useState(false);
   const toastCounter = useRef(0);
@@ -202,12 +207,12 @@ export default function WhatsAppSettingsPage() {
     try {
       const res = await crmApi.updateWhatsAppProfile(profileDesc, profileAbout);
       if (res.success) {
-        addToast('success', 'WhatsApp profile details updated successfully!');
+        addToast('success', isRtl ? 'تم تحديث بيانات ملف واتساب التجاري بنجاح!' : 'WhatsApp profile details updated successfully!');
       } else {
-        addToast('error', res.message || 'Failed to update profile.');
+        addToast('error', res.message || (isRtl ? 'فشل تحديث الملف الشخصي.' : 'Failed to update profile.'));
       }
     } catch (err: any) {
-      addToast('error', err?.message || 'Failed to update profile.');
+      addToast('error', err?.message || (isRtl ? 'فشل تحديث الملف الشخصي.' : 'Failed to update profile.'));
     } finally {
       setIsSavingProfile(false);
     }
@@ -218,12 +223,12 @@ export default function WhatsAppSettingsPage() {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      addToast('error', 'Please select an image file (PNG/JPEG).');
+      addToast('error', isRtl ? 'يرجى اختيار ملف صورة صالح (PNG/JPEG).' : 'Please select an image file (PNG/JPEG).');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      addToast('error', 'Image size must be less than 5MB.');
+      addToast('error', isRtl ? 'يجب أن يكون حجم الصورة أقل من 5 ميجابايت.' : 'Image size must be less than 5MB.');
       return;
     }
 
@@ -231,17 +236,17 @@ export default function WhatsAppSettingsPage() {
     try {
       const res = await crmApi.uploadWhatsAppLogo(file);
       if (res.success) {
-        addToast('success', 'WhatsApp profile picture updated!');
+        addToast('success', isRtl ? 'تم تحديث صورة الملف التجاري بنجاح!' : 'WhatsApp profile picture updated!');
         if (res.profile_picture_url) {
           setProfileLogoUrl(res.profile_picture_url);
         } else {
           fetchProfile();
         }
       } else {
-        addToast('error', res.message || 'Failed to upload logo.');
+        addToast('error', res.message || (isRtl ? 'فشل رفع الشعار.' : 'Failed to upload logo.'));
       }
     } catch (err: any) {
-      addToast('error', err?.message || 'Failed to upload logo.');
+      addToast('error', err?.message || (isRtl ? 'فشل رفع الشعار.' : 'Failed to upload logo.'));
     } finally {
       setIsUploadingLogo(false);
     }
@@ -296,23 +301,23 @@ export default function WhatsAppSettingsPage() {
     setIsSubscribingWaba(true);
     setWabaSubscriptionError(null);
     try {
-      addToast('info', 'Subscribing WhatsApp Business Account to Meta app...');
+      addToast('info', isRtl ? 'جارٍ اشتراك WABA في تطبيق Meta...' : 'Subscribing WhatsApp Business Account to Meta app...');
       const res = await crmApi.subscribeWaba();
       if (res.success && res.is_subscribed) {
         setIsWabaSubscribed(true);
         setWabaSubscriptionError(null);
         if (res.app_name) setWabaAppName(res.app_name);
-        addToast('success', 'Webhook subscription confirmed!');
+        addToast('success', isRtl ? 'تم تأكيد اشتراك الويب هوك بنجاح!' : 'Webhook subscription confirmed!');
         fetchSettings(false);
       } else {
         setIsWabaSubscribed(false);
-        const errMsg = res.message || 'Meta WABA subscription failed.';
+        const errMsg = res.message || (isRtl ? 'فشل اشتراك WABA لدى Meta.' : 'Meta WABA subscription failed.');
         setWabaSubscriptionError(errMsg);
         addToast('error', errMsg);
       }
     } catch (err: any) {
       setIsWabaSubscribed(false);
-      const errMsg = err?.message || 'Failed to subscribe WABA to Meta App.';
+      const errMsg = err?.message || (isRtl ? 'فشل اشتراك WABA لدى تطبيق Meta.' : 'Failed to subscribe WABA to Meta App.');
       setWabaSubscriptionError(errMsg);
       addToast('error', errMsg);
     } finally {
@@ -322,7 +327,7 @@ export default function WhatsAppSettingsPage() {
 
   const handleSaveAiSettings = async () => {
     if (!companyPrompt.trim()) {
-      addToast('error', t('app.dashboard.companyPromptRequired', 'Company prompt / context is required.'));
+      addToast('error', isRtl ? 'سياق ومعلومات الشركة مطلوبة.' : t('app.dashboard.companyPromptRequired', 'Company prompt / context is required.'));
       return;
     }
 
@@ -331,7 +336,7 @@ export default function WhatsAppSettingsPage() {
       const res = await crmApi.saveAiSettings(openaiKey || undefined, companyPrompt, replyLanguage);
       if (res.success) {
         localStorage.setItem('throb_whatsapp_reply_language', replyLanguage);
-        addToast('success', t('app.dashboard.aiSavedSuccess', 'AI auto-reply settings updated successfully!'));
+        addToast('success', isRtl ? 'تم تحديث إعدادات الرد الآلي للذكاء الاصطناعي بنجاح!' : t('app.dashboard.aiSavedSuccess', 'AI auto-reply settings updated successfully!'));
         if (res.data) {
           setOpenaiKey(res.data.openai_key || '');
           setCompanyPrompt(res.data.company_prompt || '');
@@ -340,10 +345,10 @@ export default function WhatsAppSettingsPage() {
           }
         }
       } else {
-        addToast('error', res.message || 'Failed to update AI settings.');
+        addToast('error', res.message || (isRtl ? 'فشل تحديث إعدادات الذكاء الاصطناعي.' : 'Failed to update AI settings.'));
       }
     } catch (err: any) {
-      addToast('error', err?.message || 'An error occurred while saving AI settings.');
+      addToast('error', err?.message || (isRtl ? 'حدث خطأ أثناء حفظ إعدادات الذكاء الاصطناعي.' : 'An error occurred while saving AI settings.'));
     } finally {
       setIsSavingAi(false);
     }
@@ -356,28 +361,27 @@ export default function WhatsAppSettingsPage() {
       if (status === 'connected' && !isRegistered && !isRegistering && !isFetching) {
         setIsRegistering(true);
         try {
-          addToast('info', 'Registering WhatsApp phone number automatically...');
+          addToast('info', isRtl ? 'جارٍ تسجيل رقم هاتف واتساب تلقائياً...' : 'Registering WhatsApp phone number automatically...');
           const regRes = await crmApi.registerWhatsAppNumber('123456');
           if (regRes.success && active) {
             setIsRegistered(true);
-            addToast('success', 'WhatsApp number registered and verified successfully!');
+            addToast('success', isRtl ? 'تم توثيق وتسجيل رقم واتساب بنجاح!' : 'WhatsApp number registered and verified successfully!');
             fetchProfile();
 
             if (regRes.waba_subscription?.is_subscribed) {
               setIsWabaSubscribed(true);
               setWabaSubscriptionError(null);
-              addToast('success', 'Webhook subscription confirmed!');
+              addToast('success', isRtl ? 'تم تأكيد اشتراك الويب هوك بنجاح!' : 'Webhook subscription confirmed!');
             } else {
-              // Trigger explicit subscription
               handleSubscribeWaba();
             }
           } else if (active) {
-            addToast('error', regRes.message || 'Auto-registration failed.');
+            addToast('error', regRes.message || (isRtl ? 'فشل التسجيل التلقائي.' : 'Auto-registration failed.'));
           }
         } catch (err: any) {
           if (active) {
             console.error('[CRM] Auto-registration error:', err);
-            addToast('error', err?.message || 'Auto-registration failed.');
+            addToast('error', err?.message || (isRtl ? 'فشل التسجيل التلقائي.' : 'Auto-registration failed.'));
           }
         } finally {
           if (active) {
@@ -403,23 +407,23 @@ export default function WhatsAppSettingsPage() {
       ) {
         setIsSubscribingWaba(true);
         try {
-          addToast('info', 'Subscribing WABA to Meta app automatically...');
+          addToast('info', isRtl ? 'جارٍ اشتراك WABA في تطبيق Meta تلقائياً...' : 'Subscribing WABA to Meta app automatically...');
           const res = await crmApi.subscribeWaba();
           if (active) {
             if (res.success && res.is_subscribed) {
               setIsWabaSubscribed(true);
               setWabaSubscriptionError(null);
               if (res.app_name) setWabaAppName(res.app_name);
-              addToast('success', 'Webhook subscription confirmed!');
+              addToast('success', isRtl ? 'تم تأكيد اشتراك الويب هوك بنجاح!' : 'Webhook subscription confirmed!');
             } else {
               setIsWabaSubscribed(false);
-              setWabaSubscriptionError(res.message || 'Auto-subscription failed.');
+              setWabaSubscriptionError(res.message || (isRtl ? 'فشل الاشتراك التلقائي.' : 'Auto-subscription failed.'));
             }
           }
         } catch (err: any) {
           if (active) {
             setIsWabaSubscribed(false);
-            setWabaSubscriptionError(err?.message || 'Auto-subscription failed.');
+            setWabaSubscriptionError(err?.message || (isRtl ? 'فشل الاشتراك التلقائي.' : 'Auto-subscription failed.'));
           }
         } finally {
           if (active) {
@@ -442,7 +446,7 @@ export default function WhatsAppSettingsPage() {
         const res = await crmApi.getWhatsAppSettings();
         if (res && res.is_registered) {
           setIsRegistered(true);
-          addToast('success', 'WhatsApp number registration verified!');
+          addToast('success', isRtl ? 'تم تأكيد تسجيل رقم واتساب!' : 'WhatsApp number registration verified!');
           fetchProfile();
         }
       } catch (err) {
@@ -461,7 +465,7 @@ export default function WhatsAppSettingsPage() {
   // ── Save credentials ──
   const handleSave = async () => {
     if (!form.accessToken || !form.phoneNumberId || !form.businessAccountId) {
-      addToast('error', 'Access Token, Phone Number ID, and Business Account ID are required.');
+      addToast('error', isRtl ? 'رمز الوصول، ومعرف الهاتف، ومعرف WABA مطلوبة جميعاً.' : 'Access Token, Phone Number ID, and Business Account ID are required.');
       return;
     }
     setIsSaving(true);
@@ -482,10 +486,10 @@ export default function WhatsAppSettingsPage() {
       setLastSynced(new Date().toISOString());
       setBusinessInfo({ name: form.businessName, phone: form.phoneNumber });
       setMessagingLimit((saveRes as any)?.data?.messaging_limit_tier || 'TIER_250');
-      addToast('success', 'WhatsApp API credentials saved and connected!');
+      addToast('success', isRtl ? 'تم حفظ بيانات واجهة واتساب وتأكيد الاتصال!' : 'WhatsApp API credentials saved and connected!');
       fetchProfile();
     } catch (err: any) {
-      addToast('error', err?.message || 'Failed to save credentials.');
+      addToast('error', err?.message || (isRtl ? 'فشل حفظ بيانات الاعتماد.' : 'Failed to save credentials.'));
     } finally {
       setIsSaving(false);
     }
@@ -493,27 +497,33 @@ export default function WhatsAppSettingsPage() {
 
   // ── Disconnect ──
   const handleDisconnect = async () => {
-    if (!confirm('Disconnect your WhatsApp API? This will stop all messaging.')) return;
+    if (!confirm(isRtl ? 'هل تريد قطع اتصال واجهة واتساب؟ سيؤدي ذلك لإيقاف جميع الرسائل التلقائية.' : 'Disconnect your WhatsApp API? This will stop all messaging.')) return;
     try {
       await crmApi.disconnectWhatsApp();
       setStatus('disconnected');
-      addToast('info', 'WhatsApp API disconnected.');
+      addToast('info', isRtl ? 'تم قطع اتصال واجهة واتساب.' : 'WhatsApp API disconnected.');
     } catch {
-      addToast('error', 'Failed to disconnect.');
+      addToast('error', isRtl ? 'فشل قطع الاتصال.' : 'Failed to disconnect.');
     }
   };
 
   // ── Test connection ──
   const handleTest = async () => {
-    if (!testPhone.trim()) { addToast('error', 'Enter a phone number to test.'); return; }
-    if (status !== 'connected') { addToast('error', 'Connect first before testing.'); return; }
+    if (!testPhone.trim()) { 
+      addToast('error', isRtl ? 'يرجى إدخال رقم هاتف للاختبار.' : 'Enter a phone number to test.'); 
+      return; 
+    }
+    if (status !== 'connected') { 
+      addToast('error', isRtl ? 'يجب ربط الحساب أولاً قبل إجراء الاختبار.' : 'Connect first before testing.'); 
+      return; 
+    }
     setIsTesting(true);
     try {
       const res = await crmApi.testWhatsAppConnection(testPhone.trim());
-      if (res.success) addToast('success', 'Test message delivered successfully!');
-      else addToast('error', 'Test message failed. Check your credentials.');
+      if (res.success) addToast('success', isRtl ? 'تم تسليم الرسالة التجريبية بنجاح!' : 'Test message delivered successfully!');
+      else addToast('error', isRtl ? 'فشل إرسال الرسالة التجريبية، تحقق من صحة بياناتك.' : 'Test message failed. Check your credentials.');
     } catch {
-      addToast('error', 'Test failed — please verify your credentials.');
+      addToast('error', isRtl ? 'فشل الاختبار — يرجى التحقق من صحة بيانات الاعتماد.' : 'Test failed — please verify your credentials.');
     } finally {
       setIsTesting(false);
     }
@@ -521,19 +531,20 @@ export default function WhatsAppSettingsPage() {
 
   const isConnected = status === 'connected';
   const [activeTab, setActiveTab] = useState<'profile' | 'sandbox' | 'ai'>('profile');
+  const steps = getSteps(isRtl);
 
   // ─── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-full bg-[#FFFFFF] font-sans pb-16">
+    <div className={cn("min-h-full bg-[#FFFFFF] font-sans pb-16", isRtl && "text-right")} dir={isRtl ? 'rtl' : 'ltr'}>
       {/* ─ Toast Stack ─ */}
-      <div className="fixed top-5 right-5 z-[200] flex flex-col gap-2 pointer-events-none">
+      <div className={cn("fixed top-5 z-[200] flex flex-col gap-2 pointer-events-none", isRtl ? "left-5" : "right-5")}>
         <AnimatePresence>
           {toasts.map(t => (
             <motion.div
               key={t.id}
-              initial={{ opacity: 0, x: 60, scale: 0.9 }}
+              initial={{ opacity: 0, x: isRtl ? -60 : 60, scale: 0.9 }}
               animate={{ opacity: 1, x: 0,  scale: 1   }}
-              exit   ={{ opacity: 0, x: 60, scale: 0.9 }}
+              exit   ={{ opacity: 0, x: isRtl ? -60 : 60, scale: 0.9 }}
               className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm font-semibold max-w-sm bg-white
                 ${t.type === 'success' ? 'border-emerald-200 text-emerald-800 shadow-emerald-500/10'
                 : t.type === 'error'   ? 'border-rose-200 text-rose-800 shadow-rose-500/10'
@@ -561,25 +572,30 @@ export default function WhatsAppSettingsPage() {
               <Zap size={24} className="text-[#166534]" />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#12263A] tracking-tight">WhatsApp API Setup</h1>
-              <p className="text-sm text-[#64748B] mt-1">Configure and manage your Meta Cloud API connection and business details.</p>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#12263A] tracking-tight">
+                {isRtl ? 'إعدادات واجهة واتساب السحابية' : 'WhatsApp API Setup'}
+              </h1>
+              <p className="text-sm text-[#64748B] mt-1">
+                {isRtl ? 'تكوين وإدارة اتصال Meta Cloud API وتفاصيل النشاط التجاري والردود الذكية.' : 'Configure and manage your Meta Cloud API connection and business details.'}
+              </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
+            <LanguageSwitcher variant="dropdown" />
             {isFetching ? (
               <div className="flex items-center gap-2 text-[#64748B] text-xs font-semibold bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3 py-2 shadow-xs">
-                <Loader2 size={13} className="animate-spin text-[#166534]" /> Loading setup…
+                <Loader2 size={13} className="animate-spin text-[#166534]" /> {isRtl ? 'جارٍ التحميل...' : 'Loading setup…'}
               </div>
             ) : (
-              <StatusPill status={status} />
+              <StatusPill status={status} isRtl={isRtl} />
             )}
             {isConnected && (
               <button
                 onClick={handleDisconnect}
                 className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-rose-600 border border-rose-200 bg-white hover:bg-rose-50 rounded-xl transition-all shadow-xs active:scale-[0.98] cursor-pointer"
               >
-                <Unlink size={13} /> Disconnect API
+                <Unlink size={13} /> {isRtl ? 'قطع اتصال الواجهة' : 'Disconnect API'}
               </button>
             )}
           </div>
@@ -608,19 +624,21 @@ export default function WhatsAppSettingsPage() {
                       <div className="space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="font-bold text-[#166534] text-sm tracking-wide">
-                            {businessInfo.name ? `${businessInfo.name} — WhatsApp Connected` : 'WhatsApp API Connected Successfully'}
+                            {businessInfo.name 
+                              ? `${businessInfo.name} — ${isRtl ? 'واتساب متصل بنجاح' : 'WhatsApp Connected'}` 
+                              : (isRtl ? 'تم ربط واجهة واتساب بنجاح' : 'WhatsApp API Connected Successfully')}
                           </p>
                           {isWabaSubscribed ? (
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#DCFCE7] text-[#15803D] border border-[#86EFAC]">
-                              <CheckCircle2 size={11} /> Webhook subscription confirmed
+                              <CheckCircle2 size={11} /> {isRtl ? 'اشتراك الويب هوك مؤكد' : 'Webhook subscription confirmed'}
                             </span>
                           ) : isSubscribingWaba ? (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE]">
-                              <Loader2 size={11} className="animate-spin" /> Subscribing WABA to Meta App...
+                              <Loader2 size={11} className="animate-spin" /> {isRtl ? 'جارٍ اشتراك WABA في تطبيق Meta...' : 'Subscribing WABA to Meta App...'}
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
-                              <AlertCircle size={11} /> Webhook Pending Subscription
+                              <AlertCircle size={11} /> {isRtl ? 'الويب هوك بانتظار الاشتراك' : 'Webhook Pending Subscription'}
                             </span>
                           )}
                         </div>
@@ -628,15 +646,15 @@ export default function WhatsAppSettingsPage() {
                           {businessInfo.phone && (
                             <span className="inline-flex items-center gap-1">
                               <Smartphone size={12} className="text-[#166534]" />
-                              <strong>Connected Number:</strong> {businessInfo.phone}
+                              <strong>{isRtl ? 'الرقم المتصل:' : 'Connected Number:'}</strong> {businessInfo.phone}
                             </span>
                           )}
                           <span>•</span>
-                          <span>{isRegistered ? 'Number Registered & Active' : 'Number Registration Pending'}</span>
+                          <span>{isRegistered ? (isRtl ? 'الرقم مسجل ونشط' : 'Number Registered & Active') : (isRtl ? 'تسجيل الرقم معلق' : 'Number Registration Pending')}</span>
                           {lastSynced && (
                             <>
                               <span>•</span>
-                              <span>Synced: {new Date(lastSynced).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                              <span>{isRtl ? 'المزامنة:' : 'Synced:'} {new Date(lastSynced).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                             </>
                           )}
                         </div>
@@ -651,14 +669,14 @@ export default function WhatsAppSettingsPage() {
                           className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-[#166534] hover:bg-[#14532d] disabled:opacity-50 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
                         >
                           {isSubscribingWaba ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />} 
-                          {isSubscribingWaba ? 'Subscribing...' : 'Subscribe WABA'}
+                          {isSubscribingWaba ? (isRtl ? 'جارٍ الاشتراك...' : 'Subscribing...') : (isRtl ? 'اشتراك WABA' : 'Subscribe WABA')}
                         </button>
                       )}
                       <button
                         onClick={() => fetchSettings(true)}
                         className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-[#166534] border border-[#22C55E]/30 bg-white rounded-xl hover:bg-[#F0FDF4] transition-all shadow-xs active:scale-95 cursor-pointer"
                       >
-                        <RefreshCw size={12} className="text-[#166534]" /> Refresh Profile
+                        <RefreshCw size={12} className="text-[#166534]" /> {isRtl ? 'تحديث الملف' : 'Refresh Profile'}
                       </button>
                     </div>
                   </div>
@@ -673,7 +691,7 @@ export default function WhatsAppSettingsPage() {
                       <div className="flex items-start gap-3">
                         <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-xs font-bold text-red-900">WABA Webhook Subscription Unconfirmed</p>
+                          <p className="text-xs font-bold text-red-900">{isRtl ? 'اشتراك الويب هوك لـ WABA غير مؤكد' : 'WABA Webhook Subscription Unconfirmed'}</p>
                           <p className="text-xs text-red-700 mt-0.5 leading-relaxed">{wabaSubscriptionError}</p>
                         </div>
                       </div>
@@ -683,7 +701,7 @@ export default function WhatsAppSettingsPage() {
                         className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-xl transition-all shadow-xs shrink-0 cursor-pointer"
                       >
                         {isSubscribingWaba ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
-                        Retry Subscription
+                        {isRtl ? 'إعادة المحاولة' : 'Retry Subscription'}
                       </button>
                     </motion.div>
                   )}
@@ -708,7 +726,7 @@ export default function WhatsAppSettingsPage() {
                   }`}
                 >
                   <User size={14} />
-                  Business Profile
+                  {isRtl ? 'الملف التجاري' : 'Business Profile'}
                   {isConnected && <span className="w-1.5 h-1.5 bg-[#22C55E] rounded-full animate-pulse" />}
                 </button>
                 <button
@@ -720,7 +738,7 @@ export default function WhatsAppSettingsPage() {
                   }`}
                 >
                   <Send size={14} />
-                  Sandbox & Steps
+                  {isRtl ? 'بيئة الاختبار ودليل الإعداد' : 'Sandbox & Steps'}
                 </button>
                 <button
                   onClick={() => setActiveTab('ai')}
@@ -731,14 +749,16 @@ export default function WhatsAppSettingsPage() {
                   }`}
                 >
                   <Bot size={14} />
-                  AI Auto-Reply
+                  {isRtl ? 'الرد الآلي الذكي (AI)' : 'AI Auto-Reply'}
                 </button>
               </div>
 
               {!isConnected && (
                 <div className="flex items-center gap-2 px-3.5 py-2 bg-[#FFFBEB] border border-amber-200 rounded-xl">
                   <AlertTriangle size={14} className="text-[#B45309]" />
-                  <span className="text-xs font-bold text-[#B45309] uppercase tracking-wide">Offline Configuration</span>
+                  <span className="text-xs font-bold text-[#B45309] uppercase tracking-wide">
+                    {isRtl ? 'إعداد في وضع عدم الاتصال' : 'Offline Configuration'}
+                  </span>
                 </div>
               )}
             </motion.div>
@@ -756,15 +776,18 @@ export default function WhatsAppSettingsPage() {
                   className="space-y-6"
                 >
                   {!isConnected ? (
-                    /* Redesigned API Connection Required Card */
                     <div className="flex flex-col items-center justify-center py-14 sm:py-16 px-6 sm:px-10 bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl text-center space-y-5 max-w-xl mx-auto shadow-sm">
                       <div className="w-16 h-16 bg-[#FFFBEB] border border-amber-200/80 rounded-2xl flex items-center justify-center text-[#B45309] shadow-xs">
                         <AlertTriangle size={30} />
                       </div>
                       <div className="space-y-2">
-                        <h3 className="text-xl font-bold text-[#12263A]">API Connection Required</h3>
+                        <h3 className="text-xl font-bold text-[#12263A]">
+                          {isRtl ? 'يلزم ربط الحساب أولاً' : 'API Connection Required'}
+                        </h3>
                         <p className="text-sm text-[#64748B] max-w-md mx-auto leading-relaxed">
-                          You need to connect your WhatsApp account using the official connection wizard before managing your Business Profile details.
+                          {isRtl 
+                            ? 'تحتاج إلى ربط حساب واتساب للأعمال باستخدام معالج الاتصال الرسمي قبل إدارة تفاصيل ملفك التجاري.' 
+                            : 'You need to connect your WhatsApp account using the official connection wizard before managing your Business Profile details.'}
                         </p>
                       </div>
                       <button 
@@ -772,7 +795,7 @@ export default function WhatsAppSettingsPage() {
                         className="bg-[#166534] hover:bg-[#14532d] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-[#166534]/20 text-white font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-xl shadow-sm hover:shadow transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
                       >
                         <Zap size={14} className="text-[#22C55E]" />
-                        GO TO WHATSAPP CONNECT
+                        {isRtl ? 'الانتقال إلى ربط واتساب' : 'GO TO WHATSAPP CONNECT'}
                       </button>
                     </div>
                   ) : (
@@ -786,8 +809,12 @@ export default function WhatsAppSettingsPage() {
                               <User size={16} />
                             </div>
                             <div>
-                              <h2 className="text-sm font-bold text-[#12263A] tracking-wide uppercase">WhatsApp Business Profile</h2>
-                              <p className="text-xs text-[#64748B] mt-0.5">Manage logo, description, and status info like WhatsApp Manager</p>
+                              <h2 className="text-sm font-bold text-[#12263A] tracking-wide uppercase">
+                                {isRtl ? 'ملف تعريف واتساب للأعمال' : 'WhatsApp Business Profile'}
+                              </h2>
+                              <p className="text-xs text-[#64748B] mt-0.5">
+                                {isRtl ? 'إدارة الشعار، الوصف، ونبذة الحساب بنفس أسلوب مدير واتساب' : 'Manage logo, description, and status info like WhatsApp Manager'}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -796,7 +823,7 @@ export default function WhatsAppSettingsPage() {
                           {isFetchingProfile ? (
                             <div className="flex flex-col items-center justify-center py-10 gap-3 text-[#64748B]">
                               <Loader2 size={24} className="animate-spin text-[#166534]" />
-                              <p className="text-xs font-semibold">Loading profile information…</p>
+                              <p className="text-xs font-semibold">{isRtl ? 'جارٍ تحميل معلومات الملف الشخصي...' : 'Loading profile information…'}</p>
                             </div>
                           ) : (
                             <div className="space-y-6">
@@ -815,12 +842,14 @@ export default function WhatsAppSettingsPage() {
                                   )}
                                   <div className="flex-1">
                                     <p className="text-xs font-bold text-[#B45309]">
-                                      {isRegistering ? 'Verification In Progress' : 'Phone Number Not Registered for Cloud API'}
+                                      {isRegistering 
+                                        ? (isRtl ? 'جارٍ التحقق والتسجيل...' : 'Verification In Progress') 
+                                        : (isRtl ? 'رقم الهاتف غير مسجل في واجهة Cloud API' : 'Phone Number Not Registered for Cloud API')}
                                     </p>
                                     <p className="text-[11px] text-[#B45309]/90 mt-0.5 leading-normal">
                                       {isRegistering 
-                                        ? 'Attempting automatic 2FA registration with Meta API...'
-                                        : 'Meta requires registering your number before profile updates can take effect. Auto-registering in background...'}
+                                        ? (isRtl ? 'جارٍ تسجيل الحساب والمصادقة الثنائية مع واجهة Meta...' : 'Attempting automatic 2FA registration with Meta API...')
+                                        : (isRtl ? 'تتطلب Meta تسجيل رقم هاتفك قبل تفعيل تحديثات الملف التجاري.' : 'Meta requires registering your number before profile updates can take effect. Auto-registering in background...')}
                                     </p>
                                   </div>
                                 </motion.div>
@@ -838,7 +867,9 @@ export default function WhatsAppSettingsPage() {
                                   ) : (
                                     <div className="flex flex-col items-center text-slate-400 gap-1 p-2 text-center">
                                       <Image size={20} strokeWidth={1.5} className="text-[#64748B]" />
-                                      <span className="text-[8px] font-bold text-[#64748B] tracking-wider uppercase">No Logo</span>
+                                      <span className="text-[8px] font-bold text-[#64748B] tracking-wider uppercase">
+                                        {isRtl ? 'بدون شعار' : 'No Logo'}
+                                      </span>
                                     </div>
                                   )}
 
@@ -846,7 +877,9 @@ export default function WhatsAppSettingsPage() {
                                   {!isRegistered ? (
                                     <div className="absolute inset-0 bg-slate-900/60 flex flex-col items-center justify-center gap-1 text-white">
                                       <Lock size={16} className="text-slate-300" />
-                                      <span className="text-[8px] font-bold tracking-wider uppercase text-center px-1">Locked</span>
+                                      <span className="text-[8px] font-bold tracking-wider uppercase text-center px-1">
+                                        {isRtl ? 'مقفل' : 'Locked'}
+                                      </span>
                                     </div>
                                   ) : (
                                     <label className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-white cursor-pointer transition-all duration-200">
@@ -856,7 +889,7 @@ export default function WhatsAppSettingsPage() {
                                         <UploadCloud size={16} className="text-white" />
                                       )}
                                       <span className="text-[8px] font-bold tracking-widest uppercase text-center px-1">
-                                        {isUploadingLogo ? 'Uploading…' : 'Upload'}
+                                        {isUploadingLogo ? (isRtl ? 'جارٍ الرفع…' : 'Uploading…') : (isRtl ? 'رفع' : 'Upload')}
                                       </span>
                                       <input
                                         type="file"
@@ -868,10 +901,14 @@ export default function WhatsAppSettingsPage() {
                                     </label>
                                   )}
                                 </div>
-                                <div className="flex-1 space-y-1 text-center sm:text-left">
-                                  <p className="text-xs font-bold text-[#12263A]">Business Avatar / Brand Icon</p>
+                                <div className={cn("flex-1 space-y-1 text-center", isRtl ? "sm:text-right" : "sm:text-left")}>
+                                  <p className="text-xs font-bold text-[#12263A]">
+                                    {isRtl ? 'شعار النشاط التجاري / الأيقونة' : 'Business Avatar / Brand Icon'}
+                                  </p>
                                   <p className="text-xs text-[#64748B] leading-normal max-w-sm">
-                                    Square JPEG/PNG image up to 5MB. Recommended: 640x640px. This avatar is displayed publicly on WhatsApp chats.
+                                    {isRtl 
+                                      ? 'صورة مربعة JPEG/PNG بحد أقصى 5 ميجابايت. يُفضل مقاس 640×640 بكسل. تظهر للمستخدمين في محادثات واتساب.' 
+                                      : 'Square JPEG/PNG image up to 5MB. Recommended: 640x640px. This avatar is displayed publicly on WhatsApp chats.'}
                                   </p>
                                 </div>
                               </div>
@@ -880,7 +917,7 @@ export default function WhatsAppSettingsPage() {
                               <div className="space-y-4">
                                 <div>
                                   <div className="flex items-center justify-between mb-1.5">
-                                    <FieldLabel>About / Tagline</FieldLabel>
+                                    <FieldLabel>{isRtl ? 'نبذة قصيرة / الشعار اللفظي' : 'About / Tagline'}</FieldLabel>
                                     <span className="text-[10px] text-[#64748B] font-mono">{profileAbout.length}/139</span>
                                   </div>
                                   <input
@@ -888,16 +925,18 @@ export default function WhatsAppSettingsPage() {
                                     maxLength={139}
                                     value={profileAbout}
                                     onChange={(e) => setProfileAbout(e.target.value)}
-                                    placeholder="e.g. Fast, reliable real estate solutions."
+                                    placeholder={isRtl ? "مثال: حلول أعمال ذكية وموثوقة لخدمتكم دائماً." : "e.g. Fast, reliable real estate solutions."}
                                     disabled={!isRegistered || isSavingProfile}
                                     className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-3 text-sm text-[#12263A] focus:outline-none focus:ring-4 focus:ring-[#166534]/10 focus:border-[#166534] focus:bg-white transition-all placeholder:text-[#64748B]/60 disabled:opacity-60 disabled:cursor-not-allowed font-medium"
                                   />
-                                  <p className="text-[10px] text-[#64748B] mt-1 ml-1">Displayed in the 'About' section in WhatsApp contacts (up to 139 characters).</p>
+                                  <p className="text-[10px] text-[#64748B] mt-1">
+                                    {isRtl ? 'تظهر في قسم "نبذة" في جهات اتصال واتساب (حتى 139 حرفاً).' : "Displayed in the 'About' section in WhatsApp contacts (up to 139 characters)."}
+                                  </p>
                                 </div>
 
                                 <div>
                                   <div className="flex items-center justify-between mb-1.5">
-                                    <FieldLabel>Business Description</FieldLabel>
+                                    <FieldLabel>{isRtl ? 'وصف النشاط التجاري' : 'Business Description'}</FieldLabel>
                                     <span className="text-[10px] text-[#64748B] font-mono">{profileDesc.length}/512</span>
                                   </div>
                                   <textarea
@@ -905,17 +944,20 @@ export default function WhatsAppSettingsPage() {
                                     maxLength={512}
                                     value={profileDesc}
                                     onChange={(e) => setProfileDesc(e.target.value)}
-                                    placeholder="Describe your business services, catalog, or support hours..."
+                                    placeholder={isRtl ? "اكتب نبذة تفصيلية عن منتجاتك أو خدماتك أو ساعات العمل..." : "Describe your business services, catalog, or support hours..."}
                                     disabled={!isRegistered || isSavingProfile}
                                     className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-3 text-sm text-[#12263A] focus:outline-none focus:ring-4 focus:ring-[#166534]/10 focus:border-[#166534] focus:bg-white transition-all placeholder:text-[#64748B]/60 resize-none font-medium leading-relaxed disabled:opacity-60 disabled:cursor-not-allowed"
                                   />
-                                  <p className="text-[10px] text-[#64748B] mt-1 ml-1">Visible on your official WhatsApp Business details profile page (up to 512 characters).</p>
+                                  <p className="text-[10px] text-[#64748B] mt-1">
+                                    {isRtl ? 'تظهر في الصفحة الرسمية لتفاصيل حساب الأعمال (حتى 512 حرفاً).' : 'Visible on your official WhatsApp Business details profile page (up to 512 characters).'}
+                                  </p>
                                 </div>
                               </div>
 
                               <div className="pt-2 flex items-center justify-between border-t border-[#E2E8F0]">
                                 <div className="text-[11px] text-[#64748B] flex items-center gap-1.5 font-medium">
-                                  <Zap size={13} className="text-[#22C55E]" /> Real-time Meta Graph API Sync
+                                  <Zap size={13} className="text-[#22C55E]" /> 
+                                  {isRtl ? 'مزامنة مباشرة مع Meta Graph API' : 'Real-time Meta Graph API Sync'}
                                 </div>
                                 <button
                                   type="button"
@@ -925,11 +967,11 @@ export default function WhatsAppSettingsPage() {
                                 >
                                   {isSavingProfile ? (
                                     <>
-                                      <Loader2 size={13} className="animate-spin" /> Saving Profile...
+                                      <Loader2 size={13} className="animate-spin" /> {isRtl ? 'جارٍ الحفظ...' : 'Saving Profile...'}
                                     </>
                                   ) : (
                                     <>
-                                      <Check size={13} /> Update Profile Info
+                                      <Check size={13} /> {isRtl ? 'تحديث بيانات الملف' : 'Update Profile Info'}
                                     </>
                                   )}
                                 </button>
@@ -944,9 +986,12 @@ export default function WhatsAppSettingsPage() {
                       <div className="w-full lg:w-80 shrink-0 space-y-4">
                         <div className="flex items-center justify-between px-1">
                           <p className="text-xs font-bold text-[#12263A] uppercase tracking-wider flex items-center gap-1.5">
-                            <Smartphone size={14} className="text-[#166534]" /> WhatsApp Live Preview
+                            <Smartphone size={14} className="text-[#166534]" /> 
+                            {isRtl ? 'المعاينة الحية على الهاتف' : 'WhatsApp Live Preview'}
                           </p>
-                          <span className="text-[10px] font-semibold text-[#22C55E] bg-[#F0FDF4] px-2 py-0.5 rounded-full border border-[#22C55E]/30">Verified</span>
+                          <span className="text-[10px] font-semibold text-[#22C55E] bg-[#F0FDF4] px-2 py-0.5 rounded-full border border-[#22C55E]/30">
+                            {isRtl ? 'موثق' : 'Verified'}
+                          </span>
                         </div>
 
                         {/* Phone Container */}
@@ -958,10 +1003,10 @@ export default function WhatsAppSettingsPage() {
                           </div>
 
                           {/* Screen Header */}
-                          <div className="bg-[#128C7E] pt-7 pb-2.5 px-3 rounded-t-[26px] text-white flex items-center justify-between text-xs z-10 shadow-xs">
+                          <div className="bg-[#128C7E] pt-7 pb-2.5 px-3 rounded-t-[26px] text-white flex items-center justify-between text-xs z-10 shadow-xs" dir="ltr">
                             <div className="flex items-center gap-2 truncate">
                               <span className="text-white/80">&larr;</span>
-                              <span className="font-bold text-xs truncate max-w-[150px]">{form.businessName || 'Business Profile'}</span>
+                              <span className="font-bold text-xs truncate max-w-[150px]">{form.businessName || (isRtl ? 'الملف التجاري' : 'Business Profile')}</span>
                             </div>
                             <span className="text-white/80 text-[10px]">&vellip;</span>
                           </div>
@@ -980,41 +1025,49 @@ export default function WhatsAppSettingsPage() {
                               </div>
                               <div>
                                 <h4 className="font-bold text-slate-900 text-xs truncate max-w-[190px]">
-                                  {form.businessName || 'Business Name'}
+                                  {form.businessName || (isRtl ? 'اسم النشاط التجاري' : 'Business Name')}
                                 </h4>
                                 <p className="text-[10px] text-slate-500 font-mono mt-0.5">
-                                  {form.phoneNumber || '+92 300 1234567'}
+                                  {form.phoneNumber || '+966 50 123 4567'}
                                 </p>
                               </div>
                               <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-100 rounded-full">
                                 <span className="w-1 h-1 rounded-full bg-emerald-500" />
-                                <span className="text-[9px] font-bold text-emerald-700">Official Account</span>
+                                <span className="text-[9px] font-bold text-emerald-700">
+                                  {isRtl ? 'حساب رسمي معتمد' : 'Official Account'}
+                                </span>
                               </div>
                             </div>
 
                             {/* About Card */}
-                            <div className="bg-white rounded-lg shadow-xs p-3.5 space-y-2.5 border border-slate-200/50 text-left">
+                            <div className={cn("bg-white rounded-lg shadow-xs p-3.5 space-y-2.5 border border-slate-200/50", isRtl ? "text-right" : "text-left")}>
                               <div>
-                                <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-wide block">About</span>
+                                <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-wide block">
+                                  {isRtl ? 'نبذة' : 'About'}
+                                </span>
                                 <p className="text-xs text-slate-800 leading-normal font-semibold mt-0.5">
-                                  {profileAbout || 'Hello there! We are on WhatsApp.'}
+                                  {profileAbout || (isRtl ? 'مرحباً بكم! نحن متواجدون على واتساب لخدمتكم.' : 'Hello there! We are on WhatsApp.')}
                                 </p>
                               </div>
                               <div className="h-px bg-slate-100" />
                               <div>
-                                <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-wide block">Description</span>
+                                <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-wide block">
+                                  {isRtl ? 'الوصف' : 'Description'}
+                                </span>
                                 <p className="text-xs text-slate-500 leading-relaxed font-medium italic mt-0.5">
-                                  {profileDesc || 'Enter a detailed profile description on the left to see how customers view your business details page.'}
+                                  {profileDesc || (isRtl ? 'أدخل وصفاً تفصيلياً لنشاطك التجاري لترى كيف يظهر لعملائك.' : 'Enter a detailed profile description on the left to see how customers view your business details page.')}
                                 </p>
                               </div>
                             </div>
 
                             {/* Chat preview bubble */}
-                            <div className="bg-white rounded-lg shadow-xs p-3 border border-slate-200/50 text-left">
-                              <span className="text-[8px] font-black text-slate-400 tracking-wide block mb-1.5">Live Message Box</span>
-                              <div className="p-2 bg-[#E1FFC7] rounded-lg shadow-xs border border-slate-200/30 max-w-[85%] ml-auto text-right">
+                            <div className="bg-white rounded-lg shadow-xs p-3 border border-slate-200/50">
+                              <span className="text-[8px] font-black text-slate-400 tracking-wide block mb-1.5">
+                                {isRtl ? 'معاينة الرسائل الواردة' : 'Live Message Box'}
+                              </span>
+                              <div className={cn("p-2 bg-[#E1FFC7] rounded-lg shadow-xs border border-slate-200/30 max-w-[85%]", isRtl ? "mr-auto text-right" : "ml-auto text-right")}>
                                 <p className="text-[11px] text-slate-800 leading-tight">
-                                  Hello! How can we assist you today?
+                                  {isRtl ? 'مرحباً بك! كيف يمكننا مساعدتك اليوم؟' : 'Hello! How can we assist you today?'}
                                 </p>
                                 <span className="text-[8px] text-slate-400 block mt-0.5">10:14 AM ✓✓</span>
                               </div>
@@ -1046,8 +1099,12 @@ export default function WhatsAppSettingsPage() {
                           <Bot size={16} />
                         </div>
                         <div>
-                          <h2 className="text-sm font-bold text-[#12263A] uppercase tracking-wide">AI Auto-Reply Configuration</h2>
-                          <p className="text-xs text-[#64748B]">Configure your DeepSeek model to reply automatically to incoming messages</p>
+                          <h2 className="text-sm font-bold text-[#12263A] uppercase tracking-wide">
+                            {isRtl ? 'إعدادات الرد الآلي بالذكاء الاصطناعي' : 'AI Auto-Reply Configuration'}
+                          </h2>
+                          <p className="text-xs text-[#64748B]">
+                            {isRtl ? 'تكوين نموذج DeepSeek الذكي للرد التلقائي على رسائل العملاء' : 'Configure your DeepSeek model to reply automatically to incoming messages'}
+                          </p>
                         </div>
                       </div>
 
@@ -1059,16 +1116,22 @@ export default function WhatsAppSettingsPage() {
                           </div>
                           <div className="space-y-0.5">
                             <div className="flex items-center gap-2">
-                              <h4 className="text-xs font-bold text-[#166534] uppercase tracking-wider">Universal Platform DeepSeek Active</h4>
-                              <span className="px-2 py-0.5 bg-[#dcfce7] text-[#14532d] text-[10px] font-extrabold rounded-full">Managed For All Vendors</span>
+                              <h4 className="text-xs font-bold text-[#166534] uppercase tracking-wider">
+                                {isRtl ? 'محرك DeepSeek مفعل سحابياً لجميع الحسابات' : 'Universal Platform DeepSeek Active'}
+                              </h4>
+                              <span className="px-2 py-0.5 bg-[#dcfce7] text-[#14532d] text-[10px] font-extrabold rounded-full">
+                                {isRtl ? 'مُدار مركزياً' : 'Managed For All Vendors'}
+                              </span>
                             </div>
                             <p className="text-xs text-[#166534] leading-relaxed font-medium">
-                              DeepSeek AI is pre-configured and provided centrally by the platform. You do not need to purchase, add, or manage an API key. Simply provide your company knowledge and FAQs below!
+                              {isRtl 
+                                ? 'الذكاء الاصطناعي DeepSeek مهيأ سلفاً ومقدم من المنصة. لا تحتاج لشراء أو إدخال مفتاح API. فقط اكتب معلومات نشاطك التجاري والأسئلة الشائعة بالأسفل!' 
+                                : 'DeepSeek AI is pre-configured and provided centrally by the platform. You do not need to purchase, add, or manage an API key. Simply provide your company knowledge and FAQs below!'}
                             </p>
                           </div>
                         </div>
 
-                        {/* Customer-Facing Reply Language Selection (Independent from Dashboard UI) */}
+                        {/* Customer-Facing Reply Language Selection */}
                         <div className="p-4 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs space-y-3">
                           <div className="flex items-center justify-between gap-3 flex-wrap">
                             <div className="flex items-center gap-2.5">
@@ -1077,20 +1140,20 @@ export default function WhatsAppSettingsPage() {
                               </div>
                               <div>
                                 <h4 className="text-xs font-bold text-[#12263A] uppercase tracking-wider">
-                                  {t('app.dashboard.autoReplyLanguage', 'Customer Auto-Reply Language')}
+                                  {isRtl ? 'لغة الرد الآلي على العملاء' : t('app.dashboard.autoReplyLanguage', 'Customer Auto-Reply Language')}
                                 </h4>
                                 <p className="text-[11px] text-[#64748B]">
-                                  {t('app.dashboard.autoReplyLanguageDesc', 'Independent from your dashboard language. Arabic is the default for new configurations.')}
+                                  {isRtl ? 'مستقلة عن لغة لوحة التحكم. العربية هي الخيار الافتراضي للتكوينات الجديدة.' : t('app.dashboard.autoReplyLanguageDesc', 'Independent from your dashboard language. Arabic is the default for new configurations.')}
                                 </p>
                               </div>
                             </div>
                             <span className="px-2.5 py-1 bg-amber-50 text-amber-800 text-[10px] font-bold rounded-full border border-amber-200">
-                              {t('app.dashboard.independentFromUi', 'Independent of UI Locale')}
+                              {isRtl ? 'مستقل عن لغة الواجهة' : t('app.dashboard.independentFromUi', 'Independent of UI Locale')}
                             </span>
                           </div>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                            {/* Arabic Option (Default for new configs) */}
+                            {/* Arabic Option */}
                             <button
                               type="button"
                               onClick={() => setReplyLanguage('ar-SA')}
@@ -1101,15 +1164,15 @@ export default function WhatsAppSettingsPage() {
                               }`}
                             >
                               <div className="text-xl">🇸🇦</div>
-                              <div className="flex-1 min-w-0">
+                              <div className={cn("flex-1 min-w-0", isRtl && "text-right")}>
                                 <div className="flex items-center justify-between gap-1">
                                   <span className="text-xs font-bold text-[#12263A]">العربية (Saudi Arabic)</span>
                                   <span className="px-1.5 py-0.5 bg-[#dcfce7] text-[#14532d] text-[9px] font-extrabold rounded">
-                                    {t('app.dashboard.defaultTag', 'Default')}
+                                    {isRtl ? 'افتراضي' : 'Default'}
                                   </span>
                                 </div>
                                 <p className="text-[11px] text-[#64748B] mt-0.5">
-                                  {t('app.dashboard.arabicReplyDesc', 'Replies to customers in natural, polite Saudi Arabic.')}
+                                  {isRtl ? 'الرد على العملاء بلغة عربية سلسة ومهذبة.' : 'Replies to customers in natural, polite Saudi Arabic.'}
                                 </p>
                               </div>
                               {replyLanguage === 'ar-SA' && (
@@ -1128,12 +1191,12 @@ export default function WhatsAppSettingsPage() {
                               }`}
                             >
                               <div className="text-xl">🇺🇸</div>
-                              <div className="flex-1 min-w-0">
+                              <div className={cn("flex-1 min-w-0", isRtl && "text-right")}>
                                 <div className="flex items-center justify-between gap-1">
                                   <span className="text-xs font-bold text-[#12263A]">English (United States)</span>
                                 </div>
                                 <p className="text-[11px] text-[#64748B] mt-0.5">
-                                  {t('app.dashboard.englishReplyDesc', 'Replies to customers in professional, helpful English.')}
+                                  {isRtl ? 'الرد على العملاء بلغة إنجليزية احترافية ومفيدة.' : 'Replies to customers in professional, helpful English.'}
                                 </p>
                               </div>
                               {replyLanguage === 'en' && (
@@ -1145,15 +1208,19 @@ export default function WhatsAppSettingsPage() {
 
                         <div className="space-y-4">
                           <div>
-                            <FieldLabel required>Company Idea / Context (AI Knowledge Base)</FieldLabel>
+                            <FieldLabel required>
+                              {isRtl ? 'سياق ومعلومات الشركة (قاعدة معرفة الذكاء الاصطناعي)' : 'Company Idea / Context (AI Knowledge Base)'}
+                            </FieldLabel>
                             <textarea
                               rows={8}
                               value={companyPrompt}
                               onChange={e => setCompanyPrompt(e.target.value)}
-                              placeholder="Describe your company, products, services, FAQs, and any rules or tone the AI should follow when replying to customers. Be detailed!"
+                              placeholder={isRtl ? "اكتب تفاصيل نشاطك التجاري، المنتجات، الأسعار، الأسئلة الشائعة، وقواعد الرد التي يجب أن يلتزم بها الذكاء الاصطناعي..." : "Describe your company, products, services, FAQs, and any rules or tone the AI should follow when replying to customers. Be detailed!"}
                               className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4 text-sm text-[#12263A] focus:outline-none focus:ring-4 focus:ring-[#22C55E]/10 focus:border-[#166534] focus:bg-white transition-all placeholder:text-[#64748B]/60"
                             />
-                            <p className="text-[10px] text-[#64748B] mt-1">Provide all details the AI needs to answer customer questions about pricing, features, support, hours, etc.</p>
+                            <p className="text-[10px] text-[#64748B] mt-1">
+                              {isRtl ? 'وفّر كل التفاصيل التي يحتاجها الذكاء الاصطناعي للإجابة على استفسارات الأسعار والمواعيد والدعم الفني.' : 'Provide all details the AI needs to answer customer questions about pricing, features, support, hours, etc.'}
+                            </p>
                           </div>
                         </div>
 
@@ -1165,13 +1232,11 @@ export default function WhatsAppSettingsPage() {
                           >
                             {isSavingAi ? (
                               <>
-                                <Loader2 size={13} className="animate-spin" />
-                                Saving AI Settings...
+                                <Loader2 size={13} className="animate-spin" /> {isRtl ? 'جارٍ الحفظ...' : 'Saving AI Settings...'}
                               </>
                             ) : (
                               <>
-                                <Check size={13} />
-                                Save AI Settings
+                                <Check size={13} /> {isRtl ? 'حفظ إعدادات الذكاء الاصطناعي' : 'Save AI Settings'}
                               </>
                             )}
                           </button>
@@ -1188,16 +1253,22 @@ export default function WhatsAppSettingsPage() {
                           <Zap size={18} />
                         </div>
                         <div>
-                          <h3 className="text-sm font-bold text-[#12263A]">Smart AI Responses</h3>
-                          <p className="text-xs text-[#64748B]">Automated customer messaging</p>
+                          <h3 className="text-sm font-bold text-[#12263A]">
+                            {isRtl ? 'ردود ذكية وفورية' : 'Smart AI Responses'}
+                          </h3>
+                          <p className="text-xs text-[#64748B]">
+                            {isRtl ? 'مراسلة عملاء آلية' : 'Automated customer messaging'}
+                          </p>
                         </div>
                       </div>
                       <p className="text-xs text-[#64748B] leading-relaxed">
-                        When active, customers messaging your WhatsApp number receive conversational, intelligent replies matching your knowledge base rules.
+                        {isRtl 
+                          ? 'عند تفعيلها، سيتلقى العملاء الذين يراسلون رقمك ردوداً تفاعلية وذكية مطابقة لمعلومات شركتك.' 
+                          : 'When active, customers messaging your WhatsApp number receive conversational, intelligent replies matching your knowledge base rules.'}
                       </p>
                       <div className="p-3.5 bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl text-xs text-[#1D4ED8] space-y-1">
-                        <p className="font-bold">✨ Instant Response</p>
-                        <p>Works 24/7 without manual staff intervention.</p>
+                        <p className="font-bold">{isRtl ? '✨ استجابة فورية' : '✨ Instant Response'}</p>
+                        <p>{isRtl ? 'تعمل على مدار 24/7 دون الحاجة لتدخل الموظفين.' : 'Works 24/7 without manual staff intervention.'}</p>
                       </div>
                     </div>
                   </div>
@@ -1221,8 +1292,12 @@ export default function WhatsAppSettingsPage() {
                           <Send size={16} />
                         </div>
                         <div>
-                          <h2 className="text-sm font-bold text-[#12263A] uppercase tracking-wide">Test Sandbox Console</h2>
-                          <p className="text-xs text-[#64748B]">Trigger test messages to verify API connection logs</p>
+                          <h2 className="text-sm font-bold text-[#12263A] uppercase tracking-wide">
+                            {isRtl ? 'منصة اختبار الرسائل (Sandbox)' : 'Test Sandbox Console'}
+                          </h2>
+                          <p className="text-xs text-[#64748B]">
+                            {isRtl ? 'إرسال رسائل تجريبية للتحقق من سلامة سجلات الاتصال بالواجهة' : 'Trigger test messages to verify API connection logs'}
+                          </p>
                         </div>
                       </div>
 
@@ -1231,32 +1306,38 @@ export default function WhatsAppSettingsPage() {
                           <div className="flex items-center gap-2.5 p-4 bg-[#FFFBEB] border border-amber-200 rounded-xl">
                             <AlertTriangle size={15} className="text-[#B45309] shrink-0" />
                             <p className="text-xs text-[#B45309] font-medium">
-                              Please connect your API credentials first to enable test sandbox messages.
+                              {isRtl ? 'يرجى ربط بيانات الواجهة أولاً لتفعيل رسائل الاختبار.' : 'Please connect your API credentials first to enable test sandbox messages.'}
                             </p>
                           </div>
                         )}
 
                         <div className="space-y-4">
                           <div>
-                            <FieldLabel required>Test Recipient Phone Number</FieldLabel>
-                            <div className="relative group">
+                            <FieldLabel required>
+                              {isRtl ? 'رقم هاتف المستلم التجريبي' : 'Test Recipient Phone Number'}
+                            </FieldLabel>
+                            <div className="relative group" dir="ltr">
                               <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B] group-focus-within:text-[#166534] transition-colors" size={15} />
                               <input
                                 id="test-phone-number"
                                 value={testPhone}
                                 onChange={e => setTestPhone(e.target.value)}
-                                placeholder="e.g. +923001234567"
+                                placeholder="e.g. +966501234567"
                                 disabled={!isConnected}
-                                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl py-3 pl-10 pr-3 text-sm text-[#12263A] focus:outline-none focus:ring-4 focus:ring-[#166534]/10 focus:border-[#166534] focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-all placeholder:text-[#64748B]/60"
+                                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl py-3 pl-10 pr-3 text-sm text-[#12263A] focus:outline-none focus:ring-4 focus:ring-[#166534]/10 focus:border-[#166534] focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-all placeholder:text-[#64748B]/60 font-mono text-left"
                               />
                             </div>
-                            <p className="text-[10px] text-[#64748B] mt-1 ml-1">Use international format starting with country code</p>
+                            <p className="text-[10px] text-[#64748B] mt-1">
+                              {isRtl ? 'استخدم الصيغة الدولية مسبوقة برمز الدولة (مثال: 966+)' : 'Use international format starting with country code'}
+                            </p>
                           </div>
 
                           {/* Mock log display terminal */}
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#64748B]">Sandbox Dispatch Logs</label>
-                            <div className="bg-[#12263A] rounded-xl p-4 font-mono text-xs text-slate-200 space-y-2 border border-[#12263A] shadow-inner">
+                            <label className="text-xs font-bold text-[#64748B]">
+                              {isRtl ? 'سجلات نافذة الاختبار' : 'Sandbox Dispatch Logs'}
+                            </label>
+                            <div className="bg-[#12263A] rounded-xl p-4 font-mono text-xs text-slate-200 space-y-2 border border-[#12263A] shadow-inner text-left" dir="ltr">
                               <div className="flex items-center justify-between text-[9px] text-slate-400 border-b border-slate-700/60 pb-2 mb-2 font-sans font-bold uppercase tracking-wider">
                                 <span>API Console Terminal</span>
                                 <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-[#22C55E] animate-pulse' : 'bg-slate-500'}`} />
@@ -1270,7 +1351,7 @@ export default function WhatsAppSettingsPage() {
                                 </div>
                               ) : (
                                 <div className="space-y-1 text-slate-400">
-                                  <p className="text-slate-400">// Ready to trigger test dispatch.</p>
+                                  <p className="text-slate-400">{isRtl ? '// جاهز لإرسال الرسالة التجريبية.' : '// Ready to trigger test dispatch.'}</p>
                                   <p>&gt; Connection Status: {status.toUpperCase()}</p>
                                   {testPhone && <p className="text-emerald-400">&gt; Target Phone: {testPhone}</p>}
                                 </div>
@@ -1286,9 +1367,9 @@ export default function WhatsAppSettingsPage() {
                               className="w-full bg-[#166534] hover:bg-[#14532d] active:scale-[0.98] text-white font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                             >
                               {isTesting ? (
-                                <><Loader2 size={15} className="animate-spin" /> Sending Test Message…</>
+                                <><Loader2 size={15} className="animate-spin" /> {isRtl ? 'جارٍ إرسال الرسالة...' : 'Sending Test Message…'}</>
                               ) : (
-                                <><Send size={15} /> Dispatch Sandbox Message</>
+                                <><Send size={15} /> {isRtl ? 'إرسال رسالة تجريبية' : 'Dispatch Sandbox Message'}</>
                               )}
                             </button>
                           </div>
@@ -1307,15 +1388,19 @@ export default function WhatsAppSettingsPage() {
                             <Globe size={15} />
                           </div>
                           <div>
-                            <h2 className="text-sm font-bold text-[#12263A]">Webhook Config</h2>
-                            <p className="text-xs text-[#64748B]">Values to configure in Meta App dashboard</p>
+                            <h2 className="text-sm font-bold text-[#12263A]">
+                              {isRtl ? 'إعدادات الويب هوك (Webhook)' : 'Webhook Config'}
+                            </h2>
+                            <p className="text-xs text-[#64748B]">
+                              {isRtl ? 'القيم المطلوب نسخها في لوحة تحكم Meta App' : 'Values to configure in Meta App dashboard'}
+                            </p>
                           </div>
                         </div>
                         {isConnected && (
                           <div>
                             {isWabaSubscribed ? (
                               <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold bg-[#DCFCE7] text-[#15803D] rounded-full border border-[#86EFAC]">
-                                <CheckCircle2 size={11} /> Verified & Active
+                                <CheckCircle2 size={11} /> {isRtl ? 'مؤكد ونشط' : 'Verified & Active'}
                               </span>
                             ) : (
                               <button
@@ -1324,7 +1409,7 @@ export default function WhatsAppSettingsPage() {
                                 className="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold text-[#166534] bg-[#F0FDF4] hover:bg-[#DCFCE7] border border-[#22C55E]/40 rounded-lg transition-all cursor-pointer"
                               >
                                 {isSubscribingWaba ? <Loader2 size={11} className="animate-spin" /> : <Zap size={11} />}
-                                {isSubscribingWaba ? 'Verifying...' : 'Verify Subscription'}
+                                {isSubscribingWaba ? (isRtl ? 'جارٍ التحقق...' : 'Verifying...') : (isRtl ? 'التحقق من الاشتراك' : 'Verify Subscription')}
                               </button>
                             )}
                           </div>
@@ -1332,16 +1417,19 @@ export default function WhatsAppSettingsPage() {
                       </div>
 
                       <div className="p-6 space-y-4">
-                        <CopyField label="Callback URL" value={WEBHOOK_URL}  fieldKey="webhookUrl"  copied={copied} onCopy={copy} />
-                        <CopyField label="Verify Token" value={VERIFY_TOKEN} fieldKey="verifyToken" copied={copied} onCopy={copy} />
+                        <CopyField label={isRtl ? "رابط رد النداء (Callback URL)" : "Callback URL"} value={WEBHOOK_URL}  fieldKey="webhookUrl"  copied={copied} onCopy={copy} isRtl={isRtl} />
+                        <CopyField label={isRtl ? "رمز التحقق (Verify Token)" : "Verify Token"} value={VERIFY_TOKEN} fieldKey="verifyToken" copied={copied} onCopy={copy} isRtl={isRtl} />
 
                         <div className="flex items-start gap-3 p-4 bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl">
                           <Info size={15} className="text-[#1D4ED8] shrink-0 mt-0.5" />
                           <div className="space-y-1">
-                            <p className="text-xs font-semibold text-[#1D4ED8]">How to configure webhooks</p>
+                            <p className="text-xs font-semibold text-[#1D4ED8]">
+                              {isRtl ? 'طريقة تكوين الويب هوك في Meta' : 'How to configure webhooks'}
+                            </p>
                             <p className="text-[11px] text-[#1D4ED8]/90 leading-relaxed">
-                              In your Meta app, go to <strong>WhatsApp › Configuration</strong>, click <strong>Edit</strong>, 
-                              paste the Callback URL and Verify Token above, then subscribe to <strong>messages</strong> events.
+                              {isRtl 
+                                ? <>في تطبيقك على Meta، انتقل إلى <strong>WhatsApp › Configuration</strong>، انقر فوق <strong>Edit</strong>، والصق رابط Callback URL ورمز Verify Token أعلاه، ثم اشترك في أحداث <strong>messages</strong>.</>
+                                : <>In your Meta app, go to <strong>WhatsApp › Configuration</strong>, click <strong>Edit</strong>, paste the Callback URL and Verify Token above, then subscribe to <strong>messages</strong> events.</>}
                             </p>
                             <a
                               href="https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks"
@@ -1349,7 +1437,7 @@ export default function WhatsAppSettingsPage() {
                               rel="noreferrer"
                               className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#1D4ED8] hover:underline mt-1"
                             >
-                              Meta Webhook Docs <ExternalLink size={10} />
+                              {isRtl ? 'دليل وثائق Meta للويب هوك' : 'Meta Webhook Docs'} <ExternalLink size={10} />
                             </a>
                           </div>
                         </div>
@@ -1360,16 +1448,20 @@ export default function WhatsAppSettingsPage() {
                     <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
                       <div className="flex items-center gap-3 px-5 py-4 border-b border-[#E2E8F0] bg-[#F8FAFC]">
                         <div className="w-8 h-8 bg-[#166534] text-white rounded-lg flex items-center justify-center shadow-xs">
-                          <ArrowRight size={15} />
+                          {isRtl ? <ArrowLeft size={15} /> : <ArrowRight size={15} />}
                         </div>
                         <div>
-                          <h2 className="text-sm font-bold text-[#12263A]">Quick Setup Checklist</h2>
-                          <p className="text-xs text-[#64748B]">Steps to complete integration</p>
+                          <h2 className="text-sm font-bold text-[#12263A]">
+                            {isRtl ? 'دليل خطوات الإعداد' : 'Quick Setup Checklist'}
+                          </h2>
+                          <p className="text-xs text-[#64748B]">
+                            {isRtl ? 'خطوات إكمال التكامل مع Meta' : 'Steps to complete integration'}
+                          </p>
                         </div>
                       </div>
 
                       <div className="p-5 space-y-4">
-                        {STEPS.map((step, idx) => (
+                        {steps.map((step, idx) => (
                           <div key={step.num} className="flex items-start gap-3">
                             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
                               isConnected && idx < 3
@@ -1393,7 +1485,8 @@ export default function WhatsAppSettingsPage() {
                           rel="noreferrer"
                           className="inline-flex items-center justify-center w-full h-10 px-4 rounded-xl font-semibold text-xs text-[#12263A] bg-white hover:bg-[#F8FAFC] border border-[#E2E8F0] shadow-xs transition-colors"
                         >
-                          <LinkIcon size={12} className="mr-1" /> Open Meta Portal
+                          <LinkIcon size={12} className={cn(isRtl ? "ml-1" : "mr-1")} /> 
+                          {isRtl ? 'فتح بوابة مطوري Meta' : 'Open Meta Portal'}
                         </a>
                       </div>
                     </div>

@@ -8,16 +8,34 @@ import {
   X 
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
-
-const subMenuItems = [
-  { label: 'Overview', path: '/automation', icon: LayoutDashboard, desc: 'Insights and summary' },
-  { label: 'Workflows', path: '/automation/workflows', icon: GitFork, desc: 'Automation pipelines' },
-  { label: 'Executions', path: '/automation/executions', icon: History, desc: 'Workflow execution records' },
-];
+import { useI18n } from '../../i18n';
+import { LanguageSwitcher } from '../../components/common/LanguageSwitcher';
 
 export default function AutomationLayout() {
   const location = useLocation();
+  const { isRtl } = useI18n();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const subMenuItems = [
+    { 
+      label: isRtl ? 'نظرة عامة' : 'Overview', 
+      path: '/automation', 
+      icon: LayoutDashboard, 
+      desc: isRtl ? 'الرؤى والملخص العام' : 'Insights and summary' 
+    },
+    { 
+      label: isRtl ? 'مسارات العمل' : 'Workflows', 
+      path: '/automation/workflows', 
+      icon: GitFork, 
+      desc: isRtl ? 'مسارات وأنابيب الأتمتة' : 'Automation pipelines' 
+    },
+    { 
+      label: isRtl ? 'سجلات التنفيذ' : 'Executions', 
+      path: '/automation/executions', 
+      icon: History, 
+      desc: isRtl ? 'سجلات تشغيل العمليات' : 'Workflow execution records' 
+    },
+  ];
 
   const activeItem = subMenuItems.find(item => {
     if (item.path === '/automation') {
@@ -27,7 +45,7 @@ export default function AutomationLayout() {
   }) || subMenuItems[0];
 
   return (
-    <div className="min-h-[calc(100vh-112px)] flex flex-col lg:flex-row bg-[#FFFFFF] rounded-2xl overflow-hidden border border-[#E2E8F0] shadow-sm relative select-none">
+    <div className={cn("min-h-[calc(100vh-112px)] flex flex-col lg:flex-row bg-[#FFFFFF] rounded-2xl overflow-hidden border border-[#E2E8F0] shadow-sm relative select-none font-sans", isRtl && "text-right")} dir={isRtl ? 'rtl' : 'ltr'}>
       
       {/* Mobile submenu header */}
       <div className="lg:hidden p-4 bg-white border-b border-[#E2E8F0] flex items-center justify-between z-20">
@@ -40,22 +58,30 @@ export default function AutomationLayout() {
             <p className="text-[10px] text-[#64748B] font-medium mt-0.5">{activeItem.desc}</p>
           </div>
         </div>
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 rounded-lg bg-[#F8FAFC] hover:bg-[#F1F5F9] text-[#12263A] transition-all cursor-pointer border border-[#E2E8F0]"
-          aria-label="Toggle menu"
-        >
-          {isMobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
-        </button>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher variant="dropdown" />
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 rounded-lg bg-[#F8FAFC] hover:bg-[#F1F5F9] text-[#12263A] transition-all cursor-pointer border border-[#E2E8F0]"
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
+          </button>
+        </div>
       </div>
 
       {/* Sidebar navigation */}
       <div className={cn(
-        "lg:block w-full lg:w-[260px] shrink-0 bg-[#FFFFFF] lg:border-r border-[#E2E8F0] flex-col transition-all duration-300 lg:translate-x-0 absolute lg:relative inset-y-0 left-0 z-30 lg:z-10",
-        isMobileMenuOpen ? "translate-x-0 flex" : "-translate-x-full lg:flex hidden"
+        "lg:block w-full lg:w-[260px] shrink-0 bg-[#FFFFFF] flex-col transition-all duration-300 lg:translate-x-0 absolute lg:relative inset-y-0 z-30 lg:z-10",
+        isRtl ? "right-0 lg:border-l border-[#E2E8F0]" : "left-0 lg:border-r border-[#E2E8F0]",
+        isMobileMenuOpen 
+          ? "translate-x-0 flex" 
+          : (isRtl ? "translate-x-full lg:flex hidden" : "-translate-x-full lg:flex hidden")
       )}>
         <div className="lg:hidden p-5 border-b border-[#E2E8F0] flex items-center justify-between bg-white">
-          <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider">Automation Menu</span>
+          <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider">
+            {isRtl ? 'قائمة الأتمتة' : 'Automation Menu'}
+          </span>
           <button 
             onClick={() => setIsMobileMenuOpen(false)}
             className="text-[#64748B] hover:text-[#12263A]"
@@ -64,9 +90,15 @@ export default function AutomationLayout() {
           </button>
         </div>
 
-        <div className="hidden lg:block p-5 border-b border-[#E2E8F0] bg-white">
-          <h2 className="text-sm font-bold text-[#12263A] tracking-tight">Automation Panel</h2>
-          <p className="text-[11px] text-[#64748B] font-medium mt-0.5">Flow Controller</p>
+        <div className="hidden lg:flex p-5 border-b border-[#E2E8F0] bg-white items-center justify-between">
+          <div>
+            <h2 className="text-sm font-bold text-[#12263A] tracking-tight">
+              {isRtl ? 'لوحة الأتمتة والعمليات' : 'Automation Panel'}
+            </h2>
+            <p className="text-[11px] text-[#64748B] font-medium mt-0.5">
+              {isRtl ? 'التحكم في المسارات' : 'Flow Controller'}
+            </p>
+          </div>
         </div>
 
         <nav className="flex-1 p-3.5 space-y-1.5 overflow-y-auto custom-scrollbar bg-white">
@@ -96,6 +128,12 @@ export default function AutomationLayout() {
             );
           })}
         </nav>
+
+        {/* Desktop Language Switcher Footer in sidebar */}
+        <div className="hidden lg:flex p-3.5 border-t border-[#E2E8F0] bg-slate-50/50 justify-between items-center">
+          <span className="text-[11px] font-bold text-slate-500">{isRtl ? 'اللغة' : 'Language'}</span>
+          <LanguageSwitcher variant="dropdown" />
+        </div>
       </div>
 
       {/* Main Content Area */}

@@ -11,9 +11,12 @@ import { crmApi } from '../../services/crmApi';
 import CampaignCard from '../../components/campaigns/CampaignCard';
 import CampaignTable from '../../components/campaigns/CampaignTable';
 import { cn } from '../../lib/utils';
+import { useI18n } from '../../i18n';
+import { LanguageSwitcher } from '../../components/common/LanguageSwitcher';
 
 export default function CampaignsPage() {
   const navigate = useNavigate();
+  const { isRtl } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
   const urlQuery = searchParams.get('search') || '';
   
@@ -53,7 +56,7 @@ export default function CampaignsPage() {
   const mapApiCampaign = (c: any): Campaign => {
     return {
       id: String(c.id),
-      name: c.name || 'Untitled Campaign',
+      name: c.name || (isRtl ? 'حملة بدون عنوان' : 'Untitled Campaign'),
       type: (c.type === 'automation' || c.type === 'Automation' || c.type_label === 'Automation') ? 'Automation' : 'Broadcast',
       audienceSize: Number(c.total_contacts || c.audience_size || c.audienceSize || c.contacts_count || c.recipient_count || c.contacts?.length || 0),
       sent: Number(c.sent_count || c.sent || 0),
@@ -153,7 +156,7 @@ export default function CampaignsPage() {
       setCampaigns(loadedCampaigns);
     } catch (err: any) {
       console.error('[CampaignsPage] List load failed', err);
-      setApiError(err?.message || 'Failed to download real-time campaign configurations.');
+      setApiError(err?.message || (isRtl ? 'فشل تحميل إعدادات الحملات المباشرة.' : 'Failed to download real-time campaign configurations.'));
       setCampaigns([...mockCampaigns]);
     } finally {
       setIsLoading(false);
@@ -175,7 +178,10 @@ export default function CampaignsPage() {
   }, [debouncedSearch, typeFilter, statusFilter]);
 
   const handleDeleteCampaign = async (id: string | number) => {
-    if (!window.confirm('Are you absolutely sure you want to delete this campaign? This action is permanent.')) {
+    const confirmMsg = isRtl 
+      ? 'هل أنت متأكد تماماً من رغبتك في حذف هذه الحملة؟ هذا الإجراء نهائي ولا يمكن التراجع عنه.' 
+      : 'Are you absolutely sure you want to delete this campaign? This action is permanent.';
+    if (!window.confirm(confirmMsg)) {
       return;
     }
 
@@ -185,7 +191,10 @@ export default function CampaignsPage() {
       console.log(`[CampaignsPage] Tracing delete endpoint for id: ${id}`);
       await crmApi.deleteCampaign(id);
       
-      setFeedbackMsg({ type: 'success', message: 'Campaign was successfully deleted.' });
+      setFeedbackMsg({ 
+        type: 'success', 
+        message: isRtl ? 'تم حذف الحملة بنجاح.' : 'Campaign was successfully deleted.' 
+      });
       // Filter out deleted campaign locally
       setCampaigns(prev => prev.filter(c => c.id !== String(id)));
       
@@ -198,7 +207,7 @@ export default function CampaignsPage() {
       setCampaigns(prev => prev.filter(c => c.id !== String(id)));
       setFeedbackMsg({ 
         type: 'err', 
-        message: err?.message || 'Deleted successfully from UI representation.'
+        message: err?.message || (isRtl ? 'تم الحذف بنجاح من واجهة العرض.' : 'Deleted successfully from UI representation.')
       });
     } finally {
       setDeletingId(null);
@@ -226,15 +235,12 @@ export default function CampaignsPage() {
     let rawReach = null;
 
     if (target && typeof target === 'object') {
-      // Robust key-value resolution helper with falling backs
       const getVal = (paths: string[]): any => {
-        // 1. Direct key match
         for (const path of paths) {
           if (path in target && target[path] !== undefined && target[path] !== null) {
             return target[path];
           }
         }
-        // 2. Transformed camel / snake matches
         for (const path of paths) {
           const camel = path.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
           if (camel in target && target[camel] !== undefined && target[camel] !== null) {
@@ -245,7 +251,6 @@ export default function CampaignsPage() {
             return target[snake];
           }
         }
-        // 3. Substring case-insensitive match
         const keys = Object.keys(target);
         for (const key of keys) {
           const lowerKey = key.toLowerCase();
@@ -268,7 +273,7 @@ export default function CampaignsPage() {
 
     return [
       { 
-        label: 'Active Campaigns', 
+        label: isRtl ? 'الحملات النشطة' : 'Active Campaigns', 
         value: rawActive !== null && rawActive !== undefined ? String(rawActive) : '12', 
         change: '+2', 
         trend: 'up', 
@@ -276,7 +281,7 @@ export default function CampaignsPage() {
         color: 'indigo' 
       },
       { 
-        label: 'Total Messages', 
+        label: isRtl ? 'إجمالي الرسائل' : 'Total Messages', 
         value: rawMessages !== null && rawMessages !== undefined 
           ? (Number(rawMessages) >= 1000 ? `${(Number(rawMessages) / 1000).toFixed(1)}k` : String(rawMessages))
           : '8.4k', 
@@ -286,7 +291,7 @@ export default function CampaignsPage() {
         color: 'blue' 
       },
       { 
-        label: 'Reach Rate', 
+        label: isRtl ? 'معدل الوصول' : 'Reach Rate', 
         value: rawReach !== null && rawReach !== undefined ? `${rawReach}%` : '72%', 
         change: '-3%', 
         trend: 'down', 
@@ -294,46 +299,55 @@ export default function CampaignsPage() {
         color: 'emerald' 
       },
     ];
-  }, [dbStats]);
+  }, [dbStats, isRtl]);
 
   return (
-    <div className="space-y-12 min-h-screen pb-20">
+    <div className="space-y-12 min-h-screen pb-20" dir={isRtl ? 'rtl' : 'ltr'}>
       {/* Premium Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 relative">
-        <div className="absolute -top-20 -left-20 w-64 h-64 bg-[#166534]/5 blur-[100px] rounded-full pointer-events-none" />
+        <div className={`absolute -top-20 ${isRtl ? '-right-20' : '-left-20'} w-64 h-64 bg-[#166534]/5 blur-[100px] rounded-full pointer-events-none`} />
         
         <div className="relative z-10">
            <div className="flex items-center gap-3 mb-4">
               <div className="px-3 py-1 bg-[#F0FDF4] border border-[#bbf7d0] rounded-full">
                  <span className="text-[10px] font-black text-[#166534] uppercase tracking-widest flex items-center gap-1.5">
                     <Sparkles size={10} />
-                    Campaign Manager
+                    {isRtl ? 'مدير الحملات' : 'Campaign Manager'}
                  </span>
               </div>
               <button 
                 onClick={loadCampaignsAndStats}
                 disabled={isLoading}
                 className="w-8 h-8 border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-slate-500 hover:text-[#166534] rounded-lg shadow-xs transition-all disabled:opacity-40 flex items-center justify-center cursor-pointer active:scale-90"
-                title="Refresh List"
+                title={isRtl ? 'تحديث القائمة' : 'Refresh List'}
               >
                 <RefreshCw size={12} className={cn("stroke-[2.5px]", isLoading && "animate-spin")} />
               </button>
            </div>
-           <h1 className="text-5xl font-black text-slate-900 tracking-tighter leading-none mb-4">
-             Orchestrate <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#12263A] to-[#166534]">Impact.</span>
+           <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter leading-none mb-4">
+             {isRtl ? (
+               <>أطلق حملاتك <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#12263A] to-[#166534]">بأعلى تأثير.</span></>
+             ) : (
+               <>Orchestrate <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#12263A] to-[#166534]">Impact.</span></>
+             )}
            </h1>
-           <p className="text-slate-500 font-medium text-lg max-w-xl leading-relaxed">
-             Design, deploy, and analyze high-conversion WhatsApp campaigns with absolute precision.
+           <p className="text-slate-500 font-medium text-base md:text-lg max-w-xl leading-relaxed">
+             {isRtl 
+               ? 'صمم، وانشر، وحلل حملات واتساب التسويقية عالية التحويل بأعلى درجات الدقة والاحترافية.' 
+               : 'Design, deploy, and analyze high-conversion WhatsApp campaigns with absolute precision.'}
            </p>
         </div>
 
-        <button 
-          onClick={() => navigate('/campaigns/create')}
-          className="h-11 px-6 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white font-semibold text-sm transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 flex items-center gap-2 cursor-pointer relative z-10"
-        >
-          <Plus size={18} strokeWidth={2.5} />
-          Create New Campaign
-        </button>
+        <div className="flex items-center gap-3 relative z-10 flex-wrap">
+          <LanguageSwitcher variant="dropdown" />
+          <button 
+            onClick={() => navigate('/campaigns/create')}
+            className="h-11 px-6 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white font-semibold text-sm transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 flex items-center gap-2 cursor-pointer whitespace-nowrap"
+          >
+            <Plus size={18} strokeWidth={2.5} />
+            <span>{isRtl ? 'إنشاء حملة جديدة' : 'Create New Campaign'}</span>
+          </button>
+        </div>
       </div>
 
       <AnimatePresence mode="wait">
@@ -356,7 +370,9 @@ export default function CampaignsPage() {
             )}
             <div className="flex-1">
               <p className="text-xs font-black uppercase tracking-widest leading-none">
-                {feedbackMsg.type === 'success' ? 'Task Successful' : 'Action Notification'}
+                {feedbackMsg.type === 'success' 
+                  ? (isRtl ? 'تمت العملية بنجاح' : 'Task Successful') 
+                  : (isRtl ? 'تنبيه' : 'Action Notification')}
               </p>
               <p className="text-[11px] font-medium mt-1.5 opacity-90">{feedbackMsg.message}</p>
             </div>
@@ -375,7 +391,8 @@ export default function CampaignsPage() {
             className="premium-card p-8 group relative overflow-hidden"
           >
              <div className={cn(
-                "absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity duration-500",
+                "absolute top-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity duration-500",
+                isRtl ? "left-0" : "right-0",
                 stat.color === 'indigo' ? "text-[#166534]" : stat.color === 'blue' ? "text-blue-600" : "text-emerald-600"
              )}>
                 <stat.icon size={80} />
@@ -405,22 +422,26 @@ export default function CampaignsPage() {
                    ) : (
                      <h3 className="text-4xl font-black text-slate-900 tracking-tighter">{stat.value}</h3>
                    )}
-                   <span className="text-xs font-bold text-slate-400">vs last month</span>
+                   <span className="text-xs font-bold text-slate-400">
+                     {isRtl ? 'مقارنة بالشهر الماضي' : 'vs last month'}
+                   </span>
                 </div>
              </div>
           </motion.div>
         ))}
       </div>
 
-      {/* Futuristic Controls */}
+      {/* Controls */}
       <div className="glass-panel p-6 flex flex-col lg:flex-row gap-6 sticky top-20 z-30">
         <div className="relative group flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand transition-colors" size={18} />
+          <Search className={`absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#166534] transition-colors ${isRtl ? 'right-4' : 'left-4'}`} size={18} />
           <input 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search campaign intelligence..."
-            className="w-full bg-white/50 border border-slate-200 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-brand/5 focus:border-brand transition-all placeholder:text-slate-300"
+            placeholder={isRtl ? 'البحث في بيانات الحملات...' : 'Search campaign intelligence...'}
+            className={`w-full bg-white/50 border border-slate-200 rounded-2xl py-4 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#166534]/5 focus:border-[#166534] transition-all placeholder:text-slate-300 ${
+              isRtl ? 'pr-12 pl-4' : 'pl-12 pr-4'
+            }`}
           />
         </div>
 
@@ -431,11 +452,12 @@ export default function CampaignsPage() {
                   key={mode}
                   onClick={() => setViewMode(mode)}
                   className={cn(
-                    "w-11 h-11 rounded-xl flex items-center justify-center transition-all",
+                    "w-11 h-11 rounded-xl flex items-center justify-center transition-all cursor-pointer",
                     viewMode === mode 
                       ? "bg-white text-slate-900 shadow-sm border border-slate-200" 
                       : "text-slate-400 hover:text-slate-900"
                   )}
+                  title={mode === 'grid' ? (isRtl ? 'عرض شبكي' : 'Grid View') : (isRtl ? 'عرض جدول' : 'Table View')}
                 >
                   {mode === 'grid' ? <LayoutGrid size={18} /> : <List size={18} />}
                 </button>
@@ -449,28 +471,32 @@ export default function CampaignsPage() {
                 <select 
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="appearance-none bg-white border border-slate-200 rounded-2xl px-6 py-4 pr-12 text-[10px] font-black uppercase tracking-widest text-slate-900 hover:border-brand hover:shadow-md transition-all cursor-pointer focus:outline-none ring-offset-2"
+                  className={`appearance-none bg-white border border-slate-200 rounded-2xl py-4 text-[10px] font-black uppercase tracking-widest text-slate-900 hover:border-[#166534] hover:shadow-md transition-all cursor-pointer focus:outline-none ring-offset-2 ${
+                    isRtl ? 'pr-6 pl-12' : 'pl-6 pr-12'
+                  }`}
                 >
-                  <option value="all">Life-cycle: All</option>
-                  <option value="draft">Drafts</option>
-                  <option value="scheduled">Scheduled</option>
-                  <option value="running">Active</option>
-                  <option value="completed">Finished</option>
+                  <option value="all">{isRtl ? 'الحالة: الكل' : 'Life-cycle: All'}</option>
+                  <option value="draft">{isRtl ? 'مسودة' : 'Drafts'}</option>
+                  <option value="scheduled">{isRtl ? 'مجدولة' : 'Scheduled'}</option>
+                  <option value="running">{isRtl ? 'نشطة' : 'Active'}</option>
+                  <option value="completed">{isRtl ? 'مكتملة' : 'Finished'}</option>
                 </select>
-                <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <ChevronDown size={14} className={`absolute top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none ${isRtl ? 'left-4' : 'right-4'}`} />
               </div>
 
               <div className="relative">
                 <select 
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value)}
-                  className="appearance-none bg-white border border-slate-200 rounded-2xl px-6 py-4 pr-12 text-[10px] font-black uppercase tracking-widest text-slate-900 hover:border-brand hover:shadow-md transition-all cursor-pointer focus:outline-none"
+                  className={`appearance-none bg-white border border-slate-200 rounded-2xl py-4 text-[10px] font-black uppercase tracking-widest text-slate-900 hover:border-[#166534] hover:shadow-md transition-all cursor-pointer focus:outline-none ${
+                    isRtl ? 'pr-6 pl-12' : 'pl-6 pr-12'
+                  }`}
                 >
-                  <option value="all">Module: All</option>
-                  <option value="broadcast">Direct Message</option>
-                  <option value="automation">Auto-Flow</option>
+                  <option value="all">{isRtl ? 'النوع: الكل' : 'Module: All'}</option>
+                  <option value="broadcast">{isRtl ? 'بث مباشر' : 'Direct Message'}</option>
+                  <option value="automation">{isRtl ? 'تدفق آلي' : 'Auto-Flow'}</option>
                 </select>
-                <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <ChevronDown size={14} className={`absolute top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none ${isRtl ? 'left-4' : 'right-4'}`} />
               </div>
            </div>
         </div>
@@ -481,7 +507,9 @@ export default function CampaignsPage() {
         {isLoading ? (
           <div className="py-24 flex flex-col items-center justify-center gap-4">
              <Loader2 size={36} className="animate-spin text-[#166534] stroke-[2.5px]" />
-             <p className="text-xs font-black uppercase tracking-widest text-slate-400">Downloading Target Stream Configurations...</p>
+             <p className="text-xs font-black uppercase tracking-widest text-slate-400">
+               {isRtl ? 'جارٍ تحميل بيانات وتدفقات الحملات...' : 'Downloading Target Stream Configurations...'}
+             </p>
           </div>
         ) : filteredCampaigns.length > 0 ? (
           viewMode === 'grid' ? (
@@ -528,17 +556,21 @@ export default function CampaignsPage() {
             className="py-32 flex flex-col items-center text-center glass-panel max-w-2xl mx-auto"
           >
              <div className="w-24 h-24 rounded-3xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-300 mb-8 shadow-inner animate-float">
-                <Send size={40} />
+                <Send size={40} className={isRtl ? 'rotate-180' : ''} />
              </div>
-             <h3 className="text-2xl font-black text-slate-900 tracking-tight">Zero Intelligence Detected</h3>
+             <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+               {isRtl ? 'لا توجد حملات تطابق المعايير' : 'Zero Intelligence Detected'}
+             </h3>
              <p className="text-slate-500 mt-4 font-medium max-w-[360px] text-sm leading-relaxed">
-                We couldn't find any campaigns matching your criteria. Start fresh by launching a new outreach.
+               {isRtl 
+                 ? 'لم نتمكن من العثور على أي حملات مطابقة لبحثك أو الفلاتر المحددة. ابدأ الآن بإطلاق حملة تواصل جديدة.' 
+                 : 'We couldn\'t find any campaigns matching your criteria. Start fresh by launching a new outreach.'}
              </p>
              <button 
                onClick={() => navigate('/campaigns/create')}
-               className="btn-premium-primary mt-10 px-10"
+               className="btn-premium-primary mt-10 px-10 cursor-pointer"
              >
-                Initialize Campaign
+                {isRtl ? 'إطلاق حملة الآن' : 'Initialize Campaign'}
              </button>
           </motion.div>
         )}

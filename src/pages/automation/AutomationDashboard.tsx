@@ -6,11 +6,13 @@ import {
   Activity,
   Workflow,
   ChevronRight,
+  ChevronLeft,
   History
 } from 'lucide-react';
 import { crmApi } from '../../services/crmApi';
 import { cn } from '../../lib/utils';
 import { motion } from 'motion/react';
+import { useI18n } from '../../i18n';
 
 interface Stats {
   totalWorkflows: number;
@@ -29,6 +31,7 @@ interface Execution {
 }
 
 export default function AutomationDashboard() {
+  const { isRtl } = useI18n();
   const [stats, setStats] = useState<Stats>({
     totalWorkflows: 0,
     activeWorkflows: 0,
@@ -55,27 +58,63 @@ export default function AutomationDashboard() {
     loadData();
   }, []);
 
+  const getStatusLabel = (status: string) => {
+    const s = (status || '').toLowerCase();
+    if (isRtl) {
+      if (s === 'completed' || s === 'success') return 'مكتمل بنجاح';
+      if (s === 'failed' || s === 'error') return 'فشل';
+      if (s === 'running') return 'قيد التشغيل';
+      return status;
+    }
+    return status;
+  };
+
   return (
-    <div className="space-y-6 bg-[#FFFFFF]">
+    <div className={cn("space-y-6 bg-[#FFFFFF] font-sans", isRtl && "text-right")} dir={isRtl ? 'rtl' : 'ltr'}>
       
       {/* Title Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#E2E8F0]">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#12263A]">Automation Overview</h1>
-          <p className="text-xs sm:text-sm text-[#64748B] mt-1 font-medium">Metrics and recent orchestration runs.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[#12263A]">
+            {isRtl ? 'نظرة عامة على الأتمتة' : 'Automation Overview'}
+          </h1>
+          <p className="text-xs sm:text-sm text-[#64748B] mt-1 font-medium">
+            {isRtl ? 'مؤشرات الأداء وسجلات التشغيل الأخيرة لمسارات العمل.' : 'Metrics and recent orchestration runs.'}
+          </p>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 bg-[#F0FDF4] border border-[#22C55E]/30 rounded-xl text-[#166534] text-xs font-bold uppercase tracking-wider">
-          <Activity size={13} className="animate-pulse" /> Live monitor
+          <Activity size={13} className="animate-pulse" /> 
+          {isRtl ? 'مراقبة حية ونشطة' : 'Live monitor'}
         </div>
       </div>
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Workflows', value: stats.totalWorkflows, icon: Workflow, color: 'text-[#166534] bg-[#F0FDF4] border-[#22C55E]/30' },
-          { label: 'Active Workflows', value: stats.activeWorkflows, icon: PlayCircle, color: 'text-[#15803D] bg-[#F0FDF4] border-[#22C55E]/30' },
-          { label: 'Messages Sent Today', value: stats.messagesSentToday, icon: Send, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-          { label: 'Total Executions', value: stats.totalExecutions, icon: CheckCircle2, color: 'text-violet-600 bg-violet-50 border-violet-200' },
+          { 
+            label: isRtl ? 'إجمالي مسارات العمل' : 'Total Workflows', 
+            value: stats.totalWorkflows, 
+            icon: Workflow, 
+            color: 'text-[#166534] bg-[#F0FDF4] border-[#22C55E]/30' 
+          },
+          { 
+            label: isRtl ? 'المسارات النشطة' : 'Active Workflows', 
+            value: stats.activeWorkflows, 
+            icon: PlayCircle, 
+            color: 'text-[#15803D] bg-[#F0FDF4] border-[#22C55E]/30' 
+          },
+          { 
+            label: isRtl ? 'الرسائل المرسلة اليوم' : 'Messages Sent Today', 
+            value: stats.messagesSentToday, 
+            icon: Send, 
+            color: 'text-blue-600 bg-blue-50 border-blue-200' 
+          },
+          { 
+            label: isRtl ? 'إجمالي عمليات التنفيذ' : 'Total Executions', 
+            value: stats.totalExecutions, 
+            icon: CheckCircle2, 
+            color: 'text-violet-600 bg-violet-50 border-violet-200' 
+          },
         ].map((card, idx) => (
           <motion.div
             key={card.label}
@@ -101,24 +140,35 @@ export default function AutomationDashboard() {
       <div className="bg-[#FFFFFF] border border-[#E2E8F0] rounded-2xl p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
           <div>
-            <h3 className="text-sm font-bold text-[#12263A] uppercase tracking-wider">Recent Executions</h3>
-            <p className="text-xs text-[#64748B] mt-0.5">Chronological list of workflow executions</p>
+            <h3 className="text-sm font-bold text-[#12263A] uppercase tracking-wider">
+              {isRtl ? 'أحدث عمليات التنفيذ' : 'Recent Executions'}
+            </h3>
+            <p className="text-xs text-[#64748B] mt-0.5">
+              {isRtl ? 'قائمة زمنية بتشغيل مسارات العمل الآلية' : 'Chronological list of workflow executions'}
+            </p>
           </div>
           <a href="/automation/executions" className="text-xs font-bold text-[#166534] uppercase hover:underline flex items-center gap-1">
-            View All Runs <ChevronRight size={13} />
+            {isRtl ? 'عرض كل السجلات' : 'View All Runs'} 
+            {isRtl ? <ChevronLeft size={13} /> : <ChevronRight size={13} />}
           </a>
         </div>
 
         <div className="space-y-2.5 max-h-[360px] overflow-y-auto custom-scrollbar pr-1">
           {isLoading ? (
-            <div className="text-center py-8 text-xs font-semibold text-[#64748B]">Loading recent runs...</div>
+            <div className="text-center py-8 text-xs font-semibold text-[#64748B]">
+              {isRtl ? 'جارٍ تحميل سجلات التشغيل...' : 'Loading recent runs...'}
+            </div>
           ) : executions.length === 0 ? (
             <div className="text-center py-12 px-4 space-y-2">
               <div className="w-10 h-10 bg-[#F0FDF4] border border-[#22C55E]/30 rounded-xl flex items-center justify-center text-[#166534] mx-auto">
                 <History size={20} />
               </div>
-              <p className="text-xs font-semibold text-[#12263A]">No executions recorded yet</p>
-              <p className="text-[11px] text-[#64748B]">Workflows will log their runs here once triggered.</p>
+              <p className="text-xs font-semibold text-[#12263A]">
+                {isRtl ? 'لم يتم تسجيل أي عمليات تشغيل بعد' : 'No executions recorded yet'}
+              </p>
+              <p className="text-[11px] text-[#64748B]">
+                {isRtl ? 'ستظهر هنا سجلات التشغيل بمجرد إطلاق مسارات العمل وتفعيلها.' : 'Workflows will log their runs here once triggered.'}
+              </p>
             </div>
           ) : (
             executions.map((log) => (
@@ -134,20 +184,20 @@ export default function AutomationDashboard() {
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-[#12263A] truncate">{log.workflow}</p>
                     <p className="text-[11px] text-[#64748B] mt-0.5 flex items-center gap-2">
-                      <span>Recipient: {log.contact}</span>
+                      <span>{isRtl ? 'المستلم:' : 'Recipient:'} {log.contact}</span>
                       <span>•</span>
                       <span className="font-mono text-[#166534] font-semibold">{log.id}</span>
                     </p>
                   </div>
                 </div>
-                <div className="text-right shrink-0">
+                <div className={cn("shrink-0", isRtl ? "text-left" : "text-right")}>
                   <span className={cn(
                     "px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md border block text-center leading-normal",
                     log.status === 'completed' || log.status === 'success' 
                       ? 'bg-[#F0FDF4] text-[#15803D] border-[#22C55E]/30' 
                       : 'bg-red-50 text-[#DC2626] border-red-200'
                   )}>
-                    {log.status}
+                    {getStatusLabel(log.status)}
                   </span>
                   <span className="text-[10px] text-[#64748B] mt-1 block font-mono">{log.time} ({log.duration})</span>
                 </div>

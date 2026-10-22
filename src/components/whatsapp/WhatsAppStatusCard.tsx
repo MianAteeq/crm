@@ -2,6 +2,7 @@ import { CheckCircle2, XCircle, AlertCircle, Clock, Phone, Building2, RefreshCw,
 import { motion } from 'motion/react';
 import { WhatsAppConnectionData } from '../../types';
 import { cn } from '../../lib/utils';
+import { useI18n } from '../../i18n';
 
 export function WhatsAppIcon({ className = 'w-5 h-5' }: { className?: string }) {
   return (
@@ -29,6 +30,7 @@ export function WhatsAppStatusCard({
   onConnect,
   onDisconnect
 }: WhatsAppStatusCardProps) {
+  const { isRtl } = useI18n();
   const isConnected = connectionData?.status === 'connected';
   const hasError = connectionData?.status === 'error' || connectionData?.status === 'expired';
   const isPending = connectionData?.status === 'pending';
@@ -37,7 +39,7 @@ export function WhatsAppStatusCard({
     if (isLoading) {
       return {
         icon: RefreshCw,
-        text: 'Checking connection...',
+        text: isRtl ? 'جارٍ فحص الاتصال...' : 'Checking connection...',
         color: 'text-[#1D4ED8]',
         bgColor: 'bg-[#EFF6FF]',
         borderColor: 'border-[#BFDBFE]',
@@ -47,7 +49,7 @@ export function WhatsAppStatusCard({
     if (isConnected) {
       return {
         icon: CheckCircle2,
-        text: 'Connected',
+        text: isRtl ? 'متصل بنجاح' : 'Connected',
         color: 'text-[#166534]',
         bgColor: 'bg-[#F0FDF4]',
         borderColor: 'border-[#25D366]/30',
@@ -57,7 +59,9 @@ export function WhatsAppStatusCard({
     if (hasError) {
       return {
         icon: XCircle,
-        text: connectionData?.status === 'expired' ? 'Token Expired' : 'Connection Error',
+        text: connectionData?.status === 'expired' 
+          ? (isRtl ? 'انتهت صلاحية الرمز' : 'Token Expired') 
+          : (isRtl ? 'خطأ في الاتصال' : 'Connection Error'),
         color: 'text-red-600',
         bgColor: 'bg-red-50',
         borderColor: 'border-red-200',
@@ -67,7 +71,7 @@ export function WhatsAppStatusCard({
     if (isPending) {
       return {
         icon: Clock,
-        text: 'Setup Pending',
+        text: isRtl ? 'قيد الإعداد' : 'Setup Pending',
         color: 'text-amber-600',
         bgColor: 'bg-amber-50',
         borderColor: 'border-amber-200',
@@ -76,7 +80,7 @@ export function WhatsAppStatusCard({
 
     return {
       icon: AlertCircle,
-      text: 'Not Connected',
+      text: isRtl ? 'غير متصل' : 'Not Connected',
       color: 'text-[#64748B]',
       bgColor: 'bg-[#F8FAFC]',
       borderColor: 'border-[#E2E8F0]',
@@ -90,7 +94,8 @@ export function WhatsAppStatusCard({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+      className={cn("bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden font-sans", isRtl && "text-right")}
+      dir={isRtl ? 'rtl' : 'ltr'}
     >
       <div className="p-6 lg:p-8">
         {/* Header */}
@@ -101,10 +106,10 @@ export function WhatsAppStatusCard({
             </div>
             <div>
               <h3 className="text-lg font-bold text-[#12263A]">
-                WhatsApp Business
+                {isRtl ? 'واتساب للأعمال' : 'WhatsApp Business'}
               </h3>
               <p className="text-xs sm:text-sm text-[#64748B]">
-                Cloud API Integration
+                {isRtl ? 'تكامل واجهة Meta Cloud API' : 'Cloud API Integration'}
               </p>
             </div>
           </div>
@@ -141,7 +146,7 @@ export function WhatsAppStatusCard({
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mb-1">
-                    Business Name
+                    {isRtl ? 'اسم النشاط التجاري' : 'Business Name'}
                   </p>
                   <p className="text-sm font-bold text-[#12263A] truncate">
                     {connectionData.businessName}
@@ -156,7 +161,7 @@ export function WhatsAppStatusCard({
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mb-1">
-                    Phone Number
+                    {isRtl ? 'رقم الهاتف المعتمد' : 'Phone Number'}
                   </p>
                   <p className="text-sm font-bold text-[#12263A] font-mono">
                     {connectionData.phoneNumber}
@@ -176,7 +181,9 @@ export function WhatsAppStatusCard({
                 )}>
                 </div>
                 <span className="text-xs font-medium text-[#64748B]">
-                  Webhook {connectionData.webhookConfigured ? 'Active' : 'Not Configured'}
+                  {isRtl 
+                    ? (connectionData.webhookConfigured ? 'الويب هوك (Webhook): نشط' : 'الويب هوك: غير مهيأ')
+                    : `Webhook ${connectionData.webhookConfigured ? 'Active' : 'Not Configured'}`}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -188,14 +195,16 @@ export function WhatsAppStatusCard({
                 )}>
                 </div>
                 <span className="text-xs font-medium text-[#64748B]">
-                  Number {connectionData.numberVerified ? 'Verified' : 'Not Verified'}
+                  {isRtl 
+                    ? (connectionData.numberVerified ? 'الرقم: موثق ومعتمد' : 'الرقم: غير موثق')
+                    : `Number ${connectionData.numberVerified ? 'Verified' : 'Not Verified'}`}
                 </span>
               </div>
               {connectionData.lastSynced && (
-                <div className="flex items-center gap-1.5 ml-auto">
+                <div className={cn("flex items-center gap-1.5", isRtl ? "mr-auto" : "ml-auto")}>
                   <Clock className="w-3.5 h-3.5 text-[#64748B]" />
                   <span className="text-xs text-[#64748B]">
-                    Last synced: {new Date(connectionData.lastSynced).toLocaleDateString()}
+                    {isRtl ? 'آخر مزامنة: ' : 'Last synced: '}{new Date(connectionData.lastSynced).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US')}
                   </span>
                 </div>
               )}
@@ -211,7 +220,7 @@ export function WhatsAppStatusCard({
             className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl"
           >
             <p className="text-sm text-red-700">
-              <span className="font-semibold">Error:</span> {connectionData.errorMessage}
+              <span className="font-semibold">{isRtl ? 'رسالة الخطأ:' : 'Error:'}</span> {connectionData.errorMessage}
             </p>
           </motion.div>
         )}
@@ -223,10 +232,12 @@ export function WhatsAppStatusCard({
               <WhatsAppIcon className="w-10 h-10" />
             </div>
             <h4 className="text-xl font-bold text-[#12263A] mb-2">
-              Connect your WhatsApp Business Account
+              {isRtl ? 'ربط حساب واتساب للأعمال' : 'Connect your WhatsApp Business Account'}
             </h4>
             <p className="text-sm text-[#64748B] max-w-md mx-auto leading-relaxed">
-              Authenticate via Meta Cloud API to start sending and receiving official WhatsApp messages and campaigns with your customers.
+              {isRtl 
+                ? 'قم بالمصادقة عبر واجهة Meta Cloud API لبدء إرسال واستقبال رسائل واتساب الرسمية وإطلاق الحملات التسويقية لعملائك.' 
+                : 'Authenticate via Meta Cloud API to start sending and receiving official WhatsApp messages and campaigns with your customers.'}
             </p>
           </div>
         )}
@@ -240,7 +251,7 @@ export function WhatsAppStatusCard({
               className="w-full h-12 px-6 rounded-xl font-semibold text-sm text-rose-600 hover:text-rose-700 bg-white hover:bg-rose-50 border border-rose-200 hover:border-rose-300 active:scale-[0.99] focus:outline-none focus:ring-4 focus:ring-rose-500/10 transition-all duration-200 shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Unplug className="w-4 h-4" />
-              Disconnect WhatsApp Account
+              {isRtl ? 'إلغاء ربط حساب واتساب' : 'Disconnect WhatsApp Account'}
             </button>
           ) : (
             <button
@@ -253,7 +264,11 @@ export function WhatsAppStatusCard({
               ) : (
                 <WhatsAppIcon className="w-5 h-5" />
               )}
-              <span>{hasError ? 'Reconnect WhatsApp' : 'Connect WhatsApp'}</span>
+              <span>
+                {hasError 
+                  ? (isRtl ? 'إعادة ربط واتساب' : 'Reconnect WhatsApp') 
+                  : (isRtl ? 'ربط حساب واتساب الآن' : 'Connect WhatsApp')}
+              </span>
             </button>
           )}
         </div>

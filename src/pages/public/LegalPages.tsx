@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import Navbar from '../../components/public/Navbar';
 import Footer from '../../components/public/Footer';
+import { useI18n } from '../../i18n';
+import { cn } from '../../lib/utils';
+import { ShieldCheck, FileText, Scale } from 'lucide-react';
 
 // Reusable scroll behavior helper
 function useScrollToTop() {
@@ -11,9 +14,16 @@ function useScrollToTop() {
 
 export function PrivacyPage() {
   useScrollToTop();
+  const { t, isRtl } = useI18n();
 
   return (
-    <div className="bg-white text-slate-900 min-h-screen selection:bg-indigo-500/20 selection:text-indigo-900 font-sans overflow-x-hidden">
+    <div 
+      className={cn(
+        "bg-white text-slate-900 min-h-screen selection:bg-[#166534]/20 selection:text-[#166534] font-sans overflow-x-hidden",
+        isRtl && "text-right"
+      )}
+      dir={isRtl ? 'rtl' : 'ltr'}
+    >
       <Navbar />
 
       <main>
@@ -26,80 +36,95 @@ export function PrivacyPage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.1),transparent_70%)] pointer-events-none z-0" />
 
           <div className="max-w-4xl mx-auto space-y-6 relative z-10">
-            <span className="text-[10px] font-black text-[#F0FDF4] uppercase tracking-[0.2em] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30">
-              Trust & Transparency
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-[#F0FDF4] uppercase tracking-[0.2em] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30">
+              <ShieldCheck size={11} className="text-[#22C55E]" />
+              {t('legal.privacy.eyebrow', 'Trust & Transparency')}
             </span>
-            <h1 className="font-display font-[800] text-4xl md:text-6xl tracking-tight text-white">
-              Privacy Policy
+            <h1 className="font-display font-[800] text-4xl md:text-6xl tracking-tight text-white leading-tight">
+              {t('legal.privacy.title', 'Privacy Policy')}
             </h1>
-            <p className="font-sans font-normal text-stone-300 text-sm md:text-base max-w-xl mx-auto leading-relaxed uppercase tracking-widest">
-              Last updated: June 30, 2026
+            <p className="font-sans font-normal text-stone-300 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed tracking-wider">
+              {t('legal.updated', 'Last updated: June 30, 2026')}
             </p>
           </div>
         </section>
 
         {/* Content Section */}
         <section className="py-20 px-6 max-w-4xl mx-auto">
-          <div className="space-y-12 text-left">
+          <div className="space-y-12">
             
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">1. Introduction</h2>
-              <p className="text-slate-500 text-sm leading-[1.8]">
-                We value your privacy and are committed to protecting your personal data. This Privacy Policy explains how our platform collects, uses, discloses, and safeguards your information when you use our WhatsApp CRM services, marketing tools, landing page builders, and CRM database connections. Please read this policy carefully.
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.privacy.introduction.heading', '1. Introduction')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9]">
+                {t('legal.privacy.introduction.body')}
               </p>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">2. Information We Collect</h2>
-              <p className="text-slate-500 text-sm leading-[1.8] mb-2">
-                We collect information that you directly provide to us, as well as metadata generated automatically when using our integrations. This includes:
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.privacy.collection.heading', '2. Information We Collect')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9] mb-2">
+                {t('legal.privacy.collection.introduction')}
               </p>
-              <ul className="list-disc pl-5 text-slate-500 text-sm space-y-2.5">
-                <li><strong>Account Data:</strong> Name, professional email address, company profile information, and secure password configurations.</li>
-                <li><strong>Integration Settings:</strong> Meta developer credentials, WhatsApp Business API endpoints, API keys, and configurations for incoming webhook integrations.</li>
-                <li><strong>Customer Database Syncs:</strong> Form inputs, phone number data logs, pipeline stage properties, and marketing campaigns content schedules.</li>
-                <li><strong>Usage Data:</strong> Technical logs, IP addresses, browser specifications, and timestamp metrics related to your interactions with our dashboards.</li>
+              <ul className={cn("list-disc text-slate-600 text-sm space-y-2.5", isRtl ? "pr-5 pl-0" : "pl-5 pr-0")}>
+                <li>{t('legal.privacy.collection.account_data')}</li>
+                <li>{t('legal.privacy.collection.integration_settings')}</li>
+                <li>{t('legal.privacy.collection.database_syncs')}</li>
+                <li>{t('legal.privacy.collection.usage_data')}</li>
               </ul>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">3. How We Use Your Information</h2>
-              <p className="text-slate-500 text-sm leading-[1.8] mb-2">
-                We utilize the collected datasets to operate, scale, and secure our communications network:
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.privacy.use.heading', '3. How We Use Your Information')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9] mb-2">
+                {t('legal.privacy.use.introduction')}
               </p>
-              <ul className="list-disc pl-5 text-slate-500 text-sm space-y-2.5">
-                <li>To dispatch, log, and render WhatsApp broadcasts and automated messaging responses.</li>
-                <li>To synchronize customer pipeline data securely between linked form integrations and lead databases.</li>
-                <li>To diagnose system logs, optimize backend storage, and prevent fraudulent messaging distributions.</li>
-                <li>To process billing transactions and provide real-time updates regarding usage limit metrics.</li>
+              <ul className={cn("list-disc text-slate-600 text-sm space-y-2.5", isRtl ? "pr-5 pl-0" : "pl-5 pr-0")}>
+                <li>{t('legal.privacy.use.messaging')}</li>
+                <li>{t('legal.privacy.use.sync')}</li>
+                <li>{t('legal.privacy.use.diagnostics')}</li>
+                <li>{t('legal.privacy.use.billing')}</li>
               </ul>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">4. Data Retention & Security</h2>
-              <p className="text-slate-500 text-sm leading-[1.8]">
-                All data payloads are stored using secure cloud data architectures and encrypted both in transit (using TLS 1.3 protocols) and at rest. We store database indexes only as long as your account tier remains active. You may export or securely delete your campaign conversation records directly from your administration dashboard settings at any time.
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.privacy.security.heading', '4. Data Retention & Security')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9]">
+                {t('legal.privacy.security.body')}
               </p>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">5. Third-Party Service Integrations</h2>
-              <p className="text-slate-500 text-sm leading-[1.8]">
-                Our platform relies on authorized integrations with WhatsApp Business APIs (Meta Platforms, Inc.), Google Cloud Services, and external payment processors. Data exchanged with these services is governed by their respective developer integration terms. We do not sell or trade user databases to external advertising aggregators.
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.privacy.third_parties.heading', '5. Third-Party Service Integrations')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9]">
+                {t('legal.privacy.third_parties.body')}
               </p>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">6. Changes to This Policy</h2>
-              <p className="text-slate-500 text-sm leading-[1.8]">
-                We reserve the right to revise this Privacy Policy periodically. Significant changes will be broadcasted to your registered workspace administrator email or displayed via service alerts. Continued utilization of our CRM tools indicates consent to updated guidelines.
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.privacy.changes.heading', '6. Changes to This Policy')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9]">
+                {t('legal.privacy.changes.body')}
               </p>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">7. Contact Information</h2>
-              <p className="text-slate-500 text-sm leading-[1.8]">
-                For questions regarding data processing policies, deletion requests, or integration security compliance details, please submit an inquiry to our support center at <a href="mailto:admin@throbtech.com" className="text-indigo-650 font-bold hover:underline">admin@throbtech.com</a>.
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.privacy.contact.heading', '7. Contact Information')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9]">
+                {t('legal.privacy.contact.body')}
               </p>
             </div>
 
@@ -114,9 +139,16 @@ export function PrivacyPage() {
 
 export function TermsPage() {
   useScrollToTop();
+  const { t, isRtl } = useI18n();
 
   return (
-    <div className="bg-white text-slate-900 min-h-screen selection:bg-indigo-500/20 selection:text-indigo-900 font-sans overflow-x-hidden">
+    <div 
+      className={cn(
+        "bg-white text-slate-900 min-h-screen selection:bg-[#166534]/20 selection:text-[#166534] font-sans overflow-x-hidden",
+        isRtl && "text-right"
+      )}
+      dir={isRtl ? 'rtl' : 'ltr'}
+    >
       <Navbar />
 
       <main>
@@ -129,81 +161,98 @@ export function TermsPage() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.1),transparent_70%)] pointer-events-none z-0" />
 
           <div className="max-w-4xl mx-auto space-y-6 relative z-10">
-            <span className="text-[10px] font-black text-[#F0FDF4] uppercase tracking-[0.2em] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30">
-              User Agreement
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-[#F0FDF4] uppercase tracking-[0.2em] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30">
+              <Scale size={11} className="text-[#22C55E]" />
+              {t('legal.terms.eyebrow', 'User Agreement')}
             </span>
-            <h1 className="font-display font-[800] text-4xl md:text-6xl tracking-tight text-white">
-              Terms & Conditions
+            <h1 className="font-display font-[800] text-4xl md:text-6xl tracking-tight text-white leading-tight">
+              {t('legal.terms.title', 'Terms & Conditions')}
             </h1>
-            <p className="font-sans font-normal text-stone-300 text-sm md:text-base max-w-xl mx-auto leading-relaxed uppercase tracking-widest">
-              Last updated: June 30, 2026
+            <p className="font-sans font-normal text-stone-300 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed tracking-wider">
+              {t('legal.updated', 'Last updated: June 30, 2026')}
             </p>
           </div>
         </section>
 
         {/* Content Section */}
         <section className="py-20 px-6 max-w-4xl mx-auto">
-          <div className="space-y-12 text-left">
+          <div className="space-y-12">
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">1. Agreement to Terms</h2>
-              <p className="text-slate-500 text-sm leading-[1.8]">
-                By registering a business profile, initiating a trial tier, or accessing the messaging CRM portal, you agree to be bound by these Terms and Conditions. If you represent a company, you warrant that you possess the official authority to accept this agreement on behalf of the legal entity.
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.terms.agreement.heading', '1. Agreement to Terms')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9]">
+                {t('legal.terms.agreement.body')}
               </p>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">2. Scope of Service</h2>
-              <p className="text-slate-500 text-sm leading-[1.8]">
-                We supply cloud-based SaaS integrations connecting lead forms, social media post planning schedules, customized landing page elements, CRM workspace pipelines, and API integrations with the WhatsApp Business Platform. The services are provided "as available." We deploy updates regularly to improve performance, structure, and security.
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.terms.scope.heading', '2. Scope of Service')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9]">
+                {t('legal.terms.scope.body')}
               </p>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">3. User Responsibilities & Acceptable Use</h2>
-              <p className="text-slate-500 text-sm leading-[1.8] mb-2">
-                As a client administrator, you represent and warrant that:
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.terms.responsibilities.heading', '3. User Responsibilities & Acceptable Use')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9] mb-2">
+                {t('legal.terms.responsibilities.introduction')}
               </p>
-              <ul className="list-disc pl-5 text-slate-500 text-sm space-y-2.5">
-                <li>You will compile with WhatsApp Commerce and Business Policies regarding customer opt-ins.</li>
-                <li>You will not distribute unsolicited spam broadcasts or fraudulent messaging sequences.</li>
-                <li>You remain solely responsible for the authenticity of the information stored inside your linked CRM databases.</li>
-                <li>You will protect access credentials and take responsibility for activities occurring under your team members' accounts.</li>
+              <ul className={cn("list-disc text-slate-600 text-sm space-y-2.5", isRtl ? "pr-5 pl-0" : "pl-5 pr-0")}>
+                <li>{t('legal.terms.responsibilities.opt_in')}</li>
+                <li>{t('legal.terms.responsibilities.spam')}</li>
+                <li>{t('legal.terms.responsibilities.data')}</li>
+                <li>{t('legal.terms.responsibilities.credentials')}</li>
               </ul>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">4. Fees, Plans, & Billing</h2>
-              <p className="text-slate-500 text-sm leading-[1.8]">
-                Subscription fees are charged at the beginning of each billing interval based on your selected package limits. Meta WhatsApp API usage fees are invoiced separately or calculated based on your Meta account balance. Payment defaults or failure to settle overdue billing notices within 14 business days may result in campaign execution limits or total temporary workspace suspensions.
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.terms.billing.heading', '4. Fees, Plans, & Billing')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9]">
+                {t('legal.terms.billing.body')}
               </p>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">5. Intellectual Property</h2>
-              <p className="text-slate-500 text-sm leading-[1.8]">
-                All assets, code structures, interface widgets, system logos, and landing page designs are the exclusive intellectual property of our company. You receive a limited, non-assignable license to run the SaaS tools for internal corporate communications. You may not reverse-engineer, mirror, or repackage dashboard components without prior written consent.
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.terms.ip.heading', '5. Intellectual Property')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9]">
+                {t('legal.terms.ip.body')}
               </p>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">6. Limitation of Liability</h2>
-              <p className="text-slate-500 text-sm leading-[1.8]">
-                In no event shall our corporation be liable for database sync failures, third-party webhook blockages, WhatsApp phone number suspensions by Meta, loss of profits, or data leaks resulting from unsecure admin API key disclosures. Our total liability is restricted to the total amount paid by you during the three months preceding the liability claim.
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.terms.liability.heading', '6. Limitation of Liability')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9]">
+                {t('legal.terms.liability.body')}
               </p>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">7. Account Termination</h2>
-              <p className="text-slate-500 text-sm leading-[1.8]">
-                You can cancel your subscription plan at any time via your account billing administration module. We retain the authority to terminate accounts immediately if customer usage triggers repeated spam violations or breaches WhatsApp developer guidelines.
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.terms.termination.heading', '7. Account Termination')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9]">
+                {t('legal.terms.termination.body')}
               </p>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">8. Legal Disputes</h2>
-              <p className="text-slate-500 text-sm leading-[1.8]">
-                These terms are governed by the local jurisdiction's corporate statutes. Any litigation arising out of these conditions shall be adjudicated exclusively within competent regional commercial courts.
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {t('legal.terms.disputes.heading', '8. Legal Disputes')}
+              </h2>
+              <p className="text-slate-600 text-sm leading-[1.9]">
+                {t('legal.terms.disputes.body')}
               </p>
             </div>
 

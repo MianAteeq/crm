@@ -10,12 +10,12 @@ import {
   RotateCw,
   GitFork,
   CheckCircle2,
-  Clock,
-  ArrowRight
+  Clock
 } from 'lucide-react';
 import { crmApi } from '../../services/crmApi';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
+import { useI18n } from '../../i18n';
 
 interface ExecutionLogItem {
   id?: number | string;
@@ -43,6 +43,7 @@ interface Execution {
 
 export default function ExecutionsPage() {
   const navigate = useNavigate();
+  const { isRtl, language } = useI18n();
   const [executions, setExecutions] = useState<Execution[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'success' | 'failed'>('all');
@@ -62,7 +63,10 @@ export default function ExecutionsPage() {
       }
     } catch (err: any) {
       console.error('[Automation] Failed to load executions:', err);
-      setErrorMessage(err?.message || 'Unable to load execution history.');
+      setErrorMessage(
+        err?.message || 
+        (language === 'ar' ? 'تعذر تحميل سجل التنفيذ من الخادم.' : 'Unable to load execution history.')
+      );
       setExecutions([]);
     } finally {
       setIsLoading(false);
@@ -108,7 +112,7 @@ export default function ExecutionsPage() {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-md border bg-[#F0FDF4] text-[#15803D] border-[#22C55E]/30">
           <CheckCircle2 size={12} className="text-[#22C55E]" />
-          Success
+          {language === 'ar' ? 'ناجح' : 'Success'}
         </span>
       );
     }
@@ -116,26 +120,32 @@ export default function ExecutionsPage() {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-md border bg-red-50 text-[#DC2626] border-red-200">
           <AlertCircle size={12} className="text-red-500" />
-          Failed
+          {language === 'ar' ? 'فاشل' : 'Failed'}
         </span>
       );
     }
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-md border bg-blue-50 text-[#1D4ED8] border-blue-200">
         <Clock size={12} className="text-blue-500" />
-        {statusStr || 'Running'}
+        {language === 'ar' ? 'قيد التشغيل' : (statusStr || 'Running')}
       </span>
     );
   };
 
   return (
-    <div className="space-y-6 bg-[#FFFFFF]">
+    <div className={cn("space-y-6 bg-[#FFFFFF]", isRtl && "text-right")} dir={isRtl ? 'rtl' : 'ltr'}>
       
       {/* Title Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#E2E8F0]">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#12263A]">Execution Logs</h1>
-          <p className="text-xs sm:text-sm text-[#64748B] mt-1 font-medium">Historical records of completed workflow execution pipelines.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[#12263A]">
+            {language === 'ar' ? 'سجلات التنفيذ' : 'Execution Logs'}
+          </h1>
+          <p className="text-xs sm:text-sm text-[#64748B] mt-1 font-medium">
+            {language === 'ar' 
+              ? 'السجلات التاريخية لمسارات تنفيذ مهام الأتمتة المكتملة.' 
+              : 'Historical records of completed workflow execution pipelines.'}
+          </p>
         </div>
         <button
           onClick={fetchExecutions}
@@ -143,7 +153,7 @@ export default function ExecutionsPage() {
           className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-[#12263A] hover:text-[#166534] bg-[#FFFFFF] hover:bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50"
         >
           <RotateCw size={14} className={cn("text-[#166534]", isLoading && "animate-spin")} />
-          Refresh
+          {language === 'ar' ? 'تحديث' : 'Refresh'}
         </button>
       </div>
 
@@ -152,18 +162,21 @@ export default function ExecutionsPage() {
         
         {/* Search Input */}
         <div className="relative w-full sm:w-80">
-          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64748B]" />
+          <Search size={15} className={cn("absolute top-1/2 -translate-y-1/2 text-[#64748B]", isRtl ? "right-3.5" : "left-3.5")} />
           <input 
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search execution ID, contact, workflow..."
-            className="w-full h-10 pl-10 pr-9 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs font-medium text-[#12263A] focus:outline-none focus:ring-4 focus:ring-[#166534]/10 focus:border-[#166534] focus:bg-white transition-all placeholder:text-[#64748B]"
+            placeholder={language === 'ar' ? 'بحث برقم التنفيذ، جهة الاتصال، سير العمل...' : 'Search execution ID, contact, workflow...'}
+            className={cn(
+              "w-full h-10 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs font-medium text-[#12263A] focus:outline-none focus:ring-4 focus:ring-[#166534]/10 focus:border-[#166534] focus:bg-white transition-all placeholder:text-[#64748B]",
+              isRtl ? "pr-10 pl-9 text-right" : "pl-10 pr-9 text-left"
+            )}
           />
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#12263A]"
+              className={cn("absolute top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#12263A]", isRtl ? "left-3" : "right-3")}
             >
               <X size={14} />
             </button>
@@ -181,7 +194,7 @@ export default function ExecutionsPage() {
                 : "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:text-[#12263A] hover:bg-[#F1F5F9]"
             )}
           >
-            All ({executions.length})
+            {language === 'ar' ? `الكل (${executions.length})` : `All (${executions.length})`}
           </button>
           <button
             onClick={() => setStatusFilter('success')}
@@ -192,7 +205,7 @@ export default function ExecutionsPage() {
                 : "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:text-[#12263A] hover:bg-[#F1F5F9]"
             )}
           >
-            Success ({successCount})
+            {language === 'ar' ? `الناجحة (${successCount})` : `Success (${successCount})`}
           </button>
           <button
             onClick={() => setStatusFilter('failed')}
@@ -203,7 +216,7 @@ export default function ExecutionsPage() {
                 : "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:text-[#12263A] hover:bg-[#F1F5F9]"
             )}
           >
-            Failed ({failedCount})
+            {language === 'ar' ? `الفاشلة (${failedCount})` : `Failed (${failedCount})`}
           </button>
         </div>
 
@@ -217,7 +230,7 @@ export default function ExecutionsPage() {
           <div className="p-8 sm:p-12 space-y-4">
             <div className="flex items-center justify-center gap-3 text-sm font-semibold text-[#64748B]">
               <RotateCw size={18} className="animate-spin text-[#166534]" />
-              <span>Loading execution records…</span>
+              <span>{language === 'ar' ? 'جاري تحميل سجلات التنفيذ…' : 'Loading execution records…'}</span>
             </div>
             <div className="space-y-3 pt-4 max-w-4xl mx-auto">
               {[1, 2, 3, 4].map(i => (
@@ -234,14 +247,16 @@ export default function ExecutionsPage() {
               <AlertCircle size={28} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-[#12263A]">Unable to load execution history</h3>
+              <h3 className="text-base font-bold text-[#12263A]">
+                {language === 'ar' ? 'تعذر تحميل سجل التنفيذ' : 'Unable to load execution history'}
+              </h3>
               <p className="text-xs sm:text-sm text-[#64748B] mt-1 leading-relaxed">{errorMessage}</p>
             </div>
             <button
               onClick={fetchExecutions}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] text-white text-xs font-semibold rounded-xl shadow-xs transition-colors cursor-pointer"
             >
-              <RotateCw size={13} /> Retry
+              <RotateCw size={13} /> {language === 'ar' ? 'إعادة المحاولة' : 'Retry'}
             </button>
           </div>
         )}
@@ -253,9 +268,13 @@ export default function ExecutionsPage() {
               <History size={32} />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-[#12263A]">No executions yet</h3>
+              <h3 className="text-xl font-bold text-[#12263A]">
+                {language === 'ar' ? 'لا توجد سجلات تنفيذ حتى الآن' : 'No executions yet'}
+              </h3>
               <p className="text-sm text-[#64748B] mt-1 leading-relaxed">
-                Your workflow execution history will appear here after your workflows run.
+                {language === 'ar' 
+                  ? 'ستظهر هنا سجلات مسارات الأتمتة فور تشغيل المهام وسير العمل.' 
+                  : 'Your workflow execution history will appear here after your workflows run.'}
               </p>
             </div>
             <div className="pt-2">
@@ -263,7 +282,7 @@ export default function ExecutionsPage() {
                 onClick={() => navigate('/automation/workflows')}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#166534] hover:bg-[#14532d] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer"
               >
-                <GitFork size={14} /> Go to Workflows
+                <GitFork size={14} /> {language === 'ar' ? 'الانتقال إلى سير العمل' : 'Go to Workflows'}
               </button>
             </div>
           </div>
@@ -276,14 +295,20 @@ export default function ExecutionsPage() {
               <Search size={20} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-[#12263A]">No matching executions</h3>
-              <p className="text-xs text-[#64748B] mt-0.5">No execution records found matching your active filter criteria.</p>
+              <h3 className="text-sm font-bold text-[#12263A]">
+                {language === 'ar' ? 'لا توجد سجلات مطابقة' : 'No matching executions'}
+              </h3>
+              <p className="text-xs text-[#64748B] mt-0.5">
+                {language === 'ar' 
+                  ? 'لم يتم العثور على سجلات تنفيذ تطابق معايير الفلترة الحالية.' 
+                  : 'No execution records found matching your active filter criteria.'}
+              </p>
             </div>
             <button
               onClick={() => { setSearch(''); setStatusFilter('all'); }}
               className="text-xs font-semibold text-[#166534] hover:underline cursor-pointer"
             >
-              Clear filters
+              {language === 'ar' ? 'مسح الفلاتر' : 'Clear filters'}
             </button>
           </div>
         )}
@@ -291,16 +316,28 @@ export default function ExecutionsPage() {
         {/* Populated Table */}
         {!isLoading && !errorMessage && filteredLogs.length > 0 && (
           <div className="overflow-x-auto custom-scrollbar">
-            <table className="w-full text-left border-collapse">
+            <table className={cn("w-full border-collapse", isRtl ? "text-right" : "text-left")}>
               <thead>
                 <tr className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
-                  <th className="p-4 pl-6 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">Execution ID</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">Workflow Name</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">Contact Recipient</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">Duration</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">Status</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">Execution Time</th>
-                  <th className="p-4 pr-6 w-12"></th>
+                  <th className={cn("p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]", isRtl ? "pr-6 pl-4" : "pl-6 pr-4")}>
+                    {language === 'ar' ? 'معرّف التنفيذ' : 'Execution ID'}
+                  </th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">
+                    {language === 'ar' ? 'اسم سير العمل' : 'Workflow Name'}
+                  </th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">
+                    {language === 'ar' ? 'المستلم / جهة الاتصال' : 'Contact Recipient'}
+                  </th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">
+                    {language === 'ar' ? 'المدة' : 'Duration'}
+                  </th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">
+                    {language === 'ar' ? 'الحالة' : 'Status'}
+                  </th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#12263A]">
+                    {language === 'ar' ? 'وقت التنفيذ' : 'Execution Time'}
+                  </th>
+                  <th className={cn("p-4 w-12", isRtl ? "pl-6 pr-4" : "pr-6 pl-4")}></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E2E8F0]">
@@ -310,7 +347,7 @@ export default function ExecutionsPage() {
                     onClick={() => setSelectedLog(log)}
                     className="hover:bg-[#F8FAFC] transition-colors cursor-pointer group"
                   >
-                    <td className="p-4 pl-6 text-xs font-mono font-bold text-[#166534]">
+                    <td className={cn("p-4 text-xs font-mono font-bold text-[#166534]", isRtl ? "pr-6 pl-4" : "pl-6 pr-4")}>
                       {log.id}
                     </td>
                     <td className="p-4 text-xs font-bold text-[#12263A] leading-tight">
@@ -328,8 +365,8 @@ export default function ExecutionsPage() {
                     <td className="p-4 text-xs font-mono text-[#64748B]">
                       {log.time}
                     </td>
-                    <td className="p-4 pr-6 text-right">
-                      <ChevronRight size={15} className="text-[#64748B] group-hover:text-[#12263A] transition-colors" />
+                    <td className={cn("p-4", isRtl ? "pl-6 pr-4 text-left" : "pr-6 pl-4 text-right")}>
+                      <ChevronRight size={15} className={cn("text-[#64748B] group-hover:text-[#12263A] transition-colors inline-block", isRtl && "rotate-180")} />
                     </td>
                   </tr>
                 ))}
@@ -351,11 +388,15 @@ export default function ExecutionsPage() {
               onClick={() => setSelectedLog(null)} 
             />
             <motion.div
-              initial={{ x: '100%' }}
+              initial={{ x: isRtl ? '-100%' : '100%' }}
               animate={{ x: 0 }}
-              exit={{ x: '100%' }}
+              exit={{ x: isRtl ? '-100%' : '100%' }}
               transition={{ type: 'spring', damping: 26, stiffness: 240 }}
-              className="fixed right-0 top-0 bottom-0 w-full sm:w-[420px] bg-[#FFFFFF] border-l border-[#E2E8F0] shadow-2xl z-50 flex flex-col"
+              className={cn(
+                "fixed top-0 bottom-0 w-full sm:w-[420px] bg-[#FFFFFF] shadow-2xl z-50 flex flex-col",
+                isRtl ? "left-0 border-r border-[#E2E8F0]" : "right-0 border-l border-[#E2E8F0]"
+              )}
+              dir={isRtl ? 'rtl' : 'ltr'}
             >
               {/* Drawer Header */}
               <div className="p-5 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAFC]">
@@ -364,7 +405,9 @@ export default function ExecutionsPage() {
                     <FileCode size={16} />
                   </div>
                   <div>
-                    <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider block">Execution Details</span>
+                    <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider block">
+                      {language === 'ar' ? 'تفاصيل التنفيذ' : 'Execution Details'}
+                    </span>
                     <span className="text-[10px] font-mono font-medium text-[#64748B]">{selectedLog.id}</span>
                   </div>
                 </div>
@@ -382,48 +425,67 @@ export default function ExecutionsPage() {
                 {/* Metadata Card */}
                 <div className="grid grid-cols-2 gap-4 bg-[#F8FAFC] p-4 border border-[#E2E8F0] rounded-xl">
                   <div>
-                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">Execution ID</span>
+                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
+                      {language === 'ar' ? 'معرّف التنفيذ' : 'Execution ID'}
+                    </span>
                     <span className="text-xs font-mono font-bold text-[#12263A] mt-1 block">{selectedLog.id}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">Status</span>
+                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
+                      {language === 'ar' ? 'الحالة' : 'Status'}
+                    </span>
                     <div className="mt-1">
                       {renderStatusBadge(selectedLog.status)}
                     </div>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">Duration</span>
+                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
+                      {language === 'ar' ? 'المدة' : 'Duration'}
+                    </span>
                     <span className="text-xs font-mono font-semibold text-[#12263A] mt-1 block">{selectedLog.duration}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">Executed</span>
+                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
+                      {language === 'ar' ? 'تاريخ التنفيذ' : 'Executed'}
+                    </span>
                     <span className="text-xs font-medium text-[#12263A] mt-1 block">{selectedLog.time}</span>
                   </div>
                 </div>
 
                 {/* Target Workflow Info */}
                 <div className="space-y-2">
-                  <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider block">Target Workflow</span>
+                  <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider block">
+                    {language === 'ar' ? 'سير العمل المستهدف' : 'Target Workflow'}
+                  </span>
                   <div className="p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl space-y-1">
                     <p className="text-sm font-bold text-[#12263A]">{selectedLog.workflow}</p>
-                    <p className="text-xs text-[#64748B]">Recipient: <span className="font-semibold text-[#12263A]">{selectedLog.contact}</span></p>
+                    <p className="text-xs text-[#64748B]">
+                      {language === 'ar' ? 'المستلم:' : 'Recipient:'}{' '}
+                      <span className="font-semibold text-[#12263A]">{selectedLog.contact}</span>
+                    </p>
                   </div>
                 </div>
 
                 {/* Sub-step logs if present */}
                 {selectedLog.logs && selectedLog.logs.length > 0 ? (
                   <div className="space-y-2.5">
-                    <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider block">Pipeline Steps</span>
+                    <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider block">
+                      {language === 'ar' ? 'خطوات المسار' : 'Pipeline Steps'}
+                    </span>
                     <div className="space-y-2">
                       {selectedLog.logs.map((step, idx) => (
                         <div key={idx} className="p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs space-y-1">
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-[#12263A]">{step.step_name || `Step #${idx + 1}`}</span>
+                            <span className="font-bold text-[#12263A]">
+                              {step.step_name || (language === 'ar' ? `الخطوة #${idx + 1}` : `Step #${idx + 1}`)}
+                            </span>
                             <span className={cn(
                               "text-[10px] font-bold uppercase",
                               step.status === 'success' ? "text-[#15803D]" : "text-[#DC2626]"
                             )}>
-                              {step.status}
+                              {step.status === 'success' 
+                                ? (language === 'ar' ? 'ناجح' : 'success') 
+                                : (language === 'ar' ? 'فاشل' : 'failed')}
                             </span>
                           </div>
                           {step.message && (
@@ -442,7 +504,7 @@ export default function ExecutionsPage() {
                 {selectedLog.last_error && (
                   <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl space-y-1">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-red-700">
-                      <AlertCircle size={14} /> Error Details
+                      <AlertCircle size={14} /> {language === 'ar' ? 'تفاصيل الخطأ' : 'Error Details'}
                     </div>
                     <p className="text-xs text-red-600 font-mono leading-relaxed">{selectedLog.last_error}</p>
                   </div>
@@ -450,8 +512,10 @@ export default function ExecutionsPage() {
 
                 {/* Trace Log Output */}
                 <div className="space-y-2">
-                  <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider block">Execution Trace Log</span>
-                  <div className="p-4 bg-[#12263A] text-slate-200 rounded-xl border border-[#12263A] text-[11px] font-mono leading-relaxed overflow-x-auto custom-scrollbar">
+                  <span className="text-xs font-bold text-[#12263A] uppercase tracking-wider block">
+                    {language === 'ar' ? 'سجل تتبع التنفيذ' : 'Execution Trace Log'}
+                  </span>
+                  <div className="p-4 bg-[#12263A] text-slate-200 rounded-xl border border-[#12263A] text-[11px] font-mono leading-relaxed overflow-x-auto custom-scrollbar" dir="ltr">
                     <p className="text-slate-400">[INFO] Pipeline execution initialized for workflow "{selectedLog.workflow}".</p>
                     <p className="text-slate-400">[INFO] Context recipient target: {selectedLog.contact}</p>
                     {selectedLog.status === 'failed' || selectedLog.status === 'error' ? (

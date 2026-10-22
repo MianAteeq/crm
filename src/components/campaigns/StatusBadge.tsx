@@ -1,12 +1,15 @@
 import React from 'react';
 import { Campaign } from '../../types';
 import { cn } from '../../lib/utils';
+import { useI18n } from '../../i18n';
 
 interface StatusBadgeProps {
   status: Campaign['status'];
 }
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
+  const { isRtl } = useI18n();
+
   const styles = {
     Draft: 'bg-slate-100 text-slate-600 border-slate-200/50',
     Scheduled: 'bg-blue-50 text-blue-600 border-blue-200/50',
@@ -23,13 +26,21 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
     Failed: 'bg-rose-400',
   };
 
+  const labels = {
+    Draft: isRtl ? 'مسودة' : 'Draft',
+    Scheduled: isRtl ? 'مجدولة' : 'Scheduled',
+    Running: isRtl ? 'قيد الإرسال' : 'Running',
+    Completed: isRtl ? 'مكتملة' : 'Completed',
+    Failed: isRtl ? 'فشلت' : 'Failed',
+  };
+
   return (
     <span className={cn(
       "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
       styles[status]
     )}>
       <div className={cn("w-1.5 h-1.5 rounded-full", dotColors[status])} />
-      {status}
+      <span>{labels[status] || status}</span>
     </span>
   );
 }
