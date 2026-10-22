@@ -94,7 +94,9 @@ apiClient.interceptors.response.use(
     }
 
     // Display error toast
-    if (!skipToast) {
+    const isPublicConfig = error.config?.url?.includes('/branding') || error.config?.url?.includes('/plans') || error.config?.url?.includes('/public');
+    const isConnRefused = error.message?.includes('ECONNREFUSED') || error.message?.includes('Network Error');
+    if (!skipToast && !(isPublicConfig && isConnRefused)) {
       const errorMessage = error.response?.data?.message || error.message || 'An unexpected error occurred';
       toast.error('Error', errorMessage);
     }

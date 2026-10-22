@@ -18,7 +18,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="bg-white text-slate-900 min-h-screen selection:bg-brand/20 selection:text-brand-dark overflow-x-hidden">
+    <div className="min-h-screen selection:bg-[#166534] selection:text-[#F0FDF4] overflow-x-hidden relative bg-[#0a1826]">
       <Navbar />
       <main>
         <Hero />

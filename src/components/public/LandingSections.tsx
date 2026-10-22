@@ -45,7 +45,12 @@ import {
   Flame,
   Radio,
   Video,
-  Phone
+  Phone,
+  Layers,
+  Cpu,
+  Compass,
+  Shield,
+  Filter
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { NavLink } from 'react-router-dom';
@@ -57,38 +62,38 @@ import { useBrandingStore, DEFAULT_INTEGRATION_LOGOS, IntegrationLogoItem } from
 // MOCK CLIENT SVG LOGOS
 // ==========================================
 const TcLogo = () => (
-  <svg className="h-6 opacity-40 hover:opacity-100 hover:text-slate-900 transition-all duration-300 fill-current" viewBox="0 0 34 22" xmlns="http://www.w3.org/2000/svg">
+  <svg className="h-6 opacity-50 hover:opacity-100 hover:text-slate-900 transition-all duration-300 fill-current" viewBox="0 0 34 22" xmlns="http://www.w3.org/2000/svg">
     <path d="M1 10h4v11h4V10h4V6H9V1H5v5H1v4zm15-4v15h16v-4h-11v-2h8v-3h-8v-2h11V6H16z" />
   </svg>
 );
 
 const StripeLogo = () => (
-  <svg className="h-6 opacity-40 hover:opacity-100 hover:text-[#635BFF] transition-all duration-300 fill-current" viewBox="0 0 80 34" xmlns="http://www.w3.org/2000/svg">
+  <svg className="h-6 opacity-50 hover:opacity-100 hover:text-[#635BFF] transition-all duration-300 fill-current" viewBox="0 0 80 34" xmlns="http://www.w3.org/2000/svg">
     <path d="M41.4 12.3c0-3.3 2.5-4.4 6.7-4.4 3.7 0 7.3.9 10.3 2.5V3.1C55.4 1.7 51.5 1 47.9 1 34.6 1 27.6 8.1 27.6 19c0 9.8 6.7 14.1 16.5 14.1 4 0 7.8-.7 10.7-2.1v-7.3c-2.9 1.5-6.3 2.1-9.4 2.1-5.1 0-7-2-7-6.8h23.2v-1.7H41.4zm0-5c0-1.8 1.2-2.8 3.3-2.8 2.2 0 3.3 1 3.3 2.8H41.4zM24.8 9.5c0-.8-.7-1.4-1.5-1.4h-5.5V1h-9.3v7.1H3c-.8 0-1.4.6-1.4 1.4v6.8c0 .8.6 1.4 1.4 1.4h5.5v15.7h9.3V17.7h5.5c.8 0 1.4-.6 1.4-1.4V9.5z" />
   </svg>
 );
 
 const LinearLogo = () => (
-  <svg className="h-6 opacity-40 hover:opacity-100 hover:text-white transition-all duration-300 fill-current" viewBox="0 0 100 24" xmlns="http://www.w3.org/2000/svg">
+  <svg className="h-6 opacity-50 hover:opacity-100 hover:text-slate-900 transition-all duration-300 fill-current" viewBox="0 0 100 24" xmlns="http://www.w3.org/2000/svg">
     <text x="0" y="18" className="font-sans font-black tracking-wider text-lg">LINEAR</text>
   </svg>
 );
 
 const HubSpotLogo = () => (
-  <svg className="h-6 opacity-40 hover:opacity-100 hover:text-[#FF7A59] transition-all duration-300 fill-current" viewBox="0 0 100 28" xmlns="http://www.w3.org/2000/svg">
+  <svg className="h-6 opacity-50 hover:opacity-100 hover:text-[#FF7A59] transition-all duration-300 fill-current" viewBox="0 0 100 28" xmlns="http://www.w3.org/2000/svg">
     <text x="0" y="20" className="font-sans font-black tracking-wider text-lg">HUBSPOT</text>
   </svg>
 );
 
 const VercelLogo = () => (
-  <svg className="h-5 opacity-40 hover:opacity-100 hover:text-white transition-all duration-300 fill-current" viewBox="0 0 116 26" xmlns="http://www.w3.org/2000/svg">
+  <svg className="h-5 opacity-50 hover:opacity-100 hover:text-slate-900 transition-all duration-300 fill-current" viewBox="0 0 116 26" xmlns="http://www.w3.org/2000/svg">
     <path d="M12.2 2L24.4 23H0L12.2 2z" />
     <text x="32" y="20" className="font-sans font-black tracking-wider text-base">VERCEL</text>
   </svg>
 );
 
 const NotionLogo = () => (
-  <svg className="h-6 opacity-40 hover:opacity-100 hover:text-slate-900 transition-all duration-300 fill-current" viewBox="0 0 100 24" xmlns="http://www.w3.org/2000/svg">
+  <svg className="h-6 opacity-50 hover:opacity-100 hover:text-slate-900 transition-all duration-300 fill-current" viewBox="0 0 100 24" xmlns="http://www.w3.org/2000/svg">
     <text x="0" y="18" className="font-sans font-black tracking-wider text-lg">NOTION</text>
   </svg>
 );
@@ -117,18 +122,19 @@ const AnimatedChatMockup = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!inputValue.trim() || isTyping) return;
+  const handleSend = (textToSend?: string | React.FormEvent) => {
+    if (textToSend && typeof textToSend !== 'string') {
+      textToSend.preventDefault();
+    }
+    const rawText = typeof textToSend === 'string' ? textToSend : inputValue;
+    if (!rawText.trim() || isTyping) return;
 
-    const userMsg = inputValue.trim();
+    const userMsg = rawText.trim();
     setInputValue("");
 
-    // Add user message
     setMessages(prev => [...prev, { id: Date.now(), text: userMsg, isUser: true }]);
     setIsTyping(true);
 
-    // Simulate AI response
     setTimeout(() => {
       setIsTyping(false);
       const lowerInput = userMsg.toLowerCase();
@@ -136,220 +142,421 @@ const AnimatedChatMockup = () => {
 
       if (lowerInput.includes('pricing') || lowerInput.includes('cost')) {
         responseText = "Our plans start with full WhatsApp Cloud API access and unlimited contacts. Would you like a link to our plan details?";
-      } else if (lowerInput.includes('calendar') || lowerInput.includes('yes') || lowerInput.includes('invite')) {
+      } else if (lowerInput.includes('calendar') || lowerInput.includes('yes') || lowerInput.includes('invite') || lowerInput.includes('tomorrow')) {
         responseText = "Awesome! The calendar invite has been sent to your email. See you tomorrow at 3:00 PM! 📅";
-      } else if (lowerInput.includes('help') || lowerInput.includes('support')) {
+      } else if (lowerInput.includes('help') || lowerInput.includes('support') || lowerInput.includes('human')) {
         responseText = "I'm here to help! Our team is available 24/7 if you need human assistance as well.";
       } else if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
         responseText = "Hello there! 👋 How can I help you today?";
       }
 
       setMessages(prev => [...prev, { id: Date.now() + 1, text: responseText, isUser: false }]);
-    }, 1100);
+    }, 1000);
   };
 
+  const quickPrompts = ["Tomorrow at 3:00 PM", "View Pricing", "Need Human Support"];
+
   return (
-    <div className="w-full max-w-[360px] bg-[#0b141a] border border-white/10 rounded-[2rem] shadow-2xl overflow-hidden flex flex-col h-[480px] relative group transition-all hover:shadow-indigo-500/10">
+    <div className="w-full max-w-[390px] bg-[#0c1622] border border-white/10 rounded-[2.25rem] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),0_0_50px_rgba(34,197,94,0.12)] ring-1 ring-white/10 overflow-hidden flex flex-col h-[520px] relative group transition-all duration-300">
       {/* WhatsApp Header Mockup */}
-      <div className="bg-[#202c33] px-4 py-3 flex items-center gap-3 border-b border-white/5 relative z-10 shadow-sm">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center p-0.5 shadow-lg shadow-indigo-500/20">
-          <div className="w-full h-full bg-[#202c33] rounded-full flex items-center justify-center">
-            <Bot size={22} className="text-[#22C55E]" />
+      <div className="bg-[#132232] px-4 py-3 flex items-center justify-between border-b border-white/10 relative z-10 shadow-sm shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#166534] to-[#22C55E] flex items-center justify-center p-0.5 shadow-md">
+              <div className="w-full h-full bg-[#132232] rounded-full flex items-center justify-center">
+                <Bot size={20} className="text-[#22C55E]" />
+              </div>
+            </div>
+            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#22C55E] border-2 border-[#132232] rounded-full shadow-[0_0_8px_rgba(34,197,94,0.9)]" />
+          </div>
+          <div>
+            <h4 className="text-white font-semibold text-[14px] leading-tight flex items-center gap-1.5">
+              AI Copilot Agent <CheckCircle2 size={13} className="text-[#22C55E]" />
+            </h4>
+            <span className="text-[#22C55E] text-[10.5px] font-medium flex items-center gap-1">
+              Online • Official Cloud API
+            </span>
           </div>
         </div>
-        <div>
-          <h4 className="text-slate-100 font-semibold text-[15px] leading-tight flex items-center gap-1.5">
-            AI Copilot Agent <CheckCircle2 size={12} className="text-[#22C55E]" />
-          </h4>
-          <span className="text-emerald-500 text-[11px] font-medium flex items-center gap-1">
-            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" /> Always Active
-          </span>
+
+        <div className="flex items-center gap-3 text-stone-400">
+          <Video size={17} className="hover:text-white transition-colors cursor-pointer" />
+          <Phone size={16} className="hover:text-white transition-colors cursor-pointer" />
+          <MoreVertical size={16} className="hover:text-white transition-colors cursor-pointer" />
         </div>
       </div>
 
-      {/* Chat Background (Subtle Texture) */}
-      <div className="absolute inset-0 opacity-5 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CiAgPHBhdGggZD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIvPgogIDxwYXRoIGQ9Ik0wIDEwaDQwdjJIMHptMCAyMGg0MHYySDB6IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjEiLz4KPC9zdmc+')] pointer-events-none" />
+      {/* Date Divider */}
+      <div className="py-2.5 flex justify-center relative z-10 bg-[#0c1622]/80 backdrop-blur-sm">
+        <span className="bg-[#182838] text-stone-300 text-[10px] font-semibold px-3 py-0.5 rounded-full border border-white/5 uppercase tracking-wider">
+          Today
+        </span>
+      </div>
 
       {/* Messages Area */}
-      <div ref={scrollContainerRef} className="flex-1 p-4 flex flex-col gap-3 overflow-y-auto z-10 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+      <div ref={scrollContainerRef} className="flex-1 p-4 pt-1 flex flex-col gap-3 overflow-y-auto z-10 custom-scrollbar">
         <AnimatePresence initial={false}>
           {messages.map((msg) => (
             <motion.div
               key={msg.id}
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              initial={{ opacity: 0, y: 10, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.2 }}
               className={cn(
-                "max-w-[85%] rounded-[1.25rem] p-3 text-[13.5px] leading-[1.45] relative shadow-md backdrop-blur-md",
+                "max-w-[85%] rounded-[1.15rem] p-3 text-[13px] leading-[1.5] relative shadow-md",
                 msg.isUser
-                  ? "bg-[#005c4b] text-white self-end rounded-tr-sm"
-                  : "bg-[#202c33] text-slate-100 self-start rounded-tl-sm border border-white/5"
+                  ? "bg-gradient-to-r from-[#166534] to-[#1e7e43] text-white self-end rounded-tr-xs border border-emerald-500/30"
+                  : "bg-[#182838] text-stone-100 self-start rounded-tl-xs border border-white/10"
               )}
             >
               {!msg.isUser && (
-                <Sparkles size={12} className="absolute -top-1.5 -left-1.5 text-[#22C55E]" />
+                <div className="flex items-center gap-1 text-[10px] text-[#22C55E] font-semibold mb-1">
+                  <Sparkles size={11} /> Auto Copilot
+                </div>
               )}
               <div className="whitespace-pre-wrap">{msg.text}</div>
-              <div className="text-[10px] text-white/50 text-right mt-1.5 flex justify-end items-center gap-1">
+              <div className="text-[10px] text-white/60 text-right mt-1.5 flex justify-end items-center gap-1">
                 <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                {msg.isUser && <CheckCircle2 size={12} className="text-[#53bdeb]" />}
+                {msg.isUser ? (
+                  <CheckCheck size={14} className="text-[#53bdeb]" />
+                ) : (
+                  <CheckCheck size={14} className="text-white/40" />
+                )}
               </div>
             </motion.div>
           ))}
           {isTyping && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.15 } }}
-              className="bg-[#202c33] text-white self-start rounded-[1.25rem] rounded-tl-sm p-3.5 border border-white/5 flex gap-1.5 w-16 shadow-md"
+              className="bg-[#182838] text-white self-start rounded-[1.15rem] rounded-tl-xs p-3 border border-white/10 flex items-center gap-1.5 w-16 shadow-md"
             >
-              <motion.div className="w-1.5 h-1.5 bg-slate-400 rounded-full" animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} />
-              <motion.div className="w-1.5 h-1.5 bg-slate-400 rounded-full" animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} />
-              <motion.div className="w-1.5 h-1.5 bg-slate-400 rounded-full" animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} />
+              <motion.div className="w-1.5 h-1.5 bg-[#22C55E] rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} />
+              <motion.div className="w-1.5 h-1.5 bg-[#22C55E] rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} />
+              <motion.div className="w-1.5 h-1.5 bg-[#22C55E] rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
+      {/* Quick Action Suggestion Chips */}
+      <div className="px-3 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar z-10 shrink-0 bg-[#0c1622]/90 border-t border-white/5">
+        {quickPrompts.map((prompt) => (
+          <button
+            key={prompt}
+            type="button"
+            onClick={() => handleSend(prompt)}
+            className="text-[11px] font-medium text-stone-300 bg-[#162534] hover:bg-[#1f3246] hover:text-white border border-white/10 rounded-full px-3 py-1 transition-all whitespace-nowrap active:scale-95 cursor-pointer"
+          >
+            {prompt}
+          </button>
+        ))}
+      </div>
+
       {/* Interactive Input Area */}
-      <form onSubmit={handleSend} className="bg-[#202c33] px-3 py-3 flex items-center gap-2 border-t border-white/5 z-10">
-        <div className="w-8 h-8 rounded-full text-slate-400 flex items-center justify-center hover:bg-white/5 cursor-pointer transition-colors shrink-0">
-          <Plus size={20} />
+      <form onSubmit={(e) => handleSend(e)} className="bg-[#132232] px-3 py-2.5 flex items-center gap-2 border-t border-white/10 z-10 shrink-0">
+        <div className="w-8 h-8 rounded-full text-stone-400 flex items-center justify-center hover:bg-white/5 cursor-pointer transition-colors shrink-0">
+          <Smile size={18} />
+        </div>
+        <div className="w-8 h-8 rounded-full text-stone-400 flex items-center justify-center hover:bg-white/5 cursor-pointer transition-colors shrink-0 -ml-1">
+          <Paperclip size={17} />
         </div>
         <input
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Message AI Copilot..."
-          className="flex-1 bg-[#2a3942] focus:bg-[#344651] transition-colors rounded-full h-10 px-4 text-slate-200 text-[13.5px] border border-white/5 outline-none placeholder:text-slate-400"
+          className="flex-1 bg-[#1a2c3e] focus:bg-[#20364d] transition-colors rounded-full h-9 px-4 text-stone-100 text-[13px] border border-white/10 outline-none placeholder:text-stone-400"
         />
         <button
           type="submit"
           disabled={!inputValue.trim() || isTyping}
-          className="w-10 h-10 rounded-full bg-[#166534] disabled:bg-[#166534]/50 text-white flex items-center justify-center shadow-lg hover:bg-[#F0FDF4]0 transition-colors shrink-0 disabled:cursor-not-allowed"
+          className="w-9 h-9 rounded-full bg-gradient-to-r from-[#166534] to-[#22C55E] disabled:opacity-40 text-white flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all shrink-0 disabled:cursor-not-allowed cursor-pointer"
         >
-          <Send size={16} className="ml-0.5" />
+          <Send size={15} className="ml-0.5" />
         </button>
       </form>
     </div>
   );
 };
 
+// 1. HERO (🌙 DARK)
 export function Hero() {
+  const [dispatcherTab, setDispatcherTab] = useState<'campaign' | 'routing' | 'events'>('campaign');
+
   return (
-    <section className="relative min-h-[90vh] pt-40 pb-24 px-6 overflow-hidden bg-[#12263A] text-white flex items-center">
-      {/* Background Animated Tech Mesh & Gradients */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none z-0" />
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#166534]/25 rounded-full blur-[120px] pointer-events-none z-0 mix-blend-screen" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#22C55E]/15 rounded-full blur-[120px] pointer-events-none z-0 mix-blend-screen" />
+    <section className="relative min-h-screen pt-36 pb-28 px-4 sm:px-6 overflow-hidden bg-[#0a1826] text-white flex flex-col items-center justify-center">
+      {/* Background Architectural Grid & Subtle Static Ambient Highlights (No flow effect) */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:36px_36px] pointer-events-none z-0" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-[#166534]/20 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-[#22C55E]/10 rounded-full blur-[120px] pointer-events-none z-0" />
+      <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] bg-[#12263A] rounded-full blur-[130px] pointer-events-none z-0" />
 
-      {/* Floating Automation Icons (Background) */}
-      <motion.div
-        animate={{ y: [-15, 15, -15], rotate: [0, 5, -5, 0] }}
-        transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-        className="absolute top-[20%] left-[10%] opacity-20 hidden lg:block"
-      >
-        <MessageCircle size={48} className="text-[#22C55E]" />
-      </motion.div>
-      <motion.div
-        animate={{ y: [15, -15, 15], rotate: [0, -10, 10, 0] }}
-        transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
-        className="absolute bottom-[20%] right-[8%] opacity-20 hidden lg:block"
-      >
-        <Zap size={56} className="text-[#166534]" />
-      </motion.div>
-      <motion.div
-        animate={{ scale: [0.9, 1.1, 0.9], opacity: [0.1, 0.3, 0.1] }}
-        transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-        className="absolute top-[30%] right-[15%] hidden lg:block"
-      >
-        <Bot size={40} className="text-[#22C55E]" />
-      </motion.div>
-
-      <div className="max-w-7xl mx-auto relative z-10 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-
-        {/* Left Content Column */}
-        <div className="space-y-8 flex flex-col items-center lg:items-start text-center lg:text-left z-10">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#166534]/30 border border-[#22C55E]/30 rounded-full shadow-lg shadow-[#166534]/10 backdrop-blur-md"
-          >
-            <Sparkles size={14} className="text-[#22C55E]" />
-            <span className="font-sans font-medium text-[13px] tracking-wide text-[#F0FDF4]">Modern Conversational CRM & Marketing</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="font-display font-[800] text-[44px] sm:text-[54px] md:text-[64px] lg:text-[72px] leading-[1.05] tracking-[-2.5px] text-white max-w-2xl"
-          >
-            Turn WhatsApp & Email Into Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] to-[#166534]">Highest-ROI</span> Channels
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="font-sans font-normal text-[18px] md:text-[20px] leading-[1.7] max-w-[580px] text-stone-300"
-          >
-            Launch targeted broadcast campaigns, automate customer journeys, and resolve customer inquiries faster with an all-in-one conversational CRM.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2 w-full max-w-md lg:max-w-none"
-          >
-            <NavLink
-              to="/signup"
-              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-sans font-bold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(34,197,94,0.3)] active:scale-97 text-center shadow-lg flex items-center justify-center gap-2"
-            >
-              Start Free Trial <ArrowRight size={18} />
-            </NavLink>
-            <NavLink
-              to="/contact"
-              className="w-full sm:w-auto px-8 py-4 bg-white/10 border border-white/20 text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:bg-white/20 hover:text-white active:scale-95 text-center shadow-sm flex items-center justify-center gap-2"
-            >
-              <Bot size={18} className="text-[#22C55E]" /> See AI Demo
-            </NavLink>
-          </motion.div>
-
-          {/* Trust Badges Checklist */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="pt-6 mt-4 border-t border-white/10 flex flex-wrap items-center justify-center lg:justify-start gap-y-3 gap-x-6 text-[11px] font-bold text-stone-400 uppercase tracking-widest"
-          >
-            <span className="flex items-center gap-1.5 text-stone-300"><CheckCircle2 size={14} className="text-[#22C55E]" /> Official WhatsApp API</span>
-            <span className="flex items-center gap-1.5 text-stone-300"><CheckCircle2 size={14} className="text-[#22C55E]" /> Advanced AI Routing</span>
-            <span className="flex items-center gap-1.5 text-stone-300"><CheckCircle2 size={14} className="text-[#22C55E]" /> 24/7 Autopilot</span>
-          </motion.div>
-        </div>
-
-        {/* Right Content Column - AI Chat Mockup */}
+      {/* Hero Header Presentation */}
+      <div className="max-w-5xl mx-auto relative z-10 w-full flex flex-col items-center text-center space-y-7">
         <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, duration: 0.6, type: "spring" }}
-          className="flex justify-center lg:justify-end relative z-10 mt-8 lg:mt-0"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inline-flex items-center gap-2.5 px-4 py-1.5 bg-[#166534]/30 border border-[#22C55E]/40 rounded-full shadow-[0_0_25px_rgba(34,197,94,0.18)] backdrop-blur-md"
         >
-          {/* Decorative halo around mockup */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 blur-3xl -z-10 rounded-full transform scale-110" />
-          <AnimatedChatMockup />
+          <span className="w-2 h-2 rounded-full bg-[#22C55E] shadow-[0_0_8px_rgba(34,197,94,0.9)]" />
+          <span className="font-sans font-semibold text-[13px] tracking-wide text-[#F0FDF4]">
+            Modern Conversational CRM & Marketing
+          </span>
         </motion.div>
 
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="font-display font-[800] text-[32px] xs:text-[42px] sm:text-[54px] md:text-[66px] lg:text-[74px] leading-[1.08] tracking-[-0.035em] text-white max-w-4xl px-2"
+        >
+          Turn WhatsApp & Email Into Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] via-[#4ade80] to-[#bbf7d0]">Highest-ROI</span> Channels
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="font-sans font-normal text-[17px] md:text-[19px] leading-[1.75] max-w-2xl text-stone-300"
+        >
+          Launch targeted broadcast campaigns, automate customer journeys, and resolve customer inquiries faster with an all-in-one conversational CRM.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 w-full max-w-md sm:max-w-none"
+        >
+          <NavLink
+            to="/signup"
+            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] hover:from-[#14532d] hover:to-[#16a34a] text-white font-sans font-bold text-[15px] tracking-[0.2px] rounded-xl transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_12px_35px_rgba(34,197,94,0.4)] active:scale-[0.98] text-center shadow-lg flex items-center justify-center gap-2 group cursor-pointer"
+          >
+            Start Free Trial 
+            <ArrowRight size={17} className="group-hover:translate-x-1 transition-transform" />
+          </NavLink>
+          <NavLink
+            to="/contact"
+            className="w-full sm:w-auto px-8 py-4 bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-white/30 text-white font-sans font-semibold text-[15px] tracking-[0.2px] rounded-xl transition-all duration-200 backdrop-blur-md active:scale-[0.98] text-center shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <Bot size={18} className="text-[#22C55E]" /> See AI Demo
+          </NavLink>
+        </motion.div>
+
+        {/* Trust Badges Dock */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-x-8 text-[10.5px] sm:text-[11px] font-bold text-stone-300 uppercase tracking-wider bg-white/[0.03] border border-white/10 px-5 sm:px-6 py-3 sm:py-2.5 rounded-2xl sm:rounded-full backdrop-blur-md shadow-inner text-center"
+        >
+          <span className="flex items-center justify-center gap-1.5"><CheckCircle2 size={15} className="text-[#22C55E] shrink-0" /> Official WhatsApp API</span>
+          <span className="flex items-center justify-center gap-1.5"><CheckCircle2 size={15} className="text-[#22C55E] shrink-0" /> Advanced AI Routing</span>
+          <span className="flex items-center justify-center gap-1.5"><CheckCircle2 size={15} className="text-[#22C55E] shrink-0" /> 24/7 Autopilot</span>
+        </motion.div>
       </div>
+
+      {/* Panoramic Command-Center Deck: Dual-Engine Workstation */}
+      <motion.div
+        initial={{ opacity: 0, y: 35 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35, duration: 0.7 }}
+        className="w-full max-w-6xl mx-auto mt-14 relative z-10"
+      >
+        <div className="absolute -inset-1 bg-gradient-to-r from-[#166534]/40 via-[#22C55E]/20 to-[#12263A] rounded-[2.6rem] blur-xl opacity-70 -z-10" />
+
+        <div className="bg-[#0b1725]/95 border border-white/10 rounded-[2.5rem] shadow-[0_30px_90px_rgba(0,0,0,0.8)] backdrop-blur-2xl ring-1 ring-white/10 overflow-hidden flex flex-col">
+          <div className="px-3.5 sm:px-6 py-2.5 sm:py-3.5 bg-[#0f2032] border-b border-white/10 flex items-center justify-between gap-2 overflow-hidden">
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0">
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-rose-500/80 inline-block" />
+                <span className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-amber-500/80 inline-block" />
+                <span className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-emerald-500/80 inline-block" />
+              </div>
+              <div className="h-4 w-px bg-white/10 mx-1 hidden sm:block" />
+              <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-stone-300">
+                <span className="text-[#22C55E]">talkinexx-hub</span>
+                <span className="text-stone-500">/</span>
+                <span>live-automation-deck</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="inline-flex items-center gap-1.5 text-[9px] sm:text-[10px] font-mono text-[#86efac] bg-[#166534]/30 border border-[#22C55E]/30 px-2.5 sm:px-3 py-1 rounded-full uppercase tracking-wider shrink-0 whitespace-nowrap">
+                <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-[#22C55E] animate-pulse shrink-0" />
+                <span>Meta Cloud API Active <span className="hidden xs:inline">• 99.9% Uptime</span></span>
+              </span>
+            </div>
+          </div>
+
+          <div className="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-gradient-to-b from-[#0b1725] to-[#08121d]">
+            <div className="lg:col-span-7 space-y-6 text-left">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#22C55E] uppercase tracking-wider">
+                    <Activity size={14} className="text-[#22C55E]" />
+                    <span>Live Operations Dispatcher</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold font-display text-white tracking-tight">
+                    High-Throughput Campaign & Chat Ingestion
+                  </h3>
+                </div>
+
+                {/* Dispatcher View Switcher Tabs */}
+                <div className="hidden sm:flex items-center gap-1 bg-[#122437] border border-white/10 p-1 rounded-xl text-[10px] font-mono">
+                  <button
+                    onClick={() => setDispatcherTab('campaign')}
+                    className={cn("px-2.5 py-1 rounded-lg transition-all cursor-pointer", dispatcherTab === 'campaign' ? "bg-[#166534] text-white font-bold" : "text-stone-400 hover:text-white")}
+                  >
+                    Campaign
+                  </button>
+                  <button
+                    onClick={() => setDispatcherTab('routing')}
+                    className={cn("px-2.5 py-1 rounded-lg transition-all cursor-pointer", dispatcherTab === 'routing' ? "bg-[#166534] text-white font-bold" : "text-stone-400 hover:text-white")}
+                  >
+                    Routing
+                  </button>
+                  <button
+                    onClick={() => setDispatcherTab('events')}
+                    className={cn("px-2.5 py-1 rounded-lg transition-all cursor-pointer", dispatcherTab === 'events' ? "bg-[#166534] text-white font-bold" : "text-stone-400 hover:text-white")}
+                  >
+                    Events
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-stone-300 text-xs sm:text-sm leading-relaxed">
+                Real-time event streams process every inbound query, execute contextual AI routing, and sync deal status directly with your customer database.
+              </p>
+
+              {dispatcherTab === 'campaign' && (
+                <div className="bg-[#122437] border border-white/10 rounded-2xl p-4.5 space-y-3.5 shadow-lg animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <div className="w-8 h-8 rounded-xl bg-[#166534]/40 border border-[#22C55E]/30 text-[#22C55E] flex items-center justify-center shrink-0">
+                        <Send size={15} />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-xs font-bold text-white block truncate">VIP Spring Flash Promo</span>
+                        <span className="text-[10px] text-stone-400 font-mono block truncate">2,480 recipients • Instant delivery</span>
+                      </div>
+                    </div>
+                    <span className="text-[9.5px] sm:text-[10px] font-mono font-bold text-[#86efac] bg-[#166534]/30 border border-[#22C55E]/30 px-2 sm:px-2.5 py-1 rounded-md shrink-0 whitespace-nowrap">
+                      98.4% Delivered
+                    </span>
+                  </div>
+
+                  <div className="w-full bg-[#0a1826] h-2 rounded-full overflow-hidden border border-white/5">
+                    <div className="bg-gradient-to-r from-[#166534] via-[#22C55E] to-[#86efac] h-full w-[98%]" />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 pt-1 border-t border-white/5 text-center">
+                    <div className="p-2 rounded-lg bg-white/[0.02]">
+                      <span className="text-[9px] uppercase tracking-widest text-stone-400 font-semibold block">Response Time</span>
+                      <span className="text-xs font-mono font-bold text-white">&lt; 1.2s</span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-white/[0.02]">
+                      <span className="text-[9px] uppercase tracking-widest text-stone-400 font-semibold block">Campaign ROI</span>
+                      <span className="text-xs font-mono font-bold text-[#86efac]">4.2x Avg</span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-white/[0.02]">
+                      <span className="text-[9px] uppercase tracking-widest text-stone-400 font-semibold block">Meta Cloud Tier</span>
+                      <span className="text-xs font-mono font-bold text-white">Tier 3 (100k/d)</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {dispatcherTab === 'routing' && (
+                <div className="bg-[#122437] border border-white/10 rounded-2xl p-4.5 space-y-3 shadow-lg animate-in fade-in duration-200 text-xs font-mono">
+                  <div className="flex items-center justify-between pb-2 border-b border-white/5 text-stone-300">
+                    <span className="text-[11px] text-[#22C55E] font-bold">Topology Node</span>
+                    <span className="text-[10px] text-stone-400">Latency</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02]">
+                    <span className="flex items-center gap-2 text-stone-200">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      1. Ad Ingestion (TikTok / Meta)
+                    </span>
+                    <span className="text-stone-400 font-bold">12ms</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02]">
+                    <span className="flex items-center gap-2 text-stone-200">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      2. Context Intent Classifier
+                    </span>
+                    <span className="text-stone-400 font-bold">38ms</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02]">
+                    <span className="flex items-center gap-2 text-stone-200">
+                      <span className="w-2 h-2 rounded-full bg-[#22C55E]" />
+                      3. WhatsApp Cloud API Dispatch
+                    </span>
+                    <span className="text-[#86efac] font-bold">Active</span>
+                  </div>
+                </div>
+              )}
+
+              {dispatcherTab === 'events' && (
+                <div className="bg-[#122437] border border-white/10 rounded-2xl p-4.5 space-y-2 shadow-lg animate-in fade-in duration-200">
+                  <span className="text-[10.5px] font-mono text-stone-400 uppercase tracking-widest flex items-center gap-1.5 pb-2 border-b border-white/5">
+                    <Radio size={12} className="text-[#22C55E]" /> Live Broadcast Stream
+                  </span>
+                  <div className="space-y-1.5 font-mono text-[11px]">
+                    <div className="p-2 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-between text-stone-300">
+                      <span className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
+                        <span>Sarah M. booked 3:00 PM slot via WhatsApp</span>
+                      </span>
+                      <span className="text-stone-500 text-[10px]">Just now</span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-between text-stone-300">
+                      <span className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                        <span>CRM deal created: Sarah Miller ($1,200)</span>
+                      </span>
+                      <span className="text-stone-500 text-[10px]">1m ago</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <span className="text-[10.5px] font-mono text-stone-400 uppercase tracking-widest flex items-center gap-1.5">
+                  <Radio size={12} className="text-[#22C55E]" /> Live Activity Log
+                </span>
+                <div className="space-y-1.5 font-mono text-[11px]">
+                  <div className="p-2 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-between text-stone-300">
+                    <span className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
+                      <span>Sarah M. booked 3:00 PM slot via WhatsApp</span>
+                    </span>
+                    <span className="text-stone-500 text-[10px]">Just now</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-between text-stone-300">
+                    <span className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                      <span>CRM deal created: Sarah Miller ($1,200)</span>
+                    </span>
+                    <span className="text-stone-500 text-[10px]">1m ago</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 flex justify-center">
+              <AnimatedChatMockup />
+            </div>
+          </div>
+        </div>
+      </motion.div>
     </section>
   );
 }
 
-// ==========================================
-// TRUSTED BY LOGO MARQUEE SECTION
-// ==========================================
+// 2. TRUSTED BY (☀️ LIGHT)
 export function TrustedBy() {
   const { integrationTitle, integrationLogos, loadBranding } = useBrandingStore();
 
@@ -374,7 +581,7 @@ export function TrustedBy() {
           <img
             src={item.logo_url}
             alt={item.name}
-            className="h-6 max-h-7 w-auto object-contain opacity-40 hover:opacity-100 transition-opacity duration-300 grayscale hover:grayscale-0"
+            className="h-6 max-h-7 w-auto object-contain opacity-60 hover:opacity-100 transition-opacity duration-300 grayscale hover:grayscale-0"
           />
         </a>
       );
@@ -397,7 +604,7 @@ export function TrustedBy() {
       logoElement = <StripeLogo />;
     } else {
       logoElement = (
-        <span className="font-sans font-black tracking-widest text-base uppercase opacity-40 hover:opacity-100 hover:text-slate-900 transition-all duration-300 text-slate-700">
+        <span className="font-sans font-black tracking-widest text-base uppercase opacity-60 hover:opacity-100 hover:text-slate-900 transition-all duration-300 text-stone-700">
           {item.name}
         </span>
       );
@@ -409,7 +616,7 @@ export function TrustedBy() {
         href={item.url || '#'}
         target={item.url ? '_blank' : undefined}
         rel="noreferrer"
-        className="shrink-0 inline-flex items-center justify-center transition-transform duration-200 hover:scale-105"
+        className="shrink-0 inline-flex items-center justify-center transition-transform duration-200 hover:scale-105 text-stone-600"
       >
         {logoElement}
       </a>
@@ -417,19 +624,971 @@ export function TrustedBy() {
   };
 
   return (
-    <section className="py-16 border-y border-slate-100 bg-white overflow-hidden">
+    <section className="py-14 border-y border-stone-200/80 bg-[#FAFAF9] overflow-hidden relative">
       <div className="max-w-7xl mx-auto px-6 text-center">
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-10">
+        <p className="text-[11px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-8">
           {integrationTitle || 'INTEGRATES SEAMLESSLY WITH YOUR EXISTING STACK & TOOLS'}
         </p>
 
-        {/* Infinite scrolling logo row with responsive Vector SVG logos */}
-        <div className="flex w-full overflow-hidden relative">
+        <div className="flex w-full overflow-hidden relative [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
           <div className="flex gap-24 animate-marquee whitespace-nowrap py-3 shrink-0 items-center">
             {activeLogos.map((item, idx) => renderLogo(item, idx))}
-            {/* Duplicate for infinite loop */}
             {activeLogos.map((item, idx) => renderLogo(item, idx + activeLogos.length))}
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// 3. OMNICHANNEL INBOX (☀️ LIGHT SECTION WITH HIGH-CONTRAST DARK CONSOLE)
+export function OmnichannelInbox() {
+  const [selectedChannel, setSelectedChannel] = useState<'all' | 'copilot' | 'sales' | 'support' | 'broadcasts'>('all');
+
+  const channelData = {
+    all: {
+      name: 'Ahmad Khan',
+      source: 'via WhatsApp Business',
+      tag: 'AI suggested',
+      msg: '"Hi! Do you have slots available for a demo call today?"',
+      author: 'Ahmad • 10:41 AM',
+      reply: '"Yes, Ahmed! We have slots open at 3:00 PM and 5:00 PM. Book here."',
+      replyMeta: 'AI Copilot Draft • 10:41 AM'
+    },
+    copilot: {
+      name: 'Dr. Elena Vance',
+      source: 'via Medical Clinic Bot',
+      tag: 'Autonomous Flow',
+      msg: '"Can I reschedule my appointment from Tuesday to Thursday?"',
+      author: 'Elena • 11:05 AM',
+      reply: '"Certainly! Rescheduled to Thursday at 4:00 PM. Google Calendar invite sent."',
+      replyMeta: 'Auto-Confirmed • 11:05 AM'
+    },
+    sales: {
+      name: 'Sarah Miller Retail',
+      source: 'via Instagram DM Ad',
+      tag: 'High Priority Lead',
+      msg: '"Saw your ad on Instagram. What is the onboarding timeframe?"',
+      author: 'Sarah • 11:15 AM',
+      reply: '"We onboard in under 15 minutes with official Meta Cloud API templates!"',
+      replyMeta: 'Sales Qualified • 11:15 AM'
+    },
+    support: {
+      name: 'David Chen',
+      source: 'via Web ChatWidget',
+      tag: 'Tech Support',
+      msg: '"Does the CRM support custom webhook payloads?"',
+      author: 'David • 11:20 AM',
+      reply: '"Yes, full REST JSON webhook support with instant delivery callbacks."',
+      replyMeta: 'Verified Answer • 11:20 AM'
+    },
+    broadcasts: {
+      name: 'Marketing Dispatcher',
+      source: 'via WhatsApp Broadcast',
+      tag: 'Campaign Blast',
+      msg: '"Broadcast campaign \'VIP Spring Flash Promo\' sent to 2,480 users."',
+      author: 'System • 11:30 AM',
+      reply: '"98.4% delivered • 18.2% click-through rate in 8 minutes."',
+      replyMeta: 'High ROI • 11:30 AM'
+    }
+  };
+
+  const active = channelData[selectedChannel];
+
+  return (
+    <section id="solutions" className="py-32 px-6 bg-white text-[#12263A] border-b border-stone-200/80 overflow-hidden relative">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center relative z-10">
+        {/* Visual Console Mockup (Dark Workstation in Light Section) */}
+        <div className="lg:col-span-6 w-full flex justify-center">
+          <div className="w-full max-w-lg bg-[#0a1826] border border-stone-800 rounded-2xl sm:rounded-[2.25rem] shadow-[0_25px_60px_rgba(18,38,58,0.18)] ring-1 ring-black/5 p-3.5 sm:p-5 relative overflow-hidden flex flex-col min-h-[440px] sm:h-[420px] text-white">
+            {/* Console Header with macOS Window Dots */}
+            <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2.5 sm:pb-3 overflow-hidden">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-1.5 mr-1 shrink-0">
+                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold tracking-tight text-stone-200 truncate">Talkinexx Workspace</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-[#12263A] px-2 sm:px-2.5 py-1 rounded-md border border-white/10 text-[8.5px] sm:text-[9px] font-mono text-[#22C55E] shrink-0 whitespace-nowrap">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] shrink-0" />
+                <span>OFFICIAL CLOUD API</span>
+              </div>
+            </div>
+
+            {/* Console Body Split with Interactive Channel Switcher */}
+            <div className="flex-1 flex flex-col sm:flex-row gap-3 sm:gap-4 mt-3 overflow-hidden">
+              <div className="flex sm:flex-col sm:w-1/3 border-b sm:border-b-0 sm:border-r border-white/5 pb-2.5 sm:pb-0 sm:pr-3 gap-1.5 sm:space-y-1.5 text-[11px] font-medium text-stone-400 overflow-x-auto sm:overflow-visible shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setSelectedChannel('all')}
+                  className={cn("p-2 rounded-xl flex items-center justify-between font-semibold transition-all cursor-pointer text-left shrink-0 whitespace-nowrap sm:w-full",
+                    selectedChannel === 'all'
+                      ? "bg-[#166534]/30 border border-[#22C55E]/30 text-[#86efac]"
+                      : "hover:bg-white/5 text-stone-300"
+                  )}
+                >
+                  <span className="flex items-center gap-1.5">💬 All Chats</span>
+                  <span className="w-4 h-4 bg-[#22C55E] text-slate-950 font-bold text-[9px] rounded-full flex items-center justify-center ml-2 sm:ml-0">4</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedChannel('copilot')}
+                  className={cn("p-2 rounded-xl flex items-center justify-between transition-all cursor-pointer text-left shrink-0 whitespace-nowrap sm:w-full",
+                    selectedChannel === 'copilot'
+                      ? "bg-[#166534]/30 border border-[#22C55E]/30 text-[#86efac] font-semibold"
+                      : "hover:bg-white/5 text-stone-300"
+                  )}
+                >
+                  <span className="flex items-center gap-1.5">🤖 AI Copilot</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedChannel('sales')}
+                  className={cn("p-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer text-left shrink-0 whitespace-nowrap sm:w-full",
+                    selectedChannel === 'sales'
+                      ? "bg-[#166534]/30 border border-[#22C55E]/30 text-[#86efac] font-semibold"
+                      : "hover:bg-white/5 text-stone-400"
+                  )}
+                >
+                  <span>🏷️ Sales Leads</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedChannel('support')}
+                  className={cn("p-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer text-left shrink-0 whitespace-nowrap sm:w-full",
+                    selectedChannel === 'support'
+                      ? "bg-[#166534]/30 border border-[#22C55E]/30 text-[#86efac] font-semibold"
+                      : "hover:bg-white/5 text-stone-400"
+                  )}
+                >
+                  <span>🎫 Support</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedChannel('broadcasts')}
+                  className={cn("p-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer text-left shrink-0 whitespace-nowrap sm:w-full",
+                    selectedChannel === 'broadcasts'
+                      ? "bg-[#166534]/30 border border-[#22C55E]/30 text-[#86efac] font-semibold"
+                      : "hover:bg-white/5 text-stone-400"
+                  )}
+                >
+                  <span>🚀 Broadcasts</span>
+                </button>
+              </div>
+
+              <div className="flex-1 flex flex-col justify-between">
+                <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-[#166534] text-white flex items-center justify-center text-[10px] font-bold">
+                      {active.name.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-bold text-white block leading-tight">{active.name}</span>
+                      <span className="text-[9px] text-[#22C55E] block">{active.source}</span>
+                    </div>
+                  </div>
+                  <span className="text-[9px] text-[#22C55E] font-semibold bg-[#166534]/30 border border-[#22C55E]/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    {active.tag}
+                  </span>
+                </div>
+
+                <div className="flex-1 flex flex-col justify-end gap-2.5 my-2">
+                  <div className="flex flex-col items-start max-w-[88%] self-start space-y-1">
+                    <div className="p-3 bg-[#12263A] border border-white/10 rounded-2xl rounded-tl-none text-xs leading-relaxed text-stone-200">
+                      {active.msg}
+                    </div>
+                    <span className="text-[8.5px] text-stone-400 font-medium pl-1">{active.author}</span>
+                  </div>
+
+                  <div className="flex flex-col items-end max-w-[88%] self-end space-y-1">
+                    <div className="p-3 bg-gradient-to-r from-[#166534] to-[#22C55E] rounded-2xl rounded-tr-none text-xs leading-relaxed text-white relative shadow-md">
+                      <Sparkles size={11} className="absolute top-2 right-2 text-emerald-200" />
+                      {active.reply}
+                    </div>
+                    <span className="text-[8.5px] text-[#22C55E] font-medium pr-1 flex items-center gap-1">
+                      <CheckCheck size={12} /> {active.replyMeta}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 border-t border-white/5 pt-2.5 pb-1 mt-auto">
+                  <input
+                    type="text"
+                    placeholder="Send auto-reply or type response..."
+                    className="flex-1 min-w-0 bg-[#12263A] border border-white/10 rounded-xl h-8 px-3 text-[10.5px] sm:text-[11px] text-stone-300 placeholder-stone-500 focus:outline-none"
+                    disabled
+                  />
+                  <button className="h-8 px-3 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-bold text-[10px] rounded-xl flex items-center justify-center cursor-default shadow-sm shrink-0">
+                    Send
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Text Area */}
+        <div className="lg:col-span-6 space-y-6 text-left">
+          <span className="font-sans font-semibold text-[13px] uppercase tracking-[1.5px] text-[#166534] bg-[#F0FDF4] px-4 py-1.5 rounded-full border border-[#bbf7d0] inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#166534]" />
+            WhatsApp Automation
+          </span>
+          <h2 className="font-display font-[800] text-[34px] md:text-[42px] lg:text-[48px] leading-[1.12] tracking-[-0.03em] text-[#12263A]">
+            Scale your business on WhatsApp
+          </h2>
+          <p className="font-sans font-normal text-[17px] leading-[1.75] max-w-[620px] text-[#57534E]">
+            Stop manually replying to repetitive queries. Automate responses, route conversations to the right team, and send targeted broadcast campaigns on the world's most popular messaging app.
+          </p>
+
+          <div className="grid grid-cols-2 gap-5 pt-3">
+            <div className="p-5 rounded-2xl bg-[#FAFAF9] border border-stone-200/80 shadow-xs hover:border-[#166534]/40 hover:shadow-md transition-all">
+              <span className="block text-3xl md:text-4xl font-display font-extrabold text-[#12263A]">
+                98%
+              </span>
+              <span className="block text-[11px] font-bold text-stone-400 uppercase tracking-widest mt-1">
+                Message Open Rate
+              </span>
+            </div>
+            <div className="p-5 rounded-2xl bg-[#FAFAF9] border border-stone-200/80 shadow-xs hover:border-[#166534]/40 hover:shadow-md transition-all">
+              <span className="block text-3xl md:text-4xl font-display font-extrabold text-[#166534]">
+                24/7
+              </span>
+              <span className="block text-[11px] font-bold text-stone-400 uppercase tracking-widest mt-1">
+                Automated Support
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// 4. AI WORKFLOW (🌙 DARK BENTO GRID)
+export function AIWorkflow() {
+  const steps = [
+    { icon: MessageCircle, title: 'Inbound Message', desc: 'Customer texts your WhatsApp number or scans a QR code.' },
+    { icon: Zap, title: 'AI Context Engine', desc: 'Instantly analyzes context, language, and purchasing intent.' },
+    { icon: Send, title: 'Interactive Reply', desc: 'Fires back personalized replies with WhatsApp buttons & lists.' },
+    { icon: Calendar, title: 'In-Chat Booking', desc: 'Customer books a meeting slot directly within the chat window.' },
+    { icon: Database, title: 'CRM Sync', desc: 'Automatically logs the lead, tags intent, and updates your CRM.' },
+    { icon: Users, title: 'Smart Handoff', desc: 'Routes complex or high-value chats to human agents seamlessly.' }
+  ];
+
+  return (
+    <section className="py-32 px-6 bg-[#0d1c2d] text-white relative overflow-hidden border-b border-white/[0.08]">
+      {/* Background Radial Glows */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#166534]/15 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[350px] h-[350px] bg-[#22C55E]/10 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto text-center relative z-10">
+        <div className="max-w-2xl mx-auto space-y-4 mb-20 text-center flex flex-col items-center">
+          <span className="font-sans font-semibold text-[13px] uppercase tracking-[1.5px] text-[#22C55E] bg-[#166534]/30 px-4 py-1.5 rounded-full border border-[#22C55E]/30 flex items-center gap-2 backdrop-blur-md shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+            <Sparkles size={14} className="text-[#22C55E]" />
+            100% Automated Workflow
+          </span>
+          <h2 className="font-display font-[800] text-[32px] md:text-[42px] lg:text-[50px] leading-[1.12] tracking-[-0.03em] text-white">
+            Turn WhatsApp Into Your Best Employee
+          </h2>
+          <p className="font-sans font-normal text-[17px] leading-[1.75] max-w-[620px] text-stone-300">
+            Deploy AI on your WhatsApp Business number to automate response generation, support workflows, and pipeline progression 24/7.
+          </p>
+        </div>
+
+        {/* Step-by-Step Modern Bento Grid Architecture */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
+          {steps.map((s, idx) => {
+            const Icon = s.icon;
+            return (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.08 }}
+                className="group bg-[#12263A]/80 border border-white/10 hover:border-[#22C55E]/50 hover:bg-[#16304a] p-7 rounded-[1.75rem] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 relative shadow-xl text-left flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="w-13 h-13 bg-[#166534]/30 border border-[#22C55E]/30 text-[#22C55E] rounded-2xl flex items-center justify-center shadow-inner group-hover:bg-gradient-to-br group-hover:from-[#166534] group-hover:to-[#22C55E] group-hover:text-white transition-all duration-300">
+                      <Icon size={24} strokeWidth={2} />
+                    </div>
+                    <span className="font-mono text-xs font-bold text-stone-400 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg group-hover:text-[#22C55E] group-hover:border-[#22C55E]/30 transition-colors">
+                      STAGE 0{idx + 1}
+                    </span>
+                  </div>
+
+                  <h3 className="font-display font-bold text-lg text-white mb-2 tracking-tight group-hover:text-[#86efac] transition-colors">
+                    {s.title}
+                  </h3>
+                  <p className="text-sm text-stone-300 leading-relaxed font-normal">
+                    {s.desc}
+                  </p>
+                </div>
+
+                <div className="pt-4 mt-6 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-stone-400">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
+                    <span>Real-time Autopilot</span>
+                  </span>
+                  <span className="text-[#22C55E] opacity-0 group-hover:opacity-100 transition-opacity">
+                    Active →
+                  </span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// 5. WHATSAPP AUTOMATION (☀️ LIGHT SECTION WITH HIGH-CONTRAST DUAL VISUALS)
+export function WhatsAppAutomation() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const features = [
+    {
+      icon: Bot,
+      title: '24/7 AI Customer Replies',
+      desc: 'Automatically answer customer messages day and night using predefined intelligent workflows.',
+      color: 'bg-[#F0FDF4] text-[#166534] border-[#bbf7d0]'
+    },
+    {
+      icon: MessageCircle,
+      title: 'Instant Welcome Message',
+      desc: 'Send personalized greetings immediately when a customer starts a WhatsApp conversation.',
+      color: 'bg-emerald-50 text-emerald-700 border-emerald-200'
+    },
+    {
+      icon: FileText,
+      title: 'Interactive Service Selection',
+      desc: 'Display business services as clickable WhatsApp buttons so customers can quickly navigate to the service they need.',
+      color: 'bg-[#166534]/10 text-[#166534] border-[#166534]/20'
+    },
+    {
+      icon: Calendar,
+      title: 'Appointment Booking Automation',
+      desc: 'Automatically collect customer information, preferred date, available time slots, and confirm appointments without staff involvement.',
+      color: 'bg-[#12263A]/10 text-[#12263A] border-[#12263A]/20'
+    },
+    {
+      icon: MousePointerClick,
+      title: 'Click-to-WhatsApp Advertising',
+      desc: 'Integrate TikTok, Facebook, Instagram, Snapchat, and Google Ads so customers who click ads land directly into a WhatsApp conversation.',
+      color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+    },
+    {
+      icon: Database,
+      title: 'CRM & Lead Management',
+      desc: 'Automatically save customer information, create leads, notify sales representatives, and synchronize conversations with the CRM.',
+      color: 'bg-stone-100 text-stone-700 border-stone-200'
+    }
+  ];
+
+  const workflowSteps = [
+    { label: 'Customer Clicks Ad', sub: 'TikTok • Facebook • Instagram • Snapchat • Google', icon: MousePointerClick },
+    { label: 'WhatsApp Opens Instantly', sub: 'Direct deep-link conversation', icon: MessageCircle },
+    { label: 'Automatic Welcome Message', sub: '"Welcome to Talkinexx 👋"', icon: Send },
+    { label: 'Customer Selects Service', sub: 'Book • Quote • Services • Support', icon: FileText },
+    { label: 'AI Asks Required Questions', sub: 'Smart contextual follow-ups', icon: Bot },
+    { label: 'Booking Confirmed', sub: 'Appointment or quote locked in', icon: Calendar },
+    { label: 'Info Saved & Lead Created', sub: 'CRM auto-sync & lead pipeline', icon: Database },
+    { label: 'Sales Team Notified', sub: 'Instant alerts to account managers', icon: BellRing }
+  ];
+
+  const stats = [
+    { value: '24/7', label: 'AI Availability', sub: 'Non-stop coverage' },
+    { value: '98%', label: 'Instant Response Rate', sub: 'Under 3 seconds' },
+    { value: '3X', label: 'Higher Conversion', sub: 'vs traditional forms' },
+    { value: '0', label: 'Manual Intervention', sub: 'Fully automated' }
+  ];
+
+  return (
+    <>
+      {/* Main Two-Column Section (☀️ LIGHT) */}
+      <section
+        ref={sectionRef}
+        id="whatsapp-automation"
+        className="py-32 px-6 bg-[#FAFAF9] text-[#12263A] border-b border-stone-200/80 overflow-hidden"
+      >
+        <div className="max-w-7xl mx-auto">
+          {/* Section Badge + Title */}
+          <div className="text-center mb-20 max-w-2xl mx-auto space-y-4 flex flex-col items-center">
+            <span className="font-sans font-semibold text-[13px] uppercase tracking-[1.5px] text-[#166534] bg-[#F0FDF4] px-4 py-1.5 rounded-full border border-[#bbf7d0] flex items-center gap-1.5 w-fit">
+              <MessageCircle size={14} className="text-[#166534]" />
+              WhatsApp Automation
+            </span>
+            <h2 className="font-display font-[800] text-[34px] md:text-[42px] lg:text-[48px] leading-[1.12] tracking-[-0.03em] text-[#12263A]">
+              AI WhatsApp Automation for <span className="text-[#166534]">Businesses & Clinics</span>
+            </h2>
+            <p className="font-sans font-normal text-[17px] leading-[1.75] max-w-[700px] text-[#57534E]">
+              Transform customer communication with intelligent WhatsApp automation that replies instantly, guides customers through services, books appointments, captures leads, and integrates directly with your marketing campaigns.
+            </p>
+          </div>
+
+          {/* Two-Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+            {/* Left Column: 6 Features (Light Cards) */}
+            <div className="lg:col-span-5 space-y-8">
+              <div className="space-y-4">
+                <h3 className="font-display font-[800] text-[24px] md:text-[28px] leading-[1.2] tracking-[-0.02em] text-[#12263A]">
+                  Automate every customer touchpoint from ad click to appointment booking
+                </h3>
+                <p className="font-sans font-normal text-[16px] leading-[1.75] text-[#57534E]">
+                  Deploy AI-powered WhatsApp workflows that handle lead capture, service inquiries, appointment scheduling, and CRM synchronization — completely hands-free.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {features.map((f, idx) => (
+                  <motion.div
+                    key={f.title}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="p-5 bg-white border border-stone-200/80 rounded-2xl shadow-xs hover:shadow-md hover:border-[#166534]/40 hover:-translate-y-1 transition-all duration-300 group ring-1 ring-black/5"
+                  >
+                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center border transition-all mb-3", f.color)}>
+                      <f.icon size={18} strokeWidth={2.2} />
+                    </div>
+                    <h4 className="text-sm font-bold text-[#12263A] mb-1.5 tracking-tight group-hover:text-[#166534] transition-colors">{f.title}</h4>
+                    <p className="text-[#57534E] font-medium text-[11px] leading-relaxed">{f.desc}</p>
+                  </motion.div>
+                ))}
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="pt-2"
+              >
+                <NavLink
+                  to="/contact"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] hover:from-[#14532d] hover:to-[#16a34a] text-white font-sans font-bold text-[15px] tracking-[0.2px] rounded-xl transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(34,197,94,0.35)] active:scale-[0.98] shadow-lg cursor-pointer"
+                >
+                  Get Started with WhatsApp AI
+                  <ArrowRight size={16} />
+                </NavLink>
+              </motion.div>
+            </div>
+
+            {/* Right Column: 8-Step Pipeline (Dark Contrast Console) */}
+            <div className="lg:col-span-7 w-full">
+              <div className="w-full bg-[#0a1826] border border-stone-800 rounded-[2.25rem] p-6 md:p-8 shadow-[0_20px_50px_rgba(18,38,58,0.18)] ring-1 ring-white/10 relative overflow-hidden">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6 relative z-10">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 mr-2">
+                      <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                    </div>
+                    <span className="text-xs font-semibold tracking-tight text-stone-200">WhatsApp Automation Pipeline</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-[#12263A] px-2.5 py-1 rounded-md border border-white/10 text-[9px] font-mono text-[#22C55E]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
+                    <span>LIVE • 8 STEPS</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 relative z-10">
+                  {workflowSteps.map((step, idx) => (
+                    <motion.div
+                      key={step.label}
+                      initial={{ opacity: 0, x: 20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, margin: "-30px" }}
+                      transition={{ delay: idx * 0.06, duration: 0.3 }}
+                    >
+                      <div className="flex items-center gap-4 p-3 bg-white/[0.04] border border-white/[0.08] rounded-xl backdrop-blur-sm hover:bg-white/[0.08] hover:border-[#22C55E]/30 transition-all duration-300 group">
+                        <div className="w-8 h-8 bg-[#166534]/40 border border-[#22C55E]/30 text-[#22C55E] font-mono font-bold rounded-lg flex items-center justify-center text-xs shrink-0 group-hover:bg-[#166534] group-hover:text-white transition-all duration-300">
+                          {idx + 1}
+                        </div>
+
+                        <div className="w-8 h-8 bg-[#12263A] border border-white/10 rounded-lg flex items-center justify-center shrink-0">
+                          <step.icon size={14} className="text-stone-300 group-hover:text-[#22C55E] transition-colors" />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <span className="text-[12px] font-bold text-white block leading-tight group-hover:text-[#86efac] transition-colors">{step.label}</span>
+                          <span className="text-[10px] text-stone-400 font-medium block mt-0.5 truncate">{step.sub}</span>
+                        </div>
+
+                        <div className="w-2 h-2 rounded-full bg-[#22C55E]/60 group-hover:bg-[#22C55E] transition-colors shrink-0" />
+                      </div>
+
+                      {idx < workflowSteps.length - 1 && (
+                        <div className="flex justify-center py-0.5">
+                          <div className="w-px h-1.5 bg-[#22C55E]/30" />
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="mt-5 pt-3.5 border-t border-white/10 flex items-center justify-between text-[10px] relative z-10">
+                  <span className="flex items-center gap-1.5 text-stone-300 font-medium">
+                    <CheckCircle2 size={12} className="text-[#22C55E]" />
+                    End-to-end automation • Zero manual intervention
+                  </span>
+                  <span className="text-[#22C55E] font-bold uppercase tracking-wider text-[9px] bg-[#166534]/30 border border-[#22C55E]/30 px-2 py-0.5 rounded-full">Active</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Statistics Strip (🌙 DARK POD) */}
+      <section className="py-20 px-6 bg-[#0a1826] relative overflow-hidden border-b border-white/[0.08]">
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="bg-gradient-to-r from-[#0d1d2e] via-[#12263A] to-[#0d1d2e] border border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.6)] rounded-[2.25rem] p-10 md:p-14 relative overflow-hidden ring-1 ring-white/10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:divide-x md:divide-white/[0.08] relative z-10">
+              {stats.map((s, idx) => (
+                <motion.div
+                  key={s.label}
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.08 }}
+                  className={cn(
+                    "flex flex-col items-center justify-center text-center group/stat",
+                    idx > 0 && "md:pl-6"
+                  )}
+                >
+                  <div className="relative mb-2 sm:mb-3">
+                    <span className="text-3xl sm:text-5xl md:text-6xl font-display font-extrabold bg-clip-text text-transparent bg-gradient-to-b from-white via-[#F0FDF4] to-[#86efac] tracking-tighter block drop-shadow-md">
+                      {s.value}
+                    </span>
+                  </div>
+                  <span className="block text-[11px] sm:text-[12px] font-bold text-[#22C55E] uppercase tracking-[0.15em] sm:tracking-[0.18em] mb-1">{s.label}</span>
+                  <span className="block text-[9.5px] sm:text-[10px] font-semibold text-stone-400 uppercase tracking-widest">{s.sub}</span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Secondary CTA Section (🌙 DARK) */}
+      <section className="py-28 px-6 bg-[#0d1c2d] text-white text-center relative overflow-hidden border-b border-white/[0.08]">
+        <div className="max-w-3xl mx-auto space-y-8 relative z-10 flex flex-col items-center">
+          <span className="font-sans font-semibold text-[13px] uppercase tracking-[1.5px] text-[#22C55E] bg-[#166534]/30 px-4 py-1.5 rounded-full border border-[#22C55E]/30 flex items-center gap-1.5 backdrop-blur-md">
+            <Sparkles size={13} className="text-[#22C55E]" />
+            WhatsApp AI
+          </span>
+
+          <h2 className="font-display font-[800] text-[32px] md:text-[42px] lg:text-[50px] leading-[1.1] tracking-[-0.03em] text-white max-w-2xl">
+            Ready to Automate Your Customer <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] via-[#4ade80] to-[#bbf7d0]">Conversations?</span>
+          </h2>
+
+          <p className="font-sans font-normal text-[17px] leading-[1.75] max-w-[600px] text-stone-300">
+            Deploy AI-powered WhatsApp automation for your business or clinic and never miss another customer again.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-x-8 text-[11px] sm:text-[12px] font-semibold text-stone-200 font-sans uppercase tracking-[0.5px] bg-white/[0.06] border border-white/10 px-5 sm:px-8 py-3.5 rounded-2xl sm:rounded-full backdrop-blur-md shadow-inner text-center">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={14} className="text-[#22C55E] shrink-0" />
+              <span>Click-to-WhatsApp Ads</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={14} className="text-[#22C55E] shrink-0" />
+              <span>AI Booking</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={14} className="text-[#22C55E] shrink-0" />
+              <span>CRM Sync</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={14} className="text-[#22C55E] shrink-0" />
+              <span>24/7 Auto-Reply</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 w-full">
+            <NavLink
+              to="/signup"
+              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] hover:from-[#14532d] hover:to-[#16a34a] text-white font-sans font-bold text-[15px] tracking-[0.2px] rounded-xl transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(34,197,94,0.35)] active:scale-[0.98] text-center shadow-lg cursor-pointer"
+            >
+              Get Started
+            </NavLink>
+            <NavLink
+              to="/contact"
+              className="w-full sm:w-auto px-8 py-4 bg-white/[0.07] hover:bg-white/[0.12] border border-white/15 hover:border-white/30 text-white font-sans font-semibold text-[15px] tracking-[0.2px] rounded-xl transition-all duration-200 backdrop-blur-sm active:scale-[0.98] text-center shadow-sm cursor-pointer"
+            >
+              Book a Live Demo
+            </NavLink>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+// 6. CRM DASHBOARD PREVIEW (☀️ LIGHT SECTION WITH CRISP MAC OS BOARD)
+export function CRMDashboardPreview() {
+  const { websiteName } = useBrandingStore();
+  const [dealFilter, setDealFilter] = useState<'all' | 'whatsapp' | 'instagram' | 'messenger'>('all');
+
+  const rawColumns = [
+    {
+      title: 'Qualification',
+      count: '1 Lead',
+      value: '$4,500',
+      color: 'border-t-[#12263A]',
+      deals: [
+        {
+          initials: 'AK',
+          name: 'Ahmad Khan Support',
+          deal: '$4,500 CRM Integration',
+          time: 'Active 2m ago',
+          channel: '💬 WhatsApp API',
+          channelType: 'whatsapp',
+          tag: 'High Priority',
+          tagColor: 'bg-rose-50 text-rose-600 border-rose-200',
+          desc: 'Needs segment routing and automated follow-ups configuration.'
+        }
+      ]
+    },
+    {
+      title: 'Proposal & AI Review',
+      count: '1 Lead',
+      value: '$1,200',
+      color: 'border-t-[#166534]',
+      deals: [
+        {
+          initials: 'SM',
+          name: 'Sarah Miller Retail',
+          deal: '$1,200 Campaign Setup',
+          time: 'Active 15m ago',
+          channel: '📸 Instagram DM',
+          channelType: 'instagram',
+          tag: 'AI Replied',
+          tagColor: 'bg-[#F0FDF4] text-[#166534] border-[#bbf7d0]',
+          desc: 'AI suggested birthday auto-coupon template has been drafted.'
+        }
+      ]
+    },
+    {
+      title: 'Closed Won',
+      count: '1 Lead',
+      value: '$8,900',
+      color: 'border-t-[#22C55E]',
+      deals: [
+        {
+          initials: 'ZM',
+          name: 'Zayn Malik Labs',
+          deal: '$8,900 Enterprise Hub',
+          time: 'Completed 1h ago',
+          channel: '👥 Messenger Chat',
+          channelType: 'messenger',
+          tag: 'API Integrated',
+          tagColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          desc: 'Database fields synced. REST webhook callbacks are operational.'
+        }
+      ]
+    }
+  ];
+
+  const columns = rawColumns.map(col => ({
+    ...col,
+    deals: col.deals.filter(d => dealFilter === 'all' || d.channelType === dealFilter)
+  }));
+
+  return (
+    <section className="py-32 px-6 bg-white text-[#12263A] border-b border-stone-200/80 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto space-y-16">
+        <div className="text-center max-w-xl mx-auto space-y-4">
+          <span className="font-sans font-semibold text-[13px] uppercase tracking-[1.5px] text-[#166534] bg-[#F0FDF4] px-4 py-1.5 rounded-full border border-[#bbf7d0] inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#166534]" />
+            Core Engine
+          </span>
+          <h2 className="font-display font-[800] text-[34px] md:text-[42px] lg:text-[48px] leading-[1.12] tracking-[-0.03em] text-[#12263A]">
+            Complete Customer Relationship Pipeline
+          </h2>
+          <p className="font-sans font-normal text-[17px] leading-[1.75] max-w-[620px] text-[#57534E]">
+            Monitor deals, track lead status, view active customer profiles, and review task timelines from one central workspace.
+          </p>
+        </div>
+
+        {/* Kanban Board Interface Mockup */}
+        <div className="w-full bg-[#FAFAF9] border border-stone-200/90 shadow-[0_20px_50px_rgba(18,38,58,0.06)] rounded-[2.25rem] p-6 sm:p-8 flex flex-col gap-6 ring-1 ring-black/5">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-stone-200/70 pb-4 sm:pb-6 gap-3 sm:gap-4">
+            <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+              <div className="flex items-center gap-1.5 mt-1 sm:mt-0 shrink-0">
+                <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+              </div>
+              <div className="h-4 w-px bg-stone-300 mx-0.5 sm:mx-1 hidden xs:block" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#22C55E] shrink-0" />
+                  <h3 className="text-xs sm:text-base font-bold text-[#12263A] tracking-tight truncate">{websiteName || 'Talkinexx'} Active Deals Board</h3>
+                </div>
+                <span className="text-[10px] sm:text-[11px] font-semibold text-stone-500 mt-0.5 block truncate">Pipeline Value: <strong className="text-[#166534] font-bold">$14,600 USD</strong> • 3 active customer profiles</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-3 w-full sm:w-auto pt-1 sm:pt-0">
+              <span className="text-[9.5px] sm:text-[10.5px] font-mono font-bold text-stone-600 uppercase tracking-wider bg-white border border-stone-200 px-2.5 sm:px-3 py-1.5 rounded-xl shadow-xs shrink-0 whitespace-nowrap">REST API: Active</span>
+              <NavLink to="/contact" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#12263A] to-[#166534] hover:from-[#0a1826] hover:to-[#14532d] text-white rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95 shrink-0 whitespace-nowrap">
+                <span>Open CRM Workspace</span> <ArrowRight size={12} className="shrink-0" />
+              </NavLink>
+            </div>
+          </div>
+
+          {/* Filter Bar Chips */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+            <span className="text-stone-400 font-semibold text-[11px] flex items-center gap-1 shrink-0 mr-1">
+              <Filter size={13} /> Filter:
+            </span>
+            <button
+              onClick={() => setDealFilter('all')}
+              className={cn("px-3 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap",
+                dealFilter === 'all'
+                  ? "bg-[#12263A] text-white shadow-xs"
+                  : "bg-white text-stone-600 border border-stone-200 hover:bg-stone-50"
+              )}
+            >
+              All Deals (3)
+            </button>
+            <button
+              onClick={() => setDealFilter('whatsapp')}
+              className={cn("px-3 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap",
+                dealFilter === 'whatsapp'
+                  ? "bg-[#166534] text-white shadow-xs"
+                  : "bg-white text-stone-600 border border-stone-200 hover:bg-stone-50"
+              )}
+            >
+              💬 WhatsApp ($4,500)
+            </button>
+            <button
+              onClick={() => setDealFilter('instagram')}
+              className={cn("px-3 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap",
+                dealFilter === 'instagram'
+                  ? "bg-[#166534] text-white shadow-xs"
+                  : "bg-white text-stone-600 border border-stone-200 hover:bg-stone-50"
+              )}
+            >
+              📸 Instagram ($1,200)
+            </button>
+            <button
+              onClick={() => setDealFilter('messenger')}
+              className={cn("px-3 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap",
+                dealFilter === 'messenger'
+                  ? "bg-[#166534] text-white shadow-xs"
+                  : "bg-white text-stone-600 border border-stone-200 hover:bg-stone-50"
+              )}
+            >
+              👥 Messenger ($8,900)
+            </button>
+          </div>
+
+          {/* Kanban Columns Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {columns.map((col) => (
+              <div key={col.title} className={cn("p-5 bg-white border border-stone-200/90 rounded-2xl flex flex-col gap-4 border-t-4 shadow-xs", col.color)}>
+                <div className="flex justify-between items-center border-b border-stone-100 pb-2.5">
+                  <div>
+                    <span className="font-display font-[700] text-sm text-[#12263A] block">{col.title}</span>
+                    <span className="text-[10px] text-stone-400 font-semibold">{col.deals.length} Lead{col.deals.length !== 1 ? 's' : ''}</span>
+                  </div>
+                  <span className="text-xs font-bold text-[#166534] bg-[#F0FDF4] border border-[#bbf7d0] px-2.5 py-0.5 rounded-lg">{col.value}</span>
+                </div>
+
+                <div className="space-y-3 flex-1 min-h-[140px]">
+                  {col.deals.length > 0 ? (
+                    col.deals.map((deal, dealIdx) => (
+                      <div key={dealIdx} className="p-4 bg-[#FAFAF9] border border-stone-200/70 shadow-xs rounded-xl flex flex-col gap-3.5 hover:border-[#166534]/40 hover:shadow-md transition-all duration-300 group">
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-[#F0FDF4] border border-[#bbf7d0] text-[#166534] flex items-center justify-center text-xs font-bold">
+                              {deal.initials}
+                            </div>
+                            <div>
+                              <span className="text-xs font-bold text-[#12263A] group-hover:text-[#166534] transition-colors block leading-tight">{deal.name}</span>
+                              <span className="text-[10px] text-stone-400 font-medium block mt-0.5">{deal.channel}</span>
+                            </div>
+                          </div>
+                          <span className={cn("text-[8.5px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0", deal.tagColor)}>
+                            {deal.tag}
+                          </span>
+                        </div>
+
+                        <div className="space-y-1">
+                          <span className="text-[11.5px] font-bold text-[#12263A] block leading-tight">{deal.deal}</span>
+                          <p className="text-[10.5px] text-[#57534E] leading-normal font-normal">{deal.desc}</p>
+                        </div>
+
+                        <div className="pt-2.5 border-t border-stone-200/60 flex justify-between items-center text-[9.5px] text-stone-400 font-semibold">
+                          <span>{deal.time}</span>
+                          <span className="text-[#166534] group-hover:underline cursor-pointer flex items-center gap-0.5">Edit Deal <ArrowUpRight size={10} /></span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="h-full flex items-center justify-center p-6 border border-dashed border-stone-200 rounded-xl text-stone-400 text-xs text-center font-mono">
+                      No matching leads for current filter
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="pt-2 flex justify-between items-center text-[11px] text-stone-500 font-medium">
+            <span className="flex items-center gap-1.5"><CheckCircle2 size={13} className="text-[#22C55E]" /> Database profiles update in real-time as users enter landing forms or chat webhooks.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// 7. TESTIMONIALS (☀️ LIGHT)
+export function Testimonials() {
+  const { websiteName } = useBrandingStore();
+  const reviews = [
+    {
+      text: "Switching from standard template CRM tools was an instant growth catalyst. Our sales teams responded in minutes instead of hours, completely scaling our marketing conversion metrics.",
+      author: "Jessica Lin",
+      role: "VP of Support, TechCorp",
+      stats: "300% Higher Conversion",
+      logo: "TechCorp",
+      avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d"
+    },
+    {
+      text: "Our marketing workflows became unified in minutes. The WhatsApp Graph API integration is compliant, robust, and performs flawlessly during high-volume promo sales events.",
+      author: "Marcus Aurel",
+      role: "Founder, NexxDigital",
+      stats: "4x Faster Response",
+      logo: "NexxDigital",
+      avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d"
+    }
+  ];
+
+  return (
+    <section id="resources" className="py-32 px-6 bg-[#FAFAF9] text-[#12263A] relative overflow-hidden border-b border-stone-200/80">
+      <div className="max-w-7xl mx-auto space-y-20 relative z-10">
+        <div className="text-center max-w-2xl mx-auto space-y-6">
+          <span className="font-sans font-semibold text-[13px] uppercase tracking-[1.5px] text-[#166534] bg-white px-4 py-2 rounded-full border border-[#bbf7d0] shadow-xs inline-flex items-center gap-2">
+            <Star size={14} className="fill-[#166534] text-[#166534]" />
+            Success Stories
+          </span>
+          <h2 className="font-display font-[800] text-[36px] md:text-[48px] lg:text-[56px] leading-[1.1] tracking-[-0.03em] text-[#12263A]">
+            Hear it from teams who <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#166534] to-[#22C55E]">build on {websiteName || 'Talkinexx'}</span>
+          </h2>
+          <p className="font-sans font-medium text-[17px] md:text-[18px] leading-[1.75] max-w-[620px] mx-auto text-[#57534E]">
+            See how high-growth startups and local businesses streamline customer support, scale marketing outreach, and automate replies.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+          {reviews.map((r, idx) => (
+            <motion.div
+              key={r.author}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.15 }}
+              className="group relative bg-white p-6 sm:p-10 md:p-12 rounded-2xl sm:rounded-[2.25rem] shadow-[0_10px_35px_rgba(18,38,58,0.04)] border border-stone-200/80 hover:shadow-[0_20px_45px_rgba(18,38,58,0.08)] hover:border-[#166534]/30 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden ring-1 ring-black/5"
+            >
+              <div className="relative z-10 space-y-6 flex-1">
+                <div className="flex gap-1.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={18} className="fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <p className="text-[#12263A] font-display font-medium text-[19px] md:text-[21px] leading-[1.6] tracking-tight">
+                  "{r.text}"
+                </p>
+              </div>
+
+              <div className="relative z-10 mt-8 pt-5 border-t border-stone-100 flex flex-col xs:flex-row xs:items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="relative shrink-0">
+                    <img src={r.avatar} alt={r.author} className="w-11 sm:w-13 h-11 sm:h-13 rounded-full border-2 border-white shadow-sm object-cover ring-2 ring-[#22C55E]/30 shrink-0" />
+                    <span className="absolute bottom-0 right-0 w-2.5 sm:w-3 h-2.5 sm:h-3 bg-[#22C55E] border-2 border-white rounded-full" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="font-bold text-sm sm:text-[15px] text-[#12263A] block leading-tight truncate">{r.author}</span>
+                    <span className="text-[11px] sm:text-[12px] text-stone-400 font-medium block mt-0.5 truncate">{r.role}</span>
+                  </div>
+                </div>
+                <div className="text-left xs:text-right flex xs:flex-col items-start xs:items-end justify-between xs:justify-start gap-1 shrink-0">
+                  <span className="text-[9.5px] sm:text-[10.5px] font-bold text-[#166534] bg-[#F0FDF4] border border-[#bbf7d0] px-2 sm:px-2.5 py-1 rounded-md uppercase tracking-wider shrink-0 whitespace-nowrap">{r.stats}</span>
+                  <span className="text-[9.5px] sm:text-[10px] text-stone-400 font-bold block uppercase tracking-widest">{r.logo}</span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// 8. FINAL CTA (🌙 DARK)
+export function FinalCTA() {
+  return (
+    <section id="contact" className="py-36 px-6 bg-[#060e17] text-white text-center relative overflow-hidden">
+      {/* Mesh Grid & Radial Glow overlays */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.15),transparent_70%)] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#166534]/25 rounded-full blur-[140px] pointer-events-none" />
+
+      <div className="max-w-4xl mx-auto space-y-10 relative z-10 flex flex-col items-center">
+        <span className="font-sans font-semibold text-[13px] uppercase tracking-[1.5px] text-[#22C55E] bg-[#166534]/30 px-4 py-1.5 rounded-full border border-[#22C55E]/30 flex items-center gap-1.5 backdrop-blur-md shadow-[0_0_15px_rgba(34,197,94,0.12)]">
+          <Sparkles size={13} className="text-[#22C55E]" />
+          Get Started Today
+        </span>
+
+        <h2 className="font-display font-[800] text-[36px] sm:text-[46px] md:text-[56px] lg:text-[64px] leading-[1.08] tracking-[-0.035em] text-white max-w-3xl">
+          Ready to Transform Customer <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] via-[#4ade80] to-[#bbf7d0]">Communication?</span>
+        </h2>
+
+        <p className="font-sans font-normal text-[17px] md:text-[19px] leading-[1.75] max-w-[620px] text-stone-300">
+          Join thousands of high-growth teams who automate WhatsApp messages, nurture leads, and scale conversion pipelines automatically.
+        </p>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-x-8 text-[11px] sm:text-[12px] font-semibold text-stone-200 font-sans uppercase tracking-[0.5px] bg-white/[0.06] border border-white/10 px-5 sm:px-8 py-3.5 rounded-2xl sm:rounded-full backdrop-blur-md shadow-inner text-center">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={14} className="text-[#22C55E] shrink-0" />
+            <span>Unlimited Messaging</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={14} className="text-[#22C55E] shrink-0" />
+            <span>AI Included</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={14} className="text-[#22C55E] shrink-0" />
+            <span>CRM Included</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={14} className="text-[#22C55E] shrink-0" />
+            <span>No Credit Card</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 w-full">
+          <NavLink
+            to="/signup"
+            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] hover:from-[#14532d] hover:to-[#16a34a] text-white font-sans font-bold text-[15px] tracking-[0.2px] rounded-xl transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(34,197,94,0.35)] active:scale-[0.98] text-center shadow-lg cursor-pointer"
+          >
+            Start Free Trial
+          </NavLink>
+          <NavLink
+            to="/contact"
+            className="w-full sm:w-auto px-8 py-4 bg-white/[0.07] hover:bg-white/[0.12] border border-white/15 hover:border-white/30 text-white font-sans font-semibold text-[15px] tracking-[0.2px] rounded-xl transition-all duration-200 backdrop-blur-sm active:scale-[0.98] text-center shadow-sm cursor-pointer"
+          >
+            Book Demo
+          </NavLink>
         </div>
       </div>
     </section>
@@ -449,7 +1608,7 @@ export function Statistics() {
   ];
 
   return (
-    <section className="py-20 px-6 bg-slate-50 border-b border-slate-100">
+    <section className="py-20 px-6 bg-[#0a1826] border-b border-white/[0.08]">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           {stats.map((s, idx) => (
@@ -459,11 +1618,11 @@ export function Statistics() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.05 }}
-              className="text-center space-y-2 border-r border-slate-200/50 last:border-0"
+              className="text-center space-y-2 border-r border-white/10 last:border-0"
             >
-              <span className="block text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">{s.value}</span>
-              <span className="block text-[11px] font-black text-slate-400 uppercase tracking-wider">{s.label}</span>
-              <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest">{s.sub}</span>
+              <span className="block text-3xl md:text-4xl font-extrabold text-white tracking-tight">{s.value}</span>
+              <span className="block text-[11px] font-black text-[#22C55E] uppercase tracking-wider">{s.label}</span>
+              <span className="block text-[9px] font-bold text-stone-400 uppercase tracking-widest">{s.sub}</span>
             </motion.div>
           ))}
         </div>
@@ -482,7 +1641,7 @@ export function Features() {
       title: 'Targeted WhatsApp Campaigns',
       desc: 'Send personalized messages based on customer segments (Offers - Reminders - Follow-ups - New Services) while tracking performance in real-time.',
       bullets: ['Segmented broadcasts', 'Interactive reply headers', 'Live delivery tracking'],
-      color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+      color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
       route: '/services/whatsapp-campaigns'
     },
     {
@@ -490,7 +1649,7 @@ export function Features() {
       title: 'Data Upload & Retargeting',
       desc: 'Re-engage your existing customer database with effective campaigns designed to boost bookings and conversions.',
       bullets: ['Excel & CSV imports', 'Database list retargeting', 'Advanced booking triggers'],
-      color: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+      color: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
       route: '/services/retargeting'
     },
     {
@@ -498,7 +1657,7 @@ export function Features() {
       title: 'Automated Messaging',
       desc: 'Automate birthday greetings and service reminders (e.g., Filler touch-ups) at the perfect time to enhance customer loyalty.',
       bullets: ['Birthday wish triggers', 'Service follow-up alerts', 'Customer loyalty engine'],
-      color: 'bg-[#F0FDF4]0/10 text-[#166534] border-indigo-500/20',
+      color: 'bg-[#166534]/20 text-[#86efac] border-[#22C55E]/30',
       route: '/services/automation'
     },
     {
@@ -506,7 +1665,7 @@ export function Features() {
       title: 'Social Media Planner',
       desc: 'Schedule and publish content, monitor comments, and measure engagement across all platforms from a single dashboard.',
       bullets: ['Cross-channel scheduler', 'Comments monitoring feed', 'Unified engagement metrics'],
-      color: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
+      color: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
       route: '/services/social-media'
     },
     {
@@ -514,7 +1673,7 @@ export function Features() {
       title: 'Lead Form CRM Integration',
       desc: 'Automatically capture lead data from your campaigns on Facebook, Instagram, TikTok, and Snapchat to maximize deals.',
       bullets: ['FB & IG lead forms sync', 'TikTok & Snapchat webhooks', 'Automatic contact assignment'],
-      color: 'bg-rose-500/10 text-rose-600 border-rose-500/20',
+      color: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
       route: '/services/lead-forms'
     },
     {
@@ -522,7 +1681,7 @@ export function Features() {
       title: 'AI-Powered Automated Response',
       desc: 'Provide fast, professional, and consistent responses to chat inquiries and Google Reviews using our integrated AI.',
       bullets: ['Chat assistant replies', 'Google reviews automation', '24/7 intelligent answering'],
-      color: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+      color: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
       route: '/services/ai-responses'
     },
     {
@@ -530,7 +1689,7 @@ export function Features() {
       title: 'Page & Form Builder',
       desc: 'Create sleek landing pages, micro-websites, and surveys that link directly to your CRM without writing any code.',
       bullets: ['Sleek drag-drop builder', 'CRM linked custom surveys', 'Fast micro-websites templates'],
-      color: 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20',
+      color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
       route: '/services/page-builder'
     },
     {
@@ -538,18 +1697,18 @@ export function Features() {
       title: 'Media Storage & Advanced Reporting',
       desc: 'Securely store your media assets and access detailed performance reports for both your ads and team to make data-driven decisions.',
       bullets: ['Secure assets storage drive', 'Ads analytics reports', 'Team performance monitoring'],
-      color: 'bg-violet-500/10 text-violet-600 border-violet-500/20',
+      color: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
       route: '/services/media-storage'
     }
   ];
 
   return (
-    <section id="features" className="py-32 px-6 bg-slate-50/50">
+    <section id="features" className="py-32 px-6 bg-[#0a1826] text-white border-b border-white/[0.08]">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-24 max-w-xl mx-auto space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">Capabilities</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Everything you need to automate & engage</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Ditch multiple subscription services. Manage your marketing campaigns, workflows, messaging pipelines, and customer support from one interface.</p>
+          <span className="font-sans font-semibold text-[13px] uppercase tracking-[1.5px] text-[#22C55E] bg-[#166534]/30 px-4 py-1.5 rounded-full border border-[#22C55E]/30">Capabilities</span>
+          <h2 className="font-display font-[800] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-white">Everything you need to automate & engage</h2>
+          <p className="font-sans font-normal text-[17px] leading-[1.8] max-w-[620px] text-stone-300">Ditch multiple subscription services. Manage your marketing campaigns, workflows, messaging pipelines, and customer support from one interface.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -560,380 +1719,31 @@ export function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: i * 0.05 }}
-              className="p-8 bg-white border border-slate-200/60 rounded-3xl shadow-sm hover:shadow-xl hover:shadow-slate-100 hover:-translate-y-2 hover:border-indigo-500/30 transition-all group flex flex-col justify-between relative overflow-hidden"
+              className="p-8 bg-[#0e1f30] border border-white/10 rounded-3xl shadow-lg hover:border-[#22C55E]/40 hover:-translate-y-2 transition-all group flex flex-col justify-between relative overflow-hidden"
             >
               <div>
                 <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border transition-colors mb-6", f.color)}>
                   <f.icon size={22} strokeWidth={2.5} />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-3 tracking-tight">{f.title}</h3>
-                <p className="text-slate-500 font-medium text-xs leading-relaxed mb-6">{f.desc}</p>
+                <h3 className="text-lg font-bold text-white mb-3 tracking-tight">{f.title}</h3>
+                <p className="text-stone-300 font-medium text-xs leading-relaxed mb-6">{f.desc}</p>
 
-                {/* Benefits Bullet Checklist */}
                 <ul className="space-y-2 mb-6">
                   {f.bullets.map((b) => (
-                    <li key={b} className="flex items-center gap-2 text-[10.5px] font-semibold text-slate-450">
-                      <CheckCircle2 size={12} className="text-indigo-500" />
+                    <li key={b} className="flex items-center gap-2 text-[10.5px] font-semibold text-stone-400">
+                      <CheckCircle2 size={12} className="text-[#22C55E]" />
                       <span>{b}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="pt-4 border-t border-slate-100/80">
-                <NavLink to={f.route} className="inline-flex items-center gap-1.5 text-xs font-black text-indigo-650 hover:text-indigo-805 transition-colors uppercase tracking-wider leading-none">
+              <div className="pt-4 border-t border-white/10">
+                <NavLink to={f.route} className="inline-flex items-center gap-1.5 text-xs font-black text-[#86efac] hover:text-white transition-colors uppercase tracking-wider leading-none">
                   Learn More <ArrowRight size={12} />
                 </NavLink>
               </div>
             </motion.div>
           ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ==========================================
-// AI WORKFLOW ANIMATED SECTION
-// ==========================================
-export function AIWorkflow() {
-  const steps = [
-    { icon: MessageCircle, title: 'Inbound Message', desc: 'Customer texts your WhatsApp number or scans a QR code.' },
-    { icon: Zap, title: 'AI Context Engine', desc: 'Instantly analyzes context, language, and purchasing intent.' },
-    { icon: Send, title: 'Interactive Reply', desc: 'Fires back personalized replies with WhatsApp buttons & lists.' },
-    { icon: Calendar, title: 'In-Chat Booking', desc: 'Customer books a meeting slot directly within the chat window.' },
-    { icon: Database, title: 'CRM Sync', desc: 'Automatically logs the lead, tags intent, and updates your CRM.' },
-    { icon: Users, title: 'Smart Handoff', desc: 'Routes complex or high-value chats to human agents seamlessly.' }
-  ];
-
-  return (
-    <section className="py-32 px-6 bg-[#12263A] text-white relative overflow-hidden">
-      {/* Glow Effects */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto text-center relative z-10">
-        <div className="max-w-2xl mx-auto space-y-4 mb-20 text-center flex flex-col items-center">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-purple-400 bg-purple-500/10 px-3.5 py-1.5 rounded-full border border-purple-500/20 flex items-center gap-2">
-            <Sparkles size={14} className="text-purple-400" />
-            100% Automated Workflow
-          </span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-white">Turn WhatsApp Into Your Best Employee</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-300">Deploy AI on your WhatsApp Business number to automate response generation, support workflows, and pipeline progression 24/7.</p>
-        </div>
-
-        {/* Step-by-Step Flow diagram */}
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-6 relative">
-          {/* Connecting Line Overlay for Desktop */}
-          <div className="hidden md:block absolute top-[28px] left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/40 to-purple-500/0 -z-10" />
-
-          {steps.map((s, idx) => {
-            const Icon = s.icon;
-            return (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="flex flex-col items-center group bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md hover:border-purple-500/30 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1"
-              >
-                <div className="w-14 h-14 bg-purple-500/10 border border-purple-500/30 text-purple-400 rounded-xl flex items-center justify-center shadow-inner group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 transition-all duration-300 relative">
-                  <Icon size={24} strokeWidth={2} />
-                  {/* Pulse dot (kept Emerald for WhatsApp vibe) */}
-                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
-                </div>
-                <h3 className="font-display font-[700] text-[16px] text-white mt-6 mb-2 tracking-tight text-center group-hover:text-purple-300 transition-colors">{s.title}</h3>
-                <p className="text-xs text-slate-400 leading-relaxed font-normal text-center">{s.desc}</p>
-              </motion.div>
-            )
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ==========================================
-// OMNICHANNEL INBOX PIPELINE
-// ==========================================
-export function OmnichannelInbox() {
-  const channels = [
-    { icon: MessageCircle, name: 'WhatsApp', color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
-    { icon: Facebook, name: 'Facebook Messenger', color: 'bg-blue-600/10 text-blue-500 border-blue-600/20' },
-    { icon: Instagram, name: 'Instagram DM', color: 'bg-pink-500/10 text-pink-500 border-pink-500/20' },
-    { icon: Smartphone, name: 'SMS', color: 'bg-[#F0FDF4]0/10 text-indigo-500 border-indigo-500/20' },
-    { icon: Mail, name: 'Email Inbox', color: 'bg-amber-500/10 text-amber-500 border-amber-500/20' },
-    { icon: Globe, name: 'Web ChatWidget', color: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20' }
-  ];
-
-  return (
-    <section id="solutions" className="py-32 px-6 bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-
-        {/* Visual Console Mockup */}
-        <div className="lg:col-span-6 w-full flex justify-center">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-[2.5rem] p-5 shadow-2xl relative overflow-hidden flex flex-col h-[380px] text-white">
-
-            {/* Console Header */}
-            <div className="flex items-center justify-between border-b border-white/5 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-bold tracking-tight text-slate-200">WhatsApp Workspace</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-[#12263A] px-2.5 py-1 rounded-lg border border-white/5 text-[9px] font-mono text-emerald-400">
-                <span>OFFICIAL API</span>
-              </div>
-            </div>
-
-            {/* Console Body Split */}
-            <div className="flex-1 flex gap-4 mt-3 overflow-hidden">
-
-              {/* Channel Switcher Sidebar -> WhatsApp Views Sidebar */}
-              <div className="w-1/3 border-r border-white/5 pr-3 space-y-2 text-[10.5px] font-bold text-slate-450">
-                <div className="p-2 bg-[#166534]/10 border border-indigo-500/20 text-[#22C55E] rounded-xl flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">💬 All Chats</span>
-                  <span className="w-4 h-4 bg-emerald-500 text-white text-[8px] rounded-full flex items-center justify-center">4</span>
-                </div>
-                <div className="p-2 hover:bg-white/5 rounded-xl flex items-center justify-between transition-colors cursor-pointer">
-                  <span className="flex items-center gap-1.5 text-slate-300">🤖 AI Copilot</span>
-                </div>
-                <div className="p-2 hover:bg-white/5 rounded-xl flex items-center gap-1.5 text-slate-400 transition-colors cursor-pointer">
-                  <span>🏷️ Sales Leads</span>
-                </div>
-                <div className="p-2 hover:bg-white/5 rounded-xl flex items-center gap-1.5 text-slate-400 transition-colors cursor-pointer">
-                  <span>🎫 Support</span>
-                </div>
-                <div className="p-2 hover:bg-white/5 rounded-xl flex items-center gap-1.5 text-slate-400 transition-colors cursor-pointer">
-                  <span>🚀 Broadcasts</span>
-                </div>
-              </div>
-
-              {/* Chat Thread Area */}
-              <div className="flex-1 flex flex-col justify-between">
-
-                {/* Active contact bar */}
-                <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <div>
-                    <span className="text-[10.5px] font-bold text-white block">Ahmad Khan</span>
-                    <span className="text-[8.5px] text-slate-500 block">via WhatsApp Business</span>
-                  </div>
-                  <span className="text-[8.5px] text-[#22C55E] font-bold bg-[#F0FDF4]0/10 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">AI suggested</span>
-                </div>
-
-                {/* Message feed */}
-                <div className="flex-1 flex flex-col justify-end gap-3 my-3">
-
-                  {/* Incoming */}
-                  <div className="flex flex-col items-start max-w-[85%] self-start space-y-1">
-                    <div className="p-3 bg-[#12263A] border border-white/5 rounded-2xl rounded-tl-none text-xs leading-relaxed text-slate-200">
-                      "Hi! Do you have slots available for a demo call today?"
-                    </div>
-                    <span className="text-[8px] text-slate-500 font-semibold pl-1">Ahmad • 10:41 AM</span>
-                  </div>
-
-                  {/* AI Suggested Response */}
-                  <div className="flex flex-col items-end max-w-[85%] self-end space-y-1">
-                    <div className="p-3 bg-gradient-to-r from-[#166534] to-[#22C55E] rounded-2xl rounded-tr-none text-xs leading-relaxed text-white relative">
-                      <Sparkles size={10} className="absolute top-2 right-2 text-indigo-200 animate-pulse" />
-                      "Yes, Ahmed! We have slots open at 3:00 PM and 5:00 PM. Book here."
-                    </div>
-                    <span className="text-[8px] text-slate-500 font-semibold pr-1">AI Copilot Draft • 10:41 AM</span>
-                  </div>
-
-                </div>
-
-                {/* Response Input block */}
-                <div className="flex items-center gap-2 border-t border-white/5 pt-2">
-                  <input
-                    type="text"
-                    placeholder="Send auto-reply or type response..."
-                    className="flex-1 bg-[#12263A] border border-white/5 rounded-xl h-8 px-3 text-[10px] placeholder-slate-650 focus:outline-none focus:border-indigo-650"
-                    disabled
-                  />
-                  <button className="h-8 px-3 bg-[#166534] hover:bg-[#14532d] text-white font-bold text-[10px] rounded-xl flex items-center justify-center cursor-default">
-                    Send
-                  </button>
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-        </div>
-
-        {/* Text Area */}
-        <div className="lg:col-span-6 space-y-8 text-left">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">WhatsApp Automation</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Scale your business on WhatsApp</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Stop manually replying to repetitive queries. Automate responses, route conversations to the right team, and send targeted broadcast campaigns on the world's most popular messaging app.</p>
-
-          <div className="grid grid-cols-2 gap-6 pt-4">
-            <div className="space-y-2">
-              <span className="block text-2xl font-black text-slate-900">98%</span>
-              <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Message Open Rate</span>
-            </div>
-            <div className="space-y-2">
-              <span className="block text-2xl font-black text-slate-900">24/7</span>
-              <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Automated Support</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-  );
-}
-
-// CRM DASHBOARD PREVIEW
-// ==========================================
-export function CRMDashboardPreview() {
-  const columns = [
-    {
-      title: 'Qualification',
-      count: '1 Lead',
-      value: '$4,500',
-      color: 'border-t-indigo-500',
-      deals: [
-        {
-          initials: 'AK',
-          name: 'Ahmad Khan Support',
-          deal: '$4,500 CRM Integration',
-          time: 'Active 2m ago',
-          channel: '💬 WhatsApp API',
-          tag: 'High Priority',
-          tagColor: 'bg-rose-50 text-rose-600 border-rose-100',
-          desc: 'Needs segment routing and automated follow-ups configuration.'
-        }
-      ]
-    },
-    {
-      title: 'Proposal & AI Review',
-      count: '1 Lead',
-      value: '$1,200',
-      color: 'border-t-purple-500',
-      deals: [
-        {
-          initials: 'SM',
-          name: 'Sarah Miller Retail',
-          deal: '$1,200 Campaign Setup',
-          time: 'Active 15m ago',
-          channel: '📸 Instagram DM',
-          tag: 'AI Replied',
-          tagColor: 'bg-purple-50 text-purple-600 border-purple-100',
-          desc: 'AI suggested birthday auto-coupon template has been drafted.'
-        }
-      ]
-    },
-    {
-      title: 'Closed Won',
-      count: '1 Lead',
-      value: '$8,900',
-      color: 'border-t-emerald-500',
-      deals: [
-        {
-          initials: 'ZM',
-          name: 'Zayn Malik Labs',
-          deal: '$8,900 Enterprise Hub',
-          time: 'Completed 1h ago',
-          channel: '👥 Messenger Chat',
-          tag: 'API Integrated',
-          tagColor: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-          desc: 'Database fields synced. REST webhook callbacks are operational.'
-        }
-      ]
-    }
-  ];
-
-  return (
-    <section className="py-32 px-6 bg-slate-50/50">
-      <div className="max-w-7xl mx-auto space-y-16">
-        <div className="text-center max-w-xl mx-auto space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">Core Engine</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Complete Customer Relationship Pipeline</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Monitor deals, track lead status, view active customer profiles, and review task timelines from one central workspace.</p>
-        </div>
-
-        {/* Kanban Board Interface Mockup */}
-        <div className="w-full bg-white border border-slate-200 shadow-xl rounded-[2.5rem] p-8 flex flex-col gap-8">
-
-          {/* Header of Board */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-6 gap-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#166534] animate-pulse" />
-                <h3 className="text-base font-bold text-slate-900 tracking-tight">Throb Active Deals Board</h3>
-              </div>
-              <span className="text-[11px] font-semibold text-slate-450 mt-0.5 block">Pipeline Value: <strong className="text-[#166534]">$14,600 USD</strong> • 3 active customer profiles</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <span className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">REST API: Active</span>
-              <a href="#contact" className="px-4 py-2 bg-slate-900 hover:bg-indigo-650 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">
-                Open CRM Workspace <ArrowRight size={12} />
-              </a>
-            </div>
-          </div>
-
-          {/* Kanban Columns Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {columns.map((col) => (
-              <div key={col.title} className={cn("p-5 bg-slate-50/50 border border-slate-200/80 rounded-2.5xl flex flex-col gap-4 border-t-4", col.color)}>
-
-                {/* Column header info */}
-                <div className="flex justify-between items-center border-b border-slate-200/50 pb-2">
-                  <div>
-                    <span className="font-display font-[700] text-sm text-slate-800 block">{col.title}</span>
-                    <span className="text-[9.5px] text-slate-450 font-semibold">{col.count}</span>
-                  </div>
-                  <span className="text-xs font-bold text-[#166534] bg-[#F0FDF4] border border-[#bbf7d0] px-2 py-0.5 rounded-lg">{col.value}</span>
-                </div>
-
-                {/* Cards List inside column */}
-                <div className="space-y-3 flex-1">
-                  {col.deals.map((deal, dealIdx) => (
-                    <div key={dealIdx} className="p-4 bg-white border border-slate-200/60 shadow-sm rounded-2xl flex flex-col gap-3.5 hover:border-indigo-400 hover:shadow-md transition-all duration-350 group">
-
-                      {/* Card Header Profile & Tag */}
-                      <div className="flex justify-between items-start gap-2">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8.5 h-8.5 rounded-xl bg-[#F0FDF4] border border-[#bbf7d0]/50 text-indigo-650 flex items-center justify-center text-xs font-bold shadow-sm">
-                            {deal.initials}
-                          </div>
-                          <div>
-                            <span className="text-xs font-bold text-slate-850 group-hover:text-indigo-650 transition-colors block">{deal.name}</span>
-                            <span className="text-[9.5px] text-slate-400 font-medium block">{deal.channel}</span>
-                          </div>
-                        </div>
-                        <span className={cn("text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0", deal.tagColor)}>
-                          {deal.tag}
-                        </span>
-                      </div>
-
-                      {/* Card Body Detail */}
-                      <div className="space-y-1">
-                        <span className="text-[11.5px] font-bold text-slate-800 block leading-tight">{deal.deal}</span>
-                        <p className="text-[10px] text-slate-500 leading-normal font-normal">{deal.desc}</p>
-                      </div>
-
-                      {/* Card Footer actions */}
-                      <div className="pt-2.5 border-t border-slate-100 flex justify-between items-center text-[9px] text-slate-450 font-semibold">
-                        <span>{deal.time}</span>
-                        <span className="text-indigo-650 group-hover:underline cursor-pointer flex items-center gap-0.5">Edit Deal <ArrowUpRight size={10} /></span>
-                      </div>
-
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            ))}
-          </div>
-
-          {/* Quick interactive note */}
-          <div className="pt-2 flex justify-between items-center text-[10.5px] text-slate-400 font-semibold">
-            <span className="flex items-center gap-1.5"><CheckCircle2 size={12} className="text-indigo-500" /> Database profiles update in real-time as users enter landing forms or chat webhooks.</span>
-          </div>
-
         </div>
       </div>
     </section>
@@ -954,25 +1764,24 @@ export function MarketingAutomation() {
   ];
 
   return (
-    <section className="py-32 px-6 bg-white overflow-hidden">
+    <section className="py-32 px-6 bg-[#0a1826] text-white border-b border-white/[0.08] overflow-hidden">
       <div className="max-w-7xl mx-auto space-y-20">
         <div className="text-center max-w-xl mx-auto space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">Automation Flow</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Advanced marketing workflow mapping</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Visually model how users engage with your brand touchpoints. Create custom wait delays, filter conditions, message blocks, and alerts.</p>
+          <span className="font-sans font-semibold text-[13px] uppercase tracking-[1.5px] text-[#22C55E] bg-[#166534]/30 px-4 py-1.5 rounded-full border border-[#22C55E]/30">Automation Flow</span>
+          <h2 className="font-display font-[800] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-white">Advanced marketing workflow mapping</h2>
+          <p className="font-sans font-normal text-[17px] leading-[1.8] max-w-[620px] text-stone-300">Visually model how users engage with your brand touchpoints. Create custom wait delays, filter conditions, message blocks, and alerts.</p>
         </div>
 
         <div className="relative flex flex-col md:flex-row gap-6 justify-between items-center">
-          {/* Linking Line for desktop */}
-          <div className="hidden md:block absolute top-[44px] left-[5%] right-[5%] h-0.5 bg-slate-100 -z-10" />
+          <div className="hidden md:block absolute top-[44px] left-[5%] right-[5%] h-0.5 bg-white/10 -z-10" />
 
           {pipeline.map((item, idx) => (
-            <div key={item.label} className="w-full md:w-44 bg-slate-50 border border-slate-150 p-6 rounded-3xl text-left relative hover:border-indigo-400 transition-colors">
-              <div className="w-8 h-8 rounded-xl bg-indigo-650 text-white flex items-center justify-center text-xs font-black mb-4">
+            <div key={item.label} className="w-full md:w-44 bg-[#0d1d2e] border border-white/10 p-6 rounded-3xl text-left relative hover:border-[#22C55E]/40 transition-colors">
+              <div className="w-8 h-8 rounded-xl bg-[#166534] text-white flex items-center justify-center text-xs font-black mb-4">
                 {idx + 1}
               </div>
-              <h3 className="text-xs font-extrabold text-slate-900 mb-1 tracking-tight">{item.label}</h3>
-              <p className="text-[10px] text-slate-400 leading-relaxed font-semibold">{item.desc}</p>
+              <h3 className="text-xs font-extrabold text-white mb-1 tracking-tight">{item.label}</h3>
+              <p className="text-[10px] text-stone-400 leading-relaxed font-semibold">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -986,56 +1795,47 @@ export function MarketingAutomation() {
 // ==========================================
 export function AnalyticsDashboard() {
   return (
-    <section id="integrations" className="py-32 px-6 bg-[#12263A] text-white overflow-hidden relative">
-      {/* Background blobs */}
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#F0FDF4]0/10 rounded-full blur-[100px] pointer-events-none" />
-
+    <section id="integrations" className="py-32 px-6 bg-[#0b1827] text-white overflow-hidden relative border-b border-white/[0.08]">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-
-        {/* Text Area */}
         <div className="lg:col-span-5 space-y-8 text-left">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#22C55E] bg-[#F0FDF4]0/10 px-3.5 py-1.5 rounded-full border border-indigo-500/20">Unified Metrics</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-white">Campaign analytics with pixel-perfect accuracy</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-300">Monitor conversion rates, sales pipelines, message volume, and support resolution metrics. Our real-time data visualizer tracks agent response speeds and total return-on-investment automatically.</p>
+          <span className="font-sans font-semibold text-[13px] uppercase tracking-[1.5px] text-[#22C55E] bg-[#166534]/30 px-4 py-1.5 rounded-full border border-[#22C55E]/30">Unified Metrics</span>
+          <h2 className="font-display font-[800] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-white">Campaign analytics with pixel-perfect accuracy</h2>
+          <p className="font-sans font-normal text-[17px] leading-[1.8] max-w-[620px] text-stone-300">Monitor conversion rates, sales pipelines, message volume, and support resolution metrics. Our real-time data visualizer tracks agent response speeds and total return-on-investment automatically.</p>
 
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-5 h-5 rounded bg-emerald-500/20 flex items-center justify-center"><CheckCircle2 size={12} className="text-emerald-400" /></div>
-              <span className="text-xs font-bold text-slate-200">Exportable custom PDF reports</span>
+              <span className="text-xs font-bold text-stone-200">Exportable custom PDF reports</span>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-5 h-5 rounded bg-emerald-500/20 flex items-center justify-center"><CheckCircle2 size={12} className="text-emerald-400" /></div>
-              <span className="text-xs font-bold text-slate-200">Daily summaries delivered via Slack/Email</span>
+              <span className="text-xs font-bold text-stone-200">Daily summaries delivered via Slack/Email</span>
             </div>
           </div>
         </div>
 
-        {/* Custom Premium Chart Visual */}
         <div className="lg:col-span-7 w-full">
-          <div className="w-full bg-slate-900/60 border border-white/10 rounded-[2.5rem] p-8 shadow-2xl space-y-8">
-            <div className="flex items-center justify-between border-b border-white/5 pb-4">
+          <div className="w-full bg-[#0d1d2e] border border-white/10 rounded-[2.5rem] p-8 shadow-2xl space-y-8">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
-                <span className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Workspace report</span>
+                <span className="text-[9px] uppercase tracking-widest text-stone-400 font-bold">Workspace report</span>
                 <h3 className="text-sm font-extrabold text-white">Monthly Conversation Volume</h3>
               </div>
               <div className="text-right">
                 <span className="text-xs font-black text-emerald-400 flex items-center gap-1 justify-end">
                   <TrendingUp size={12} /> +24%
                 </span>
-                <span className="text-[9px] text-slate-500 font-bold block mt-0.5">Vs Last Quarter</span>
+                <span className="text-[9px] text-stone-400 font-bold block mt-0.5">Vs Last Quarter</span>
               </div>
             </div>
 
-            {/* Custom SVG Line Chart */}
             <div className="w-full aspect-[2/1] relative">
               <svg className="w-full h-full" viewBox="0 0 600 300">
-                {/* Grid Lines */}
                 <line x1="50" y1="50" x2="550" y2="50" stroke="rgba(255,255,255,0.05)" />
                 <line x1="50" y1="125" x2="550" y2="125" stroke="rgba(255,255,255,0.05)" />
                 <line x1="50" y1="200" x2="550" y2="200" stroke="rgba(255,255,255,0.05)" />
                 <line x1="50" y1="250" x2="550" y2="250" stroke="rgba(255,255,255,0.08)" />
 
-                {/* Line Path */}
                 <path
                   d="M50,220 C120,180 180,120 250,140 C320,160 380,80 450,100 C520,120 530,60 550,50"
                   fill="none"
@@ -1044,47 +1844,42 @@ export function AnalyticsDashboard() {
                   strokeLinecap="round"
                 />
 
-                {/* Gradient Definition */}
                 <defs>
                   <linearGradient id="chartGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#6366f1" />
-                    <stop offset="50%" stopColor="#a855f7" />
-                    <stop offset="100%" stopColor="#ec4899" />
+                    <stop offset="0%" stopColor="#166534" />
+                    <stop offset="50%" stopColor="#22C55E" />
+                    <stop offset="100%" stopColor="#86efac" />
                   </linearGradient>
                 </defs>
 
-                {/* Active Points */}
-                <circle cx="250" cy="140" r="5" fill="#a855f7" stroke="#ffffff" strokeWidth="2" />
-                <circle cx="450" cy="100" r="5" fill="#ec4899" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="250" cy="140" r="5" fill="#22C55E" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="450" cy="100" r="5" fill="#86efac" stroke="#ffffff" strokeWidth="2" />
 
-                {/* Labels */}
-                <text x="50" y="275" fill="#64748b" fontSize="10" fontWeight="bold">Jan</text>
-                <text x="150" y="275" fill="#64748b" fontSize="10" fontWeight="bold">Feb</text>
-                <text x="250" y="275" fill="#64748b" fontSize="10" fontWeight="bold">Mar</text>
-                <text x="350" y="275" fill="#64748b" fontSize="10" fontWeight="bold">Apr</text>
-                <text x="450" y="275" fill="#64748b" fontSize="10" fontWeight="bold">May</text>
-                <text x="550" y="275" fill="#64748b" fontSize="10" fontWeight="bold">Jun</text>
+                <text x="50" y="275" fill="#94a3b8" fontSize="10" fontWeight="bold">Jan</text>
+                <text x="150" y="275" fill="#94a3b8" fontSize="10" fontWeight="bold">Feb</text>
+                <text x="250" y="275" fill="#94a3b8" fontSize="10" fontWeight="bold">Mar</text>
+                <text x="350" y="275" fill="#94a3b8" fontSize="10" fontWeight="bold">Apr</text>
+                <text x="450" y="275" fill="#94a3b8" fontSize="10" fontWeight="bold">May</text>
+                <text x="550" y="275" fill="#94a3b8" fontSize="10" fontWeight="bold">Jun</text>
               </svg>
             </div>
 
-            {/* KPI Cards */}
-            <div className="grid grid-cols-3 gap-4 border-t border-white/5 pt-6">
+            <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-6">
               <div>
-                <span className="text-[9px] text-slate-500 font-bold block uppercase mb-1">Delivered</span>
+                <span className="text-[9px] text-stone-400 font-bold block uppercase mb-1">Delivered</span>
                 <span className="text-sm font-extrabold text-white">99.8%</span>
               </div>
               <div>
-                <span className="text-[9px] text-slate-500 font-bold block uppercase mb-1">Click Rate</span>
+                <span className="text-[9px] text-stone-400 font-bold block uppercase mb-1">Click Rate</span>
                 <span className="text-sm font-extrabold text-white">18.4%</span>
               </div>
               <div>
-                <span className="text-[9px] text-slate-500 font-bold block uppercase mb-1">Total ROI</span>
-                <span className="text-sm font-extrabold text-emerald-450">4.2x</span>
+                <span className="text-[9px] text-stone-400 font-bold block uppercase mb-1">Total ROI</span>
+                <span className="text-sm font-extrabold text-emerald-400">4.2x</span>
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </section>
   );
@@ -1104,127 +1899,28 @@ export function IntegrationsGrid() {
   ];
 
   return (
-    <section className="py-32 px-6 bg-white border-t border-slate-100">
+    <section className="py-32 px-6 bg-[#0a1826] text-white border-t border-white/[0.08]">
       <div className="max-w-7xl mx-auto space-y-16">
         <div className="text-center max-w-xl mx-auto space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">Connectivity</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Connected Integrations Ecosystem</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-500">Sync contact fields, events, tags, pipelines, and trigger workflows instantly using secure REST endpoints and native webhooks.</p>
+          <span className="font-sans font-semibold text-[13px] uppercase tracking-[1.5px] text-[#22C55E] bg-[#166534]/30 px-4 py-1.5 rounded-full border border-[#22C55E]/30">Connectivity</span>
+          <h2 className="font-display font-[800] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-white">Connected Integrations Ecosystem</h2>
+          <p className="font-sans font-normal text-[17px] leading-[1.8] max-w-[620px] text-stone-300">Sync contact fields, events, tags, pipelines, and trigger workflows instantly using secure REST endpoints and native webhooks.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {integrations.map((int) => (
-            <div key={int.name} className="p-8 bg-slate-50/50 border border-slate-150 rounded-3xl hover:border-slate-300 transition-colors flex flex-col justify-between">
+            <div key={int.name} className="p-8 bg-[#0d1d2e] border border-white/10 rounded-3xl hover:border-[#22C55E]/40 transition-colors flex flex-col justify-between">
               <div className="space-y-4">
-                <div className="w-10 h-10 bg-white border border-slate-200 text-[#166534] rounded-xl flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 bg-[#166534]/30 border border-[#22C55E]/30 text-[#22C55E] rounded-xl flex items-center justify-center shrink-0">
                   <int.icon size={18} strokeWidth={2.5} />
                 </div>
-                <h3 className="text-base font-bold text-slate-900 block tracking-tight">{int.name}</h3>
-                <p className="text-slate-550 font-medium text-xs leading-relaxed">{int.desc}</p>
+                <h3 className="text-base font-bold text-white block tracking-tight">{int.name}</h3>
+                <p className="text-stone-300 font-medium text-xs leading-relaxed">{int.desc}</p>
               </div>
-              <div className="pt-4 mt-6 border-t border-slate-200/50 text-[9px] font-black uppercase text-slate-400 tracking-wider">
+              <div className="pt-4 mt-6 border-t border-white/10 text-[9px] font-black uppercase text-stone-400 tracking-wider">
                 Category: {int.category}
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ==========================================
-// TESTIMONIALS SECTION
-// ==========================================
-export function Testimonials() {
-  const reviews = [
-    {
-      text: "Switching from standard template CRM tools was an instant growth catalyst. Our sales teams responded in minutes instead of hours, completely scaling our marketing conversion metrics.",
-      author: "Jessica Lin",
-      role: "VP of Support, TechCorp",
-      stats: "300% Higher Conversion",
-      logo: "TechCorp",
-      avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-      gradient: "from-indigo-500/5 to-purple-500/5"
-    },
-    {
-      text: "Our marketing workflows became unified in minutes. The WhatsApp Graph API integration is compliant, robust, and performs flawlessly during high-volume promo sales events.",
-      author: "Marcus Aurel",
-      role: "Founder, NexxDigital",
-      stats: "4x Faster Response",
-      logo: "NexxDigital",
-      avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-      gradient: "from-purple-500/5 to-pink-500/5"
-    }
-  ];
-
-  return (
-    <section id="resources" className="py-32 px-6 bg-slate-50 relative overflow-hidden border-y border-slate-100">
-      {/* Background decoration */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-[#F0FDF4]0/5 blur-[120px] rounded-full" />
-        <div className="absolute top-[60%] -right-[10%] w-[50%] h-[50%] bg-purple-500/5 blur-[120px] rounded-full" />
-      </div>
-
-      <div className="max-w-7xl mx-auto space-y-20 relative z-10">
-        <div className="text-center max-w-2xl mx-auto space-y-6">
-          <span className="font-sans font-[600] text-[13px] uppercase tracking-[1.5px] text-[#166534] bg-white px-4 py-2 rounded-full border border-[#bbf7d0] shadow-sm shadow-indigo-100/50 inline-flex items-center gap-2">
-            <Star size={14} className="fill-indigo-600 text-[#166534]" />
-            Success Stories
-          </span>
-          <h2 className="font-display font-[800] text-[36px] md:text-[48px] lg:text-[56px] leading-[1.1] tracking-[-1.5px] text-slate-900">
-            Hear it from teams who <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#166534] to-[#22C55E]">build on Throb</span>
-          </h2>
-          <p className="font-sans font-medium text-[18px] leading-[1.8] max-w-[620px] mx-auto text-slate-500">
-            See how high-growth startups and local businesses streamline customer support, scale marketing outreach, and automate replies.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
-          {reviews.map((r, idx) => (
-            <motion.div
-              key={r.author}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.2 }}
-              className="group relative bg-white p-10 md:p-12 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between overflow-hidden"
-            >
-              {/* Subtle background gradient on hover */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${r.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-
-              {/* Massive decorative quote mark */}
-              <div className="absolute -top-6 -left-6 text-slate-50 opacity-100 group-hover:text-indigo-50/80 transition-colors duration-500 pointer-events-none">
-                <svg width="180" height="180" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M14.017 18L14.017 10.609C14.017 4.905 17.748 1.039 23 0L23.995 2.151C21.563 3.068 20 5.789 20 8H24V18H14.017ZM0 18V10.609C0 4.905 3.748 1.038 9 0L9.996 2.151C7.563 3.068 6 5.789 6 8H9.983L9.983 18L0 18Z" />
-                </svg>
-              </div>
-
-              <div className="relative z-10 space-y-8 flex-1">
-                <div className="flex gap-1.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={18} className="fill-yellow-400 text-yellow-400 drop-shadow-sm" />
-                  ))}
-                </div>
-                <p className="text-slate-700 font-display font-medium text-[20px] md:text-[22px] leading-[1.6] tracking-tight">
-                  "{r.text}"
-                </p>
-              </div>
-
-              <div className="relative z-10 mt-12 pt-8 border-t border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <img src={r.avatar} alt={r.author} className="w-14 h-14 rounded-full border-2 border-white shadow-md object-cover" />
-                  <div>
-                    <span className="font-bold text-[16px] text-slate-900 block">{r.author}</span>
-                    <span className="text-[13px] text-slate-500 font-medium block mt-0.5">{r.role}</span>
-                  </div>
-                </div>
-                <div className="text-right flex flex-col items-end gap-1.5">
-                  <span className="text-[11px] font-black text-[#166534] bg-[#F0FDF4] px-2.5 py-1 rounded-md uppercase tracking-wider">{r.stats}</span>
-                  <span className="text-[11px] text-slate-400 font-bold block uppercase tracking-widest">{r.logo}</span>
-                </div>
-              </div>
-            </motion.div>
           ))}
         </div>
       </div>
@@ -1316,30 +2012,29 @@ export function Pricing() {
   };
 
   return (
-    <section id="pricing" className="py-32 px-6 bg-white relative overflow-hidden border-t border-slate-100">
-      {/* Background glow effects */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-200 to-transparent" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#F0FDF4]/50 rounded-full blur-[100px] pointer-events-none" />
-
+    <section id="pricing" className="py-32 px-6 bg-[#FAFAF9] text-[#12263A] relative overflow-hidden border-t border-stone-200">
+      <div className="absolute inset-0 bg-[radial-gradient(#166534_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.03] pointer-events-none" />
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-16 max-w-2xl mx-auto space-y-4">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50">Pricing Plans</span>
-          <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">Scale your WhatsApp operations</h2>
-          <p className="font-sans font-normal text-[18px] leading-[1.8] text-slate-500">Choose a plan that fits your business scale. Unlock unlimited contacts, advanced AI auto-replies, and seamless CRM integrations.</p>
+          <span className="font-sans font-semibold text-[13px] uppercase tracking-[1.5px] text-[#166534] bg-[#F0FDF4] px-4 py-1.5 rounded-full border border-[#22C55E]/30 inline-flex items-center gap-2 shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
+            Pricing Plans
+          </span>
+          <h2 className="font-display font-[800] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-[#12263A]">Scale your WhatsApp operations</h2>
+          <p className="font-sans font-normal text-[17px] leading-[1.8] text-stone-600">Choose a plan that fits your business scale. Unlock unlimited contacts, advanced AI auto-replies, and seamless CRM integrations.</p>
         </div>
 
-        {/* Monthly / Yearly billing Toggle Switch */}
         <div className="flex items-center justify-center gap-4 mb-20">
-          <span className={cn("text-xs font-black uppercase tracking-wider", !isYearly ? "text-slate-900" : "text-slate-400")}>Monthly Billing</span>
+          <span className={cn("text-xs font-black uppercase tracking-wider", !isYearly ? "text-[#12263A]" : "text-stone-400")}>Monthly Billing</span>
           <button
             onClick={() => setIsYearly(!isYearly)}
-            className="w-14 h-7 bg-[#F0FDF4] border border-[#bbf7d0] rounded-full p-1 transition-all duration-300 relative focus:outline-none cursor-pointer hover:bg-[#dcfce7]"
+            className="w-14 h-7 bg-stone-200/80 border border-stone-300 rounded-full p-1 transition-all duration-300 relative focus:outline-none cursor-pointer"
           >
             <div className={cn("w-5 h-5 bg-[#166534] rounded-full transition-all duration-300 shadow-sm", isYearly ? "translate-x-7" : "translate-x-0")} />
           </button>
           <div className="flex items-center gap-2">
-            <span className={cn("text-xs font-black uppercase tracking-wider", isYearly ? "text-slate-900" : "text-slate-400")}>Yearly Billing</span>
-            <span className="text-[9px] font-black uppercase tracking-widest bg-[#dcfce7] text-[#166534] px-2.5 py-1 rounded-md border border-[#bbf7d0]">Save 20%</span>
+            <span className={cn("text-xs font-black uppercase tracking-wider", isYearly ? "text-[#12263A]" : "text-stone-400")}>Yearly Billing</span>
+            <span className="text-[9px] font-black uppercase tracking-widest bg-[#F0FDF4] text-[#166534] px-2.5 py-1 rounded-md border border-[#22C55E]/30 font-bold">Save 20%</span>
           </div>
         </div>
 
@@ -1348,34 +2043,38 @@ export function Pricing() {
             <div key={plan.name} className={cn(
               "p-10 rounded-[2.5rem] flex flex-col transition-all duration-500 relative group overflow-hidden",
               plan.highlighted
-                ? "bg-white text-slate-900 border-2 border-[#166534] shadow-[0_20px_60px_rgba(22,101,52,0.12)] md:-translate-y-4 z-10"
-                : "bg-white text-slate-900 border border-slate-200/80 hover:border-[#bbf7d0] hover:shadow-xl hover:shadow-indigo-900/5 hover:-translate-y-2"
+                ? "bg-[#0a1826] text-white border-2 border-[#22C55E] shadow-[0_25px_60px_rgba(18,38,58,0.25)] md:-translate-y-4 z-10"
+                : "bg-white text-[#12263A] border border-stone-200/90 shadow-sm hover:border-[#22C55E]/50 hover:shadow-xl hover:-translate-y-2"
             )}>
-
               {plan.highlighted && (
-                <div className="absolute top-6 right-6 bg-[#F0FDF4] text-[#166534] border border-[#bbf7d0] text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
-                  <Sparkles size={12} className="text-[#166534]" /> Most Popular
+                <div className="absolute top-6 right-6 bg-[#166534]/50 text-[#86efac] border border-[#22C55E]/40 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                  <Sparkles size={12} className="text-[#22C55E]" /> Most Popular
                 </div>
               )}
 
-              <h3 className={cn("text-sm font-black uppercase tracking-[0.2em] mb-2", plan.highlighted ? "text-[#166534]" : "text-slate-500")}>{plan.name}</h3>
-              <p className="text-slate-500 text-xs font-medium mb-6 min-h-[32px]">{plan.desc}</p>
+              <h3 className={cn("text-sm font-black uppercase tracking-[0.2em] mb-2", plan.highlighted ? "text-[#86efac]" : "text-stone-500")}>{plan.name}</h3>
+              <p className={cn("text-xs font-medium mb-6 min-h-[32px]", plan.highlighted ? "text-stone-300" : "text-stone-600")}>{plan.desc}</p>
 
               <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-5xl font-black tracking-tight text-slate-900">{getPriceLabel(plan)}</span>
-                {plan.price !== 'Custom' && <span className="text-sm font-medium text-slate-400">/mo</span>}
+                <span className={cn("text-5xl font-black tracking-tight", plan.highlighted ? "text-white" : "text-[#12263A]")}>{getPriceLabel(plan)}</span>
+                {plan.price !== 'Custom' && <span className={cn("text-sm font-medium", plan.highlighted ? "text-stone-400" : "text-stone-500")}>/mo</span>}
               </div>
 
               <div className="h-6 mb-8">
                 {isYearly && plan.price !== 'Custom' && (
-                  <span className="block text-[10.5px] font-bold text-[#166534] uppercase tracking-wider bg-[#F0FDF4] w-fit px-2.5 py-1 rounded-md border border-[#bbf7d0]">Billed annually</span>
+                  <span className={cn(
+                    "block text-[10.5px] font-bold uppercase tracking-wider w-fit px-2.5 py-1 rounded-md border",
+                    plan.highlighted
+                      ? "bg-[#166534]/40 text-[#86efac] border-[#22C55E]/30"
+                      : "bg-[#F0FDF4] text-[#166534] border-[#22C55E]/30"
+                  )}>Billed annually</span>
                 )}
               </div>
 
               <div className="flex-1 space-y-4 mb-10">
                 {plan.features.map((f: string) => (
-                  <div key={f} className="flex items-start gap-3 text-sm font-medium text-slate-700">
-                    <CheckCircle2 size={18} className={cn("shrink-0 mt-0.5", plan.highlighted ? "text-[#166534]" : "text-[#22C55E]")} />
+                  <div key={f} className={cn("flex items-start gap-3 text-sm font-medium", plan.highlighted ? "text-stone-200" : "text-stone-700")}>
+                    <CheckCircle2 size={18} className="shrink-0 mt-0.5 text-[#22C55E]" />
                     <span>{f}</span>
                   </div>
                 ))}
@@ -1384,10 +2083,10 @@ export function Pricing() {
               <NavLink
                 to={`/signup?plan=${plan.key}`}
                 className={cn(
-                  "w-full py-4 rounded-xl font-bold text-[13px] uppercase tracking-widest transition-all active:scale-95 cursor-pointer text-center block relative overflow-hidden group-hover:shadow-md",
+                  "w-full py-4 rounded-xl font-bold text-[13px] uppercase tracking-widest transition-all active:scale-95 cursor-pointer text-center block relative overflow-hidden shadow-sm",
                   plan.highlighted
-                    ? "bg-[#166534] text-white hover:bg-[#14532d] shadow-lg shadow-[#166534]/30"
-                    : "bg-slate-50 border border-slate-200 text-slate-800 hover:border-[#166534] hover:text-[#166534] hover:bg-white"
+                    ? "bg-gradient-to-r from-[#166534] to-[#22C55E] text-white hover:from-[#14532d] hover:to-[#16a34a] shadow-lg shadow-[#166534]/30"
+                    : "bg-[#0a1826] text-white hover:bg-[#166534] hover:shadow-md"
                 )}
               >
                 <span className="relative z-10">Get Started</span>
@@ -1430,44 +2129,36 @@ export function FAQ() {
   ];
 
   return (
-    <section className="py-32 px-6 bg-slate-50 relative overflow-hidden">
-      {/* Decorative Background */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-[#F0FDF4]/50 -skew-x-12 transform origin-top-right z-0" />
-      <div className="absolute top-20 right-20 w-72 h-72 bg-purple-200/50 rounded-full blur-[80px] pointer-events-none z-0" />
-      <div className="absolute bottom-20 left-20 w-72 h-72 bg-indigo-200/50 rounded-full blur-[80px] pointer-events-none z-0" />
-
+    <section className="py-32 px-6 bg-[#091522] text-white relative overflow-hidden border-t border-white/[0.08]">
       <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-
-        {/* Left Content Area */}
         <div className="lg:col-span-5 space-y-8 sticky top-24">
           <div className="space-y-4">
-            <span className="font-sans font-[600] text-[13px] uppercase tracking-[1.5px] text-[#166534] bg-white px-4 py-2 rounded-full border border-[#bbf7d0] shadow-sm shadow-indigo-100/50 inline-flex items-center gap-2">
-              <HelpCircle size={14} className="text-[#166534]" />
+            <span className="font-sans font-semibold text-[13px] uppercase tracking-[1.5px] text-[#22C55E] bg-[#166534]/30 px-4 py-2 rounded-full border border-[#22C55E]/30 inline-flex items-center gap-2">
+              <HelpCircle size={14} className="text-[#22C55E]" />
               Support Center
             </span>
-            <h2 className="font-display font-[800] text-[36px] md:text-[44px] leading-[1.1] tracking-[-1px] text-slate-900">
-              Got questions about <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#166534] to-[#22C55E]">WhatsApp AI?</span>
+            <h2 className="font-display font-[800] text-[36px] md:text-[44px] leading-[1.1] tracking-[-1px] text-white">
+              Got questions about <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#22C55E] via-[#4ade80] to-[#bbf7d0]">WhatsApp AI?</span>
             </h2>
-            <p className="font-sans font-medium text-[18px] leading-[1.7] text-slate-500">
+            <p className="font-sans font-medium text-[18px] leading-[1.7] text-stone-300">
               Everything you need to know about setting up your WhatsApp Business API, automation limits, compliance, and CRM integrations.
             </p>
           </div>
 
-          <div className="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-[#F0FDF4] flex items-center justify-center shrink-0">
-              <MessageCircle size={24} className="text-[#166534]" />
+          <div className="p-6 bg-[#0e1f30] border border-white/10 rounded-2xl shadow-sm flex items-start gap-4">
+            <div className="w-12 h-12 rounded-full bg-[#166534]/30 border border-[#22C55E]/30 flex items-center justify-center shrink-0">
+              <MessageCircle size={24} className="text-[#22C55E]" />
             </div>
             <div>
-              <h4 className="font-bold text-slate-900 mb-1">Still have questions?</h4>
-              <p className="text-sm text-slate-500 mb-3">Our WhatsApp automation experts are ready to help you build the perfect workflow.</p>
-              <a href="#contact" className="text-sm font-bold text-[#166534] hover:text-[#166534] flex items-center gap-1.5 transition-colors">
+              <h4 className="font-bold text-white mb-1">Still have questions?</h4>
+              <p className="text-sm text-stone-300 mb-3">Our WhatsApp automation experts are ready to help you build the perfect workflow.</p>
+              <NavLink to="/contact" className="text-sm font-bold text-[#86efac] hover:text-white flex items-center gap-1.5 transition-colors">
                 Chat with our team <ArrowRight size={14} />
-              </a>
+              </NavLink>
             </div>
           </div>
         </div>
 
-        {/* Right FAQ Accordion Area */}
         <div className="lg:col-span-7 space-y-4">
           {faqs.map((faq, idx) => {
             const isOpen = openIdx === idx;
@@ -1477,8 +2168,8 @@ export function FAQ() {
                 className={cn(
                   "border rounded-2xl overflow-hidden transition-all duration-300",
                   isOpen
-                    ? "bg-white border-[#bbf7d0] shadow-lg shadow-indigo-900/5"
-                    : "bg-white/60 border-slate-200/80 hover:bg-white hover:border-slate-300"
+                    ? "bg-[#0e2133] border-[#22C55E]/40 shadow-xl"
+                    : "bg-[#0d1d2e]/80 border-white/10 hover:border-white/20"
                 )}
               >
                 <button
@@ -1488,20 +2179,20 @@ export function FAQ() {
                   <div className="flex gap-4">
                     <span className={cn(
                       "font-mono text-xs font-bold mt-1 shrink-0",
-                      isOpen ? "text-[#166534]" : "text-slate-400"
+                      isOpen ? "text-[#22C55E]" : "text-stone-400"
                     )}>
                       {String(idx + 1).padStart(2, '0')}
                     </span>
                     <span className={cn(
                       "font-bold text-[15px] md:text-[17px] leading-snug transition-colors",
-                      isOpen ? "text-indigo-900" : "text-slate-800"
+                      isOpen ? "text-white" : "text-stone-200"
                     )}>
                       {faq.q}
                     </span>
                   </div>
                   <div className={cn(
                     "shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors",
-                    isOpen ? "bg-[#166534] text-white" : "bg-slate-100 text-slate-500"
+                    isOpen ? "bg-[#166534] text-white" : "bg-white/5 text-stone-400"
                   )}>
                     {isOpen ? <Minus size={16} strokeWidth={2.5} /> : <Plus size={16} strokeWidth={2.5} />}
                   </div>
@@ -1515,7 +2206,7 @@ export function FAQ() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                      <div className="px-6 pb-6 pl-[52px] text-[14px] md:text-[15px] font-medium text-slate-500 leading-relaxed">
+                      <div className="px-6 pb-6 pl-[52px] text-[14px] md:text-[15px] font-medium text-stone-300 leading-relaxed">
                         {faq.a}
                       </div>
                     </motion.div>
@@ -1527,392 +2218,5 @@ export function FAQ() {
         </div>
       </div>
     </section>
-  );
-}
-
-// ==========================================
-// FINAL CTA SECTION
-// ==========================================
-export function FinalCTA() {
-  return (
-    <section id="contact" className="py-36 px-6 bg-[#12263A] text-white text-center relative overflow-hidden">
-      {/* Mesh Grid & Radial Glow overlays */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.12),transparent_70%)] pointer-events-none" />
-
-      <div className="max-w-4xl mx-auto space-y-10 relative z-10 flex flex-col items-center">
-
-        {/* Sparkles tag */}
-        <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#22C55E] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30 flex items-center gap-1.5">
-          <Sparkles size={12} className="text-[#22C55E] animate-pulse" />
-          Get Started Today
-        </span>
-
-        {/* Header */}
-        <h2 className="font-display font-[800] text-[38px] md:text-[48px] lg:text-[60px] xl:text-[68px] leading-[1.05] tracking-[-2px] text-white max-w-3xl">
-          Ready to Transform Customer <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] via-[#86efac] to-[#bbf7d0]">Communication?</span>
-        </h2>
-
-        {/* Description */}
-        <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[620px] text-slate-400">
-          Join thousands of high-growth teams who automate WhatsApp messages, nurture leads, and scale conversion pipelines automatically.
-        </p>
-
-        {/* Glassmorphic Checklist Bar */}
-        <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-8 text-[12px] font-semibold text-slate-300 font-sans uppercase tracking-[0.5px] bg-white/5 border border-white/10 px-8 py-3.5 rounded-full backdrop-blur-md">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 size={13} className="text-[#22C55E]" />
-            <span>Unlimited Messaging</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 size={13} className="text-[#22C55E]" />
-            <span>AI Included</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 size={13} className="text-[#22C55E]" />
-            <span>CRM Included</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 size={13} className="text-[#22C55E]" />
-            <span>No Credit Card</span>
-          </div>
-        </div>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 w-full">
-          <NavLink
-            to="/signup"
-            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(22,101,52,0.35)] active:scale-97 text-center shadow-lg"
-          >
-            Start Free Trial
-          </NavLink>
-          <NavLink
-            to="/contact"
-            className="w-full sm:w-auto px-8 py-4 bg-slate-900 border border-slate-800 text-slate-200 font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:bg-slate-850 hover:text-white active:scale-95 text-center shadow-sm"
-          >
-            Book Demo
-          </NavLink>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ==========================================
-// AI WHATSAPP AUTOMATION SECTION
-// ==========================================
-export function WhatsAppAutomation() {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  const features = [
-    {
-      icon: Bot,
-      title: '24/7 AI Customer Replies',
-      desc: 'Automatically answer customer messages day and night using predefined intelligent workflows.',
-      color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
-    },
-    {
-      icon: MessageCircle,
-      title: 'Instant Welcome Message',
-      desc: 'Send personalized greetings immediately when a customer starts a WhatsApp conversation.',
-      color: 'bg-blue-500/10 text-blue-600 border-blue-500/20'
-    },
-    {
-      icon: FileText,
-      title: 'Interactive Service Selection',
-      desc: 'Display business services as clickable WhatsApp buttons so customers can quickly navigate to the service they need.',
-      color: 'bg-[#F0FDF4]0/10 text-[#166534] border-indigo-500/20'
-    },
-    {
-      icon: Calendar,
-      title: 'Appointment Booking Automation',
-      desc: 'Automatically collect customer information, preferred date, available time slots, and confirm appointments without staff involvement.',
-      color: 'bg-purple-500/10 text-purple-600 border-purple-500/20'
-    },
-    {
-      icon: MousePointerClick,
-      title: 'Click-to-WhatsApp Advertising',
-      desc: 'Integrate TikTok, Facebook, Instagram, Snapchat, and Google Ads so customers who click ads land directly into a WhatsApp conversation.',
-      color: 'bg-rose-500/10 text-rose-600 border-rose-500/20'
-    },
-    {
-      icon: Database,
-      title: 'CRM & Lead Management',
-      desc: 'Automatically save customer information, create leads, notify sales representatives, and synchronize conversations with the CRM.',
-      color: 'bg-amber-500/10 text-amber-600 border-amber-500/20'
-    }
-  ];
-
-  const workflowSteps = [
-    { label: 'Customer Clicks Ad', sub: 'TikTok • Facebook • Instagram • Snapchat • Google', icon: MousePointerClick },
-    { label: 'WhatsApp Opens Instantly', sub: 'Direct deep-link conversation', icon: MessageCircle },
-    { label: 'Automatic Welcome Message', sub: '"Welcome to Talkinexx 👋"', icon: Send },
-    { label: 'Customer Selects Service', sub: 'Book • Quote • Services • Support', icon: FileText },
-    { label: 'AI Asks Required Questions', sub: 'Smart contextual follow-ups', icon: Bot },
-    { label: 'Booking Confirmed', sub: 'Appointment or quote locked in', icon: Calendar },
-    { label: 'Info Saved & Lead Created', sub: 'CRM auto-sync & lead pipeline', icon: Database },
-    { label: 'Sales Team Notified', sub: 'Instant alerts to account managers', icon: BellRing }
-  ];
-
-  const stats = [
-    { value: '24/7', label: 'AI Availability', sub: 'Non-stop coverage' },
-    { value: '98%', label: 'Instant Response Rate', sub: 'Under 3 seconds' },
-    { value: '3X', label: 'Higher Conversion', sub: 'vs traditional forms' },
-    { value: '0', label: 'Manual Intervention', sub: 'Fully automated' }
-  ];
-
-  return (
-    <>
-      {/* ========== MAIN TWO-COLUMN SECTION ========== */}
-      <section
-        ref={sectionRef}
-        id="whatsapp-automation"
-        className="py-32 px-6 bg-white overflow-hidden"
-      >
-        <div className="max-w-7xl mx-auto">
-
-          {/* Section Badge + Title */}
-          <div className="text-center mb-20 max-w-2xl mx-auto space-y-4 flex flex-col items-center">
-            <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#166534] bg-[#F0FDF4] px-3.5 py-1.5 rounded-full border border-[#bbf7d0]/50 flex items-center gap-1.5 w-fit">
-              <MessageCircle size={14} className="text-indigo-500" />
-              WhatsApp Automation
-            </span>
-            <h2 className="font-display font-[700] text-[32px] md:text-[40px] lg:text-[48px] leading-[1.15] tracking-[-1px] text-slate-900">
-              AI WhatsApp Automation for <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] via-[#86efac] to-[#bbf7d0]">Businesses & Clinics</span>
-            </h2>
-            <p className="font-sans font-normal text-[18px] leading-[1.8] max-w-[700px] text-slate-500">
-              Transform customer communication with intelligent WhatsApp automation that replies instantly, guides customers through services, books appointments, captures leads, and integrates directly with your marketing campaigns.
-            </p>
-          </div>
-
-          {/* Two-Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-
-            {/* ---- LEFT COLUMN ---- */}
-            <div className="lg:col-span-5 space-y-10">
-              <div className="space-y-5">
-                <h3 className="font-display font-[700] text-[24px] md:text-[28px] leading-[1.2] tracking-[-0.5px] text-slate-900">
-                  Automate every customer touchpoint from ad click to appointment booking
-                </h3>
-                <p className="font-sans font-normal text-[16px] leading-[1.8] text-slate-500">
-                  Deploy AI-powered WhatsApp workflows that handle lead capture, service inquiries, appointment scheduling, and CRM synchronization — completely hands-free.
-                </p>
-              </div>
-
-              {/* Feature Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {features.map((f, idx) => (
-                  <motion.div
-                    key={f.title}
-                    initial={{ opacity: 0, y: 15 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-40px" }}
-                    transition={{ delay: idx * 0.06 }}
-                    className="p-5 bg-white border border-slate-200/60 rounded-2xl shadow-sm hover:shadow-lg hover:shadow-slate-100 hover:-translate-y-1 hover:border-indigo-500/30 transition-all duration-300 group"
-                  >
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center border transition-colors mb-3", f.color)}>
-                      <f.icon size={18} strokeWidth={2.5} />
-                    </div>
-                    <h4 className="text-sm font-bold text-slate-900 mb-1.5 tracking-tight group-hover:text-[#166534] transition-colors">{f.title}</h4>
-                    <p className="text-slate-500 font-medium text-[11px] leading-relaxed">{f.desc}</p>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Primary CTA */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="pt-2"
-              >
-                <NavLink
-                  to="/contact"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-sans font-semibold text-[15px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(22,101,52,0.35)] active:scale-97 shadow-lg"
-                >
-                  Get Started with WhatsApp AI
-                  <ArrowRight size={16} />
-                </NavLink>
-              </motion.div>
-            </div>
-
-            {/* ---- RIGHT COLUMN: Workflow Visualization ---- */}
-            <div className="lg:col-span-7 w-full">
-              <div className="w-full bg-[#12263A] border border-slate-800 rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative overflow-hidden">
-
-                {/* Background glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
-                <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-[#F0FDF4]0/5 rounded-full blur-[80px] pointer-events-none" />
-
-                {/* Console Header */}
-                <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-6 relative z-10">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#F0FDF4]0 animate-pulse" />
-                    <span className="text-xs font-bold tracking-tight text-slate-200">WhatsApp Automation Pipeline</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1 rounded-lg border border-white/5 text-[9px] font-mono text-[#22C55E]">
-                    <span>LIVE • 8 STEPS</span>
-                  </div>
-                </div>
-
-                {/* Workflow Steps */}
-                <div className="space-y-3 relative z-10">
-                  {workflowSteps.map((step, idx) => (
-                    <motion.div
-                      key={step.label}
-                      initial={{ opacity: 0, x: 20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true, margin: "-30px" }}
-                      transition={{ delay: idx * 0.08, duration: 0.4 }}
-                    >
-                      {/* Step Card */}
-                      <div className="flex items-center gap-4 p-3.5 bg-white/5 border border-white/8 rounded-xl backdrop-blur-sm hover:bg-white/8 hover:border-purple-500/20 transition-all duration-300 group">
-                        {/* Step Number */}
-                        <div className="w-9 h-9 bg-purple-500/10 border border-purple-500/25 text-purple-400 font-display font-bold rounded-lg flex items-center justify-center text-xs shrink-0 group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 transition-all duration-300">
-                          {idx + 1}
-                        </div>
-
-                        {/* Step Icon */}
-                        <div className="w-8 h-8 bg-slate-800/80 border border-white/5 rounded-lg flex items-center justify-center shrink-0">
-                          <step.icon size={14} className="text-slate-300 group-hover:text-purple-400 transition-colors" />
-                        </div>
-
-                        {/* Step Content */}
-                        <div className="flex-1 min-w-0">
-                          <span className="text-[12px] font-bold text-white block leading-tight group-hover:text-purple-300 transition-colors">{step.label}</span>
-                          <span className="text-[10px] text-slate-500 font-medium block mt-0.5 truncate">{step.sub}</span>
-                        </div>
-
-                        {/* Status Indicator */}
-                        <div className="w-2 h-2 rounded-full bg-purple-500/50 group-hover:bg-purple-400 transition-colors shrink-0" />
-                      </div>
-
-                      {/* Connector Arrow (except last) */}
-                      {idx < workflowSteps.length - 1 && (
-                        <div className="flex justify-center py-0.5">
-                          <motion.div
-                            initial={{ opacity: 0, scaleY: 0 }}
-                            whileInView={{ opacity: 1, scaleY: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: idx * 0.08 + 0.15 }}
-                            className="flex flex-col items-center"
-                          >
-                            <div className="w-px h-2 bg-gradient-to-b from-indigo-500/40 to-indigo-500/10" />
-                            <ChevronDown size={10} className="text-indigo-500/40 -mt-0.5" />
-                          </motion.div>
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-
-                {/* Bottom Status Bar */}
-                <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] relative z-10">
-                  <span className="flex items-center gap-1.5 text-slate-400 font-semibold">
-                    <CheckCircle2 size={11} className="text-[#22C55E]" />
-                    End-to-end automation • Zero manual intervention
-                  </span>
-                  <span className="text-[#22C55E] font-bold uppercase tracking-wider text-[9px]">Active</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ========== STATISTICS STRIP ========== */}
-      <section className="py-20 px-6 bg-white relative overflow-hidden">
-
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="bg-[#12263A] border border-slate-800/60 shadow-[0_20px_60px_rgba(0,0,0,0.15)] rounded-[2.5rem] p-10 md:p-14 relative overflow-hidden group">
-            {/* Animated Background Glows */}
-            <div className="absolute top-0 left-1/4 w-1/2 h-1/2 bg-[#F0FDF4]0/20 blur-[100px] pointer-events-none rounded-full group-hover:bg-[#F0FDF4]0/30 transition-colors duration-700" />
-            <div className="absolute bottom-0 right-1/4 w-1/2 h-1/2 bg-purple-500/20 blur-[100px] pointer-events-none rounded-full group-hover:bg-purple-500/30 transition-colors duration-700" />
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 relative z-10">
-              {stats.map((s, idx) => (
-                <motion.div
-                  key={s.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="flex flex-col items-center text-center group/stat"
-                >
-                  <div className="relative mb-5">
-                    <span className="text-5xl md:text-6xl font-display font-extrabold bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-slate-400 tracking-tighter group-hover/stat:scale-110 group-hover/stat:-translate-y-1 transition-all duration-500 block drop-shadow-lg">
-                      {s.value}
-                    </span>
-                    {/* Tiny decorative WhatsApp green dot on hover */}
-                    <span className="absolute top-0 -right-4 w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(52,211,153,1)] opacity-0 group-hover/stat:opacity-100 transition-opacity duration-300" />
-                  </div>
-                  <span className="block text-[12px] font-black text-indigo-300 uppercase tracking-[0.2em] mb-1.5">{s.label}</span>
-                  <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">{s.sub}</span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ========== CTA SECTION ========== */}
-      <section className="py-28 px-6 bg-[#12263A] text-white text-center relative overflow-hidden">
-        {/* Background overlays */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.12),transparent_70%)] pointer-events-none" />
-
-        <div className="max-w-3xl mx-auto space-y-8 relative z-10 flex flex-col items-center">
-          <span className="font-sans font-[500] text-[14px] uppercase tracking-[1px] text-[#22C55E] bg-[#166534]/30 px-3.5 py-1.5 rounded-full border border-[#22C55E]/30 flex items-center gap-1.5">
-            <Sparkles size={12} className="text-[#22C55E] animate-pulse" />
-            WhatsApp AI
-          </span>
-
-          <h2 className="font-display font-[800] text-[32px] md:text-[42px] lg:text-[52px] leading-[1.08] tracking-[-2px] text-white max-w-2xl">
-            Ready to Automate Your Customer <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] via-[#86efac] to-[#bbf7d0]">Conversations?</span>
-          </h2>
-
-          <p className="font-sans font-normal text-[17px] leading-[1.8] max-w-[600px] text-slate-400">
-            Deploy AI-powered WhatsApp automation for your business or clinic and never miss another customer again.
-          </p>
-
-          {/* Glassmorphic Features Bar */}
-          <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-8 text-[12px] font-semibold text-slate-300 font-sans uppercase tracking-[0.5px] bg-white/5 border border-white/10 px-8 py-3.5 rounded-full backdrop-blur-md">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={13} className="text-[#22C55E]" />
-              <span>Click-to-WhatsApp Ads</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={13} className="text-[#22C55E]" />
-              <span>AI Booking</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={13} className="text-[#22C55E]" />
-              <span>CRM Sync</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={13} className="text-[#22C55E]" />
-              <span>24/7 Auto-Reply</span>
-            </div>
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 w-full">
-            <NavLink
-              to="/signup"
-              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#166534] to-[#22C55E] text-white font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(22,101,52,0.35)] active:scale-97 text-center shadow-lg"
-            >
-              Get Started
-            </NavLink>
-            <NavLink
-              to="/contact"
-              className="w-full sm:w-auto px-8 py-4 bg-slate-900 border border-slate-800 text-slate-200 font-sans font-semibold text-[16px] tracking-[0.3px] rounded-xl transition-all hover:bg-slate-850 hover:text-white active:scale-95 text-center shadow-sm"
-            >
-              Book a Live Demo
-            </NavLink>
-          </div>
-        </div>
-      </section>
-    </>
   );
 }

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useBrandingStore } from '../../store/brandingStore';
+import defaultFavicon from '../../assets/fav-icon.png';
 
 // ==========================================
 // KNOWLEDGE BASE - Predefined Q&A Pairs
@@ -149,8 +150,9 @@ const quickActions = [
 // CHATBOT WIDGET COMPONENT
 // ==========================================
 export default function ChatbotWidget() {
-  const { websiteName, websiteLogo } = useBrandingStore();
-  const botName = websiteName || 'Talkinexx AI';
+  const { websiteName, websiteFavicon } = useBrandingStore();
+  const botName = websiteName || 'Talkinexx';
+  const chatAvatar = websiteFavicon || defaultFavicon;
 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -260,10 +262,10 @@ export default function ChatbotWidget() {
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 text-white rounded-full shadow-xl shadow-indigo-500/25 flex items-center justify-center hover:scale-110 hover:shadow-2xl hover:shadow-indigo-500/30 transition-all duration-300 cursor-pointer group"
+            className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-br from-[#12263A] via-[#166534] to-[#22C55E] text-white rounded-full shadow-xl shadow-[#166534]/30 flex items-center justify-center hover:scale-110 hover:shadow-2xl hover:shadow-[#22C55E]/40 transition-all duration-300 cursor-pointer group"
             aria-label="Open chat"
           >
-            <MessageCircle size={22} className="group-hover:scale-110 transition-transform" />
+            <MessageCircle size={24} className="group-hover:scale-110 transition-transform" />
             
             {/* Unread Badge */}
             {hasUnread && (
@@ -277,7 +279,7 @@ export default function ChatbotWidget() {
             )}
 
             {/* Pulse Ring */}
-            <span className="absolute inset-0 rounded-full bg-indigo-500/20 animate-ping pointer-events-none" style={{ animationDuration: '3s' }} />
+            <span className="absolute inset-0 rounded-full bg-[#22C55E]/30 animate-ping pointer-events-none" style={{ animationDuration: '3s' }} />
           </motion.button>
         )}
       </AnimatePresence>
@@ -290,33 +292,33 @@ export default function ChatbotWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[560px] max-h-[calc(100vh-3rem)] bg-white border border-slate-200 rounded-[1.75rem] shadow-2xl shadow-slate-900/10 flex flex-col overflow-hidden"
+            className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[560px] max-h-[calc(100vh-3rem)] bg-white border border-stone-200 rounded-[1.75rem] shadow-2xl shadow-[#0a1826]/20 flex flex-col overflow-hidden"
           >
             {/* ---- HEADER ---- */}
-            <div className="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 px-5 py-4 text-white shrink-0">
+            <div className="relative bg-[#166534] px-5 py-4 text-white shrink-0 border-b border-emerald-700/50">
               {/* Background pattern */}
-              <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none rounded-t-[1.75rem]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_70%)] pointer-events-none rounded-t-[1.75rem]" />
               
               <div className="relative z-10 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-white/15 backdrop-blur-sm border border-white/20 rounded-xl flex items-center justify-center overflow-hidden">
-                    {websiteLogo ? (
-                      <img src={websiteLogo} alt="Logo" className="w-full h-full object-cover" />
-                    ) : (
-                      <Bot size={18} className="text-white" />
-                    )}
+                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden p-1.5 shrink-0 shadow-md border-2 border-white/20">
+                    <img 
+                      src={chatAvatar} 
+                      alt="Talkinexx Favicon" 
+                      className="w-full h-full object-contain" 
+                    />
                   </div>
                   <div>
-                    <h3 className="font-display font-bold text-[14px] tracking-tight leading-tight">{botName}</h3>
+                    <h3 className="font-display font-bold text-[15px] tracking-tight leading-tight text-white">{botName}</h3>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span className="text-[10px] font-semibold text-indigo-200 uppercase tracking-wider">Online Now</span>
+                      <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse shadow-[0_0_8px_#22C55E]" />
+                      <span className="text-[10px] font-bold text-emerald-100 uppercase tracking-wider">ONLINE NOW</span>
                     </div>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer text-white"
                   aria-label="Close chat"
                 >
                   <X size={16} />
@@ -338,10 +340,10 @@ export default function ChatbotWidget() {
                     {/* Bot avatar */}
                     {msg.sender === 'bot' && (
                       <div className="flex items-center gap-1.5 mb-1.5">
-                        <div className="w-5 h-5 bg-indigo-100 border border-indigo-200/50 rounded-md flex items-center justify-center">
-                          <Sparkles size={10} className="text-indigo-600" />
+                        <div className="w-5 h-5 bg-[#F0FDF4] border border-[#22C55E]/30 rounded-md flex items-center justify-center">
+                          <Sparkles size={10} className="text-[#166534]" />
                         </div>
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">AI Assistant</span>
+                        <span className="text-[9px] font-bold text-stone-400 uppercase tracking-wider">AI ASSISTANT</span>
                       </div>
                     )}
 
@@ -349,15 +351,15 @@ export default function ChatbotWidget() {
                     <div
                       className={`px-4 py-3 text-[12.5px] leading-relaxed font-medium ${
                         msg.sender === 'user'
-                          ? 'bg-gradient-to-r from-[#12263A] to-[#166534] text-white rounded-2xl rounded-tr-md shadow-sm'
-                          : 'bg-white border border-slate-200/80 text-slate-700 rounded-2xl rounded-tl-md shadow-sm'
+                          ? 'bg-[#166534] text-white rounded-2xl rounded-tr-md shadow-sm'
+                          : 'bg-white border border-stone-200/90 text-stone-800 rounded-2xl rounded-tl-md shadow-sm'
                       }`}
                     >
                       {msg.sender === 'bot' ? formatMessage(msg.text) : msg.text}
                     </div>
 
                     {/* Timestamp */}
-                    <span className={`text-[9px] font-semibold text-slate-400 mt-1 block ${msg.sender === 'user' ? 'text-right pr-1' : 'pl-1'}`}>
+                    <span className={`text-[9px] font-semibold text-stone-400 mt-1 block ${msg.sender === 'user' ? 'text-right pr-1' : 'pl-1'}`}>
                       {formatTime(msg.timestamp)}
                     </span>
                   </div>
@@ -372,10 +374,10 @@ export default function ChatbotWidget() {
                   className="flex justify-start"
                 >
                   <div className="flex items-center gap-1.5 mb-1.5">
-                    <div className="w-5 h-5 bg-indigo-100 border border-indigo-200/50 rounded-md flex items-center justify-center">
-                      <Sparkles size={10} className="text-indigo-600" />
+                    <div className="w-5 h-5 bg-[#F0FDF4] border border-[#22C55E]/30 rounded-md flex items-center justify-center">
+                      <Sparkles size={10} className="text-[#166534]" />
                     </div>
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">AI Assistant</span>
+                    <span className="text-[9px] font-bold text-stone-400 uppercase tracking-wider">AI ASSISTANT</span>
                   </div>
                 </motion.div>
               )}
@@ -385,11 +387,11 @@ export default function ChatbotWidget() {
                   animate={{ opacity: 1, y: 0 }}
                   className="flex justify-start"
                 >
-                  <div className="bg-white border border-slate-200/80 rounded-2xl rounded-tl-md px-4 py-3 shadow-sm">
+                  <div className="bg-white border border-stone-200/90 rounded-2xl rounded-tl-md px-4 py-3 shadow-sm">
                     <div className="flex items-center gap-1">
-                      <span className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <span className="w-2 h-2 bg-[#22C55E] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-2 h-2 bg-[#22C55E] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-2 h-2 bg-[#22C55E] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
                   </div>
                 </motion.div>
@@ -405,7 +407,7 @@ export default function ChatbotWidget() {
                   <button
                     key={action}
                     onClick={() => handleQuickAction(action)}
-                    className="px-3 py-1.5 text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100/50 rounded-full hover:bg-indigo-100 hover:border-indigo-200 transition-all cursor-pointer whitespace-nowrap"
+                    className="px-3 py-1.5 text-[10.5px] font-semibold text-[#166534] bg-[#F0FDF4] border border-[#22C55E]/30 rounded-full hover:bg-[#22C55E] hover:text-white transition-all cursor-pointer whitespace-nowrap shadow-xs"
                   >
                     {action}
                   </button>
@@ -414,7 +416,7 @@ export default function ChatbotWidget() {
             )}
 
             {/* ---- INPUT AREA ---- */}
-            <form onSubmit={handleSubmit} className="px-4 py-3 border-t border-slate-100 bg-white shrink-0">
+            <form onSubmit={handleSubmit} className="px-4 py-3 border-t border-stone-100 bg-white shrink-0">
               <div className="flex items-center gap-2">
                 <input
                   ref={inputRef}
@@ -422,13 +424,13 @@ export default function ChatbotWidget() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type your message..."
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-[13px] font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 focus:bg-white transition-all"
+                  className="flex-1 bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-[13px] font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/20 focus:border-[#22C55E] focus:bg-white transition-all"
                   disabled={isTyping}
                 />
                 <button
                   type="submit"
                   disabled={!input.trim() || isTyping}
-                  className="w-10 h-10 bg-gradient-to-br from-[#12263A] to-[#166534] text-white rounded-xl flex items-center justify-center hover:shadow-lg hover:shadow-[#166534]/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer active:scale-95 shrink-0"
+                  className="w-10 h-10 bg-[#22C55E] hover:bg-[#16a34a] text-white rounded-xl flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer active:scale-95 shrink-0 shadow-sm"
                   aria-label="Send message"
                 >
                   <Send size={16} />
