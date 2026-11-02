@@ -364,17 +364,32 @@ export const scraperApi = {
     status?: string;
     search?: string;
     has_email?: boolean;
+    filename?: string;
   } = {}): Promise<void> {
     const res = await apiClient.get('/scraper/export-csv', {
       params,
       responseType: 'blob',
     });
 
+    let filename = params.filename;
+    if (!filename) {
+      const disposition = res.headers ? (res.headers['content-disposition'] || res.headers['Content-Disposition']) : null;
+      if (disposition && typeof disposition === 'string' && disposition.includes('filename=')) {
+        const match = disposition.match(/filename=["']?([^"';]+)["']?/);
+        if (match && match[1]) {
+          filename = match[1].trim();
+        }
+      }
+    }
+    if (!filename) {
+      filename = params.search_id ? `scrape_job_${params.search_id}_${Date.now()}.csv` : `scraped_leads_${Date.now()}.csv`;
+    }
+
     const blob = new Blob([res.data], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `scraped_leads_${Date.now()}.csv`);
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

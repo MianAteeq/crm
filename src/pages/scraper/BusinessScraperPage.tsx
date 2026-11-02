@@ -67,7 +67,7 @@ export default function BusinessScraperPage() {
   const [industry, setIndustry] = useState('');
   const [location, setLocation] = useState('');
   const [coverageRadius, setCoverageRadius] = useState<number>(25000); // 25 km Metro default
-  const [leadVolume, setLeadVolume] = useState<number>(5000); // Up to 5,000 default
+  const [leadVolume, setLeadVolume] = useState<number>(500); // 500 default (cost-safe)
   const [searchMode, setSearchMode] = useState<'standard' | 'deep'>('deep'); // Deep Search by default
   const [emailDiscoveryMode, setEmailDiscoveryMode] = useState<'basic' | 'website_contact' | 'deep'>('website_contact');
   
@@ -265,7 +265,7 @@ export default function BusinessScraperPage() {
   const loadHistory = async (page = 1) => {
     setIsLoadingHistory(true);
     try {
-      const data = await scraperApi.getSearches(page, 10);
+      const data = await scraperApi.getSearches(page, 30);
       const list = data.data || [];
       setHistorySearches(list);
       setHistoryPagination(data);
@@ -285,11 +285,34 @@ export default function BusinessScraperPage() {
     }
   };
 
-  // Initial Load
+  // Initial Load: defaults to latest scrape job so results are clean and isolated
   useEffect(() => {
     loadStatus();
-    loadResults(1);
-    loadHistory(1);
+    const initializeScraper = async () => {
+      try {
+        const data = await scraperApi.getSearches(1, 30);
+        const list = data.data || [];
+        setHistorySearches(list);
+        setHistoryPagination(data);
+        setHistoryPage(data.current_page || 1);
+
+        const running = list.find((s: ScraperSearchItem) => s.status === 'processing');
+        const latest = running || (list.length > 0 ? list[0] : null);
+
+        if (latest) {
+          setActiveSearch(latest);
+          setFilterSearchId(String(latest.id));
+          loadResults(1, latest.id);
+        } else {
+          loadResults(1, '');
+        }
+      } catch (e) {
+        console.error('Failed to initialize scraper', e);
+        loadResults(1, '');
+      }
+    };
+
+    initializeScraper();
   }, []);
 
   // Filter effect for results
@@ -402,6 +425,10 @@ export default function BusinessScraperPage() {
       });
 
       setActiveSearch(newSearch);
+      setFilterSearchId(String(newSearch.id));
+      setResultFilterTab('all');
+      setFilterSearch('');
+      loadResults(1, newSearch.id);
       loadStatus();
       loadHistory(1);
       toast.success(
@@ -590,13 +617,15 @@ export default function BusinessScraperPage() {
     }
   };
 
-  // Export CSV
-  const handleExportCsv = async () => {
+  // Export CSV (supports individual search export or current filter view)
+  const handleExportCsv = async (targetSearchId?: number | string, customFilename?: string) => {
     try {
+      const searchIdVal = targetSearchId !== undefined ? targetSearchId : (filterSearchId ? Number(filterSearchId) : undefined);
       await scraperApi.downloadCsv({
-        search_id: filterSearchId ? Number(filterSearchId) : undefined,
+        search_id: searchIdVal ? Number(searchIdVal) : undefined,
         tab: resultFilterTab,
         search: filterSearch.trim() || undefined,
+        filename: customFilename,
       });
       toast.success('Export Started', 'CSV file generated successfully with public contact details.');
     } catch (err: any) {
@@ -644,15 +673,29 @@ export default function BusinessScraperPage() {
     }
   };
 
-  // Calculate dynamic metrics for Summary Cards from current activeSearch or latest search
-  const displayMetrics = {
-    found: Number(activeSearch?.total_found ?? stats?.total_leads_scraped ?? 0).toLocaleString(),
-    websites: Number(activeSearch?.websites_found ?? 0).toLocaleString(),
-    emails: Number(activeSearch?.total_emails_found ?? stats?.total_emails_discovered ?? 0).toLocaleString(),
-    duplicates: Number((activeSearch?.duplicates_removed ?? activeSearch?.total_duplicates) ?? 0).toLocaleString(),
-    noEmail: Number(activeSearch?.no_email ?? 0).toLocaleString(),
-    failed: Number(activeSearch?.total_failed ?? 0).toLocaleString(),
-  };
+  // Find currently selected/filtered search item from history
+  const currentFilteredSearch = filterSearchId
+    ? historySearches.find((s) => String(s.id) === String(filterSearchId)) || (activeSearch && String(activeSearch.id) === String(filterSearchId) ? activeSearch : null)
+    : null;
+
+  // Calculate dynamic metrics for Summary Cards from current filtered search or all searches
+  const displayMetrics = currentFilteredSearch
+    ? {
+        found: Number(currentFilteredSearch.total_found ?? pagination?.total ?? results.length).toLocaleString(),
+        websites: Number(currentFilteredSearch.websites_found ?? 0).toLocaleString(),
+        emails: Number(currentFilteredSearch.total_emails_found ?? 0).toLocaleString(),
+        duplicates: Number((currentFilteredSearch.duplicates_removed ?? currentFilteredSearch.total_duplicates) ?? 0).toLocaleString(),
+        noEmail: Number(currentFilteredSearch.no_email ?? 0).toLocaleString(),
+        failed: Number(currentFilteredSearch.total_failed ?? 0).toLocaleString(),
+      }
+    : {
+        found: Number(stats?.total_leads_scraped ?? pagination?.total ?? results.length).toLocaleString(),
+        websites: Number(results.filter((r) => !!r.website).length).toLocaleString(),
+        emails: Number(stats?.total_emails_discovered ?? 0).toLocaleString(),
+        duplicates: Number(stats?.total_duplicates_prevented ?? 0).toLocaleString(),
+        noEmail: Number(results.filter((r) => !r.email).length).toLocaleString(),
+        failed: '0',
+      };
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 animate-fade-in font-sans">
@@ -881,13 +924,13 @@ export default function BusinessScraperPage() {
                     onChange={(e) => setCoverageRadius(Number(e.target.value))}
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] transition-all cursor-pointer"
                   >
-                    <option value={5000}>5 km — Local</option>
-                    <option value={10000}>10 km — Nearby</option>
-                    <option value={25000}>25 km — Metro Area</option>
-                    <option value={50000}>50 km — Regional</option>
-                    <option value={100000}>100 km — Extended</option>
+                    <option value={5000}>5 km — Local Area</option>
+                    <option value={10000}>10 km — City District</option>
+                    <option value={25000}>25 km — Metro Area (Recommended)</option>
                   </select>
-                  <p className="text-[11px] text-slate-400">Broad geographic searches are subdivided into sub-zones</p>
+                  <p className="text-[11px] text-slate-400">
+                    Concentric geographic zones cover dense metropolitan businesses
+                  </p>
                 </div>
 
                 {/* Lead Volume Dropdown */}
@@ -903,10 +946,8 @@ export default function BusinessScraperPage() {
                     <option value={20}>20 — Quick Test</option>
                     <option value={50}>50 — Small Search</option>
                     <option value={100}>100 — Standard Search</option>
-                    <option value={250}>250 — Large Search</option>
-                    <option value={500}>500 — Bulk Search</option>
-                    <option value={1000}>1,000 — Large Batch</option>
-                    <option value={5000}>5,000 — Enterprise Batch</option>
+                    <option value={250}>250 — Medium Search</option>
+                    <option value={500}>500 — Bulk Search (Recommended)</option>
                   </select>
                   <p className="text-[11px] text-slate-400">
                     Target unique businesses across the search area
@@ -929,7 +970,7 @@ export default function BusinessScraperPage() {
                     }`}
                   >
                     <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md bg-[#166534] text-[9px] font-extrabold text-white uppercase tracking-wider">
-                      5,000 Volume Ready
+                      Multi-Zone Ready
                     </span>
                     <div className="flex items-center gap-2">
                       <div
@@ -942,7 +983,7 @@ export default function BusinessScraperPage() {
                       <span className="font-bold text-xs text-slate-900">Deep Geographic Discovery</span>
                     </div>
                     <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
-                      Subdivides coverage area into multiple geographic cells and expands query variations to discover up to 5,000 unique businesses.
+                      Subdivides coverage area into multiple geographic cells and expands query variations to discover up to 500 unique businesses.
                     </p>
                   </div>
 
@@ -1351,7 +1392,7 @@ export default function BusinessScraperPage() {
                   </p>
                   <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                     <span className="px-2 py-0.5 rounded-md bg-[#F0FDF4] text-[#166534] text-[10px] font-bold">
-                      Target: {Number(activeSearch.lead_volume ?? activeSearch.max_results ?? 5000).toLocaleString()}
+                      Target: {Number(activeSearch.lead_volume ?? activeSearch.max_results ?? 500).toLocaleString()}
                     </span>
                     <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-bold uppercase">
                       {activeSearch.search_mode === 'deep' ? 'Deep Grid Discovery' : 'Standard'}
@@ -1506,7 +1547,7 @@ export default function BusinessScraperPage() {
                       <div className="bg-white border border-slate-200/80 rounded-xl p-2">
                         <span className="text-[10px] text-slate-400 font-bold uppercase block">Target</span>
                         <p className="font-extrabold text-slate-800 text-xs mt-0.5">
-                          {Number(activeSearch.options.discovery_stats.target ?? 5000).toLocaleString()}
+                          {Number(activeSearch.options.discovery_stats.target ?? 500).toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-white border border-slate-200/80 rounded-xl p-2">
@@ -1566,7 +1607,7 @@ export default function BusinessScraperPage() {
                   </div>
                 )}
 
-                <div className="pt-2 flex gap-3">
+                <div className="pt-2 flex gap-2">
                   <button
                     onClick={() => {
                       setFilterSearchId(String(activeSearch.id));
@@ -1574,10 +1615,18 @@ export default function BusinessScraperPage() {
                       setActiveTab('results');
                       loadResults(1, activeSearch.id);
                     }}
-                    className="flex-1 h-10 px-5 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white font-semibold text-xs sm:text-sm transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="flex-1 h-10 px-4 rounded-xl bg-[#166534] hover:bg-[#14532d] text-white font-semibold text-xs sm:text-sm transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <span>View Qualified Results ({(activeSearch.total_found ?? 0).toLocaleString()})</span>
                     <ChevronRight size={14} />
+                  </button>
+                  <button
+                    onClick={() => handleExportCsv(activeSearch.id)}
+                    className="h-10 px-3.5 rounded-xl bg-white border border-slate-200 hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-slate-700 hover:text-[#166534] font-bold text-xs transition-all shadow-xs flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
+                    title="Download CSV for this scrape only"
+                  >
+                    <Download size={14} />
+                    <span>CSV</span>
                   </button>
                 </div>
               </div>
@@ -1758,46 +1807,139 @@ export default function BusinessScraperPage() {
             </div>
           </div>
 
-          {/* Active Search Context Filter Banner */}
-          {filterSearchId ? (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F0FDF4]/80 border border-[#166534]/20 rounded-2xl px-5 py-3 shadow-xs">
-              <div className="flex items-center gap-3">
-                <span className="w-8 h-8 rounded-xl bg-[#166534]/10 text-[#166534] flex items-center justify-center font-bold shrink-0">
-                  <Compass size={16} />
-                </span>
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold text-slate-800">
-                      {activeSearch?.keyword ? `${activeSearch.keyword} — ${activeSearch.location}` : `Search Job #${filterSearchId}`}
-                    </span>
+          {/* SCRAPE RUN SELECTOR & INDIVIDUAL DOWNLOAD BAR */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-3.5">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30">
+                    Scrape Run Filter
+                  </span>
+                  <span className="text-xs font-bold text-slate-500">
+                    {filterSearchId ? `Showing leads from Job #${filterSearchId}` : 'Showing all leads combined'}
+                  </span>
+                  {currentFilteredSearch && (
                     <span
                       className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        activeSearch?.status === 'completed'
+                        currentFilteredSearch.status === 'completed'
                           ? 'bg-emerald-100 text-emerald-800'
-                          : activeSearch?.status === 'failed'
+                          : currentFilteredSearch.status === 'failed'
                           ? 'bg-red-100 text-red-800'
                           : 'bg-indigo-100 text-indigo-800 animate-pulse'
                       }`}
                     >
-                      {activeSearch?.status || 'Active'}
+                      {currentFilteredSearch.status}
                     </span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    Showing discovered leads for Search #{filterSearchId} ({(pagination?.total ?? results.length).toLocaleString()} leads)
-                  </p>
+                  )}
                 </div>
+                <h3 className="text-base sm:text-lg font-extrabold text-slate-900">
+                  {currentFilteredSearch
+                    ? `${currentFilteredSearch.keyword} — ${currentFilteredSearch.location}`
+                    : 'All Scraped Leads Combined'}
+                </h3>
               </div>
-              <button
-                onClick={() => {
-                  setFilterSearchId('');
-                  loadResults(1, '');
-                }}
-                className="px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 text-xs font-bold transition-all cursor-pointer shadow-xs shrink-0"
-              >
-                Clear Filter (View All Leads)
-              </button>
+
+              {/* Scrape Dropdown Selector & Individual Download Action */}
+              <div className="flex flex-wrap items-center gap-2.5">
+                <div className="relative min-w-[260px] sm:min-w-[340px]">
+                  <select
+                    value={filterSearchId}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setFilterSearchId(val);
+                      if (val) {
+                        const target = historySearches.find((s) => String(s.id) === val);
+                        if (target) setActiveSearch(target);
+                      }
+                      loadResults(1, val);
+                    }}
+                    className="w-full bg-slate-50 border border-slate-200 hover:border-[#166534] rounded-2xl py-2.5 pl-3.5 pr-8 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] transition-all cursor-pointer shadow-xs"
+                  >
+                    {historySearches.length > 0 && (
+                      <option value={String(historySearches[0].id)}>
+                        ⭐ Latest Scrape: #{historySearches[0].id} — {historySearches[0].keyword} ({historySearches[0].location}) • {historySearches[0].total_found} leads
+                      </option>
+                    )}
+                    {historySearches.slice(1).map((s) => (
+                      <option key={s.id} value={String(s.id)}>
+                        Past Scrape: #{s.id} — {s.keyword} ({s.location}) • {s.total_found} leads ({new Date(s.created_at).toLocaleDateString()})
+                      </option>
+                    ))}
+                    <option value="">🌐 All Scrapes Combined ({stats?.total_leads_scraped ?? 0} leads)</option>
+                  </select>
+                </div>
+
+                {/* Download Individual Scrape Button */}
+                <button
+                  onClick={() => handleExportCsv(filterSearchId || undefined)}
+                  className="h-10 px-3.5 bg-[#166534] hover:bg-[#14532d] text-white rounded-2xl text-xs font-bold shadow-sm shadow-[#166534]/25 flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shrink-0"
+                  title={filterSearchId ? `Download CSV for Scrape #${filterSearchId}` : 'Download CSV for all results'}
+                >
+                  <Download size={14} />
+                  <span>{filterSearchId ? 'Download This Scrape' : 'Download All'}</span>
+                </button>
+
+                {filterSearchId && historySearches.length > 0 && String(historySearches[0].id) !== filterSearchId && (
+                  <button
+                    onClick={() => {
+                      const latestId = String(historySearches[0].id);
+                      setFilterSearchId(latestId);
+                      setActiveSearch(historySearches[0]);
+                      loadResults(1, latestId);
+                    }}
+                    className="h-10 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl text-xs font-bold transition-all cursor-pointer active:scale-95 shrink-0"
+                    title="Switch back to latest scrape"
+                  >
+                    View Latest
+                  </button>
+                )}
+              </div>
             </div>
-          ) : null}
+
+            {/* Scrape Run Details Meta */}
+            {currentFilteredSearch ? (
+              <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-semibold text-slate-700">Location:</span>
+                  <span className="bg-slate-100 px-2 py-0.5 rounded-md text-slate-800 font-bold">{currentFilteredSearch.location}</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="font-semibold text-slate-700">Discovered:</span>
+                  <span className="bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-md font-bold">{currentFilteredSearch.total_found} businesses</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="font-semibold text-slate-700">Emails:</span>
+                  <span className="bg-blue-50 text-blue-800 px-2 py-0.5 rounded-md font-bold">{currentFilteredSearch.total_emails_found} public emails</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="text-slate-400">Scraped on {new Date(currentFilteredSearch.created_at).toLocaleString()}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    setFilterSearchId('');
+                    loadResults(1, '');
+                  }}
+                  className="text-xs text-slate-500 hover:text-[#166534] underline font-semibold cursor-pointer"
+                >
+                  View all scrapes combined
+                </button>
+              </div>
+            ) : (
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                <span>Showing aggregated leads across all previous search jobs.</span>
+                {historySearches.length > 0 && (
+                  <button
+                    onClick={() => {
+                      const latestId = String(historySearches[0].id);
+                      setFilterSearchId(latestId);
+                      setActiveSearch(historySearches[0]);
+                      loadResults(1, latestId);
+                    }}
+                    className="text-xs text-[#166534] font-bold hover:underline cursor-pointer"
+                  >
+                    Show only latest scrape (#{historySearches[0].id})
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Controls & Filter Tabs Bar */}
           <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
@@ -2289,6 +2431,14 @@ export default function BusinessScraperPage() {
                   </div>
 
                   <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleExportCsv(s.id)}
+                      className="h-8.5 px-3 rounded-xl bg-white border border-slate-200 hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-slate-700 hover:text-[#166534] text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95"
+                      title={`Download CSV for ${s.keyword} (${s.total_found} leads)`}
+                    >
+                      <Download size={13} />
+                      <span>Export CSV</span>
+                    </button>
                     <button
                       onClick={() => {
                         setActiveSearch(s);
