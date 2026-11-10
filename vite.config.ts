@@ -39,8 +39,13 @@ export default defineConfig(({mode}) => {
           changeOrigin: true,
           secure: false,
         },
+        // Forward /storage/* → local Laravel (avoids CORS in dev)
+        '/storage': {
+          target: backendUrl,
+          changeOrigin: true,
+          secure: false,
+        },
       },
     },
   };
 });
-

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+﻿import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useBrandingStore } from './store/brandingStore';
@@ -68,6 +68,27 @@ import WorkflowsPage from './pages/automation/WorkflowsPage';
 import ExecutionsPage from './pages/automation/ExecutionsPage';
 import WorkflowBuilderPage from './pages/automation/WorkflowBuilderPage';
 
+// Page & Form Builder Pages
+import PageBuilderDashboard from './pages/pageBuilder/PageBuilderDashboard';
+import LandingPagesListPage from './pages/pageBuilder/LandingPagesListPage';
+import LandingPageEditor from './pages/pageBuilder/LandingPageEditor';
+import FormsListPage from './pages/pageBuilder/FormsListPage';
+import FormEditorPage from './pages/pageBuilder/FormEditorPage';
+import SubmissionsListPage from './pages/pageBuilder/SubmissionsListPage';
+import PublicPageView from './pages/pageBuilder/PublicPageView';
+import PublicFormView from './pages/pageBuilder/PublicFormView';
+
+// Social Media Planner Pages
+import SocialOverviewPage from './pages/social/SocialOverviewPage';
+import SocialCalendarPage from './pages/social/SocialCalendarPage';
+import SocialCreatePostPage from './pages/social/SocialCreatePostPage';
+import SocialAccountsPage from './pages/social/SocialAccountsPage';
+import SocialInboxPage from './pages/social/SocialInboxPage';
+import SocialAnalyticsPage from './pages/social/SocialAnalyticsPage';
+import SocialLeadAdsPage from './pages/social/SocialLeadAdsPage';
+import MediaLibraryPage from './pages/media/MediaLibraryPage';
+import AdvancedReportingPage from './pages/reporting/AdvancedReportingPage';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -88,6 +109,10 @@ function PublicChatbot() {
                        !pathname.startsWith('/settings') && 
                        !pathname.startsWith('/whatsapp') && 
                        !pathname.startsWith('/automation') && 
+                       !pathname.startsWith('/social-planner') && !pathname.startsWith('/media-library') && !pathname.startsWith('/reporting') && 
+                       !pathname.startsWith('/page-builder') && 
+                       !pathname.startsWith('/p/') && 
+                       !pathname.startsWith('/f/') && 
                        !pathname.startsWith('/scraper') && 
                        !pathname.startsWith('/admin') && 
                        !pathname.startsWith('/onboarding');
@@ -130,6 +155,20 @@ export default function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
+        {/* Public Standalone Landing Page & Form Routes */}
+        <Route path="/p/:slug" element={<PublicPageView />} />
+        <Route path="/f/:slug" element={<PublicFormView />} />
+        {/* Full-Screen Visual Studio Editors (Independent of CRM Sidebar) */}
+        <Route path="/page-builder/pages/create" element={
+          <ProtectedRoute>
+            <LandingPageEditor />
+          </ProtectedRoute>
+        } />
+        <Route path="/page-builder/pages/edit/:id" element={
+          <ProtectedRoute>
+            <LandingPageEditor />
+          </ProtectedRoute>
+        } />
         <Route path="/onboarding" element={
           <ProtectedRoute>
             <OnboardingPage />
@@ -172,6 +211,29 @@ export default function App() {
           </Route>
           <Route path="automation/workflows/builder/:id" element={<WorkflowBuilderPage />} />
           <Route path="automation/workflows/builder" element={<WorkflowBuilderPage />} />
+
+          {/* Page & Form Builder Routes */}
+          <Route path="page-builder" element={<PageBuilderDashboard />} />
+          <Route path="page-builder/pages" element={<LandingPagesListPage />} />
+          <Route path="page-builder/forms" element={<FormsListPage />} />
+          <Route path="page-builder/forms/create" element={<FormEditorPage />} />
+          <Route path="page-builder/forms/edit/:id" element={<FormEditorPage />} />
+          <Route path="page-builder/submissions" element={<SubmissionsListPage />} />
+
+          {/* Social Media Planner Routes */}
+          <Route path="social-planner" element={<SocialOverviewPage />} />
+          <Route path="social-planner/calendar" element={<SocialCalendarPage />} />
+          <Route path="social-planner/create" element={<SocialCreatePostPage />} />
+          <Route path="social-planner/accounts" element={<SocialAccountsPage />} />
+          <Route path="social-planner/inbox" element={<SocialInboxPage />} />
+          <Route path="social-planner/analytics" element={<SocialAnalyticsPage />} />
+          <Route path="social-planner/lead-ads" element={<SocialLeadAdsPage />} />
+
+          {/* Media Storage & Advanced Reporting Routes */}
+          <Route path="media-library" element={<MediaLibraryPage />} />
+          <Route path="media" element={<Navigate to="/media-library" replace />} />
+          <Route path="reporting" element={<AdvancedReportingPage />} />
+          <Route path="analytics/advanced" element={<AdvancedReportingPage />} />
 
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>

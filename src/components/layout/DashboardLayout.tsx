@@ -35,7 +35,10 @@ import {
   Zap,
   ShieldCheck,
   Cpu,
-  Globe
+  Globe,
+  Share2,
+  Layers,
+  HardDrive
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { useAuthStore } from '../../store/authStore';
@@ -71,6 +74,47 @@ const getMenuItems = (t: (key: string, params?: any, fallback?: string) => strin
   ]},
   { group: t('app.dashboard.automation_d90975', undefined, 'Automation'), items: [
     { icon: Zap, label: t('app.dashboard.workflows_automation_daecf7', undefined, 'Workflows & Automation'), path: '/automation' },
+  ]},
+  { group: t('app.dashboard.page_form_builder', undefined, 'Page & Form Builder'), items: [
+    {
+      icon: Layers,
+      label: t('app.dashboard.page_builder_title', undefined, 'Page & Form Builder'),
+      path: '/page-builder',
+      submenus: [
+        { label: 'Overview', path: '/page-builder' },
+        { label: 'Landing Pages', path: '/page-builder/pages' },
+        { label: 'Forms & Surveys', path: '/page-builder/forms' },
+        { label: 'Submissions', path: '/page-builder/submissions' },
+      ],
+    },
+  ]},
+  { group: t('app.dashboard.social_media_planner', undefined, 'Social Media Planner'), items: [
+    {
+      icon: Share2,
+      label: t('app.dashboard.social_planner_title', undefined, 'Social Media Planner'),
+      path: '/social-planner',
+      submenus: [
+        { label: 'Overview', path: '/social-planner' },
+        { label: 'Content Calendar', path: '/social-planner/calendar' },
+        { label: 'Create Post', path: '/social-planner/create' },
+        { label: 'Social Accounts', path: '/social-planner/accounts' },
+        { label: 'Inbox', path: '/social-planner/inbox' },
+        { label: 'Analytics', path: '/social-planner/analytics' },
+        { label: 'Lead Ads (FB & IG)', path: '/social-planner/lead-ads' },
+      ],
+    },
+  ]},
+  { group: 'Media & Analytics', items: [
+    {
+      icon: HardDrive,
+      label: 'Media Storage',
+      path: '/media-library',
+    },
+    {
+      icon: BarChart3,
+      label: 'Advanced Reporting',
+      path: '/reporting',
+    },
   ]}
 ];
 
@@ -102,6 +146,7 @@ export function Sidebar({
   const { t, isRtl } = useI18n();
   const menuItems = getMenuItems(t);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({ '/social-planner': true, '/page-builder': true });
 
   const isItemActive = (isActive: boolean, itemPath: string) => {
     if (!isActive) return false;
@@ -271,7 +316,7 @@ export function Sidebar({
     }, 950);
 
     setTimeout(() => {
-      setAiLogs(prev => [...prev, 'OS Orchestration COMPLETE ✔']);
+      setAiLogs(prev => [...prev, 'OS Orchestration COMPLETE âœ”']);
       setAiStep('done');
     }, 1400);
   };
@@ -377,7 +422,101 @@ export function Sidebar({
                   <div className="w-full h-px bg-[#e7e5e4] my-2" />
                 )}
                 <nav className="space-y-0.5">
-                  {group.items.map((item) => (
+                  {group.items.map((item) => {
+                    const submenus = (item as any).submenus as Array<{ label: string; path: string }> | undefined;
+                    const isItemOpen = openSubmenus[item.path] ?? location.pathname.startsWith(item.path);
+
+                    if (submenus && submenus.length > 0) {
+                      const isAnySubActive = location.pathname.startsWith(item.path);
+                      return (
+                        <div key={item.label} className="space-y-0.5">
+                          <div
+                            onClick={() => {
+                              if (!isCollapsed) {
+                                setOpenSubmenus((prev) => ({ ...prev, [item.path]: !isItemOpen }));
+                              }
+                            }}
+                            className={cn(
+                              "flex items-center rounded-xl text-xs sm:text-[13px] font-semibold transition-all duration-200 group relative cursor-pointer",
+                              isCollapsed ? "p-2 justify-center" : "px-3 py-2 gap-2.5",
+                              isAnySubActive
+                                ? "bg-[#166534] text-white shadow-sm shadow-[#166534]/25"
+                                : "text-[#57534E] hover:text-[#12263A] hover:bg-[#F0FDF4]"
+                            )}
+                          >
+                            <item.icon
+                              size={17}
+                              strokeWidth={2}
+                              className={cn("shrink-0 transition-colors", isAnySubActive ? "text-white" : "text-[#57534E]/75 group-hover:text-[#12263A]")}
+                            />
+                            {!isCollapsed && (
+                              <>
+                                <NavLink
+                                  to={item.path}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsMobileMenuOpen(false);
+                                  }}
+                                  className="flex-1 text-left"
+                                >
+                                  {item.label}
+                                </NavLink>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenSubmenus((prev) => ({ ...prev, [item.path]: !isItemOpen }));
+                                  }}
+                                  className="p-1 hover:bg-black/10 rounded-md transition-transform"
+                                >
+                                  <ChevronDown size={14} className={cn("transition-transform duration-200", isItemOpen ? "rotate-180" : "")} />
+                                </button>
+                              </>
+                            )}
+                            {isCollapsed && (
+                              <div
+                                className={cn(
+                                  "absolute top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-[#12263A] text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]",
+                                  isRtl ? "right-[64px]" : "left-[64px]"
+                                )}
+                              >
+                                {item.label}
+                              </div>
+                            )}
+                          </div>
+
+                          {!isCollapsed && isItemOpen && (
+                            <div className="pl-6 pr-1 py-0.5 space-y-0.5">
+                              {submenus.map((sub) => {
+                                const isSubActive =
+                                  sub.path === '/social-planner' || sub.path === '/page-builder'
+                                    ? location.pathname === sub.path
+                                    : location.pathname.startsWith(sub.path);
+
+                                return (
+                                  <NavLink
+                                    key={sub.path}
+                                    to={sub.path}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className={cn(
+                                      "flex items-center px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                                      isSubActive
+                                        ? "bg-[#166534]/15 text-[#166534] font-bold"
+                                        : "text-[#57534E] hover:text-[#12263A] hover:bg-[#F0FDF4]"
+                                    )}
+                                  >
+                                    <span className="w-1.5 h-1.5 rounded-full mr-2 bg-current opacity-60" />
+                                    {sub.label}
+                                  </NavLink>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+
+                    return (
                     <NavLink
                       key={item.label}
                       to={item.path}
@@ -416,7 +555,8 @@ export function Sidebar({
                         );
                       }}
                     </NavLink>
-                  ))}
+                    );
+                  })}
                 </nav>
               </div>
             ))}
@@ -424,7 +564,7 @@ export function Sidebar({
               <div className="space-y-0.5 pt-1">
                 {!isCollapsed ? (
                   <p className="px-3 mb-1 text-[11px] font-bold uppercase tracking-wider text-[#166534] select-none">
-                    {isRtl ? 'الإدارة' : 'Administration'}
+                    {isRtl ? 'Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©' : 'Administration'}
                   </p>
                 ) : (
                   <div className="w-full h-px bg-[#e7e5e4] my-2" />
@@ -441,13 +581,13 @@ export function Sidebar({
                     )}
                   >
                     <Cpu size={17} strokeWidth={2} className="shrink-0 text-[#166534] group-hover:text-[#14532d]" />
-                    {!isCollapsed && <span className="flex-1">{isRtl ? 'لوحة الإدارة' : 'Admin Panel'}</span>}
+                    {!isCollapsed && <span className="flex-1">{isRtl ? 'Ù„ÙˆØ­Ø© Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©' : 'Admin Panel'}</span>}
                     {isCollapsed && (
                       <div className={cn(
                         "absolute top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-[#12263A] text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]",
                         isRtl ? "right-[64px]" : "left-[64px]"
                       )}>
-                        {isRtl ? 'لوحة الإدارة' : 'Admin Panel'}
+                        {isRtl ? 'Ù„ÙˆØ­Ø© Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©' : 'Admin Panel'}
                       </div>
                     )}
                   </NavLink>
@@ -465,8 +605,8 @@ export function Sidebar({
                     <FileText size={14} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-[#12263A] truncate">{isRtl ? 'المساعدة والوثائق' : 'Help & Docs'}</p>
-                    <p className="text-[10px] text-[#57534E] truncate">{isRtl ? 'أدلة ومراجع شاملة' : 'Guides & resources'}</p>
+                    <p className="text-xs font-bold text-[#12263A] truncate">{isRtl ? 'Ø§Ù„Ù…Ø³Ø§Ø¹Ø¯Ø© ÙˆØ§Ù„ÙˆØ«Ø§Ø¦Ù‚' : 'Help & Docs'}</p>
+                    <p className="text-[10px] text-[#57534E] truncate">{isRtl ? 'Ø£Ø¯Ù„Ø© ÙˆÙ…Ø±Ø§Ø¬Ø¹ Ø´Ø§Ù…Ù„Ø©' : 'Guides & resources'}</p>
                   </div>
                 </div>
                 <button
@@ -474,7 +614,7 @@ export function Sidebar({
                   onClick={() => navigate('/resources')}
                   className="h-7 px-3 text-[11px] font-bold text-[#166534] hover:text-[#14532d] bg-white hover:bg-[#F0FDF4] border border-slate-200 hover:border-[#bbf7d0] rounded-lg transition-all shadow-xs active:scale-95 cursor-pointer shrink-0"
                 >
-                  {isRtl ? 'عرض' : 'View'}
+                  {isRtl ? 'Ø¹Ø±Ø¶' : 'View'}
                 </button>
               </div>
             </div>
@@ -600,7 +740,7 @@ export function Sidebar({
                               }}
                               className="px-4 py-2 border border-red-200 bg-red-50 hover:bg-red-105 text-red-650 rounded-xl text-xs font-bold transition-all cursor-pointer"
                             >
-                              {isRtl ? 'إزالة الصورة' : 'Remove Photo'}
+                              {isRtl ? 'Ø¥Ø²Ø§Ù„Ø© Ø§Ù„ØµÙˆØ±Ø©' : 'Remove Photo'}
                             </button>
                           )}
                         </div>
@@ -649,7 +789,7 @@ export function Sidebar({
                     </div>
 
                     <div>
-                      <label className="block mb-2 text-xs font-semibold text-slate-500">{isRtl ? 'اسم المؤسسة / العمل' : 'Business Name'}</label>
+                      <label className="block mb-2 text-xs font-semibold text-slate-500">{isRtl ? 'Ø§Ø³Ù… Ø§Ù„Ù…Ø¤Ø³Ø³Ø© / Ø§Ù„Ø¹Ù…Ù„' : 'Business Name'}</label>
                       <div className="relative">
                         <Briefcase className={cn("absolute top-1/2 -translate-y-1/2 text-slate-400", isRtl ? "right-4" : "left-4")} size={14} />
                         <input
@@ -665,7 +805,7 @@ export function Sidebar({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block mb-1.5 text-xs font-semibold text-slate-500">{isRtl ? 'البريد الإلكتروني' : 'Email'}</label>
+                        <label className="block mb-1.5 text-xs font-semibold text-slate-500">{isRtl ? 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ' : 'Email'}</label>
                         <div className="relative">
                           <Mail className={cn("absolute top-1/2 -translate-y-1/2 text-slate-400", isRtl ? "right-4" : "left-4")} size={13} />
                           <input
@@ -688,7 +828,7 @@ export function Sidebar({
                         >
                           <span className="font-mono text-slate-500" dir="ltr">{user?.tenantId || 'Tenant-1'}</span>
                           {isCopied ? (
-                            <span className="text-[8.5px] font-black text-indigo-600 uppercase tracking-widest">{isRtl ? 'تم النسخ' : 'Copied'}</span>
+                            <span className="text-[8.5px] font-black text-indigo-600 uppercase tracking-widest">{isRtl ? 'ØªÙ… Ø§Ù„Ù†Ø³Ø®' : 'Copied'}</span>
                           ) : (
                             <Copy size={11} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
                           )}
@@ -704,7 +844,7 @@ export function Sidebar({
                       onClick={() => setShowPasswordFields(!showPasswordFields)}
                       className="flex items-center justify-between w-full text-left text-xs font-black text-[#166534] hover:text-[#14532d] uppercase tracking-widest cursor-pointer hover:underline"
                     >
-                      <span>🔒 {t('account.profile.change_password')}</span>
+                      <span>ðŸ”’ {t('account.profile.change_password')}</span>
                       <span>{showPasswordFields ? t('account.profile.hide') : t('account.profile.show')}</span>
                     </button>
 
@@ -716,7 +856,7 @@ export function Sidebar({
                             type="password"
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
-                            placeholder="••••••••"
+                            placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                             dir="ltr"
                             className="w-full bg-slate-50 border border-slate-200/65 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition-all"
                           />
@@ -771,13 +911,13 @@ export function Sidebar({
                     {showStatus === 'success' && (
                       <p className="text-xs font-semibold text-emerald-600 flex items-center gap-1.5">
                         <CheckCircle2 size={14} />
-                        {isRtl ? 'تم حفظ الملف الشخصي بنجاح' : 'Profile saved'}
+                        {isRtl ? 'ØªÙ… Ø­ÙØ¸ Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø´Ø®ØµÙŠ Ø¨Ù†Ø¬Ø§Ø­' : 'Profile saved'}
                       </p>
                     )}
                     {showStatus === 'error' && (
                       <p className="text-xs font-semibold text-red-500 flex items-center gap-1.5">
                         <X size={14} />
-                        {isRtl ? 'فشل التحديث' : 'Update failed'}
+                        {isRtl ? 'ÙØ´Ù„ Ø§Ù„ØªØ­Ø¯ÙŠØ«' : 'Update failed'}
                       </p>
                     )}
                     {!showStatus && (
@@ -791,7 +931,7 @@ export function Sidebar({
                       onClick={() => setIsProfileModalOpen(false)}
                       className="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all cursor-pointer"
                     >
-                      {isRtl ? 'إلغاء' : 'Cancel'}
+                      {isRtl ? 'Ø¥Ù„ØºØ§Ø¡' : 'Cancel'}
                     </button>
                     <button
                       type="submit"
@@ -801,7 +941,7 @@ export function Sidebar({
                       {isSaving ? (
                         <Loader2 size={14} className="animate-spin text-white" />
                       ) : (
-                        isRtl ? 'حفظ التغييرات' : "Save Changes"
+                        isRtl ? 'Ø­ÙØ¸ Ø§Ù„ØªØºÙŠÙŠØ±Ø§Øª' : "Save Changes"
                       )}
                     </button>
                   </div>
@@ -1017,7 +1157,7 @@ export function Header() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setIsFocused(true)}
-            placeholder={isRtl ? "البحث في جهات الاتصال والحملات أو طرح سؤال..." : "Search contacts, campaigns, or ask a question..."}
+            placeholder={isRtl ? "Ø§Ù„Ø¨Ø­Ø« ÙÙŠ Ø¬Ù‡Ø§Øª Ø§Ù„Ø§ØªØµØ§Ù„ ÙˆØ§Ù„Ø­Ù…Ù„Ø§Øª Ø£Ùˆ Ø·Ø±Ø­ Ø³Ø¤Ø§Ù„..." : "Search contacts, campaigns, or ask a question..."}
             className={cn(
               "w-full bg-[#FAFAF9] border border-[#e7e5e4] rounded-full py-2.5 text-[13px] font-medium text-[#12263A] focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 shadow-sm transition-all placeholder:text-[#57534E]/60",
               isRtl ? "pr-11 pl-12 text-right" : "pl-11 pr-12 text-left"
@@ -1042,7 +1182,7 @@ export function Header() {
               >
                 {/* Search Meta Info */}
                 <div className="bg-slate-50 border-b border-slate-100 px-5 py-3 flex items-center justify-between text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                  <span>✨ Universal OS Intelligence</span>
+                  <span>âœ¨ Universal OS Intelligence</span>
                   {isLoading ? (
                     <span className="flex items-center gap-2 text-indigo-600">
                       <Loader2 size={10} className="animate-spin" />
@@ -1060,7 +1200,7 @@ export function Header() {
                   {!query && (
                     <div className="space-y-4">
                       <div>
-                        <p className="px-2 mb-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">⚡ QUICK PILOTS</p>
+                        <p className="px-2 mb-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">âš¡ QUICK PILOTS</p>
                         <div className="grid grid-cols-2 gap-2">
                           <button 
                             onClick={() => handleSelectResult('/contacts/add')}
@@ -1156,8 +1296,8 @@ export function Header() {
                                   )}
                                   <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-all" />
                                 </div>
-                              </button>
-                            ))}
+                            </button>
+                          ))}
                           </div>
                         </div>
                       )}
@@ -1196,8 +1336,8 @@ export function Header() {
                                   </span>
                                   <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-all" />
                                 </div>
-                              </button>
-                            ))}
+                            </button>
+                          ))}
                           </div>
                         </div>
                       )}
@@ -1231,8 +1371,8 @@ export function Header() {
                                   </span>
                                   <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-600 group-hover:translate-x-0.5 transition-all" />
                                 </div>
-                              </button>
-                            ))}
+                            </button>
+                          ))}
                           </div>
                         </div>
                       )}
@@ -1323,7 +1463,7 @@ export function Header() {
                 <div className="px-5 py-3.5 border-b border-[#e7e5e4] bg-white flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-[#12263A]">
-                      {isRtl ? 'الإشعارات' : 'Notifications'}
+                      {isRtl ? 'Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª' : 'Notifications'}
                     </span>
                     {unreadCount > 0 && (
                       <span className="bg-[#166534] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
@@ -1336,7 +1476,7 @@ export function Header() {
                       onClick={markAllAsRead}
                       className="text-xs font-semibold text-[#166534] hover:text-[#14532d] transition-colors cursor-pointer"
                     >
-                      {isRtl ? 'تحديد الكل كمقروء' : 'Mark all as read'}
+                      {isRtl ? 'ØªØ­Ø¯ÙŠØ¯ Ø§Ù„ÙƒÙ„ ÙƒÙ…Ù‚Ø±ÙˆØ¡' : 'Mark all as read'}
                     </button>
                   )}
                 </div>
