@@ -30,6 +30,8 @@ import { useI18n } from '../../i18n';
 import { toast } from '../../components/ui/Toast';
 import { cn } from '../../lib/utils';
 
+type RedirectTarget = 'payment_methods' | 'currency' | 'billing_hub' | 'whatsapp_manager' | 'business_settings';
+
 export default function WhatsAppBillingPage() {
   const { isRtl } = useI18n();
   const [profile, setProfile] = useState<WhatsAppBillingProfile | null>(null);
@@ -37,7 +39,7 @@ export default function WhatsAppBillingPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [showRedirectModal, setShowRedirectModal] = useState(false);
-  const [redirectTarget, setRedirectTarget] = useState<'payment_methods' | 'currency' | 'billing_hub'>('payment_methods');
+  const [redirectTarget, setRedirectTarget] = useState<RedirectTarget>('payment_methods');
   const [pendingUrl, setPendingUrl] = useState<string>('');
 
   useEffect(() => {
@@ -84,7 +86,7 @@ export default function WhatsAppBillingPage() {
     }
   };
 
-  const handleOpenMetaBilling = async (target: 'payment_methods' | 'currency' | 'billing_hub') => {
+  const handleOpenMetaBilling = async (target: RedirectTarget) => {
     try {
       setRedirectTarget(target);
       const res = await whatsappApi.getMetaBillingUrl(target);
@@ -520,7 +522,7 @@ export default function WhatsAppBillingPage() {
         <div className="lg:col-span-2 space-y-6">
           {/* Action Card: Manage Payment Methods */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <CreditCard className="w-5 h-5 text-emerald-600" />
@@ -535,21 +537,31 @@ export default function WhatsAppBillingPage() {
                 </p>
               </div>
 
-              <button
-                onClick={() => handleOpenMetaBilling('payment_methods')}
-                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-2 transition-all cursor-pointer hover:shadow-md shrink-0"
-              >
-                <span>{isRtl ? 'فتح طرق الدفع' : 'Manage Payment Method'}</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </button>
+              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
+                <button
+                  onClick={() => handleOpenMetaBilling('payment_methods')}
+                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-2 transition-all cursor-pointer hover:shadow-md"
+                >
+                  <span>{isRtl ? 'مركز الفوترة (Billing Hub)' : 'Meta Billing Hub'}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => handleOpenMetaBilling('whatsapp_manager')}
+                  className="px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-bold text-xs shadow-sm flex items-center gap-2 transition-all cursor-pointer"
+                  title={isRtl ? 'فتح مدير واتساب' : 'Open WhatsApp Manager'}
+                >
+                  <span>{isRtl ? 'مدير واتساب' : 'WhatsApp Manager'}</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+              </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex items-center gap-3">
               <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
               <p className="text-xs text-slate-600 dark:text-slate-300">
                 {isRtl
-                  ? 'يتم نقلك بأمان إلى مركز فوترة Meta الرسمي المقترن بمعرف WABA الخاص بك لإضافة بطاقة ائتمان أو خط ائتمان شهري.'
-                  : 'You will be securely routed to Meta WhatsApp Manager dedicated to your WABA ID to attach credit cards or monthly invoicing lines.'}
+                  ? 'يتم نقلك بأمان إلى مركز فوترة Meta الرسمي المقترن بحسابك لإضافة بطاقة ائتمان أو خط ائتمان شهري.'
+                  : 'You will be securely routed to official Meta Billing Hub to attach a payment card or monthly invoicing line.'}
               </p>
             </div>
           </div>
@@ -629,7 +641,11 @@ export default function WhatsAppBillingPage() {
                     <ExternalLink className="w-5 h-5" />
                   </div>
                   <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                    {isRtl ? 'الانتقال إلى منصة Meta الرسمية' : 'Proceed to Official Meta Portal'}
+                    {redirectTarget === 'currency'
+                      ? (isRtl ? 'إعداد عملة ودولة النشاط التجاري في Meta' : 'Meta Business Portfolio - Currency Setup')
+                      : redirectTarget === 'whatsapp_manager'
+                      ? (isRtl ? 'مدير واتساب للأعمال (WhatsApp Manager)' : 'Meta WhatsApp Manager (WABA)')
+                      : (isRtl ? 'مركز الفوترة وطرق الدفع في Meta' : 'Meta Billing Hub - Payment Methods')}
                   </h3>
                 </div>
                 <button
@@ -642,19 +658,36 @@ export default function WhatsAppBillingPage() {
 
               <div className="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
                 <p>
-                  {isRtl
-                    ? 'سيتم فتح منصة Meta الرسمية في علامة تبويب جديدة لإدارة طرق الدفع أو العملة لحساب واتساب الخاص بك:'
-                    : 'You are about to be redirected to the official Meta Business Manager interface:'}
+                  {redirectTarget === 'currency'
+                    ? (isRtl
+                        ? 'سيتم فتح إعدادات محفظة أعمال Meta. يرجى اختيار الدولة والعملة الرسمية وحفظ الإعدادات لحل الخطأ 131042:'
+                        : 'You will be redirected to Meta Business Info to select your business legal country and currency to resolve Error 131042:')
+                    : redirectTarget === 'whatsapp_manager'
+                    ? (isRtl
+                        ? 'سيتم فتح صفحة حساب واتساب للأعمال (WABA) الرسمي في Meta لمراجعة حالة الحساب وجودة الرسائل:'
+                        : 'You will be redirected to your WhatsApp Business Account dashboard in Meta Business Manager:')
+                    : (isRtl
+                        ? 'سيتم فتح مركز الفوترة الرسمي في Meta Business Suite لإضافة أو تحديث بطاقة الائتمان الخاصة برسائل واتساب:'
+                        : 'You will be redirected to Meta Business Suite Billing Hub to add or manage your credit/debit card for WhatsApp Cloud API messaging:')}
                 </p>
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 font-mono text-[11px] text-slate-700 dark:text-slate-300 break-all border border-slate-200/60 dark:border-slate-700/60">
-                  {pendingUrl}
+                <div className="relative group">
+                  <div className="p-3 pr-10 rounded-xl bg-slate-50 dark:bg-slate-800 font-mono text-[11px] text-slate-700 dark:text-slate-300 break-all border border-slate-200/60 dark:border-slate-700/60">
+                    {pendingUrl}
+                  </div>
+                  <button
+                    onClick={() => copyToClipboard(pendingUrl, 'meta_url')}
+                    className="absolute top-2.5 right-2.5 p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 hover:text-slate-700 dark:text-slate-300 shadow-xs cursor-pointer"
+                    title={isRtl ? 'نسخ الرابط' : 'Copy URL'}
+                  >
+                    {copiedField === 'meta_url' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
                 </div>
                 <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 text-xs flex items-start gap-2">
                   <Info className="w-4 h-4 shrink-0 mt-0.5" />
                   <span>
                     {isRtl
-                      ? 'ملاحظة: بعد إكمال عملية إضافة البطاقة أو ضبط العملة، يرجى العودة إلى هذه الصفحة والنقر على "تحديث حالة الفوترة" للتحقق من الجاهزية.'
-                      : 'Important: Once you add your payment method or save your currency in Meta, return here and click "Refresh Billing Status".'}
+                      ? 'ملاحظة: بعد إكمال عملية إضافة البطاقة أو ضبط العملة في Meta، يرجى العودة إلى هذه الصفحة والنقر على "تحديث حالة الفوترة" للمزامنة والتحقق.'
+                      : 'Important: Once you add your payment method or save your currency in Meta, return here and click "Refresh Billing Status" to synchronize.'}
                   </span>
                 </div>
               </div>

@@ -205,7 +205,9 @@ class WhatsAppApiService {
   /**
    * Generates official Meta billing portal link.
    */
-  async getMetaBillingUrl(target: 'payment_methods' | 'currency' | 'billing_hub' = 'payment_methods'): Promise<{ success: boolean; url: string }> {
+  async getMetaBillingUrl(
+    target: 'payment_methods' | 'currency' | 'billing_hub' | 'whatsapp_manager' | 'business_settings' = 'payment_methods'
+  ): Promise<{ success: boolean; url: string }> {
     return this.request('/whatsapp/billing/meta-url', {
       method: 'POST',
       body: JSON.stringify({ target }),
