@@ -38,7 +38,8 @@ import {
   Globe,
   Share2,
   Layers,
-  HardDrive
+  HardDrive,
+  CreditCard
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { useAuthStore } from '../../store/authStore';
@@ -70,6 +71,7 @@ const getMenuItems = (t: (key: string, params?: any, fallback?: string) => strin
     { icon: Send, label: t('app.dashboard.whatsapp_campaigns_c8204e', undefined, 'WhatsApp Campaigns'), path: '/campaigns' },
     { icon: LayoutIcon, label: t('app.dashboard.whatsapp_templates_431349', undefined, 'WhatsApp Templates'), path: '/templates' },
     { icon: Smartphone, label: t('app.dashboard.whatsapp_numbers_53ab7d', undefined, 'WhatsApp Numbers'), path: '/whatsapp/connect' },
+    { icon: CreditCard, label: t('app.dashboard.whatsapp_billing', undefined, 'Billing & Payments'), path: '/whatsapp/billing' },
     { icon: Settings, label: t('app.dashboard.whatsapp_settings_37faf3', undefined, 'WhatsApp Settings'), path: '/settings/whatsapp' },
   ]},
   { group: t('app.dashboard.automation_d90975', undefined, 'Automation'), items: [

@@ -1,4 +1,4 @@
-import { WhatsAppTemplate } from '../types/whatsapp';
+import { WhatsAppTemplate, WhatsAppBillingProfile } from '../types/whatsapp';
 import { apiClient } from './apiClient';
 
 class WhatsAppApiService {
@@ -182,6 +182,42 @@ class WhatsAppApiService {
         components,
         parameters
       }),
+    });
+  }
+
+  /**
+   * Fetches WhatsApp billing profile and status.
+   */
+  async getBillingProfile(): Promise<WhatsAppBillingProfile> {
+    const res = await this.request<any>('/whatsapp/billing');
+    return res.data;
+  }
+
+  /**
+   * Refreshes billing profile against Meta Graph API.
+   */
+  async refreshBillingStatus(): Promise<{ success: boolean; message: string; profile?: WhatsAppBillingProfile }> {
+    return this.request('/whatsapp/billing/refresh', {
+      method: 'POST',
+    });
+  }
+
+  /**
+   * Generates official Meta billing portal link.
+   */
+  async getMetaBillingUrl(target: 'payment_methods' | 'currency' | 'billing_hub' = 'payment_methods'): Promise<{ success: boolean; url: string }> {
+    return this.request('/whatsapp/billing/meta-url', {
+      method: 'POST',
+      body: JSON.stringify({ target }),
+    });
+  }
+
+  /**
+   * Dismisses/acknowledges an active billing error.
+   */
+  async dismissBillingError(): Promise<{ success: boolean; message: string }> {
+    return this.request('/whatsapp/billing/dismiss-error', {
+      method: 'POST',
     });
   }
 }

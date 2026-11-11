@@ -46,3 +46,45 @@ export interface TemplateAnalytics {
   replied: number;
   trends: { date: string; sent: number }[];
 }
+
+export type WhatsAppBillingStatus =
+  | 'Not Configured'
+  | 'Configuration Required'
+  | 'Pending Verification'
+  | 'Operational'
+  | 'Payment Attention Required'
+  | 'Restricted'
+  | 'Unknown';
+
+export interface WhatsAppBillingProfile {
+  id: number;
+  tenant_id: number;
+  waba_id: string | null;
+  business_id: string | null;
+  business_name: string | null;
+  phone_number: string | null;
+  phone_number_id: string | null;
+  is_connected: boolean;
+  billing_status: WhatsAppBillingStatus;
+  currency: string | null;
+  country: string | null;
+  payment_method_status: string;
+  payment_verification_note: string;
+  last_error_code: string | null;
+  last_error_message: string | null;
+  last_error_details: any;
+  last_checked_at: string | null;
+  last_successful_message_at: string | null;
+  meta_links: {
+    payment_methods: string;
+    currency_config: string;
+    billing_hub: string;
+  } | null;
+  meta_raw?: {
+    currency?: string | null;
+    timezone_id?: string | null;
+    account_review_status?: string | null;
+    primary_funding_id?: boolean;
+  } | null;
+}
+

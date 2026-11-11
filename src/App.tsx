@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useBrandingStore } from './store/brandingStore';
@@ -44,6 +44,7 @@ import { PrivacyPage, TermsPage } from './pages/public/LegalPages';
 
 // New Enhanced Pages
 import WhatsAppConnectPage from './pages/whatsapp/WhatsAppConnectPage';
+import WhatsAppBillingPage from './pages/whatsapp/WhatsAppBillingPage';
 import InboxPageEnhanced from './pages/inbox/InboxPageEnhanced';
 
 // Toast Notifications
@@ -202,6 +203,7 @@ export default function App() {
           <Route path="templates/builder" element={<TemplateBuilderPage />} />
           <Route path="settings/whatsapp" element={<WhatsAppSettingsPage />} />
           <Route path="whatsapp/connect" element={<WhatsAppConnectPage />} />
+          <Route path="whatsapp/billing" element={<WhatsAppBillingPage />} />
 
           {/* Automation Routes */}
           <Route path="automation" element={<AutomationLayout />}>
