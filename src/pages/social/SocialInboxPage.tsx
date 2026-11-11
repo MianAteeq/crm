@@ -319,6 +319,16 @@ export default function SocialInboxPage() {
                 ...convData,
               } as SocialConversation);
 
+        // Check activeTab and filterPlatform filters
+        const convType = updatedConv.conversation_type || 'direct_message';
+        const convPlatform = updatedConv.platform || 'facebook';
+        const matchesTab = activeTab === 'all' || convType === activeTab;
+        const matchesPlatform = filterPlatform === 'all' || convPlatform === filterPlatform;
+
+        if (!matchesTab || !matchesPlatform) {
+          return prev.filter((c) => c.id !== newMsg.social_conversation_id);
+        }
+
         // Remove from current position and prepend to top (sorted by latest activity)
         const filtered = prev.filter((c) => c.id !== newMsg.social_conversation_id);
         return [updatedConv, ...filtered];
@@ -348,9 +358,11 @@ export default function SocialInboxPage() {
         } else {
           setHasNewMessagesBelow(true);
         }
+      } else if (!selectedConvId) {
+        setSelectedConvId(newMsg.social_conversation_id);
       }
     },
-    [selectedConvId, tenantId]
+    [selectedConvId, tenantId, activeTab, filterPlatform]
   );
 
   // --------------------------------------------------------------------------

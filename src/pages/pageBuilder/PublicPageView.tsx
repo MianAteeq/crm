@@ -103,18 +103,25 @@ export default function PublicPageView() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleFormSubmit = async (e: React.FormEvent, formSlug?: string) => {
+  const handleFormSubmit = async (e: React.FormEvent, formIdentifier?: string | number) => {
     e.preventDefault();
-    if (!formSlug && !slug) return;
+    if (!formIdentifier && !slug) return;
 
     try {
       setIsSubmitting(true);
       setSubmitError(null);
-      const targetSlug = formSlug || slug;
-      const res = await pageBuilderApi.submitPublicForm(targetSlug, formData);
+      const targetSlug = typeof formIdentifier === 'string' && formIdentifier && isNaN(Number(formIdentifier)) ? formIdentifier : slug;
+      const payload: Record<string, any> = {
+        ...formData,
+        _page_slug: slug,
+      };
+      if (typeof formIdentifier === 'number' || (typeof formIdentifier === 'string' && !isNaN(Number(formIdentifier)))) {
+        payload.form_id = Number(formIdentifier);
+      }
+      const res = await pageBuilderApi.submitPublicForm(targetSlug, payload);
 
       if (res.success) {
-        setSubmitSuccess(res.data?.thank_you_message || 'Thank you! Your information has been received.');
+        setSubmitSuccess(res.message || res.data?.thank_you_message || 'Thank you! Your information has been received.');
         if (res.data?.redirect_url) {
           setTimeout(() => {
             window.location.href = res.data.redirect_url!;
@@ -587,7 +594,7 @@ export default function PublicPageView() {
                         <p className="text-xs text-slate-500 leading-relaxed">{submitSuccess}</p>
                       </div>
                     ) : (
-                      <form onSubmit={(e) => handleFormSubmit(e)} className="space-y-4 text-xs">
+                      <form onSubmit={(e) => handleFormSubmit(e, sec.content?.form_id)} className="space-y-4 text-xs">
                         {submitError && (
                           <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
                             {submitError}

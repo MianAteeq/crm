@@ -33,6 +33,13 @@ export const socialPlannerApi = {
     return res.data;
   },
 
+  async retryWebhook(id: number) {
+    const res = await apiClient.post<{ success: boolean; message: string; status?: string; account?: SocialAccount }>(
+      `/v1/social/accounts/${id}/retry-webhook`
+    );
+    return res.data;
+  },
+
   async disconnectAccount(id: number) {
     const res = await apiClient.delete<{ success: boolean; message: string }>(`/v1/social/accounts/${id}`);
     return res.data;

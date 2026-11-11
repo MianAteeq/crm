@@ -28,6 +28,7 @@ export default function SocialAccountsPage() {
   const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState(false);
   const [checkingHealthId, setCheckingHealthId] = useState<number | null>(null);
+  const [retryingWebhookId, setRetryingWebhookId] = useState<number | null>(null);
   const [disconnectModalAccount, setDisconnectModalAccount] = useState<SocialAccount | null>(null);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
@@ -185,6 +186,55 @@ export default function SocialAccountsPage() {
     }
   };
 
+  const handleRetryWebhook = async (acc: SocialAccount) => {
+    setRetryingWebhookId(acc.id);
+    try {
+      const res = await socialPlannerApi.retryWebhook(acc.id);
+      if (res.success) {
+        toast.success(`Webhook active for "${acc.name}"`, res.message || 'Page subscribed to Facebook webhooks.');
+      } else {
+        toast.error('Subscription issue', res.message || 'Could not subscribe page to webhooks.');
+      }
+      await fetchAccounts();
+    } catch (err: any) {
+      console.error('Failed to retry webhook subscription:', err);
+      toast.error('Subscription retry failed', err.response?.data?.message || err.message);
+    } finally {
+      setRetryingWebhookId(null);
+    }
+  };
+
+  const getWebhookStatusBadge = (status?: string) => {
+    switch (status) {
+      case 'webhook_active':
+        return {
+          label: 'Webhook Active',
+          className: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+          dot: 'bg-emerald-500',
+        };
+      case 'webhook_failed':
+        return {
+          label: 'Webhook Failed',
+          className: 'text-rose-700 bg-rose-50 border-rose-200',
+          dot: 'bg-rose-500',
+        };
+      case 'disconnected':
+        return {
+          label: 'Disconnected',
+          className: 'text-slate-600 bg-slate-100 border-slate-200',
+          dot: 'bg-slate-400',
+        };
+      case 'webhook_pending':
+      case 'connected':
+      default:
+        return {
+          label: 'Webhook Pending',
+          className: 'text-amber-700 bg-amber-50 border-amber-200',
+          dot: 'bg-amber-500',
+        };
+    }
+  };
+
   const handleDisconnect = async () => {
     if (!disconnectModalAccount) return;
     setIsDisconnecting(true);
@@ -326,37 +376,77 @@ export default function SocialAccountsPage() {
                           <p className="text-[11px] text-slate-400 truncate">
                             {acc.category || 'Facebook Page'}
                           </p>
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded mt-1">
-                            <CheckCircle2 size={10} /> Active Page
-                          </span>
+                          <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                              <CheckCircle2 size={10} /> Connected
+                            </span>
+                            {(() => {
+                              const badge = getWebhookStatusBadge(acc.webhook_status);
+                              return (
+                                <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded border ${badge.className}`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
+                                  {badge.label}
+                                </span>
+                              );
+                            })()}
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="text-[11px] text-slate-500 pt-2 border-t border-slate-100 flex items-center justify-between">
-                      <span>Followers: {acc.followers_count.toLocaleString()}</span>
-                      <span className="text-slate-400">ID: {acc.account_id}</span>
+                    {/* Subscription error banner if any */}
+                    {acc.webhook_subscription_error && (
+                      <div className="p-2 rounded-xl bg-rose-50 border border-rose-200 text-[11px] text-rose-800 flex items-start gap-1.5">
+                        <AlertTriangle size={13} className="text-rose-600 shrink-0 mt-0.5" />
+                        <span className="line-clamp-2">{acc.webhook_subscription_error}</span>
+                      </div>
+                    )}
+
+                    <div className="text-[11px] text-slate-500 pt-2 border-t border-slate-100 flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
+                        <span>Followers: {acc.followers_count.toLocaleString()}</span>
+                        <span className="text-slate-400 font-mono">ID: {acc.account_id}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[10px] text-slate-400">
+                        <span>Last Webhook: {acc.last_webhook_received_at ? new Date(acc.last_webhook_received_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }) : 'Never'}</span>
+                        <span>Synced: {acc.last_synced_at ? new Date(acc.last_synced_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Pending'}</span>
+                      </div>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                      <button
-                        type="button"
-                        onClick={() => handleCheckHealth(acc)}
-                        disabled={checkingHealthId === acc.id}
-                        className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-600 hover:text-[#166534] transition-colors"
-                      >
-                        <RefreshCw
-                          size={12}
-                          className={checkingHealthId === acc.id ? 'animate-spin' : ''}
-                        />
-                        Check Health
-                      </button>
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 gap-1 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleCheckHealth(acc)}
+                          disabled={checkingHealthId === acc.id}
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 hover:text-[#166534] transition-colors cursor-pointer"
+                        >
+                          <RefreshCw
+                            size={12}
+                            className={checkingHealthId === acc.id ? 'animate-spin' : ''}
+                          />
+                          Check Token
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRetryWebhook(acc)}
+                          disabled={retryingWebhookId === acc.id}
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+                          title="Retry Webhook Subscription"
+                        >
+                          <RefreshCw
+                            size={12}
+                            className={retryingWebhookId === acc.id ? 'animate-spin text-blue-600' : ''}
+                          />
+                          Retry Webhook
+                        </button>
+                      </div>
 
                       <button
                         type="button"
                         onClick={() => setDisconnectModalAccount(acc)}
-                        className="text-[11px] font-bold text-rose-600 hover:text-rose-700 transition-colors"
+                        className="text-[11px] font-bold text-rose-600 hover:text-rose-700 transition-colors cursor-pointer"
                       >
                         Disconnect
                       </button>

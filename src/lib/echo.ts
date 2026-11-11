@@ -18,18 +18,15 @@ export const getEcho = (): any => {
 
   const token = AuthService.getToken();
 
-  const isLocal =
+  const isLocalDev =
     typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-  const host = isLocal
-    ? '127.0.0.1'
-    : import.meta.env.VITE_REVERB_HOST || 'crm.throbtech.com';
+  const host = isLocalDev ? '127.0.0.1' : (import.meta.env.VITE_REVERB_HOST || 'crm.throbtech.com');
   const key = import.meta.env.VITE_REVERB_APP_KEY || 'crmkey';
-  const port = isLocal
-    ? 8080
-    : parseInt(String(import.meta.env.VITE_REVERB_PORT || '443'), 10);
-  const isTls = !isLocal && (import.meta.env.VITE_REVERB_SCHEME || 'https') === 'https';
+  const port = isLocalDev ? 8080 : parseInt(String(import.meta.env.VITE_REVERB_PORT || '443'), 10);
+  const scheme = isLocalDev ? 'http' : (import.meta.env.VITE_REVERB_SCHEME || 'https');
+  const isTls = scheme === 'https';
 
   try {
     echoInstance = new Echo({

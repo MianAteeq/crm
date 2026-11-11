@@ -12,6 +12,10 @@ export interface SocialAccount {
   profile_picture_url?: string | null;
   token_expires_at?: string | null;
   is_active: boolean;
+  webhook_status?: 'connected' | 'webhook_pending' | 'webhook_active' | 'webhook_failed' | 'disconnected';
+  webhook_subscription_error?: string | null;
+  last_webhook_received_at?: string | null;
+  last_synced_at?: string | null;
   category?: string | null;
   followers_count: number;
   connected_at?: string | null;
