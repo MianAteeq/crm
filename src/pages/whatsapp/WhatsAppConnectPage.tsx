@@ -13,8 +13,8 @@ import { LanguageSwitcher } from '../../components/common/LanguageSwitcher';
 import { cn } from '../../lib/utils';
 
 // Mock data for demo - replace with your actual config
-const FB_APP_ID = "1570952461271028";
-const FB_CONFIG_ID = "1397654585410667";
+const FB_APP_ID = "2165361860709832";
+const FB_CONFIG_ID = "2548551309001075";
 
 export default function WhatsAppConnectPage() {
   const navigate = useNavigate();
@@ -316,8 +316,8 @@ export default function WhatsAppConnectPage() {
                     <Info className="w-5 h-5 text-[#1D4ED8] shrink-0 mt-0.5" />
                     <div className="text-sm text-[#1D4ED8] leading-relaxed">
                       <span className="font-bold">{isRtl ? 'المتطلبات:' : 'Requirements:'}</span>{' '}
-                      {isRtl 
-                        ? 'تحتاج إلى حساب أعمال في Meta Business Portfolio ورقم هاتف مخصص للأعمال غير مربوط بتطبيق واتساب الشخصي للبدء.' 
+                      {isRtl
+                        ? 'تحتاج إلى حساب أعمال في Meta Business Portfolio ورقم هاتف مخصص للأعمال غير مربوط بتطبيق واتساب الشخصي للبدء.'
                         : 'You need a Meta Business account and a verified WhatsApp Business phone number to connect.'}
                     </div>
                   </div>
@@ -333,8 +333,8 @@ export default function WhatsAppConnectPage() {
                           {isRtl ? 'خيار بديل: الإعداد اليدوي لبيانات الاعتماد' : 'Alternative: Manual Credentials Setup'}
                         </p>
                         <p className="text-xs sm:text-sm text-[#64748B] mt-0.5">
-                          {isRtl 
-                            ? 'هل تفضل ربط الحساب يدوياً باستخدام رمز وصول مستخدم النظام (System User Token) ومعرف WABA؟' 
+                          {isRtl
+                            ? 'هل تفضل ربط الحساب يدوياً باستخدام رمز وصول مستخدم النظام (System User Token) ومعرف WABA؟'
                             : 'Prefer connecting manually using a permanent System User Access Token?'}
                         </p>
                       </div>
