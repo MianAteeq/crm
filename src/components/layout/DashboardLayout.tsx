@@ -47,6 +47,7 @@ import { crmApi } from '../../services/crmApi';
 import { whatsappApi } from '../../services/whatsappApi';
 import { Contact, Campaign } from '../../types';
 import { WhatsAppTemplate } from '../../types/whatsapp';
+import { can, pagePermission } from '../../lib/permissions';
 
 const menuItems = [
   { group: 'Main', items: [
@@ -69,6 +70,9 @@ const menuItems = [
   ]},
   { group: 'Automation', items: [
     { icon: Zap, label: 'Workflows & Automation', path: '/automation' },
+  ]},
+  { group: 'Workspace', items: [
+    { icon: ShieldCheck, label: 'Users & Access', path: '/settings/users' },
   ]}
 ];
 
@@ -357,7 +361,7 @@ export function Sidebar({
         {/* 3. Navigation */}
         <div className="flex-1 px-3 overflow-y-auto custom-scrollbar flex flex-col justify-between">
           <div className="space-y-3.5 py-1">
-            {menuItems.map((group) => (
+            {menuItems.map(group => ({ ...group, items: group.items.filter(item => !pagePermission(item.path) || can(user, pagePermission(item.path)!)) })).filter(group => group.items.length > 0).map((group) => (
               <div key={group.group} className="space-y-0.5">
                 {!isCollapsed ? (
                   <p className="px-3 mb-1 text-[11px] font-bold uppercase tracking-wider text-[#57534E]/70 select-none">{group.group}</p>
@@ -791,6 +795,7 @@ export function Sidebar({
 export function Header() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+  const accessKey = `${user?.id}:${user?.role}:${user?.permissions?.join(',')}`;
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -821,10 +826,11 @@ export function Header() {
   };
 
   useEffect(() => {
+    setNotifications([]);
     fetchNotifications();
     const timer = setInterval(fetchNotifications, 30000);
     return () => clearInterval(timer);
-  }, []);
+  }, [accessKey]);
 
   const unreadCount = notifications.filter(n => n.unread).length;
 
@@ -867,6 +873,13 @@ export function Header() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [templates, setTemplates] = useState<WhatsAppTemplate[]>([]);
 
+  useEffect(() => {
+    setContacts([]);
+    setCampaigns([]);
+    setTemplates([]);
+    setHasLoadedIndex(false);
+  }, [accessKey]);
+
   // Keyboard shortcut listener to focus search (Cmd/Ctrl + K and ESC to blur)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -889,9 +902,9 @@ export function Header() {
     setIsLoading(true);
     try {
       const [contRes, campRes, tempRes] = await Promise.allSettled([
-        crmApi.getContacts(),
-        crmApi.getCampaignsList(),
-        whatsappApi.fetchTemplates()
+        can(user, 'contacts.view') ? crmApi.getContacts() : Promise.resolve([]),
+        can(user, 'campaigns.view') ? crmApi.getCampaignsList() : Promise.resolve([]),
+        can(user, 'templates.view') ? whatsappApi.fetchTemplates() : Promise.resolve([])
       ]);
 
       if (contRes.status === 'fulfilled') {

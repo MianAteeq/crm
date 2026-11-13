@@ -17,7 +17,7 @@ export default function EmailSettingsPage() {
           <div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Email Sending Domains</h1>
             <p className="text-sm text-slate-500">
-              Verify and manage authorized email sending domains for your account
+              Add your domain and verify its DNS records. Email delivery is managed by the platform.
             </p>
           </div>
         </div>

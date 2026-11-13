@@ -12,7 +12,6 @@ interface RealtimeOptions {
 export function useRealtime({ channel, event, isPrivate = false, onEvent, enabled = true }: RealtimeOptions) {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const echoRef = useRef(getEcho());
 
   // Use a ref for the callback to prevent effect re-runs when only the callback changes
   const callbackRef = useRef(onEvent);
@@ -23,7 +22,7 @@ export function useRealtime({ channel, event, isPrivate = false, onEvent, enable
   useEffect(() => {
     if (!enabled) return;
 
-    const echo = echoRef.current;
+    const echo = getEcho();
     
     // Determine the correct event name for listening
     // User requested .event pattern for custom broadcastAs events

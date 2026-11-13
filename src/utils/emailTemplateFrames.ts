@@ -1,4 +1,6 @@
 // Shared Email Template Frames & Themes for Campaign Builders and AI Marketing Agent
+import { corporateEmailHeader, corporateEmailFooter, type EmailBrandSettings } from './emailBranding';
+import { CORPORATE_EMAIL_DEFAULT_BODY } from './corporateEmailDefault';
 
 export interface EmailFrame {
   id: string;
@@ -9,11 +11,25 @@ export interface EmailFrame {
   description: string;
   defaultSubject: string;
   defaultBody: string;
-  renderHeader: (fromName: string) => string;
-  renderFooter: (fromName: string) => string;
+  category?: string;
+  renderHeader: (fromName: string, brand?: EmailBrandSettings) => string;
+  renderFooter: (fromName: string, brand?: EmailBrandSettings) => string;
 }
 
 export const PROFESSIONAL_FRAMES: EmailFrame[] = [
+  {
+    id: 'corporate-letter',
+    name: 'Corporate Letter',
+    badge: 'Black & Lime',
+    category: 'General',
+    accentBg: 'bg-lime-400',
+    accentBorder: 'border-lime-400',
+    description: 'White letterhead, black navigation, lime accents, and a branded social footer. Customize your header, links, and address.',
+    defaultSubject: 'Your email subject',
+    defaultBody: CORPORATE_EMAIL_DEFAULT_BODY,
+    renderHeader: (_fromName, brand) => corporateEmailHeader(brand),
+    renderFooter: (_fromName, brand) => corporateEmailFooter(brand),
+  },
   {
     id: 'executive',
     name: 'Modern Executive',
@@ -167,29 +183,35 @@ export const PROFESSIONAL_FRAMES: EmailFrame[] = [
 export function assembleFullEmailHtml(
   frame: EmailFrame, 
   userBodyHtml: string, 
-  fromName: string
+  fromName: string,
+  brand?: EmailBrandSettings
 ): string {
+  const corporate = frame.id === 'corporate-letter';
   return `
-<table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 30px 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" data-email-frame="${frame.id}" style="background-color: #f1f5f9; padding: 24px 10px; font-family: Arial, Helvetica, sans-serif;">
   <tr>
     <td align="center">
-      <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+      <!--[if mso]><table role="presentation" width="600" border="0" cellspacing="0" cellpadding="0"><tr><td><![endif]-->
+      <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: ${corporate ? '0' : '12px'}; overflow: hidden; border: 1px solid #e2e8f0;">
         <tr>
           <td>
-            ${frame.renderHeader(fromName)}
+            ${frame.renderHeader(fromName, brand)}
           </td>
         </tr>
         <tr>
-          <td style="padding: 36px 32px; color: #334155; font-size: 15px; line-height: 1.6;">
+          <td class="body-content-pad" style="padding: 32px; color: #334155; font-size: ${corporate ? '13.5px' : '15px'}; line-height: 1.65; overflow-wrap: break-word;">
+            <!-- CRM:BODY:START -->
             ${userBodyHtml}
+            <!-- CRM:BODY:END -->
           </td>
         </tr>
         <tr>
           <td>
-            ${frame.renderFooter(fromName)}
+            ${frame.renderFooter(fromName, brand)}
           </td>
         </tr>
       </table>
+      <!--[if mso]></td></tr></table><![endif]-->
     </td>
   </tr>
 </table>`.trim();

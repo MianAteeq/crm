@@ -11,6 +11,8 @@ import { emailCampaignApi } from '../../services/emailCampaignApi';
 import { EmailTemplate } from '../../types/emailCampaign';
 import { toast } from '../../components/ui/Toast';
 import { PROFESSIONAL_FRAMES, EmailFrame, assembleFullEmailHtml } from '../../utils/emailTemplateFrames';
+import { emailBrandSettings, extractEmailBody, emailPlainText } from '../../utils/emailBranding';
+import EmailBrandEditor from '../../components/campaigns/EmailBrandEditor';
 
 const CATEGORIES = ['All', 'Sales', 'Introduction', 'Follow-up', 'Appointment', 'Newsletter', 'General'];
 
@@ -51,12 +53,12 @@ export default function EmailTemplatesPage() {
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
   const [category, setCategory] = useState('Sales');
-  const [selectedFrameId, setSelectedFrameId] = useState<string>('executive');
+  const [selectedFrameId, setSelectedFrameId] = useState<string>('corporate-letter');
+  const [brand, setBrand] = useState(() => emailBrandSettings());
   const activeFrame = PROFESSIONAL_FRAMES.find(f => f.id === selectedFrameId) || PROFESSIONAL_FRAMES[0];
 
-  // User ONLY edits this body message! Header & Footer are locked/managed automatically!
+  // Message content is stored separately from the reusable header and footer.
   const [userBodyMessage, setUserBodyMessage] = useState(activeFrame.defaultBody);
-  const [textBody, setTextBody] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
   const visualEditorRef = useRef<HTMLDivElement>(null);
@@ -89,15 +91,15 @@ export default function EmailTemplatesPage() {
     }
   }, [isModalOpen, selectedFrameId]);
 
-  const openCreateModal = (defaultFrameId = 'executive') => {
+  const openCreateModal = (defaultFrameId = 'corporate-letter') => {
     const frame = PROFESSIONAL_FRAMES.find(f => f.id === defaultFrameId) || PROFESSIONAL_FRAMES[0];
     setEditingTemplate(null);
     setSelectedFrameId(frame.id);
     setName(frame.name + ' Template');
     setSubject(frame.defaultSubject);
-    setCategory(frame.category);
+    setCategory(frame.category || 'General');
+    setBrand(emailBrandSettings());
     setUserBodyMessage(frame.defaultBody);
-    setTextBody('');
     setIsModalOpen(true);
   };
 
@@ -108,20 +110,18 @@ export default function EmailTemplatesPage() {
     setCategory(t.category);
 
     // Try to detect frame from name or HTML, or default to executive
-    const matchedFrame = PROFESSIONAL_FRAMES.find(f => 
+    const matchedFrame = PROFESSIONAL_FRAMES.find(f => f.id === t.editor_data?.frame_id) || PROFESSIONAL_FRAMES.find(f =>
       t.name.toLowerCase().includes(f.name.toLowerCase()) || 
       (t.html_body && t.html_body.includes(f.accentBorder))
-    ) || PROFESSIONAL_FRAMES[0];
+    ) || PROFESSIONAL_FRAMES.find(f => f.id === 'executive')!;
     
     setSelectedFrameId(matchedFrame.id);
+    setBrand(emailBrandSettings(t.editor_data?.brand));
 
     // Extract body content if inside table, otherwise use html_body
-    const bodyMatch = t.html_body.match(/<!-- EDITABLE BODY TEXT -->[\s\S]*?<td[^>]*>([\s\S]*?)<\/td>/i) ||
-                      t.html_body.match(/<!-- BODY \(USER'S MESSAGE ONLY\) -->[\s\S]*?<td[^>]*>([\s\S]*?)<\/td>/i);
-    const bodyContent = bodyMatch ? bodyMatch[1].trim() : t.html_body;
+    const bodyContent = t.editor_data?.body_html ?? extractEmailBody(t.html_body);
     
     setUserBodyMessage(bodyContent);
-    setTextBody(t.text_body || '');
     setIsModalOpen(true);
   };
 
@@ -132,7 +132,7 @@ export default function EmailTemplatesPage() {
     if (!editingTemplate) {
       setName(found.name + ' Template');
       setSubject(found.defaultSubject);
-      setCategory(found.category);
+      setCategory(found.category || 'General');
       setUserBodyMessage(found.defaultBody);
       if (visualEditorRef.current) {
         visualEditorRef.current.innerHTML = found.defaultBody;
@@ -215,7 +215,8 @@ export default function EmailTemplatesPage() {
     }
 
     // Assemble complete professional responsive HTML
-    const fullHtml = assembleFullEmailHtml(activeFrame, userBodyMessage, '{{from_name}}');
+    const fullHtml = assembleFullEmailHtml(activeFrame, userBodyMessage, '{{from_name}}', brand);
+    const editorData = { frame_id: activeFrame.id, body_html: userBodyMessage, brand };
 
     setIsSaving(true);
     try {
@@ -225,7 +226,8 @@ export default function EmailTemplatesPage() {
           subject,
           category,
           html_body: fullHtml,
-          text_body: textBody || undefined,
+          editor_data: editorData,
+          text_body: emailPlainText(fullHtml),
         });
         toast.success('Template updated successfully');
       } else {
@@ -234,7 +236,8 @@ export default function EmailTemplatesPage() {
           subject,
           category,
           html_body: fullHtml,
-          text_body: textBody || undefined,
+          editor_data: editorData,
+          text_body: emailPlainText(fullHtml),
         });
         toast.success('Template created successfully');
       }
@@ -280,7 +283,7 @@ export default function EmailTemplatesPage() {
             <div>
               <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Email Templates</h1>
               <p className="text-xs text-slate-500">
-                Professional, brand-ready email templates with locked headers & footers. Edit message body freely.
+                Reusable email layouts with editable content, brand details, social links, and address.
               </p>
             </div>
           </div>
@@ -305,7 +308,7 @@ export default function EmailTemplatesPage() {
           <span className="text-[11px] text-slate-400">Header & Footer included automatically</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {PROFESSIONAL_FRAMES.map((frame) => (
             <button
               key={frame.id}
@@ -483,7 +486,7 @@ export default function EmailTemplatesPage() {
                   {editingTemplate ? 'Edit Email Template' : 'Create Framed Email Template'}
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Header and Footer stay locked and branded. Type your message body in the center canvas.
+                  Customize your brand settings, then edit the message without changing the layout.
                 </p>
               </div>
               <button 
@@ -502,7 +505,7 @@ export default function EmailTemplatesPage() {
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                   Choose Template Style Frame
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {PROFESSIONAL_FRAMES.map((frame) => {
                     const isSelected = frame.id === selectedFrameId;
                     return (
@@ -583,6 +586,8 @@ export default function EmailTemplatesPage() {
                   required
                 />
               </div>
+
+              {selectedFrameId === 'corporate-letter' && <EmailBrandEditor value={brand} onChange={setBrand} />}
 
               {/* Visual Body Formatting Toolbar */}
               <div className="space-y-2">
@@ -715,10 +720,10 @@ export default function EmailTemplatesPage() {
                     
                     {/* Locked Header */}
                     <div className="relative group select-none">
-                      <div dangerouslySetInnerHTML={{ __html: activeFrame.renderHeader('{{from_name}}') }} />
+                      <div dangerouslySetInnerHTML={{ __html: activeFrame.renderHeader('{{from_name}}', brand) }} />
                       <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1">
                         <Lock size={9} />
-                        Locked Header
+                        {selectedFrameId === 'corporate-letter' ? 'Header · edit above' : 'Template Header'}
                       </div>
                     </div>
 
@@ -738,10 +743,10 @@ export default function EmailTemplatesPage() {
 
                     {/* Locked Footer */}
                     <div className="relative group select-none">
-                      <div dangerouslySetInnerHTML={{ __html: activeFrame.renderFooter('{{from_name}}') }} />
+                      <div dangerouslySetInnerHTML={{ __html: activeFrame.renderFooter('{{from_name}}', brand) }} />
                       <div className="absolute bottom-2 right-2 bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1">
                         <Lock size={9} />
-                        Locked Footer
+                        {selectedFrameId === 'corporate-letter' ? 'Footer · edit above' : 'Template Footer'}
                       </div>
                     </div>
 
@@ -814,16 +819,17 @@ export default function EmailTemplatesPage() {
               <div className={`transition-all duration-300 bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden ${
                 previewDevice === 'desktop' ? 'w-full max-w-xl' : 'w-[360px] max-w-full'
               }`}>
-                <div 
-                  className="prose prose-sm max-w-none text-xs leading-relaxed"
-                  dangerouslySetInnerHTML={{ 
-                    __html: previewTemplate.html_body
+                <iframe
+                  title="Email template preview"
+                  sandbox=""
+                  className="block h-[65vh] w-full border-0 bg-white"
+                  srcDoc={previewTemplate.html_body
                       .replace(/\{\{\s*first_name[^}]*\}\}/g, 'Farhan')
                       .replace(/\{\{\s*business_name[^}]*\}\}/g, 'Apex Dental Studio')
                       .replace(/\{\{\s*city[^}]*\}\}/g, 'Lahore')
                       .replace(/\{\{\s*from_name[^}]*\}\}/g, 'Ali Khan')
                       .replace(/\{\{\s*unsubscribe_url[^}]*\}\}/g, '#')
-                  }} 
+                  }
                 />
               </div>
             </div>

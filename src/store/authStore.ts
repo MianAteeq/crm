@@ -6,6 +6,8 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  accessReady: boolean;
+  refreshAccess: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, name: string, password: string, plan?: string) => Promise<void>;
   logout: () => void;
@@ -19,6 +21,30 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
+  accessReady: false,
+
+  refreshAccess: async () => {
+    const accountId = useAuthStore.getState().user?.id;
+    const remote = await AuthService.me();
+    // A request from an old session must not restore access after logout.
+    if (!accountId || useAuthStore.getState().user?.id !== accountId) return;
+    set(state => {
+      const user: User = {
+        ...state.user!,
+        name: remote.name,
+        email: remote.email,
+        role: remote.role,
+        permissions: remote.permissions || [],
+        tenantId: remote.tenant_id == null ? undefined : String(remote.tenant_id),
+        businessName: remote.tenant?.name || state.user?.businessName,
+        avatar: remote.avatar || state.user?.avatar,
+      };
+      if (remote.tenant_id != null) AuthService.setTenantId(remote.tenant_id);
+      else localStorage.removeItem('tenant_id');
+      localStorage.setItem('auth_session', JSON.stringify(user));
+      return { user, accessReady: true };
+    });
+  },
 
   login: async (email: string, password: string) => {
     set({ isLoading: true });
@@ -36,12 +62,13 @@ export const useAuthStore = create<AuthState>((set) => ({
         avatar: response.user.avatar || 'royal',
         onboardingStep: 4,
         tenantId: String(tenantIdValue),
-        role: response.user.role || 'admin'
+        role: response.user.role || 'user',
+        permissions: response.user.permissions || []
       };
       
       AuthService.setToken(response.token);
       AuthService.setTenantId(tenantIdValue);
-      set({ user, isAuthenticated: true, isLoading: false });
+      set({ user, isAuthenticated: true, isLoading: false, accessReady: true });
       localStorage.setItem('auth_session', JSON.stringify(user));
       
       // Refresh the WebSocket connection with the new token
@@ -72,12 +99,13 @@ export const useAuthStore = create<AuthState>((set) => ({
         avatar: response.user.avatar || 'royal',
         onboardingStep: 1, // Start onboarding
         tenantId: String(tenantIdValue),
-        role: response.user.role || 'admin'
+        role: response.user.role || 'user',
+        permissions: response.user.permissions || []
       };
       
       AuthService.setToken(response.token);
       AuthService.setTenantId(tenantIdValue);
-      set({ user, isAuthenticated: true, isLoading: false });
+      set({ user, isAuthenticated: true, isLoading: false, accessReady: true });
       localStorage.setItem('auth_session', JSON.stringify(user));
     } catch (error) {
       set({ isLoading: false });
@@ -87,7 +115,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: () => {
     AuthService.removeToken();
-    set({ user: null, isAuthenticated: false });
+    void import('../lib/echo').then(({ disconnectEcho }) => disconnectEcho());
+    set({ user: null, isAuthenticated: false, accessReady: false });
     localStorage.removeItem('auth_session');
   },
 

@@ -48,10 +48,11 @@ export const getEcho = (): any => {
 };
 
 export const refreshEcho = () => {
-  if (echoInstance) {
-    console.log('[Echo] Disconnecting existing instance');
-    echoInstance.disconnect();
-    echoInstance = null;
-  }
+  disconnectEcho();
   return getEcho();
+};
+
+export const disconnectEcho = () => {
+  echoInstance?.disconnect();
+  echoInstance = null;
 };

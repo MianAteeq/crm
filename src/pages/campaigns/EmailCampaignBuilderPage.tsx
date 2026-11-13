@@ -15,6 +15,8 @@ import { emailCampaignApi } from '../../services/emailCampaignApi';
 import { crmApi } from '../../services/crmApi';
 import { AudienceFilter, AudienceEstimate, EmailTemplate, EmailSendingDomain } from '../../types/emailCampaign';
 import { toast } from '../../components/ui/Toast';
+import { PROFESSIONAL_FRAMES, assembleFullEmailHtml } from '../../utils/emailTemplateFrames';
+import { emailBrandSettings, extractEmailBody, emailPlainText } from '../../utils/emailBranding';
 
 type Step = 'audience' | 'email' | 'personalization' | 'preview_test' | 'schedule_send';
 
@@ -112,202 +114,6 @@ const DEFAULT_SAMPLE_CONTACTS: SampleContact[] = [
   },
 ];
 
-// 5 PROFESSIONAL TEMPLATE FRAMES (FIXED HEADER & FOOTER - USER ONLY CHANGES BODY)
-export interface EmailFrame {
-  id: string;
-  name: string;
-  badge: string;
-  accentBg: string;
-  accentBorder: string;
-  description: string;
-  defaultSubject: string;
-  defaultBody: string;
-  renderHeader: (fromName: string) => string;
-  renderFooter: (fromName: string) => string;
-}
-
-export const PROFESSIONAL_FRAMES: EmailFrame[] = [
-  {
-    id: 'executive',
-    name: 'Modern Executive',
-    badge: 'Navy & Slate',
-    accentBg: 'bg-slate-900',
-    accentBorder: 'border-blue-600',
-    description: 'Clean executive letterhead with dark navy header and verified business badge.',
-    defaultSubject: 'Partnership inquiry for {{business_name}}',
-    defaultBody: `<p style="margin: 0 0 16px 0;">Hi {{first_name | default: "there"}},</p>
-<p style="margin: 0 0 16px 0;">I noticed <strong>{{business_name}}</strong> and was really impressed by your reputation and market presence.</p>
-<p style="margin: 0 0 16px 0;">We recently helped companies similar to yours increase their qualified inquiries and streamline client scheduling. I wanted to share a few specific ideas tailored for your team.</p>
-<p style="margin: 20px 0;"><a href="https://calendly.com" target="_blank" style="display: inline-block; background-color: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-family: sans-serif; font-size: 14px;">Schedule a 10-Minute Call &rarr;</a></p>
-<p style="margin: 0 0 16px 0;">Would you be open to a brief 10-minute chat this week?</p>
-<p style="margin: 0; line-height: 1.5;">Best regards,<br><strong style="color: #0f172a;">{{from_name}}</strong><br><span style="font-size: 13px; color: #64748b;">Growth & Strategy</span></p>`,
-    renderHeader: (fromName) => `
-<div style="background-color: #0f172a; padding: 24px 32px; border-bottom: 3px solid #3b82f6; border-radius: 12px 12px 0 0;">
-  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-    <tr>
-      <td>
-        <span style="color: #ffffff; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase;">${fromName || 'Your Business'}</span>
-        <span style="display: block; color: #94a3b8; font-size: 12px; margin-top: 3px; font-weight: 500;">Executive Business Advisory</span>
-      </td>
-      <td align="right">
-        <span style="display: inline-block; background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;">Verified Partner</span>
-      </td>
-    </tr>
-  </table>
-</div>`,
-    renderFooter: (fromName) => `
-<div style="background-color: #f8fafc; padding: 24px 32px; border-top: 1px solid #e2e8f0; border-radius: 0 0 12px 12px; text-align: center; color: #94a3b8; font-size: 11px; line-height: 1.5;">
-  <p style="margin: 0 0 6px 0; color: #64748b;">You received this business email regarding <strong>{{business_name}}</strong>.</p>
-  <p style="margin: 0 0 10px 0;">Sent by ${fromName || 'our team'} &bull; Direct Outreach &bull; All rights reserved.</p>
-  <p style="margin: 0;"><a href="{{unsubscribe_url}}" style="color: #64748b; text-decoration: underline; font-weight: 600;">Unsubscribe from future emails</a></p>
-</div>`
-  },
-  {
-    id: 'saas_indigo',
-    name: 'Tech & SaaS',
-    badge: 'Indigo Gradient',
-    accentBg: 'bg-[#166534]',
-    accentBorder: 'border-[#166534]',
-    description: 'Vibrant indigo header tailored for modern software, agencies, and automation companies.',
-    defaultSubject: 'Quick idea for {{business_name}}',
-    defaultBody: `<p style="margin: 0 0 16px 0;">Hi {{first_name | default: "there"}},</p>
-<p style="margin: 0 0 16px 0;">We recently developed an automated outreach and CRM pipeline system specifically designed for modern businesses like <strong>{{business_name}}</strong>.</p>
-<div style="background-color: #f5f3ff; border-left: 4px solid #7c3aed; border-radius: 8px; padding: 16px; margin: 20px 0;">
-  <strong style="color: #5b21b6; font-size: 14px;">Why this matters for {{business_name}}:</strong>
-  <p style="margin: 6px 0 0 0; color: #4c1d95; font-size: 13px;">Teams using this framework have seen a 35% reduction in manual data entry and a 2x increase in qualified lead bookings.</p>
-</div>
-<p style="margin: 20px 0;"><a href="https://" target="_blank" style="display: inline-block; background-color: #4f46e5; color: #ffffff; padding: 12px 26px; border-radius: 8px; text-decoration: none; font-weight: bold; font-family: sans-serif; font-size: 14px;">Explore 10-Min Demo &rarr;</a></p>
-<p style="margin: 0 0 16px 0;">Let me know if you would like me to send over a 2-minute overview video.</p>
-<p style="margin: 0; line-height: 1.5;">Best regards,<br><strong style="color: #1e1b4b;">{{from_name}}</strong></p>`,
-    renderHeader: (fromName) => `
-<div style="background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%); padding: 28px 32px; border-radius: 12px 12px 0 0;">
-  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-    <tr>
-      <td>
-        <span style="color: #ffffff; font-size: 19px; font-weight: 800; letter-spacing: -0.5px;">${fromName || 'Intelligent Solutions'}</span>
-        <span style="display: block; color: #c7d2fe; font-size: 12px; margin-top: 2px;">Software Automation & Acceleration</span>
-      </td>
-      <td align="right">
-        <span style="background-color: rgba(255,255,255,0.2); color: #ffffff; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px;">SaaS Platform</span>
-      </td>
-    </tr>
-  </table>
-</div>`,
-    renderFooter: (fromName) => `
-<div style="background-color: #faf5ff; padding: 22px 32px; border-top: 1px solid #ede9fe; border-radius: 0 0 12px 12px; text-align: center; color: #a78bfa; font-size: 11px;">
-  <p style="margin: 0 0 6px 0; color: #6b21a8;">Delivered by ${fromName || 'our platform'} &bull; Certified Outreach Engine</p>
-  <p style="margin: 0;"><a href="{{unsubscribe_url}}" style="color: #7c3aed; text-decoration: underline;">Unsubscribe</a></p>
-</div>`
-  },
-  {
-    id: 'healthcare_teal',
-    name: 'Clinic & Healthcare',
-    badge: 'Teal & Emerald',
-    accentBg: 'bg-teal-700',
-    accentBorder: 'border-teal-500',
-    description: 'Calm, trust-inspiring teal header ideal for clinics, dental practices, doctors, and healthcare.',
-    defaultSubject: 'Patient booking consultation for {{business_name}}',
-    defaultBody: `<p style="margin: 0 0 16px 0;">Dear {{first_name | default: "Doctor"}},</p>
-<p style="margin: 0 0 16px 0;">We noticed <strong>{{business_name}}</strong> and understand the importance of patient satisfaction and minimizing appointment no-shows.</p>
-<p style="margin: 0 0 16px 0;">Our dedicated WhatsApp reminder and patient portal software helps healthcare providers cut missed appointments by up to 40% while saving hours of staff time.</p>
-<p style="margin: 20px 0;"><a href="https://" target="_blank" style="display: inline-block; background-color: #0d9488; color: #ffffff; padding: 12px 26px; border-radius: 8px; text-decoration: none; font-weight: bold; font-family: sans-serif; font-size: 14px;">Request Free Clinic Demonstration &rarr;</a></p>
-<p style="margin: 0 0 16px 0;">Would you be available for a short 10-minute online walkthrough this week?</p>
-<p style="margin: 0; line-height: 1.5;">Warm regards,<br><strong style="color: #115e59;">{{from_name}}</strong><br><span style="font-size: 13px; color: #64748b;">Practice Advisor</span></p>`,
-    renderHeader: (fromName) => `
-<div style="background-color: #0f766e; padding: 24px 32px; border-bottom: 3px solid #14b8a6; border-radius: 12px 12px 0 0;">
-  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-    <tr>
-      <td>
-        <span style="color: #ffffff; font-size: 18px; font-weight: 800; letter-spacing: -0.3px;">${fromName || 'Practice Care'}</span>
-        <span style="display: block; color: #99f6e4; font-size: 12px; margin-top: 2px;">Healthcare & Medical Solutions</span>
-      </td>
-      <td align="right">
-        <span style="background-color: rgba(20, 184, 166, 0.25); color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;">Health Partner</span>
-      </td>
-    </tr>
-  </table>
-</div>`,
-    renderFooter: (fromName) => `
-<div style="background-color: #f0fdfa; padding: 22px 32px; border-top: 1px solid #ccfbf1; border-radius: 0 0 12px 12px; text-align: center; color: #0f766e; font-size: 11px;">
-  <p style="margin: 0 0 6px 0;">Confidential healthcare outreach for {{business_name}} &bull; Sent by ${fromName || 'Practice Care'}</p>
-  <p style="margin: 0;"><a href="{{unsubscribe_url}}" style="color: #0d9488; text-decoration: underline;">Unsubscribe from medical outreach</a></p>
-</div>`
-  },
-  {
-    id: 'followup_minimal',
-    name: 'Clean Minimal',
-    badge: 'Light Border',
-    accentBg: 'bg-blue-600',
-    accentBorder: 'border-blue-400',
-    description: 'Clean border with a slim top accent bar. Perfect for short, high-response follow-ups.',
-    defaultSubject: 'Following up regarding {{business_name}}',
-    defaultBody: `<p style="margin: 0 0 16px 0;">Hi {{first_name | default: "there"}},</p>
-<p style="margin: 0 0 16px 0;">I wanted to follow up quickly on my note from last week regarding {{business_name}}.</p>
-<p style="margin: 0 0 16px 0;">I know how busy you are, so I will keep this brief: are you open to a 5-minute chat to see if our growth solutions would be relevant for {{business_name}}?</p>
-<p style="margin: 20px 0;"><a href="https://calendly.com" target="_blank" style="display: inline-block; background-color: #1e293b; color: #ffffff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-family: sans-serif; font-size: 13px;">Pick a 5-Minute Time &rarr;</a></p>
-<p style="margin: 0; line-height: 1.5;">Best regards,<br><strong>{{from_name}}</strong></p>`,
-    renderHeader: () => `
-<div style="height: 4px; background-color: #3b82f6; border-radius: 12px 12px 0 0;"></div>`,
-    renderFooter: () => `
-<div style="padding: 18px 28px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; border-radius: 0 0 12px 12px; text-align: center; color: #94a3b8; font-size: 11px;">
-  <p style="margin: 0;">If you'd rather not hear from us again, you can <a href="{{unsubscribe_url}}" style="color: #64748b; text-decoration: underline;">unsubscribe here</a>.</p>
-</div>`
-  },
-  {
-    id: 'direct_note',
-    name: 'Personal Direct Note',
-    badge: 'Borderless',
-    accentBg: 'bg-slate-700',
-    accentBorder: 'border-slate-400',
-    description: 'Looks and feels like a natural 1-on-1 personal email sent directly from your email client.',
-    defaultSubject: 'Quick question for {{first_name | default: "there"}}',
-    defaultBody: `<p style="margin: 0 0 16px 0;">Hi {{first_name | default: "there"}},</p>
-<p style="margin: 0 0 16px 0;">Are you still looking to expand client acquisition for {{business_name}}?</p>
-<p style="margin: 0 0 16px 0;">We have a few proven playbooks that worked well for similar businesses. Would love to share them with you.</p>
-<p style="margin: 0 0 16px 0;">Let me know if you have 5 minutes this week.</p>
-<p style="margin: 0; line-height: 1.5;">Best,<br><strong>{{from_name}}</strong></p>`,
-    renderHeader: () => `
-<div style="padding: 16px 24px; border-bottom: 1px solid #f1f5f9; font-size: 11px; color: #94a3b8; border-radius: 12px 12px 0 0;">
-  Personal Note &bull; Direct Message
-</div>`,
-    renderFooter: () => `
-<div style="padding: 16px 24px; border-top: 1px solid #f1f5f9; font-size: 11px; color: #94a3b8; border-radius: 0 0 12px 12px; text-align: center;">
-  <a href="{{unsubscribe_url}}" style="color: #94a3b8; text-decoration: underline;">Unsubscribe</a>
-</div>`
-  }
-];
-
-// Assembles complete responsive email table combining Header + User's Body + Footer
-export function assembleFullEmailHtml(
-  frame: EmailFrame, 
-  userBodyHtml: string, 
-  fromName: string
-): string {
-  return `
-<table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 30px 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-  <tr>
-    <td align="center">
-      <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-        <tr>
-          <td>
-            ${frame.renderHeader(fromName)}
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 36px 32px; color: #334155; font-size: 15px; line-height: 1.6;">
-            ${userBodyHtml}
-          </td>
-        </tr>
-        <tr>
-          <td>
-            ${frame.renderFooter(fromName)}
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>`.trim();
-}
 
 export function extractContactVariables(contact?: SampleContact): Record<string, string> {
   if (!contact) {
@@ -489,12 +295,13 @@ export default function EmailCampaignBuilderPage() {
   
   // Selected Professional Template Frame
   const [selectedFrameId, setSelectedFrameId] = useState<string>('executive');
+  const [templateBrand, setTemplateBrand] = useState(() => emailBrandSettings());
+  const [sourceTemplateId, setSourceTemplateId] = useState<number | null>(null);
   const activeFrame = PROFESSIONAL_FRAMES.find(f => f.id === selectedFrameId) || PROFESSIONAL_FRAMES[0];
 
   const [subject, setSubject] = useState(activeFrame.defaultSubject);
   // User ONLY edits this body message! Header & Footer are locked/managed automatically!
   const [userBodyMessage, setUserBodyMessage] = useState(activeFrame.defaultBody);
-  const [textBody, setTextBody] = useState('');
 
   // Audience Filter State
   const [audienceType, setAudienceType] = useState<'all' | 'filtered'>('all');
@@ -606,27 +413,26 @@ export default function EmailCampaignBuilderPage() {
     // Check if templateId was provided in query param
     const templateIdParam = searchParams.get('templateId');
     if (templateIdParam) {
-      emailCampaignApi.getTemplates().then((tmplRes) => {
-        const found = tmplRes.data?.find(t => t.id === Number(templateIdParam));
+      emailCampaignApi.getTemplate(Number(templateIdParam)).then((tmplRes) => {
+        const found = tmplRes.data;
         if (found) {
           setName(`${found.name} Campaign`);
           setSubject(found.subject);
+          setSourceTemplateId(found.id);
+          setTemplateBrand(emailBrandSettings(found.editor_data?.brand));
           
-          const matchedFrame = PROFESSIONAL_FRAMES.find(f => 
+          const matchedFrame = PROFESSIONAL_FRAMES.find(f => f.id === found.editor_data?.frame_id) || PROFESSIONAL_FRAMES.find(f =>
             found.name.toLowerCase().includes(f.name.toLowerCase())
           );
           if (matchedFrame) {
             setSelectedFrameId(matchedFrame.id);
           }
 
-          const bodyMatch = found.html_body.match(/<!-- EDITABLE BODY TEXT -->[\s\S]*?<td[^>]*>([\s\S]*?)<\/td>/i) ||
-                            found.html_body.match(/<!-- BODY \(USER'S MESSAGE ONLY\) -->[\s\S]*?<td[^>]*>([\s\S]*?)<\/td>/i);
-          const body = bodyMatch ? bodyMatch[1].trim() : found.html_body;
+          const body = found.editor_data?.body_html ?? extractEmailBody(found.html_body);
           setUserBodyMessage(body);
           if (visualBodyEditorRef.current) {
             visualBodyEditorRef.current.innerHTML = body;
           }
-          if (found.text_body) setTextBody(found.text_body);
           toast.success(`Loaded template "${found.name}"`);
         }
       }).catch(() => {});
@@ -710,8 +516,8 @@ export default function EmailCampaignBuilderPage() {
   
   // Full assembled email (Header + User Body + Footer)
   const fullAssembledEmailHtml = useMemo(() => {
-    return assembleFullEmailHtml(activeFrame, userBodyMessage, fromName);
-  }, [activeFrame, userBodyMessage, fromName]);
+    return assembleFullEmailHtml(activeFrame, userBodyMessage, fromName, templateBrand);
+  }, [activeFrame, userBodyMessage, fromName, templateBrand]);
 
   const detectedMergeTags = useMemo(() => {
     return parseMergeTags(subject, fullAssembledEmailHtml, activeVariables);
@@ -722,6 +528,7 @@ export default function EmailCampaignBuilderPage() {
     const found = PROFESSIONAL_FRAMES.find(f => f.id === frameId);
     if (!found) return;
     setSelectedFrameId(frameId);
+    setSourceTemplateId(null);
     setSubject(found.defaultSubject);
     // Note: We keep the user's existing body message if they typed one, or load the template's default body
     if (!userBodyMessage.trim() || userBodyMessage === activeFrame.defaultBody) {
@@ -843,7 +650,7 @@ export default function EmailCampaignBuilderPage() {
         reply_to: replyTo || undefined,
         subject,
         html_body: fullAssembledEmailHtml,
-        text_body: textBody || undefined,
+        text_body: emailPlainText(fullAssembledEmailHtml),
       });
       setTestSentSuccess(true);
       toast.success(`Test email dispatched to ${testEmailAddress}`);
@@ -903,8 +710,9 @@ export default function EmailCampaignBuilderPage() {
         from_email: fromEmail,
         reply_to: replyTo || undefined,
         sending_domain_id: selectedDomainId || undefined,
+        template_id: sourceTemplateId || undefined,
         html_body: fullAssembledEmailHtml,
-        text_body: textBody || undefined,
+        text_body: emailPlainText(fullAssembledEmailHtml),
         audience_filter: currentFilters,
         scheduled_at: scheduledAt,
         launch_now: !asDraft && sendOption === 'now',
@@ -956,9 +764,6 @@ export default function EmailCampaignBuilderPage() {
     setUserBodyMessage(aiGeneratedResult.html_body);
     if (visualBodyEditorRef.current) {
       visualBodyEditorRef.current.innerHTML = aiGeneratedResult.html_body;
-    }
-    if (aiGeneratedResult.text_body) {
-      setTextBody(aiGeneratedResult.text_body);
     }
     setIsAiModalOpen(false);
     toast.success('AI draft applied to your body message!');
@@ -1659,7 +1464,7 @@ export default function EmailCampaignBuilderPage() {
                   {/* 1. LOCKED PROFESSIONAL HEADER */}
                   <div className="relative group select-none">
                     <div 
-                      dangerouslySetInnerHTML={{ __html: activeFrame.renderHeader(fromName) }} 
+                      dangerouslySetInnerHTML={{ __html: activeFrame.renderHeader(fromName, templateBrand) }}
                     />
                     <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-xs text-white px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1">
                       <Lock size={10} />
@@ -1693,7 +1498,7 @@ export default function EmailCampaignBuilderPage() {
                   {/* 3. LOCKED PROFESSIONAL COMPLIANCE FOOTER */}
                   <div className="relative group select-none">
                     <div 
-                      dangerouslySetInnerHTML={{ __html: activeFrame.renderFooter(fromName) }} 
+                      dangerouslySetInnerHTML={{ __html: activeFrame.renderFooter(fromName, templateBrand) }}
                     />
                     <div className="absolute bottom-2 right-2 bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1">
                       <Lock size={10} />

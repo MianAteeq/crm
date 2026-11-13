@@ -1,567 +1,655 @@
-import { useEffect, useState, FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import {
   Users,
+  Plus,
   Search,
+  Pencil,
+  Trash2,
+  Loader2,
   ChevronLeft,
   ChevronRight,
-  Edit2,
-  Trash2,
-  CheckCircle,
-  AlertCircle,
-  X,
-  ShieldAlert,
-  Loader2,
-  KeyRound,
-  Building,
-  Mail,
-  Calendar,
-  Lock,
-  UserCheck,
-  UserX,
-  User
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
-import { crmApi } from '../../services/crmApi';
+  ShieldCheck,
+  LockKeyhole,
+} from "lucide-react";
+import {
+  accessApi,
+  accessError,
+  type AccessUser,
+  type AccessRole,
+  type UserPayload,
+  type Workspace,
+  type UserPage,
+} from "../../services/accessApi";
+import { useAuthStore } from "../../store/authStore";
+import { can } from "../../lib/permissions";
+import AccessDialog, {
+  fieldClass,
+  primaryClass,
+  secondaryClass,
+} from "../../components/access/AccessDialog";
 
-interface UserItem {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-  created_at: string;
-  tenant_id: number | null;
-  tenant?: {
-    name: string;
-  } | null;
-}
+const emptyPage: UserPage = {
+  data: [],
+  total: 0,
+  current_page: 1,
+  last_page: 1,
+};
+const emptyForm: UserPayload = {
+  name: "",
+  email: "",
+  password: "",
+  role: "agent",
+  status: "active",
+  tenant_id: null,
+};
 
-export default function AdminUsers() {
-  const [users, setUsers] = useState<UserItem[]>([]);
-  const [search, setSearch] = useState('');
+export default function AdminUsers({ global = true }: { global?: boolean }) {
+  const currentUser = useAuthStore((state) => state.user);
+  const refreshAccess = useAuthStore((state) => state.refreshAccess);
+  const canManage = global
+    ? currentUser?.role === "superadmin"
+    : can(currentUser, "users.manage");
+  const [result, setResult] = useState<UserPage>(emptyPage);
+  const [roles, setRoles] = useState<AccessRole[]>([]);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
   const [page, setPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
-  const [total, setTotal] = useState(0);
+  const [revision, setRevision] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Edit modal state
-  const [editingUser, setEditingUser] = useState<UserItem | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editRole, setEditRole] = useState('agent');
-  const [editStatus, setEditStatus] = useState('active');
-  const [editPassword, setEditPassword] = useState('');
+  const [error, setError] = useState("");
+  const [optionsError, setOptionsError] = useState("");
+  const [optionsLoading, setOptionsLoading] = useState(true);
+  const [editing, setEditing] = useState<AccessUser | "new" | null>(null);
+  const [deleting, setDeleting] = useState<AccessUser | null>(null);
+  const [form, setForm] = useState<UserPayload>(emptyForm);
+  const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<'success' | 'error' | null>(null);
-
-  // Delete modal state
-  const [deletingUser, setDeletingUser] = useState<UserItem | null>(null);
-  const [deleting, setDeleting] = useState(false);
-
-  const loadUsers = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await crmApi.getAdminUsers({ search, page });
-      if (response.success) {
-        setUsers(response.data.data || []);
-        setPage(response.data.current_page || 1);
-        setLastPage(response.data.last_page || 1);
-        setTotal(response.data.total || 0);
-      } else {
-        setError('Failed to retrieve user accounts.');
-      }
-    } catch (err) {
-      console.error(err);
-      setError('Connection to admin API failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
+    const controller = new AbortController();
+    setOptionsLoading(true);
+    setOptionsError("");
+    Promise.all([
+      accessApi.roles(global, controller.signal),
+      global ? accessApi.workspaces(controller.signal) : Promise.resolve([]),
+    ])
+      .then(([roleData, workspaceData]) => {
+        setRoles(roleData.roles);
+        setWorkspaces(workspaceData);
+      })
+      .catch((err) => {
+        if (!controller.signal.aborted) setOptionsError(accessError(err));
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setOptionsLoading(false);
+      });
+    return () => controller.abort();
+  }, [global, revision]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    setError("");
     const timer = setTimeout(() => {
-      loadUsers();
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search, page]);
+      accessApi
+        .users(global, search, roleFilter, page, controller.signal)
+        .then((data) => {
+          if (page > data.last_page) setPage(Math.max(1, data.last_page));
+          else setResult(data);
+        })
+        .catch((err) => {
+          if (!controller.signal.aborted) setError(accessError(err));
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setLoading(false);
+        });
+    }, 250);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [global, search, roleFilter, page, revision]);
 
-  const handleOpenEdit = (user: UserItem) => {
-    setEditingUser(user);
-    setEditName(user.name);
-    setEditRole(user.role);
-    setEditStatus(user.status || 'active');
-    setEditPassword('');
-    setSaveStatus(null);
+  const assignableRoles = roles.filter(
+    (role) =>
+      global ||
+      role.permissions.every((permission) => can(currentUser, permission)),
+  );
+  const open = (user?: AccessUser) => {
+    setForm(
+      user
+        ? {
+            name: user.name,
+            email: user.email,
+            password: "",
+            role: user.role,
+            status: user.status || "active",
+            tenant_id: user.tenant_id,
+          }
+        : {
+            ...emptyForm,
+            role:
+              assignableRoles.find((r) => r.key === "agent")?.key ||
+              assignableRoles[0]?.key ||
+              "",
+            tenant_id: workspaces[0]?.id ?? null,
+          },
+    );
+    setFormError("");
+    setEditing(user || "new");
   };
-
-  const handleSaveEdit = async (e: FormEvent) => {
+  const protectedAccount =
+    editing !== "new" &&
+    editing &&
+    (String(editing.id) === currentUser?.id ||
+      editing.tenant?.owner_id === editing.id);
+  const save = async (e: FormEvent) => {
     e.preventDefault();
-    if (!editingUser || !editName.trim()) return;
     setSaving(true);
-    setSaveStatus(null);
+    setFormError("");
     try {
-      const payload: any = {
-        name: editName.trim(),
-        role: editRole,
-        status: editStatus
+      const payload: UserPayload = {
+        ...form,
+        name: form.name.trim(),
+        email: form.email.trim(),
       };
-      if (editPassword) {
-        payload.password = editPassword;
-      }
-      const res = await crmApi.updateAdminUser(editingUser.id, payload);
-      if (res.success) {
-        setSaveStatus('success');
-        setUsers(prev => prev.map(item => item.id === editingUser.id ? {
-          ...item,
-          name: editName.trim(),
-          role: editRole,
-          status: editStatus
-        } : item));
-        setTimeout(() => {
-          setEditingUser(null);
-        }, 1000);
-      } else {
-        throw new Error(res.message || 'Update failed');
-      }
+      if (!payload.password) delete payload.password;
+      if (!global) delete payload.tenant_id;
+      await accessApi.saveUser(
+        global,
+        payload,
+        editing === "new" ? undefined : editing?.id,
+      );
+      if (
+        editing !== "new" &&
+        editing &&
+        String(editing.id) === currentUser?.id
+      )
+        await refreshAccess();
+      setEditing(null);
+      setRevision((v) => v + 1);
     } catch (err) {
-      console.error(err);
-      setSaveStatus('error');
+      setFormError(accessError(err));
     } finally {
       setSaving(false);
     }
   };
-
-  const handleDeleteUser = async () => {
-    if (!deletingUser) return;
-    setDeleting(true);
+  const remove = async () => {
+    if (!deleting) return;
+    setSaving(true);
+    setFormError("");
     try {
-      const res = await crmApi.deleteAdminUser(deletingUser.id);
-      if (res.success) {
-        setUsers(prev => prev.filter(item => item.id !== deletingUser.id));
-        setTotal(prev => prev - 1);
-        setDeletingUser(null);
-      } else {
-        alert(res.message || 'Deletion failed.');
-      }
+      await accessApi.deleteUser(global, deleting.id);
+      setDeleting(null);
+      setRevision((v) => v + 1);
     } catch (err) {
-      console.error(err);
-      alert('Delete request failed.');
+      setFormError(accessError(err));
     } finally {
-      setDeleting(false);
+      setSaving(false);
     }
   };
-
-  const getRoleBadgeStyle = (role: string) => {
-    switch (role) {
-      case 'superadmin':
-        return 'bg-rose-500/10 border-rose-500/20 text-rose-500 hover:bg-rose-500/15';
-      case 'admin':
-        return 'bg-violet-500/10 border-violet-500/20 text-violet-500 hover:bg-violet-500/15';
-      case 'agent':
-        return 'bg-blue-500/10 border-blue-500/20 text-blue-500 hover:bg-blue-500/15';
-      default:
-        return 'bg-slate-500/10 border-slate-500/20 text-slate-500 hover:bg-slate-500/15';
-    }
-  };
-
-  const getAvatarGradient = (role: string) => {
-    switch (role) {
-      case 'superadmin':
-        return 'from-rose-500 to-orange-500 text-white';
-      case 'admin':
-        return 'from-[#12263A] to-[#166534] text-white';
-      case 'agent':
-        return 'from-blue-500 to-cyan-500 text-white';
-      default:
-        return 'from-slate-400 to-slate-500 text-white';
-    }
-  };
+  const selectedRole = roles.find((role) => role.key === form.role);
 
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
-      {/* Header section with ambient light effect */}
-      <div className="relative overflow-hidden bg-slate-900 text-white p-8 rounded-3xl border border-slate-800 shadow-xl">
-        <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-[#166534]/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-1/3 -mb-16 w-48 h-48 bg-[#166534]/10 rounded-full blur-2xl" />
-        
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-2.5 text-xs text-[#22C55E] font-bold tracking-widest uppercase mb-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
-              <span>Identity Orchestrator</span>
-            </div>
-            <h1 className="text-2xl font-black tracking-tight text-white">System Users Directory</h1>
-            <p className="text-xs text-slate-400 mt-1 max-w-xl leading-relaxed">
-              Audit access, adjust workspace boundaries, configure elevated system privileges, and control authentication status parameters.
-            </p>
+    <div className="space-y-6 pb-10">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-green-800">
+            <Users size={18} /> Access management
           </div>
-          <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2.5 rounded-2xl shrink-0 backdrop-blur-md">
-            <Users size={16} className="text-[#22C55E]" />
-            <div className="text-left">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Registers</p>
-              <p className="text-sm font-black text-white leading-none mt-0.5">
-                {total} User{total !== 1 ? 's' : ''}
-              </p>
-            </div>
-          </div>
+          <h1 className="text-2xl font-bold text-slate-900">
+            {global ? "System Users" : "Workspace Users"}
+          </h1>
+          <p className="mt-2 text-sm text-slate-500">
+            {global
+              ? "Create accounts, assign roles, and manage access across workspaces."
+              : "Add teammates and manage their access to your workspace."}
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {global && (
+            <Link to="/admin/roles" className={secondaryClass}>
+              <ShieldCheck size={16} /> Roles & Permissions
+            </Link>
+          )}
+          {canManage && (
+            <button
+              className={primaryClass}
+              disabled={optionsLoading || !!optionsError}
+              onClick={() => open()}
+            >
+              <Plus size={17} /> Add User
+            </button>
+          )}
         </div>
       </div>
-
-      {/* Control bar */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col md:flex-row items-center gap-4 shadow-sm">
-        <div className="relative w-full md:max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-          <input
-            type="text"
-            placeholder="Search users by name or email..."
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full bg-slate-50 border border-slate-200/60 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
-          />
-        </div>
-        {search && (
+      {optionsError && (
+        <div
+          role="alert"
+          className="rounded-xl bg-red-50 p-4 text-sm text-red-700"
+        >
+          Could not load role options: {optionsError}{" "}
           <button
-            onClick={() => setSearch('')}
-            className="text-xs font-bold text-slate-450 hover:text-slate-900 transition-colors"
+            className="underline"
+            onClick={() => setRevision((v) => v + 1)}
           >
-            Clear Search
+            Retry
           </button>
-        )}
+        </div>
+      )}
+      <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+        <label className="relative w-full sm:max-w-sm">
+          <Search size={16} className="absolute left-3 top-3 text-slate-400" />
+          <input
+            aria-label="Search users"
+            placeholder="Search by name or email..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            className={`${fieldClass} pl-10`}
+          />
+        </label>
+        <select
+          aria-label="Filter users by role"
+          value={roleFilter}
+          onChange={(e) => {
+            setRoleFilter(e.target.value);
+            setPage(1);
+          }}
+          className={`${fieldClass} sm:w-48`}
+        >
+          <option value="">All roles</option>
+          {roles.map((role) => (
+            <option key={role.key} value={role.key}>
+              {role.name}
+            </option>
+          ))}
+        </select>
+        <span className="text-sm text-slate-500 sm:ml-auto">
+          {result.total} user{result.total !== 1 ? "s" : ""}
+        </span>
       </div>
-
-      {/* Main Directory Table */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm">
-        {loading && users.length === 0 ? (
-          <div className="py-24 text-center flex flex-col items-center gap-3">
-            <Loader2 size={28} className="animate-spin text-[#166534]" />
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Quarrying user catalog...</p>
+      <div
+        className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+        aria-busy={loading}
+      >
+        {loading ? (
+          <div className="flex items-center justify-center gap-2 p-16 text-sm text-slate-500">
+            <Loader2 size={22} className="animate-spin text-green-800" />{" "}
+            Loading users...
           </div>
         ) : error ? (
-          <div className="py-20 text-center text-red-500 text-xs font-semibold flex flex-col items-center gap-2">
-            <AlertCircle size={24} />
-            <span>{error}</span>
+          <div role="alert" className="p-10 text-center text-sm text-red-600">
+            {error}{" "}
+            <button
+              onClick={() => setRevision((v) => v + 1)}
+              className="ml-2 underline"
+            >
+              Retry
+            </button>
           </div>
-        ) : users.length === 0 ? (
-          <div className="py-20 text-center flex flex-col items-center gap-3">
-            <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400">
-              <User size={20} />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-800">No members found</p>
-              <p className="text-xs text-slate-400 mt-0.5">Try altering your search keywords.</p>
-            </div>
+        ) : !result.data.length ? (
+          <div className="space-y-2 p-16 text-center">
+            <Users className="mx-auto text-slate-300" size={32} />
+            <p className="font-semibold text-slate-800">No users found</p>
+            <p className="text-sm text-slate-500">
+              {search || roleFilter
+                ? "Try a different search or role filter."
+                : "Add a user to get started."}
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest select-none">
-                  <th className="py-4.5 px-6">Identity</th>
-                  <th className="py-4.5 px-6">Workspace Workspace</th>
-                  <th className="py-4.5 px-6">System Role</th>
-                  <th className="py-4.5 px-6">Status State</th>
-                  <th className="py-4.5 px-6">Date Registered</th>
-                  <th className="py-4.5 px-6 text-right">Actions</th>
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-slate-100 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-6 py-4">User</th>
+                  {global && <th className="px-6 py-4">Workspace</th>}
+                  <th className="px-6 py-4">Role</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Created</th>
+                  {canManage && (
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700">
-                {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-slate-50/40 transition-colors duration-150 text-xs font-medium group">
-                    <td className="py-4.5 px-6">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-xl bg-gradient-to-tr ${getAvatarGradient(user.role)} flex items-center justify-center font-black text-xs uppercase shadow-sm select-none`}>
-                          {user.name.substring(0, 2).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-extrabold text-slate-900 leading-none group-hover:text-[#166534] transition-colors">{user.name}</p>
-                          <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-450 font-semibold">
-                            <Mail size={11} className="text-slate-400" />
-                            <span>{user.email}</span>
+              <tbody className="divide-y divide-slate-100">
+                {result.data.map((user) => {
+                  const ownOrOwner =
+                    String(user.id) === currentUser?.id ||
+                    user.tenant?.owner_id === user.id;
+                  const canEdit =
+                    canManage &&
+                    (global ||
+                      user.permissions.every((permission) =>
+                        can(currentUser, permission),
+                      ));
+                  return (
+                    <tr key={user.id} className="hover:bg-slate-50/70">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50 font-bold text-green-800">
+                            {user.name.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-slate-900">
+                              {user.name}
+                              {String(user.id) === currentUser?.id && (
+                                <span className="ml-2 text-xs font-normal text-slate-400">
+                                  You
+                                </span>
+                              )}
+                            </p>
+                            <p className="mt-1 text-xs text-slate-500">
+                              {user.email}
+                            </p>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="py-4.5 px-6">
-                      {user.tenant ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-lg bg-[#F0FDF4] flex items-center justify-center text-[#166534] shrink-0">
-                            <Building size={12} />
+                      </td>
+                      {global && (
+                        <td className="px-6 py-4 text-slate-600">
+                          {user.tenant?.name || "Platform account"}
+                        </td>
+                      )}
+                      <td className="px-6 py-4">
+                        <span className="inline-block rounded-lg bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700">
+                          {user.access_role?.name ||
+                            roles.find((role) => role.key === user.role)
+                              ?.name ||
+                            user.role}
+                        </span>
+                        {user.tenant?.owner_id === user.id && (
+                          <p className="mt-1 text-xs text-slate-400">
+                            Workspace owner
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${user.status === "blocked" ? "bg-red-50 text-red-700" : "bg-green-50 text-green-800"}`}
+                        >
+                          {user.status === "blocked" ? "Blocked" : "Active"}
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-4 text-xs text-slate-500">
+                        {new Date(user.created_at).toLocaleDateString(
+                          undefined,
+                          { year: "numeric", month: "short", day: "numeric" },
+                        )}
+                      </td>
+                      {canManage && (
+                        <td className="px-6 py-4">
+                          <div className="flex justify-end gap-2">
+                            <button
+                              aria-label={`Edit ${user.name}`}
+                              title="Edit user"
+                              disabled={
+                                !canEdit || optionsLoading || !!optionsError
+                              }
+                              onClick={() => open(user)}
+                              className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-green-50 disabled:opacity-30"
+                            >
+                              <Pencil size={15} />
+                            </button>
+                            <button
+                              aria-label={`Delete ${user.name}`}
+                              title={
+                                ownOrOwner
+                                  ? "Account is protected"
+                                  : "Delete user"
+                              }
+                              disabled={!canEdit || ownOrOwner}
+                              onClick={() => {
+                                setDeleting(user);
+                                setFormError("");
+                              }}
+                              className="rounded-lg border border-red-100 p-2 text-red-600 hover:bg-red-50 disabled:opacity-30"
+                            >
+                              <Trash2 size={15} />
+                            </button>
                           </div>
-                          <span className="font-extrabold text-slate-800 tracking-tight">{user.tenant.name}</span>
-                        </div>
-                      ) : (
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50 border border-slate-100 px-2.5 py-0.5 rounded-full select-none">
-                          No Tenant Linked
-                        </span>
+                        </td>
                       )}
-                    </td>
-                    <td className="py-4.5 px-6">
-                      <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider leading-none border transition-all ${getRoleBadgeStyle(user.role)}`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="py-4.5 px-6">
-                      {user.status === 'blocked' ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider leading-none border bg-rose-50 border-rose-100 text-rose-600">
-                          <UserX size={10} />
-                          <span>Blocked</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider leading-none border bg-emerald-50 border-emerald-100 text-emerald-600">
-                          <UserCheck size={10} />
-                          <span>Active</span>
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-4.5 px-6 text-slate-400 font-semibold">
-                      <div className="flex items-center gap-1.5">
-                        <Calendar size={12} className="text-slate-400" />
-                        <span>{new Date(user.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
-                      </div>
-                    </td>
-                    <td className="py-4.5 px-6 text-right">
-                      <div className="flex items-center justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => handleOpenEdit(user)}
-                          className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-slate-500 hover:text-[#166534] flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-90"
-                        >
-                          <Edit2 size={13} />
-                        </button>
-                        <button
-                          onClick={() => setDeletingUser(user)}
-                          className="w-8 h-8 rounded-lg bg-rose-50/60 border border-rose-100 hover:bg-rose-600 hover:border-rose-600 text-rose-500 hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-sm active:scale-90"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
-
-        {/* Pagination controls */}
-        {lastPage > 1 && (
-          <div className="bg-slate-50 border-t border-slate-100 px-6 py-4.5 flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">
-              Showing page <strong className="text-slate-800">{page}</strong> of <strong className="text-slate-800">{lastPage}</strong>
+        {result.last_page > 1 && (
+          <div className="flex items-center justify-between border-t border-slate-100 px-6 py-4 text-sm text-slate-500">
+            <span>
+              Page {page} of {result.last_page}
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex gap-2">
               <button
-                disabled={page === 1}
-                onClick={() => setPage(prev => Math.max(prev - 1, 1))}
-                className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-slate-600 transition-all active:scale-95 shadow-xs"
+                aria-label="Previous page"
+                disabled={loading || page === 1}
+                onClick={() => setPage((p) => p - 1)}
+                className={secondaryClass}
               >
-                <ChevronLeft size={15} />
+                <ChevronLeft size={16} />
               </button>
               <button
-                disabled={page === lastPage}
-                onClick={() => setPage(prev => Math.min(prev + 1, lastPage))}
-                className="w-8.5 h-8.5 rounded-xl border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:text-[#166534] hover:border-[#bbf7d0] disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center cursor-pointer text-slate-600 transition-all active:scale-95 shadow-xs"
+                aria-label="Next page"
+                disabled={loading || page >= result.last_page}
+                onClick={() => setPage((p) => p + 1)}
+                className={secondaryClass}
               >
-                <ChevronRight size={15} />
+                <ChevronRight size={16} />
               </button>
             </div>
           </div>
         )}
       </div>
-
-      {/* Edit User Dialog Modal */}
-      <AnimatePresence>
-        {editingUser && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm"
-              onClick={() => !saving && setEditingUser(null)}
-            />
-            
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              transition={{ type: 'spring', duration: 0.4 }}
-              className="relative w-full max-w-md bg-white border border-slate-250 rounded-3xl shadow-2xl overflow-hidden z-[110]"
-            >
-              <form onSubmit={handleSaveEdit} className="flex flex-col">
-                <div className="bg-slate-55 border-b border-slate-100 p-6 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="w-9 h-9 rounded-xl bg-[#166534]/10 flex items-center justify-center text-[#166534]">
-                      <Edit2 size={15} />
-                    </span>
-                    <div>
-                      <h3 className="text-sm font-black text-slate-900">Edit User Details</h3>
-                      <p className="text-xs text-slate-450 mt-0.5 font-medium">Update credential profile parameters</p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setEditingUser(null)}
-                    disabled={saving}
-                    className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-250 text-slate-400 hover:text-slate-600 transition-all cursor-pointer"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-
-                <div className="p-6 space-y-4">
-                  {/* Name field */}
-                  <div>
-                    <label className="block mb-2 text-xs font-bold text-slate-450 uppercase tracking-wider">Full Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
-                    />
-                  </div>
-
-                  {/* System role */}
-                  <div>
-                    <label className="block mb-2 text-xs font-bold text-slate-450 uppercase tracking-wider">System Role</label>
-                    <select
-                      value={editRole}
-                      onChange={(e) => setEditRole(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
-                    >
-                      <option value="superadmin">Super Admin (Cross-Tenant Controller)</option>
-                      <option value="admin">Workspace Admin (Tenant Administrator)</option>
-                      <option value="agent">Support Agent (Standard User)</option>
-                      <option value="user">Basic User (No elevated privileges)</option>
-                    </select>
-                  </div>
-
-                  {/* Status state */}
-                  <div>
-                    <label className="block mb-2 text-xs font-bold text-slate-450 uppercase tracking-wider">Account Status</label>
-                    <select
-                      value={editStatus}
-                      onChange={(e) => setEditStatus(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all font-sans"
-                    >
-                      <option value="active">Active (Access Allowed)</option>
-                      <option value="blocked">Blocked (Access Revoked / Suspended)</option>
-                    </select>
-                  </div>
-
-                  {/* Password Reset Section */}
-                  <div className="border-t border-slate-100 pt-4.5 space-y-2">
-                    <label className="block text-xs font-extrabold text-[#166534] uppercase tracking-wider flex items-center gap-1.5 select-none">
-                      <KeyRound size={13} />
-                      <span>Security Credentials Reset</span>
-                    </label>
-                    <p className="text-[10px] text-slate-400 font-medium">Leave this parameter blank if you do not want to alter their account passcode.</p>
-                    <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={13} />
-                      <input
-                        type="password"
-                        placeholder="Enter secure new passphrase (min. 6 chars)"
-                        value={editPassword}
-                        onChange={(e) => setEditPassword(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-[#166534] focus:ring-4 focus:ring-[#22C55E]/10 transition-all"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-slate-50 border-t border-slate-100 px-6 py-4 flex items-center justify-between">
-                  <div>
-                    {saveStatus === 'success' && (
-                      <p className="text-xs font-bold text-emerald-600 flex items-center gap-1 animate-pulse">
-                        <CheckCircle size={14} /> Profile Committed
-                      </p>
-                    )}
-                    {saveStatus === 'error' && (
-                      <p className="text-xs font-bold text-red-500 flex items-center gap-1">
-                        <AlertCircle size={14} /> Save Aborted
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setEditingUser(null)}
-                      disabled={saving}
-                      className="px-4.5 py-2.5 border border-slate-200 bg-white hover:bg-[#F0FDF4] hover:border-[#bbf7d0] text-xs font-bold text-[#57534E] hover:text-[#166534] rounded-xl transition-all cursor-pointer shadow-xs active:scale-95"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={saving || saveStatus === 'success'}
-                      className="px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] text-xs font-bold text-white rounded-xl transition-all flex items-center gap-2 shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer disabled:opacity-50"
-                    >
-                      {saving && <Loader2 size={13} className="animate-spin text-white" />}
-                      <span>Save Changes</span>
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Delete User Confirmation Dialog */}
-      <AnimatePresence>
-        {deletingUser && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm"
-              onClick={() => !deleting && setDeletingUser(null)}
-            />
-            
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              transition={{ type: 'spring', duration: 0.4 }}
-              className="relative w-full max-w-sm bg-white border border-slate-250 rounded-3xl shadow-2xl overflow-hidden z-[110]"
-            >
-              <div className="p-6 text-center space-y-4">
-                <div className="w-12 h-12 bg-rose-50 border border-rose-100 text-rose-500 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
-                  <ShieldAlert size={22} className="animate-bounce" />
-                </div>
-                <div className="space-y-1.5">
-                  <h3 className="text-sm font-black text-slate-900">Remove Account Access?</h3>
-                  <p className="text-xs text-slate-450 font-medium leading-relaxed">
-                    This administrative operation is irreversible. The account <strong className="text-slate-800">"{deletingUser.name}"</strong> will have all credential permissions terminated immediately.
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-slate-50 border-t border-slate-100 px-6 py-4 flex gap-2 justify-center">
-                <button
-                  type="button"
-                  onClick={() => setDeletingUser(null)}
-                  disabled={deleting}
-                  className="flex-1 py-2.5 border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-600 rounded-xl transition-all cursor-pointer"
+      {editing && (
+        <AccessDialog
+          title={editing === "new" ? "Add User" : "Edit User"}
+          busy={saving}
+          onClose={() => setEditing(null)}
+        >
+          <form onSubmit={save} className="space-y-5 p-6">
+            {protectedAccount && (
+              <p className="flex items-center gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
+                <LockKeyhole size={17} /> This account's role, status, and
+                workspace are protected.
+              </p>
+            )}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block space-y-2 text-sm font-semibold">
+                Full name
+                <input
+                  autoComplete="name"
+                  required
+                  maxLength={255}
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  disabled={saving}
+                  className={fieldClass}
+                />
+              </label>
+              <label className="block space-y-2 text-sm font-semibold">
+                Email address
+                <input
+                  type="email"
+                  autoComplete="email"
+                  required
+                  maxLength={255}
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  disabled={saving}
+                  className={fieldClass}
+                />
+              </label>
+            </div>
+            <label className="block space-y-2 text-sm font-semibold">
+              {editing === "new" ? "Password" : "New password (optional)"}
+              <input
+                type="password"
+                autoComplete="new-password"
+                required={editing === "new"}
+                minLength={8}
+                maxLength={128}
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                disabled={saving}
+                className={fieldClass}
+                placeholder={
+                  editing === "new"
+                    ? "At least 8 characters"
+                    : "Leave empty to keep the current password"
+                }
+              />
+            </label>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block space-y-2 text-sm font-semibold">
+                Role
+                <select
+                  required
+                  value={form.role}
+                  onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  disabled={saving || !!protectedAccount}
+                  className={fieldClass}
                 >
-                  Keep Account
-                </button>
-                <button
-                  type="button"
-                  onClick={handleDeleteUser}
-                  disabled={deleting}
-                  className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-xs font-bold text-white rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm hover:shadow-rose-600/15 active:scale-95 cursor-pointer disabled:opacity-50"
+                  {assignableRoles.map((role) => (
+                    <option key={role.key} value={role.key}>
+                      {role.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block space-y-2 text-sm font-semibold">
+                Status
+                <select
+                  value={form.status}
+                  onChange={(e) => setForm({ ...form, status: e.target.value })}
+                  disabled={saving || !!protectedAccount}
+                  className={fieldClass}
                 >
-                  {deleting && <Loader2 size={13} className="animate-spin text-white" />}
-                  <span>Revoke User</span>
-                </button>
+                  <option value="active">Active</option>
+                  <option value="blocked">Blocked</option>
+                </select>
+              </label>
+            </div>
+            {global && (
+              <label className="block space-y-2 text-sm font-semibold">
+                Workspace
+                <select
+                  value={form.tenant_id ?? ""}
+                  required={form.role !== "superadmin"}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      tenant_id: e.target.value ? Number(e.target.value) : null,
+                    })
+                  }
+                  disabled={saving || !!protectedAccount}
+                  className={fieldClass}
+                >
+                  <option value="">
+                    {form.role === "superadmin"
+                      ? "Platform account (no workspace)"
+                      : "Select a workspace"}
+                  </option>
+                  {workspaces.map((workspace) => (
+                    <option key={workspace.id} value={workspace.id}>
+                      {workspace.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {selectedRole && (
+              <div className="rounded-xl border border-green-100 bg-green-50 p-4">
+                <div className="flex items-center gap-2 text-sm font-semibold text-green-900">
+                  <ShieldCheck size={16} /> {selectedRole.name}
+                </div>
+                <p className="mt-1 text-xs text-green-800">
+                  {selectedRole.description || "Custom CRM access."}
+                </p>
+                <p className="mt-2 text-xs text-green-800">
+                  {selectedRole.permissions.length} permissions
+                  {form.role === "superadmin"
+                    ? " · Full platform access"
+                    : " · Access limited to the assigned workspace"}
+                </p>
               </div>
-            </motion.div>
+            )}
+            {editing === "new" && (
+              <p className="text-xs text-slate-500">
+                The user can sign in immediately with this email and password.
+                Share the credentials securely.
+              </p>
+            )}
+            {formError && (
+              <p
+                role="alert"
+                className="rounded-xl bg-red-50 p-3 text-sm text-red-700"
+              >
+                {formError}
+              </p>
+            )}
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                className={secondaryClass}
+                disabled={saving}
+                onClick={() => setEditing(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className={primaryClass}
+                disabled={saving || !form.name.trim() || !form.role}
+              >
+                {saving && <Loader2 size={16} className="animate-spin" />}
+                {editing === "new" ? "Create user" : "Save changes"}
+              </button>
+            </div>
+          </form>
+        </AccessDialog>
+      )}
+      {deleting && (
+        <AccessDialog
+          title="Delete user"
+          busy={saving}
+          onClose={() => setDeleting(null)}
+        >
+          <div className="space-y-5 p-6">
+            <p className="text-sm text-slate-600">
+              Delete <strong>{deleting.name}</strong> ({deleting.email})? Their
+              account and access tokens will be removed.
+            </p>
+            {formError && (
+              <p role="alert" className="text-sm text-red-600">
+                {formError}
+              </p>
+            )}
+            <div className="flex justify-end gap-3">
+              <button
+                className={secondaryClass}
+                disabled={saving}
+                onClick={() => setDeleting(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className={`${primaryClass} bg-red-600 hover:bg-red-700`}
+                disabled={saving}
+                onClick={remove}
+              >
+                {saving && <Loader2 size={16} className="animate-spin" />}Delete
+                user
+              </button>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </AccessDialog>
+      )}
     </div>
   );
 }

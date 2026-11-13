@@ -13,6 +13,11 @@ export interface LoginResponse {
 }
 
 export class AuthService {
+  static async me(): Promise<LoginResponse['user']> {
+    const response = await apiClient.get<{ user: LoginResponse['user'] }>('/user/me', { headers: { 'X-Skip-Loader': 'true' } });
+    return response.data.user;
+  }
+
   static async login(email: string, password: string): Promise<LoginResponse> {
     try {
       const response = await apiClient.post<LoginResponse>(

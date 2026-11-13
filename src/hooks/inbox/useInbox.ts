@@ -2,10 +2,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Conversation, Message } from '../../types';
 import { crmApi } from '../../services/crmApi';
-import { AuthService } from '../../services/authService';
 import { useRealtime } from '../useRealtime';
+import { useAuthStore } from '../../store/authStore';
+import { can } from '../../lib/permissions';
 
 export function useInbox() {
+  const user = useAuthStore(state => state.user);
   const [searchParams] = useSearchParams();
   const selectParam = searchParams.get('select') || searchParams.get('id');
 
@@ -91,15 +93,13 @@ export function useInbox() {
   }, []);
 
   // Realtime Integration for Laravel Reverb
-  // Backend: Channel('tenant.' . $tenantId)
-  // Event: .message.received
-  const tenantId = AuthService.getTenantId() || '1';
+  const tenantId = user?.tenantId;
   
   useRealtime({
-    channel: `tenant.${tenantId}`,
+    channel: `tenant.${tenantId}.inbox`,
     event: '.message.received', // Dot prefix for explicit event name
-    isPrivate: false,           // Backend uses Channel, not PrivateChannel
-    enabled: true,
+    isPrivate: true,
+    enabled: !!tenantId && can(user, 'inbox.view'),
     onEvent: (data) => {
       console.log('[Realtime] 📥 Incoming Broadcast Payload:', data);
       

@@ -1,3 +1,5 @@
+import type { EmailTemplateEditorData } from '../utils/emailBranding';
+
 export type EmailCampaignStatus = 
   | 'draft' 
   | 'scheduled' 
@@ -121,6 +123,7 @@ export interface EmailTemplate {
   subject: string;
   category: string;
   html_body: string;
+  editor_data?: EmailTemplateEditorData | null;
   text_body?: string;
   created_at?: string;
   updated_at?: string;
@@ -133,9 +136,7 @@ export interface EmailSetting {
   from_email: string;
   reply_to?: string;
   // Mailtrap configuration
-  mailtrap_api_token?: string;
   has_mailtrap_api_token?: boolean;
-  mailtrap_webhook_secret?: string;
   has_mailtrap_webhook_secret?: boolean;
   mailtrap_domain?: string;
   mailtrap_inbox_id?: string;

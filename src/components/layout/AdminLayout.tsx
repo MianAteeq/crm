@@ -12,7 +12,8 @@ import {
   Coins,
   Cpu,
   ArrowLeftRight,
-  Globe
+  Globe,
+  ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { useAuthStore } from '../../store/authStore';
@@ -22,6 +23,7 @@ const adminMenuItems = [
   { icon: LayoutDashboard, label: 'Overview', path: '/admin' },
   { icon: Building2, label: 'Workspaces', path: '/admin/tenants' },
   { icon: Users2, label: 'System Users', path: '/admin/users' },
+  { icon: ShieldCheck, label: 'Roles & Permissions', path: '/admin/roles' },
   { icon: Globe, label: 'Sending Domains', path: '/admin/sending-domains' },
   { icon: Coins, label: 'Plans & Limits', path: '/admin/plans' },
   { icon: Settings, label: 'Global Settings', path: '/admin/settings' },
