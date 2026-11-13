@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   Users, Mail, Eye, Calendar, ArrowLeft, ArrowRight, Check, Send, 
@@ -12,11 +12,14 @@ import {
   Lock, Palette, Layout, Globe
 } from 'lucide-react';
 import { emailCampaignApi } from '../../services/emailCampaignApi';
-import { crmApi } from '../../services/crmApi';
-import { AudienceFilter, AudienceEstimate, EmailTemplate, EmailSendingDomain } from '../../types/emailCampaign';
+import { AudienceFilter, AudienceOptions, EmailTemplate, EmailSendingDomain } from '../../types/emailCampaign';
 import { toast } from '../../components/ui/Toast';
 import { PROFESSIONAL_FRAMES, assembleFullEmailHtml } from '../../utils/emailTemplateFrames';
-import { emailBrandSettings, extractEmailBody, emailPlainText } from '../../utils/emailBranding';
+import { emailBrandSettings, emailPlainText } from '../../utils/emailBranding';
+import { campaignAudienceFilters } from '../../utils/emailAudience';
+import { campaignEmailTemplate } from '../../utils/campaignEmailTemplate';
+import { useEmailAudienceEstimate } from '../../hooks/useEmailAudienceEstimate';
+import SavedEmailTemplatePicker from '../../components/campaigns/SavedEmailTemplatePicker';
 
 type Step = 'audience' | 'email' | 'personalization' | 'preview_test' | 'schedule_send';
 
@@ -297,6 +300,10 @@ export default function EmailCampaignBuilderPage() {
   const [selectedFrameId, setSelectedFrameId] = useState<string>('executive');
   const [templateBrand, setTemplateBrand] = useState(() => emailBrandSettings());
   const [sourceTemplateId, setSourceTemplateId] = useState<number | null>(null);
+  const [sourceTemplateName, setSourceTemplateName] = useState('');
+  const [customTemplateHtml, setCustomTemplateHtml] = useState(false);
+  const [isLoadingTemplate, setIsLoadingTemplate] = useState(!!searchParams.get('templateId'));
+  const [templateLoadError, setTemplateLoadError] = useState('');
   const activeFrame = PROFESSIONAL_FRAMES.find(f => f.id === selectedFrameId) || PROFESSIONAL_FRAMES[0];
 
   const [subject, setSubject] = useState(activeFrame.defaultSubject);
@@ -305,19 +312,17 @@ export default function EmailCampaignBuilderPage() {
 
   // Audience Filter State
   const [audienceType, setAudienceType] = useState<'all' | 'filtered'>('all');
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<AudienceOptions['categories']>([]);
+  const [sourceOptions, setSourceOptions] = useState<AudienceOptions['sources']>([]);
+  const [filterOptionsError, setFilterOptionsError] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
-  const [emailHistoryFilter, setEmailHistoryFilter] = useState<'all' | 'never_sent' | 'previously_sent' | 'delivered' | 'bounced'>('never_sent');
+  const [emailHistoryFilter, setEmailHistoryFilter] = useState<'all' | 'never_sent' | 'previously_sent' | 'delivered' | 'bounced'>('all');
   const [sourceFilter, setSourceFilter] = useState('');
   const [industryFilter, setIndustryFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
-  const [selectedGrades, setSelectedGrades] = useState<string[]>(['A', 'B']);
+  const [selectedGrades, setSelectedGrades] = useState<string[]>([]);
   const [minLeadScore, setMinLeadScore] = useState<number>(0);
   const [websiteAvailable, setWebsiteAvailable] = useState<boolean>(false);
-
-  // Estimate state
-  const [isEstimating, setIsEstimating] = useState(false);
-  const [estimate, setEstimate] = useState<AudienceEstimate | null>(null);
 
   // Personalization Simulator & Inspector State
   const [selectedSampleIndex, setSelectedSampleIndex] = useState<number>(0);
@@ -380,6 +385,30 @@ export default function EmailCampaignBuilderPage() {
     return sendingDomains.filter(d => d.status !== 'verified');
   }, [sendingDomains]);
 
+  const applySavedTemplate = useCallback((template: EmailTemplate) => {
+    const loaded = campaignEmailTemplate(template);
+    setName(previous => previous || `${template.name} Campaign`);
+    setSubject(template.subject);
+    setSourceTemplateId(template.id);
+    setSourceTemplateName(template.name);
+    setTemplateBrand(loaded.brand);
+    setCustomTemplateHtml(loaded.customHtml);
+    if (loaded.frameId) setSelectedFrameId(loaded.frameId);
+    setUserBodyMessage(loaded.bodyHtml);
+    setTestSentSuccess(false);
+    setTemplateLoadError('');
+    if (visualBodyEditorRef.current && !loaded.customHtml) visualBodyEditorRef.current.innerHTML = loaded.bodyHtml;
+    toast.success(`Loaded template "${template.name}"`);
+  }, []);
+
+  const loadAudienceOptions = useCallback(() => {
+    setFilterOptionsError('');
+    emailCampaignApi.getAudienceOptions().then(response => {
+      setCategories(response.data.categories);
+      setSourceOptions(response.data.sources);
+    }).catch(() => setFilterOptionsError('Could not load audience categories and sources.'));
+  }, []);
+
   // Load email settings, sending domains & template if passed in URL
   useEffect(() => {
     emailCampaignApi.getSettings().then((res) => {
@@ -391,8 +420,7 @@ export default function EmailCampaignBuilderPage() {
       }
     }).catch(() => {});
 
-    // Fetch CRM categories
-    crmApi.getCategories().then(setCategories).catch(() => {});
+    loadAudienceOptions();
 
     // Fetch verified sending domains
     emailCampaignApi.getSendingDomains().then((domRes) => {
@@ -410,34 +438,20 @@ export default function EmailCampaignBuilderPage() {
       setIsLoadingDomains(false);
     });
 
-    // Check if templateId was provided in query param
-    const templateIdParam = searchParams.get('templateId');
-    if (templateIdParam) {
-      emailCampaignApi.getTemplate(Number(templateIdParam)).then((tmplRes) => {
-        const found = tmplRes.data;
-        if (found) {
-          setName(`${found.name} Campaign`);
-          setSubject(found.subject);
-          setSourceTemplateId(found.id);
-          setTemplateBrand(emailBrandSettings(found.editor_data?.brand));
-          
-          const matchedFrame = PROFESSIONAL_FRAMES.find(f => f.id === found.editor_data?.frame_id) || PROFESSIONAL_FRAMES.find(f =>
-            found.name.toLowerCase().includes(f.name.toLowerCase())
-          );
-          if (matchedFrame) {
-            setSelectedFrameId(matchedFrame.id);
-          }
+  }, [loadAudienceOptions]);
 
-          const body = found.editor_data?.body_html ?? extractEmailBody(found.html_body);
-          setUserBodyMessage(body);
-          if (visualBodyEditorRef.current) {
-            visualBodyEditorRef.current.innerHTML = body;
-          }
-          toast.success(`Loaded template "${found.name}"`);
-        }
-      }).catch(() => {});
-    }
-  }, []);
+  useEffect(() => {
+    const templateIdParam = searchParams.get('templateId');
+    if (!templateIdParam) return;
+    let cancelled = false;
+    setIsLoadingTemplate(true);
+    emailCampaignApi.getTemplate(Number(templateIdParam)).then(response => {
+      if (!cancelled) applySavedTemplate(response.data);
+    }).catch(() => {
+      if (!cancelled) setTemplateLoadError('This saved template could not be loaded. Choose another template or a style below.');
+    }).finally(() => { if (!cancelled) setIsLoadingTemplate(false); });
+    return () => { cancelled = true; };
+  }, [searchParams, applySavedTemplate]);
 
   // Sync Visual Body Editor HTML when entering Step 2
   useEffect(() => {
@@ -446,10 +460,10 @@ export default function EmailCampaignBuilderPage() {
         visualBodyEditorRef.current.innerHTML = userBodyMessage;
       }
     }
-  }, [currentStep, selectedFrameId]);
+  }, [currentStep, selectedFrameId, sourceTemplateId, customTemplateHtml]);
 
   // Recalculate audience estimation when filters change
-  const currentFilters: AudienceFilter = {
+  const currentFilters: AudienceFilter = useMemo(() => campaignAudienceFilters({
     audience_type: audienceType,
     category_id: selectedCategoryId ? Number(selectedCategoryId) : undefined,
     email_history: emailHistoryFilter !== 'all' ? emailHistoryFilter : undefined,
@@ -459,23 +473,7 @@ export default function EmailCampaignBuilderPage() {
     lead_quality_grades: audienceType === 'filtered' ? selectedGrades : undefined,
     min_lead_score: audienceType === 'filtered' && minLeadScore > 0 ? minLeadScore : undefined,
     website_available: audienceType === 'filtered' && websiteAvailable ? true : undefined,
-  };
-
-  const runAudienceEstimate = async () => {
-    setIsEstimating(true);
-    try {
-      const res = await emailCampaignApi.estimateAudience(currentFilters);
-      setEstimate(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsEstimating(false);
-    }
-  };
-
-  useEffect(() => {
-    runAudienceEstimate();
-  }, [
+  }), [
     audienceType, 
     selectedCategoryId, 
     emailHistoryFilter, 
@@ -486,6 +484,18 @@ export default function EmailCampaignBuilderPage() {
     minLeadScore, 
     websiteAvailable
   ]);
+  const { estimate, isEstimating, error: estimateError, refreshEstimate: runAudienceEstimate } = useEmailAudienceEstimate(currentFilters);
+
+  const resetAudienceFilters = () => {
+    setSelectedCategoryId('');
+    setEmailHistoryFilter('all');
+    setSourceFilter('');
+    setIndustryFilter('');
+    setLocationFilter('');
+    setSelectedGrades([]);
+    setMinLeadScore(0);
+    setWebsiteAvailable(false);
+  };
 
   // Sample contacts list
   const sampleContactsList: SampleContact[] = useMemo(() => {
@@ -502,7 +512,7 @@ export default function EmailCampaignBuilderPage() {
         city: item.city || item.source_details?.city,
         industry: item.job_title || item.source_details?.category,
         lead_quality_grade: item.lead_quality_grade,
-        lead_score: item.lead_score,
+        lead_score: item.lead_quality_score,
         source: item.source,
         source_details: item.source_details,
       }));
@@ -516,8 +526,8 @@ export default function EmailCampaignBuilderPage() {
   
   // Full assembled email (Header + User Body + Footer)
   const fullAssembledEmailHtml = useMemo(() => {
-    return assembleFullEmailHtml(activeFrame, userBodyMessage, fromName, templateBrand);
-  }, [activeFrame, userBodyMessage, fromName, templateBrand]);
+    return customTemplateHtml ? userBodyMessage : assembleFullEmailHtml(activeFrame, userBodyMessage, fromName, templateBrand);
+  }, [activeFrame, userBodyMessage, fromName, templateBrand, customTemplateHtml]);
 
   const detectedMergeTags = useMemo(() => {
     return parseMergeTags(subject, fullAssembledEmailHtml, activeVariables);
@@ -529,9 +539,13 @@ export default function EmailCampaignBuilderPage() {
     if (!found) return;
     setSelectedFrameId(frameId);
     setSourceTemplateId(null);
+    setSourceTemplateName('');
+    setCustomTemplateHtml(false);
+    setTemplateLoadError('');
+    setTestSentSuccess(false);
     setSubject(found.defaultSubject);
     // Note: We keep the user's existing body message if they typed one, or load the template's default body
-    if (!userBodyMessage.trim() || userBodyMessage === activeFrame.defaultBody) {
+    if (customTemplateHtml || !userBodyMessage.trim() || userBodyMessage === activeFrame.defaultBody) {
       setUserBodyMessage(found.defaultBody);
       if (visualBodyEditorRef.current) {
         visualBodyEditorRef.current.innerHTML = found.defaultBody;
@@ -663,6 +677,12 @@ export default function EmailCampaignBuilderPage() {
 
   // Launch campaign
   const handleLaunchCampaign = async (asDraft = false) => {
+    if (isLoadingTemplate) return;
+    if (!asDraft && (isEstimating || estimateError)) {
+      toast.error(estimateError || 'Please wait for the current audience count.');
+      setCurrentStep('audience');
+      return;
+    }
     if (!name.trim()) {
       toast.error('Campaign Name is required.');
       setCurrentStep('audience');
@@ -797,7 +817,7 @@ export default function EmailCampaignBuilderPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => handleLaunchCampaign(true)}
-            disabled={isLaunching}
+            disabled={isLaunching || isLoadingTemplate}
             className="h-10 px-4.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-[#57534E] hover:text-[#166534] hover:bg-[#F0FDF4] hover:border-[#bbf7d0] transition-all shadow-xs active:scale-95 cursor-pointer disabled:opacity-50"
           >
             Save as Draft
@@ -989,6 +1009,7 @@ export default function EmailCampaignBuilderPage() {
                 <button
                   type="button"
                   onClick={() => setAudienceType('all')}
+                  aria-pressed={audienceType === 'all'}
                   className={`p-4 rounded-xl border text-left transition-all ${
                     audienceType === 'all' 
                       ? 'border-[#166534] bg-[#F0FDF4]/30 ring-2 ring-indigo-600/10' 
@@ -1002,6 +1023,7 @@ export default function EmailCampaignBuilderPage() {
                 <button
                   type="button"
                   onClick={() => setAudienceType('filtered')}
+                  aria-pressed={audienceType === 'filtered'}
                   className={`p-4 rounded-xl border text-left transition-all ${
                     audienceType === 'filtered' 
                       ? 'border-[#166534] bg-[#F0FDF4]/30 ring-2 ring-indigo-600/10' 
@@ -1016,10 +1038,11 @@ export default function EmailCampaignBuilderPage() {
 
             {audienceType === 'filtered' && (
               <div className="p-5 rounded-2xl bg-slate-50/70 border border-slate-200 space-y-4">
-                <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                <div className="flex items-center justify-between gap-3"><h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
                   <Filter size={14} className="text-[#166534]" />
                   Audience Filters (Scraper & CRM Leads)
-                </h3>
+                </h3><button type="button" onClick={resetAudienceFilters} className="text-xs font-semibold text-green-800 hover:underline">Reset filters</button></div>
+                {filterOptionsError && <p role="alert" className="text-xs text-rose-700">{filterOptionsError} <button type="button" onClick={loadAudienceOptions} className="font-semibold underline">Retry</button></p>}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {/* Category Dropdown (Requirement 17) */}
@@ -1061,8 +1084,7 @@ export default function EmailCampaignBuilderPage() {
                       className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
                     >
                       <option value="">All Sources</option>
-                      <option value="Business Scraper">Business Scraper</option>
-                      <option value="CRM">Manual CRM</option>
+                      {sourceOptions.map(source => <option key={source.value} value={source.value}>{source.label}</option>)}
                     </select>
                   </div>
 
@@ -1087,6 +1109,11 @@ export default function EmailCampaignBuilderPage() {
                       className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white"
                     />
                   </div>
+                  <div>
+                    <label htmlFor="campaign-min-score" className="block text-[11px] font-bold text-slate-600 uppercase mb-1">Minimum Lead Score</label>
+                    <input id="campaign-min-score" type="number" min={0} max={100} step={1} value={minLeadScore} onChange={event => setMinLeadScore(Math.max(0, Math.min(100, Number(event.target.value) || 0)))} className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-white" />
+                    <p className="mt-1 text-[11px] text-slate-400">0 includes any score. Grades and score filters apply together.</p>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
@@ -1099,6 +1126,7 @@ export default function EmailCampaignBuilderPage() {
                           <button
                             key={grade}
                             type="button"
+                            aria-pressed={isSelected}
                             onClick={() => {
                               setSelectedGrades(prev => 
                                 isSelected ? prev.filter(g => g !== grade) : [...prev, grade]
@@ -1115,6 +1143,7 @@ export default function EmailCampaignBuilderPage() {
                         );
                       })}
                     </div>
+                    <p className="mt-2 text-[11px] text-slate-400">{selectedGrades.length ? `Only grades ${selectedGrades.join(', ')} are included.` : 'All grades included, including ungraded contacts.'}</p>
                   </div>
 
                   <div>
@@ -1152,7 +1181,7 @@ export default function EmailCampaignBuilderPage() {
               </button>
             </div>
 
-            {estimate ? (
+            {estimateError ? <p role="alert" className="py-4 text-sm text-rose-700">{estimateError}</p> : isEstimating || !estimate ? <p role="status" className="py-6 text-center text-xs text-slate-500">Evaluating current audience…</p> : estimate ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200">
                   <div className="flex items-center justify-between">
@@ -1180,6 +1209,7 @@ export default function EmailCampaignBuilderPage() {
                     <span>Invalid syntax: <b>{estimate.reasons?.invalid_syntax || 0}</b></span>
                     <span>Unsubscribed: <b>{estimate.reasons?.unsubscribed || 0}</b></span>
                     <span>Suppressed: <b>{estimate.reasons?.suppressed || 0}</b></span>
+                    <span>Duplicates: <b>{estimate.reasons?.duplicate_in_audience || 0}</b></span>
                   </div>
                 </div>
               </div>
@@ -1195,13 +1225,16 @@ export default function EmailCampaignBuilderPage() {
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
             
+            <SavedEmailTemplatePicker selectedId={sourceTemplateId} selectedName={sourceTemplateName} onSelect={applySavedTemplate} />
+            {isLoadingTemplate && <p role="status" className="text-xs text-slate-500">Loading saved template…</p>}
+            {templateLoadError && <p role="alert" className="text-xs text-rose-700">{templateLoadError}</p>}
             {/* 1. PROFESSIONAL TEMPLATE FRAME SELECTOR */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
                     <Layout size={16} className="text-[#166534]" />
-                    Select Professional Template Style
+                    Or choose a starting style
                   </h3>
                   <p className="text-xs text-slate-500">
                     Header & Footer stay styled and branded. You only type and edit the message body!
@@ -1210,9 +1243,9 @@ export default function EmailCampaignBuilderPage() {
               </div>
 
               {/* Template Style Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {PROFESSIONAL_FRAMES.map((frame) => {
-                  const isSelected = frame.id === selectedFrameId;
+                  const isSelected = !customTemplateHtml && frame.id === selectedFrameId;
                   return (
                     <button
                       key={frame.id}
@@ -1325,6 +1358,12 @@ export default function EmailCampaignBuilderPage() {
             </div>
 
             {/* EMAIL TEMPLATE VISUAL COMPOSER (HEADER -> ONLY BODY EDITABLE -> FOOTER) */}
+            {customTemplateHtml ? <div className="space-y-3">
+              <label htmlFor="campaign-custom-html" className="block text-xs font-bold text-slate-800">Saved template HTML</label>
+              <p className="text-xs text-slate-500">This template has a custom layout. Its original HTML and styles are preserved. Edit the HTML and review the preview below.</p>
+              <textarea id="campaign-custom-html" value={userBodyMessage} onChange={event => { setUserBodyMessage(event.target.value); setTestSentSuccess(false); }} spellCheck={false} rows={12} className="w-full rounded-xl border border-slate-200 bg-slate-50 p-4 font-mono text-xs" />
+              <iframe title="Saved template preview" sandbox="" srcDoc={renderPersonalizedText(fullAssembledEmailHtml, activeVariables, false)} className="h-[500px] w-full rounded-xl border border-slate-200 bg-white" />
+            </div> : (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
@@ -1508,7 +1547,7 @@ export default function EmailCampaignBuilderPage() {
 
                 </div>
               </div>
-            </div>
+            </div>)}
 
           </div>
         </div>
@@ -1537,7 +1576,7 @@ export default function EmailCampaignBuilderPage() {
                 </span>
                 <span className="px-3 py-1.5 rounded-xl bg-[#F0FDF4] border border-[#bbf7d0] text-[#12263A] text-xs font-bold flex items-center gap-1.5">
                   <ShieldCheck size={14} className="text-[#166534]" />
-                  {activeFrame.name} Frame Active
+                  {sourceTemplateName || activeFrame.name} Active
                 </span>
               </div>
             </div>
@@ -1659,12 +1698,7 @@ export default function EmailCampaignBuilderPage() {
                   </div>
 
                   {/* Rendered Full Email Body Canvas */}
-                  <div 
-                    className="p-6 flex-1 overflow-y-auto prose prose-sm max-w-none text-slate-800 text-xs leading-relaxed"
-                    dangerouslySetInnerHTML={{ 
-                      __html: renderPersonalizedText(fullAssembledEmailHtml, activeVariables, highlightVariables) 
-                    }} 
-                  />
+                  <iframe title="Personalized email preview" sandbox="" className="h-[600px] w-full border-0 bg-white" srcDoc={renderPersonalizedText(fullAssembledEmailHtml, activeVariables, highlightVariables)} />
                 </div>
               </div>
             </div>
@@ -1679,7 +1713,7 @@ export default function EmailCampaignBuilderPage() {
             <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
               <div className="p-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                  Final Email Preview ({activeFrame.name})
+                  Final Email Preview ({sourceTemplateName || activeFrame.name})
                 </span>
                 <span className="text-xs text-slate-500">
                   Recipient: <strong>{activeContact.name || activeContact.email}</strong>
@@ -1698,12 +1732,7 @@ export default function EmailCampaignBuilderPage() {
                   </div>
                 </div>
 
-                <div 
-                  className="prose prose-sm max-w-none p-4 rounded-xl border border-slate-100 bg-white min-h-[260px]"
-                  dangerouslySetInnerHTML={{ 
-                    __html: renderPersonalizedText(fullAssembledEmailHtml, activeVariables, false)
-                  }} 
-                />
+                <iframe title="Final email preview" sandbox="" className="h-[600px] w-full rounded-xl border border-slate-100 bg-white" srcDoc={renderPersonalizedText(fullAssembledEmailHtml, activeVariables, false)} />
               </div>
             </div>
 
@@ -1765,8 +1794,8 @@ export default function EmailCampaignBuilderPage() {
                 </div>
 
                 <div>
-                  <span className="text-slate-400 font-semibold uppercase">Template Frame:</span>
-                  <p className="font-bold text-slate-900 text-sm mt-0.5">{activeFrame.name} ({activeFrame.badge})</p>
+                  <span className="text-slate-400 font-semibold uppercase">Email Template:</span>
+                  <p className="font-bold text-slate-900 text-sm mt-0.5">{sourceTemplateName || `${activeFrame.name} (${activeFrame.badge})`}</p>
                 </div>
 
                 <div>
@@ -1876,7 +1905,7 @@ export default function EmailCampaignBuilderPage() {
           <button
             type="button"
             onClick={() => handleLaunchCampaign(false)}
-            disabled={isLaunching}
+            disabled={isLaunching || isLoadingTemplate || isEstimating || !!estimateError}
             className="flex items-center gap-2 h-10 px-8 rounded-xl bg-[#166534] text-white text-xs sm:text-sm font-semibold hover:bg-[#14532d] transition-all shadow-sm hover:shadow-[#166534]/15 active:scale-95 cursor-pointer disabled:opacity-50"
           >
             {isLaunching ? (

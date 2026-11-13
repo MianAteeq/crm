@@ -168,12 +168,13 @@ class CrmApiService {
     return { ...data, createdAt: data.createdAt || data.created_at };
   }
 
-  async importContacts(file: File, mappings?: Record<string, string>): Promise<{ message: string; success_count: number }> {
+  async importContacts(file: File, mappings?: Record<string, string>, categoryId?: number): Promise<{ message: string; success_count: number }> {
     const formData = new FormData();
     formData.append('file', file);
     if (mappings) {
       formData.append('mappings', JSON.stringify(mappings));
     }
+    if (categoryId) formData.append('category_id', String(categoryId));
     return await this.request('/contacts/import', { method: 'POST', body: formData });
   }
 

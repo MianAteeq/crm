@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
-    "test:email-templates": "node --import tsx --test tests/emailBranding.test.ts"
+    "test:email-templates": "node --import tsx --test tests/emailBranding.test.ts",
+    "test:email-campaigns": "node --import tsx --test tests/emailCampaignBuilder.test.ts tests/emailBranding.test.ts"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",

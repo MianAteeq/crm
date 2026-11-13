@@ -8,7 +8,8 @@ import {
   ContactEmailActivity,
   AudienceFilter,
   EmailSendingDomain,
-  EmailSendingDomainSummary
+  EmailSendingDomainSummary,
+  AudienceOptions
 } from '../types/emailCampaign';
 
 export const emailCampaignApi = {
@@ -43,9 +44,15 @@ export const emailCampaignApi = {
     return res.data;
   },
 
-  async estimateAudience(filters: AudienceFilter) {
+  async getAudienceOptions() {
+    const res = await apiClient.get<{ success: boolean; data: AudienceOptions }>('/email/campaigns/audience-options');
+    return res.data;
+  },
+
+  async estimateAudience(filters: AudienceFilter, signal?: AbortSignal) {
     const res = await apiClient.post<{ success: boolean; data: AudienceEstimate }>('/email/campaigns/estimate-audience', filters, {
-      headers: { 'X-Skip-Toast': 'true' }
+      signal,
+      headers: { 'X-Skip-Toast': 'true', 'X-Skip-Loader': 'true' }
     });
     return res.data;
   },
@@ -94,8 +101,8 @@ export const emailCampaignApi = {
   },
 
   // Templates
-  async getTemplates(params?: { category?: string; search?: string; page?: number }) {
-    const res = await apiClient.get<{ success: boolean; data: EmailTemplate[]; meta: any }>('/email/templates', { params });
+  async getTemplates(params?: { category?: string; search?: string; page?: number }, signal?: AbortSignal) {
+    const res = await apiClient.get<{ success: boolean; data: EmailTemplate[]; meta: { current_page: number; last_page: number; total: number } }>('/email/templates', { params, signal, headers: { 'X-Skip-Loader': 'true', 'X-Skip-Toast': 'true' } });
     return res.data;
   },
 

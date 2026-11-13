@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, 
@@ -9,6 +9,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { crmApi } from '../../services/crmApi';
+import { toast } from '../ui/Toast';
+import type { Category } from '../../types';
 
 interface ImportModalProps {
   isOpen: boolean;
@@ -33,6 +35,14 @@ export default function ImportModal({ isOpen, onClose, onImport }: ImportModalPr
   const [step, setStep] = useState<'upload' | 'mapping'>('upload');
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryId, setCategoryId] = useState('');
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    crmApi.getCategories().then(result => { if (!cancelled) setCategories(result); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [isOpen]);
 
   const SYSTEM_FIELDS = [
     { key: 'name', label: 'Name', required: true, desc: 'Contact display name' },
@@ -158,7 +168,12 @@ export default function ImportModal({ isOpen, onClose, onImport }: ImportModalPr
         }
       });
 
-      await crmApi.importContacts(file, activeMappings);
+      const result = await crmApi.importContacts(file, activeMappings, categoryId ? Number(categoryId) : undefined);
+      if (result.success_count === 0) {
+        setError(result.message);
+        return;
+      }
+      toast.success(result.message);
       onImport();
       onClose();
       resetState();
@@ -185,6 +200,7 @@ export default function ImportModal({ isOpen, onClose, onImport }: ImportModalPr
       tags: ''
     });
     setStep('upload');
+    setCategoryId('');
     setError(null);
   };
 
@@ -274,6 +290,7 @@ export default function ImportModal({ isOpen, onClose, onImport }: ImportModalPr
         Map your CSV file columns to the contact attributes. Align them accordingly to import the database correctly.
       </div>
       
+      <label className="block space-y-1.5 text-xs font-semibold text-slate-700"><span>Assign imported contacts to a category (optional)</span><select value={categoryId} onChange={event => setCategoryId(event.target.value)} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"><option value="">No category</option>{categories.map(category => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
       <div className="max-h-[380px] overflow-y-auto pr-1 space-y-4 custom-scrollbar">
         {SYSTEM_FIELDS.map((field) => (
           <div key={field.key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-3 bg-slate-50/50 hover:bg-slate-50 border border-slate-100 rounded-xl transition-all">

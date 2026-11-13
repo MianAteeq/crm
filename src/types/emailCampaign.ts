@@ -86,6 +86,9 @@ export interface EmailSendingDomainSummary {
 
 export interface AudienceFilter {
   audience_type?: 'all' | 'selected' | 'filtered';
+  category_id?: number;
+  category_ids?: number[];
+  email_history?: 'all' | 'never_sent' | 'previously_sent' | 'sent' | 'delivered' | 'bounced';
   contact_ids?: number[];
   tag_ids?: number[];
   source?: string;
@@ -95,6 +98,11 @@ export interface AudienceFilter {
   industry?: string;
   status?: string;
   website_available?: boolean;
+}
+
+export interface AudienceOptions {
+  categories: Array<{ id: number; name: string }>;
+  sources: Array<{ value: string; label: string }>;
 }
 
 export interface AudienceEstimate {
