@@ -5,12 +5,14 @@ import { emailCampaignApi } from '../../services/emailCampaignApi';
 import type { EmailTemplate } from '../../types/emailCampaign';
 
 interface Props {
+  disabled?: boolean;
   selectedId: number | null;
   selectedName: string;
   onSelect: (template: EmailTemplate) => void;
 }
 
 export default function SavedEmailTemplatePicker({
+  disabled,
   selectedId,
   selectedName,
   onSelect,
@@ -88,7 +90,7 @@ export default function SavedEmailTemplatePicker({
         </label>
         <select
           aria-label="Saved email template"
-          disabled={loading || !!error}
+          disabled={disabled || loading || !!error}
           value={selectedId ?? ''}
           onChange={(event) => {
             const template = templates.find(

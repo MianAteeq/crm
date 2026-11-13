@@ -1225,7 +1225,7 @@ export default function EmailCampaignBuilderPage() {
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
             
-            <SavedEmailTemplatePicker selectedId={sourceTemplateId} selectedName={sourceTemplateName} onSelect={applySavedTemplate} />
+            <SavedEmailTemplatePicker disabled={isLoadingTemplate} selectedId={sourceTemplateId} selectedName={sourceTemplateName} onSelect={applySavedTemplate} />
             {isLoadingTemplate && <p role="status" className="text-xs text-slate-500">Loading saved template…</p>}
             {templateLoadError && <p role="alert" className="text-xs text-rose-700">{templateLoadError}</p>}
             {/* 1. PROFESSIONAL TEMPLATE FRAME SELECTOR */}
@@ -1251,6 +1251,7 @@ export default function EmailCampaignBuilderPage() {
                       key={frame.id}
                       type="button"
                       onClick={() => handleSelectFrame(frame.id)}
+                      disabled={isLoadingTemplate}
                       className={`p-3.5 rounded-xl border text-left transition-all ${
                         isSelected 
                           ? 'border-[#166534] bg-[#F0FDF4]/40 ring-2 ring-indigo-600/10 shadow-xs' 

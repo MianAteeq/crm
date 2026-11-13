@@ -9,7 +9,6 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { crmApi } from '../../services/crmApi';
-import { toast } from '../ui/Toast';
 import type { Category } from '../../types';
 
 interface ImportModalProps {
@@ -173,7 +172,6 @@ export default function ImportModal({ isOpen, onClose, onImport }: ImportModalPr
         setError(result.message);
         return;
       }
-      toast.success(result.message);
       onImport();
       onClose();
       resetState();
