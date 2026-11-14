@@ -4,6 +4,7 @@ import MessageStatusIcon from './MessageStatusIcon';
 import { motion } from 'motion/react';
 import { FileText, Download, Image as ImageIcon } from 'lucide-react';
 import { cn, formatDynamicDate } from '../../lib/utils';
+import { normalizeMessageContent } from '../../utils/messageContent';
 
 interface MessageBubbleProps {
   message: Message;
@@ -12,6 +13,7 @@ interface MessageBubbleProps {
 export default function MessageBubble({ message }: MessageBubbleProps) {
   if (!message) return null;
   const isUser = message.sender === 'user';
+  const content = normalizeMessageContent(message.content, 'No content');
 
   const renderContent = () => {
     switch (message.type) {
@@ -27,14 +29,14 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                   )}
                </div>
                {message.mediaUrl ? (
-                 <img src={message.mediaUrl} alt={message.content} className="w-full h-auto block" />
+                 <img src={message.mediaUrl} alt={content} className="w-full h-auto block" />
                ) : (
                  <div className="aspect-square flex items-center justify-center">
                     <ImageIcon className="text-slate-300" size={32} />
                  </div>
                )}
             </div>
-            {message.content && <p className={cn("text-[11px] font-medium opacity-80", isUser ? "text-white/80" : "text-slate-500")}>{message.content}</p>}
+            {content !== 'No content' && <p className={cn("text-[11px] font-medium opacity-80", isUser ? "text-white/80" : "text-slate-500")}>{content}</p>}
           </div>
         );
       case 'video':
@@ -49,7 +51,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                  </div>
                )}
             </div>
-            {message.content && <p className={cn("text-[11px] font-medium opacity-80", isUser ? "text-white/80" : "text-slate-500")}>{message.content}</p>}
+            {content !== 'No content' && <p className={cn("text-[11px] font-medium opacity-80", isUser ? "text-white/80" : "text-slate-500")}>{content}</p>}
           </div>
         );
       case 'file':
@@ -63,7 +65,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                 <FileText size={18} />
              </div>
              <div className="flex-1 overflow-hidden">
-                <p className={cn("text-[11px] font-bold truncate", isUser ? "text-white" : "text-slate-900")}>{message.fileName || message.content}</p>
+                <p className={cn("text-[11px] font-bold truncate", isUser ? "text-white" : "text-slate-900")}>{message.fileName || content}</p>
                 <p className={cn("text-[9px] font-medium uppercase", isUser ? "text-white/60" : "text-slate-400")}>
                   {message.type === 'audio' ? 'Audio File' : 'Document'}
                 </p>
@@ -79,9 +81,9 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
         return (
           <p className={cn(
             "text-sm font-medium leading-relaxed whitespace-pre-wrap",
-            !message.content && "italic opacity-50"
+            content === 'No content' && "italic opacity-50"
           )}>
-            {message.content || 'No content'}
+            {content}
           </p>
         );
     }

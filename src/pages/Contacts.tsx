@@ -11,6 +11,7 @@ import ContactDrawer from '../components/contacts/ContactDrawer';
 import ImportModal from '../components/contacts/ImportModal';
 import ExportDropdown from '../components/contacts/ExportDropdown';
 import { crmApi } from '../services/crmApi';
+import { emailCampaignApi } from '../services/emailCampaignApi';
 import { TableSkeleton, CardSkeleton } from '../components/ui/Skeleton';
 import { toast } from '../components/ui/Toast';
 import { useI18n } from '../i18n';
@@ -134,16 +135,12 @@ export default function Contacts() {
 
   const fetchCampaigns = async () => {
     try {
-      const res = await crmApi.getCampaigns().catch(async () => {
-        // Fallback to emailCampaignApi
-        const { emailCampaignApi } = await import('../services/emailCampaignApi');
-        const cRes = await emailCampaignApi.getCampaigns();
-        return cRes.data || cRes || [];
-      });
-      const list = Array.isArray(res) ? res : (res?.data || []);
+      const res = await emailCampaignApi.getCampaigns({ per_page: 100 });
+      const list = Array.isArray(res.data) ? res.data : [];
       setCampaigns(list.map((c: any) => ({ id: c.id, name: c.name || `Campaign #${c.id}` })));
     } catch (e) {
-      // ignore
+      console.error('Failed to fetch email campaigns', e);
+      setCampaigns([]);
     }
   };
 

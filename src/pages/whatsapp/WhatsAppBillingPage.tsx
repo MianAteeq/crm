@@ -193,6 +193,26 @@ export default function WhatsAppBillingPage() {
 
   const statusConfig = getStatusBadge(profile?.billing_status);
   const StatusIcon = statusConfig.icon;
+  const hasOperationalPaymentEvidence = Boolean(
+    profile?.payment_method_status === 'configured' ||
+    profile?.payment_method_status === 'active' ||
+    (profile?.billing_status === 'Operational' && profile?.currency && profile?.last_successful_message_at)
+  );
+  const paymentNeedsAttention = profile?.payment_method_status === 'attention_required' || Boolean(profile?.last_error_code);
+  const paymentLabel = hasOperationalPaymentEvidence
+    ? (isRtl ? 'نشطة عبر Meta' : 'Active in Meta')
+    : paymentNeedsAttention
+      ? (isRtl ? 'تتطلب إجراءً' : 'Action Required')
+      : profile?.currency
+        ? (isRtl ? 'تدار عبر Meta' : 'Managed in Meta')
+        : (isRtl ? 'الإعداد مطلوب' : 'Setup Required');
+  const paymentNote = hasOperationalPaymentEvidence
+    ? (isRtl
+        ? 'تم تأكيد الفوترة من خلال إرسال ناجح. تبقى تفاصيل البطاقة محفوظة لدى Meta.'
+        : 'Confirmed by successful messaging. Card details remain securely managed by Meta.')
+    : profile?.payment_verification_note || (isRtl
+        ? 'تتم إدارة طريقة الدفع مباشرة في Meta.'
+        : 'Payment methods are managed directly in Meta.');
 
   if (isLoading) {
     return (
@@ -209,9 +229,9 @@ export default function WhatsAppBillingPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8 font-sans transition-colors">
+    <div className="p-4 sm:p-6 max-w-[1440px] mx-auto space-y-6 font-sans transition-colors">
       {/* 1. Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/20 shadow-sm">
         <div>
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/60 shadow-sm">
@@ -338,9 +358,9 @@ export default function WhatsAppBillingPage() {
       )}
 
       {/* 3. KPI Metrics Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {/* Card 1: Billing Status */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-3">
+        <div className="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3 before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-emerald-500">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               {isRtl ? 'حالة الفوترة' : 'Billing Status'}
@@ -363,7 +383,7 @@ export default function WhatsAppBillingPage() {
         </div>
 
         {/* Card 2: Currency */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-3">
+        <div className="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3 before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-blue-500">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               {isRtl ? 'عملة الحساب' : 'WABA Currency'}
@@ -390,7 +410,7 @@ export default function WhatsAppBillingPage() {
         </div>
 
         {/* Card 3: Payment Method Status */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-3">
+        <div className="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3 before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-violet-500">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               {isRtl ? 'طريقة الدفع' : 'Payment Method'}
@@ -401,20 +421,16 @@ export default function WhatsAppBillingPage() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-lg font-black text-slate-900 dark:text-white">
-              {profile?.payment_method_status === 'configured'
-                ? (isRtl ? 'معرفة في Meta' : 'Configured')
-                : (isRtl ? 'تتطلب التحقق' : 'Requires Meta Verification')}
+              {paymentLabel}
             </span>
           </div>
           <p className="text-[11px] text-slate-400 dark:text-slate-500 line-clamp-2">
-            {isRtl
-              ? 'يجب التحقق من تفاصيل البطاقة مباشرة في Meta'
-              : 'Payment method status must be verified in Meta Business Manager.'}
+            {paymentNote}
           </p>
         </div>
 
         {/* Card 4: Messaging Eligibility */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-3">
+        <div className="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3 before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-teal-500">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               {isRtl ? 'أهلية إرسال الرسائل' : 'Messaging Eligibility'}
@@ -566,8 +582,9 @@ export default function WhatsAppBillingPage() {
             </div>
           </div>
 
-          {/* Action Card: Currency Setup (Addressing Error 131042) */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
+          {/* Show setup guidance only when currency is missing or Meta reported 131042. */}
+          {!profile?.currency || isError131042 ? (
+          <div className="bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 rounded-3xl p-6 shadow-sm space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
@@ -607,6 +624,34 @@ export default function WhatsAppBillingPage() {
               </div>
             </div>
           </div>
+          ) : (
+            <div className="rounded-3xl border border-emerald-200 dark:border-emerald-800 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/20 p-5 sm:p-6 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-2.5 rounded-2xl bg-white dark:bg-slate-900 text-emerald-600 shadow-sm border border-emerald-100 dark:border-emerald-800">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-extrabold text-emerald-950 dark:text-emerald-100">
+                      {isRtl ? 'إعداد الفوترة مكتمل' : 'Billing setup is healthy'}
+                    </h3>
+                    <p className="mt-1 text-xs sm:text-sm text-emerald-800/80 dark:text-emerald-300/80">
+                      {isRtl
+                        ? `تم ضبط العملة على ${profile.currency} وحساب واتساب مؤهل للإرسال.`
+                        : `${profile.currency} is configured and this WhatsApp account is eligible for messaging.`}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleOpenMetaBilling('business_settings')}
+                  className="px-4 py-2.5 rounded-xl bg-white/90 dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 hover:bg-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <span>{isRtl ? 'عرض إعدادات Meta' : 'View Meta Settings'}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Security & Multi-Tenant Assurance Card */}
           <div className="p-5 rounded-3xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3">

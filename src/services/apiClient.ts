@@ -66,7 +66,10 @@ apiClient.interceptors.response.use(
     // Automatically toast success messages for write/mutate operations
     const method = response.config.method?.toUpperCase();
     if (!skipToast && (method === 'POST' || method === 'PUT' || method === 'DELETE' || method === 'PATCH')) {
-      const message = response.data?.message || 'Operation completed successfully';
+      const responseMessage = response.data?.message;
+      const message = typeof responseMessage === 'string' && responseMessage.trim() !== ''
+        ? responseMessage
+        : 'Operation completed successfully';
       toast.success('Success', message);
     }
 
@@ -95,7 +98,10 @@ apiClient.interceptors.response.use(
 
     // Display error toast
     if (!skipToast) {
-      const errorMessage = error.response?.data?.message || error.message || 'An unexpected error occurred';
+      const responseMessage = error.response?.data?.message;
+      const errorMessage = typeof responseMessage === 'string' && responseMessage.trim() !== ''
+        ? responseMessage
+        : (typeof error.message === 'string' ? error.message : 'An unexpected error occurred');
       toast.error('Error', errorMessage);
     }
 

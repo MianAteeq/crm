@@ -4,6 +4,7 @@ import { Conversation, Message } from '../../types';
 import { crmApi } from '../../services/crmApi';
 import { AuthService } from '../../services/authService';
 import { useRealtime } from '../useRealtime';
+import { normalizeMessageContent } from '../../utils/messageContent';
 
 export function useInbox() {
   const [searchParams] = useSearchParams();
@@ -135,7 +136,10 @@ export function useInbox() {
         id: String(messageData.id || `rt_${Date.now()}`),
         sender: isFromMe ? 'user' : 'contact',
         type: messageData.type || 'text',
-        content: messageData.body || messageData.message || messageData.content || 'New message',
+        content: normalizeMessageContent(
+          messageData.body ?? messageData.message ?? messageData.content ?? messageData,
+          'New message'
+        ),
         timestamp: messageData.created_at || new Date().toISOString(),
         status: 'read',
         mediaUrl: messageData.media_url || messageData.url,

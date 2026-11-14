@@ -1,6 +1,7 @@
 import { Contact, Tag, Category, ContactScraperHistoryItem, WhatsAppSettings, Conversation, Message } from '../types';
 import { AuthService } from './authService';
 import { apiClient } from './apiClient';
+import { normalizeMessageContent } from '../utils/messageContent';
 
 
 class CrmApiService {
@@ -49,7 +50,7 @@ class CrmApiService {
   // Campaigns API
   async getCampaigns(): Promise<any[]> {
     try {
-      const data = await this.request<any>('/campaigns');
+      const data = await this.request<any>('/campaign/list');
       const list = Array.isArray(data) ? data : (data?.data || data?.campaigns || []);
       return Array.isArray(list) ? list : [];
     } catch (error) {
@@ -363,10 +364,7 @@ class CrmApiService {
         };
 
         // Construct last message object from flat fields in response
-        let lastMsgContentRaw = rawConv.last_message || '';
-        const lastMsgContent = typeof lastMsgContentRaw === 'object' 
-          ? (lastMsgContentRaw.body || JSON.stringify(lastMsgContentRaw)) 
-          : String(lastMsgContentRaw || '');
+        const lastMsgContent = normalizeMessageContent(rawConv.last_message);
           
         const lastMsgTimestamp = rawConv.last_message_at || rawConv.updated_at || rawConv.created_at || new Date().toISOString();
 
@@ -419,7 +417,7 @@ class CrmApiService {
 
       return messagesArray.map(m => {
         const raw = m as any;
-        const msgContent = m.content || raw.body || raw.message || raw.text || raw.msg || raw.caption || raw.payload || '';
+        const msgContent = m.content ?? raw.body ?? raw.message ?? raw.text ?? raw.msg ?? raw.caption ?? raw.payload ?? '';
         
         // Determine sender - common fields in CRM/Messaging APIs: from_me, direction, type
         let sender: 'user' | 'contact' = m.sender || (raw.from_me ? 'user' : 'contact');
@@ -444,10 +442,7 @@ class CrmApiService {
         let fileName = m.fileName || raw.file_name || raw.filename || raw.caption;
 
         if (typeof msgContent === 'object' && msgContent !== null) {
-          // Try to extract body from various known WhatsApp/Meta formats
-          finalContent = msgContent.body || 
-                         msgContent.text?.body || 
-                         (Array.isArray(msgContent.messages) ? 'Media/Message Sent' : JSON.stringify(msgContent));
+          finalContent = normalizeMessageContent(msgContent);
           
           // Check for media in nested objects
           if (msgContent.image) {
@@ -467,7 +462,7 @@ class CrmApiService {
             fileName = msgContent.document.filename || msgContent.document.caption || fileName;
           }
         } else {
-          finalContent = String(msgContent || '');
+          finalContent = normalizeMessageContent(msgContent);
         }
 
         // Final type normalization
