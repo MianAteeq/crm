@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   User, Phone, Mail, Tag, Briefcase, MapPin, Calendar, Globe, 
-  ArrowLeft, Loader2, Save, Layers, Plus, Check, X, Sparkles, Building2 
+  ArrowLeft, Loader2, Save, Layers, Plus, Check, X, Sparkles, Building2, ShieldCheck
 } from 'lucide-react';
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import { Contact, Tag as TagType, Category } from '../../types';
 import { crmApi } from '../../services/crmApi';
+import { workspaceGovernanceApi } from '../../services/workspaceGovernanceApi';
+import { salesWorkspaceApi } from '../../services/salesWorkspaceApi';
 import { FormSkeleton } from '../../components/ui/Skeleton';
 import { useI18n } from '../../i18n';
 import { cn } from '../../lib/utils';
@@ -63,6 +65,9 @@ export default function ContactEditorPage() {
     website: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [preferences, setPreferences] = useState({ email_allowed: true, whatsapp_allowed: true, sms_allowed: true, phone_allowed: true, reason: '' });
+  const [customFields, setCustomFields] = useState<any[]>([]);
+  const [customValues, setCustomValues] = useState<Record<string, any>>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,8 +81,20 @@ export default function ContactEditorPage() {
         setCategories(categoriesData);
 
         if (id) {
-          const contactData = await crmApi.getContact(id, {
-            headers: { 'X-Skip-Loader': 'true' }
+          const [contactData, contactPreferences, salesConfig, savedCustomValues] = await Promise.all([
+            crmApi.getContact(id, { headers: { 'X-Skip-Loader': 'true' } }),
+            workspaceGovernanceApi.contactPreferences(id),
+            salesWorkspaceApi.configuration(),
+            salesWorkspaceApi.customFieldValues('contact', id),
+          ]);
+          setCustomFields((salesConfig.custom_fields || []).filter((field:any) => field.entity_type === 'contact' && field.is_active));
+          setCustomValues(Object.fromEntries(Object.entries(savedCustomValues || {}).map(([fieldId, record]:any) => [fieldId, record.value?.value ?? record.value ?? ''])));
+          setPreferences({
+            email_allowed: contactPreferences.email_allowed ?? true,
+            whatsapp_allowed: contactPreferences.whatsapp_allowed ?? true,
+            sms_allowed: contactPreferences.sms_allowed ?? true,
+            phone_allowed: contactPreferences.phone_allowed ?? true,
+            reason: contactPreferences.reason || '',
           });
           setFormData({
             ...contactData,
@@ -135,6 +152,8 @@ export default function ContactEditorPage() {
 
       if (id) {
         await crmApi.updateContact(id, payload);
+        await workspaceGovernanceApi.saveContactPreferences(id, preferences);
+        await salesWorkspaceApi.saveCustomFieldValues('contact', id, customValues);
       } else {
         await crmApi.createContact(payload);
       }
@@ -655,6 +674,24 @@ export default function ContactEditorPage() {
               )}
             </div>
           </div>
+
+          {/* Communication Preferences */}
+          {id && <div className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-6 shadow-sm">
+            <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-700 shrink-0"><ShieldCheck size={20}/></div>
+              <div><span className="text-xs font-bold uppercase tracking-widest text-slate-900 block">Communication consent</span><p className="text-[11px] text-slate-500 font-medium">Disabled channels are blocked in direct messages, campaigns, and queued delivery.</p></div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {([['email_allowed','Email'],['whatsapp_allowed','WhatsApp'],['sms_allowed','SMS'],['phone_allowed','Phone calls']] as const).map(([key,label]) => <label key={key} className="flex items-center justify-between rounded-xl border border-slate-200 p-4"><span className="text-sm font-bold text-slate-700">{label}</span><input type="checkbox" checked={preferences[key]} onChange={e=>setPreferences({...preferences,[key]:e.target.checked})} className="h-5 w-5 accent-[#166534]"/></label>)}
+            </div>
+            <div><label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Consent or opt-out reason</label><textarea rows={2} value={preferences.reason} onChange={e=>setPreferences({...preferences,reason:e.target.value})} placeholder="Optional source, request, or compliance note" className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:outline-none focus:bg-white focus:border-[#166534]"/></div>
+          </div>}
+
+          {/* Custom Fields */}
+          {id && customFields.length > 0 && <div className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-6 shadow-sm">
+            <div className="flex items-center gap-3 border-b border-slate-50 pb-4"><div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-700"><Layers size={20}/></div><div><span className="text-xs font-bold uppercase tracking-widest text-slate-900 block">Custom fields</span><p className="text-[11px] text-slate-500">Workspace-defined customer information with stable field identifiers.</p></div></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{customFields.map((field:any)=><label key={field.id} className="space-y-2"><span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{field.name}{field.is_required?' *':''}</span>{field.field_type==='boolean'?<input type="checkbox" checked={!!customValues[field.id]} onChange={e=>setCustomValues({...customValues,[field.id]:e.target.checked})} className="h-5 w-5 accent-[#166534]"/>:field.field_type==='select'?<select value={customValues[field.id]??''} onChange={e=>setCustomValues({...customValues,[field.id]:e.target.value})} className="w-full rounded-xl border border-slate-200 p-3"><option value="">Select</option>{(field.options||[]).map((option:any)=><option key={String(option)} value={String(option)}>{String(option)}</option>)}</select>:<input type={field.field_type==='number'?'number':field.field_type==='date'?'date':field.field_type==='email'?'email':field.field_type==='url'?'url':'text'} value={customValues[field.id]??''} onChange={e=>setCustomValues({...customValues,[field.id]:e.target.value})} className="w-full rounded-xl border border-slate-200 p-3"/>}</label>)}</div>
+          </div>}
 
           {/* Extended Information */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-6 shadow-sm">

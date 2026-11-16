@@ -86,9 +86,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: () => {
-    AuthService.removeToken();
+    AuthService.clearSession();
     set({ user: null, isAuthenticated: false });
-    localStorage.removeItem('auth_session');
   },
 
   updateOnboarding: (step: number, data?: Partial<User>) => {
@@ -143,11 +142,16 @@ export const useAuthStore = create<AuthState>((set) => ({
 
 // Initialize from localStorage
 const savedSession = localStorage.getItem('auth_session');
-if (savedSession) {
+const savedToken = AuthService.getToken();
+if (savedSession && savedToken) {
   try {
     const user = JSON.parse(savedSession);
     useAuthStore.setState({ user, isAuthenticated: true });
   } catch (e) {
-    localStorage.removeItem('auth_session');
+    AuthService.clearSession();
   }
+} else if (savedSession || savedToken) {
+  // A UI session without its Sanctum token (or vice versa) cannot make
+  // authenticated API requests. Clear the partial state and require login.
+  AuthService.clearSession();
 }

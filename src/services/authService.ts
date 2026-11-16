@@ -92,7 +92,12 @@ export class AuthService {
   }
 
   static setToken(token: string) {
-    localStorage.setItem('auth_token', token);
+    const normalizedToken = String(token ?? '').trim();
+    if (!normalizedToken || normalizedToken === 'null' || normalizedToken === 'undefined') {
+      throw new Error('The server did not return a valid authentication token.');
+    }
+
+    localStorage.setItem('auth_token', normalizedToken);
   }
 
   static setTenantId(id: string | number) {
@@ -100,7 +105,13 @@ export class AuthService {
   }
 
   static getToken(): string | null {
-    return localStorage.getItem('auth_token');
+    const token = localStorage.getItem('auth_token')?.trim();
+    if (!token || token === 'null' || token === 'undefined') {
+      localStorage.removeItem('auth_token');
+      return null;
+    }
+
+    return token;
   }
 
   static getTenantId(): string | null {
@@ -110,5 +121,10 @@ export class AuthService {
   static removeToken() {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('tenant_id');
+  }
+
+  static clearSession() {
+    this.removeToken();
+    localStorage.removeItem('auth_session');
   }
 }

@@ -22,6 +22,7 @@ apiClient.interceptors.request.use(
     const token = AuthService.getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      (config as any)._authToken = token;
     }
 
     // Add tenant ID if present
@@ -85,13 +86,20 @@ apiClient.interceptors.response.use(
 
     // Handle 401 unauthenticated
     if (error.response?.status === 401) {
-      const token = AuthService.getToken();
-      if (token) {
-        AuthService.removeToken();
-        // Redirect to login if not already there
-        if (window.location.pathname !== '/' && !window.location.pathname.startsWith('/auth')) {
-          console.warn('[API Client] Redirecting to login due to 401');
-          window.location.href = '/';
+      const currentToken = AuthService.getToken();
+      const requestToken = error.config?._authToken as string | undefined;
+      const belongsToCurrentSession = requestToken
+        ? requestToken === currentToken
+        : !currentToken;
+
+      // Do not let a late 401 from an older request destroy a newly-created
+      // login session. Only clear the credentials used by this request.
+      if (belongsToCurrentSession) {
+        AuthService.clearSession();
+
+        if (window.location.pathname !== '/login') {
+          console.warn('[API Client] Session expired; redirecting to login');
+          window.location.replace('/login');
         }
       }
     }

@@ -39,7 +39,13 @@ import {
   Share2,
   Layers,
   HardDrive,
-  CreditCard
+  CreditCard,
+  CircleDollarSign,
+  Building2,
+  Columns3,
+  ListTodo,
+  CalendarDays,
+  SlidersHorizontal
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { useAuthStore } from '../../store/authStore';
@@ -53,72 +59,8 @@ import { Contact, Campaign } from '../../types';
 import { WhatsAppTemplate } from '../../types/whatsapp';
 import { useI18n } from '../../i18n';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
+import { SidebarNavigation } from './SidebarNavigation';
 
-const getMenuItems = (t: (key: string, params?: any, fallback?: string) => string) => [
-  { group: t('app.dashboard.main_eb814b', undefined, 'Main'), items: [
-    { icon: LayoutDashboard, label: t('app.dashboard.dashboard_67b696', undefined, 'Dashboard'), path: '/dashboard' },
-    { icon: MessageSquare, label: t('app.dashboard.conversations_1d432f', undefined, 'Conversations'), path: '/inbox' },
-    { icon: Users, label: t('app.dashboard.contacts_b45064', undefined, 'Contacts'), path: '/contacts' },
-    { icon: Compass, label: t('app.dashboard.business_scraper_198a88', undefined, 'Business Scraper'), path: '/scraper' },
-  ]},
-  { group: t('app.dashboard.email_marketing_e6eecf', undefined, 'Email Marketing'), items: [
-    { icon: Sparkles, label: t('app.dashboard.ai_marketing_agent_d02ae6', undefined, 'AI Marketing Agent'), path: '/email-campaigns/ai-agent' },
-    { icon: Mail, label: t('app.dashboard.email_campaigns_bca45a', undefined, 'Email Campaigns'), path: '/email-campaigns' },
-    { icon: FileText, label: t('app.dashboard.email_templates_d83b17', undefined, 'Email Templates'), path: '/email-templates' },
-    { icon: Globe, label: t('app.dashboard.sending_domains_7a4d67', undefined, 'Sending Domains'), path: '/settings/email' },
-  ]},
-  { group: t('app.dashboard.whatsapp_marketing_b93ac6', undefined, 'WhatsApp Marketing'), items: [
-    { icon: Send, label: t('app.dashboard.whatsapp_campaigns_c8204e', undefined, 'WhatsApp Campaigns'), path: '/campaigns' },
-    { icon: LayoutIcon, label: t('app.dashboard.whatsapp_templates_431349', undefined, 'WhatsApp Templates'), path: '/templates' },
-    { icon: Smartphone, label: t('app.dashboard.whatsapp_numbers_53ab7d', undefined, 'WhatsApp Numbers'), path: '/whatsapp/connect' },
-    { icon: CreditCard, label: t('app.dashboard.whatsapp_billing', undefined, 'Billing & Payments'), path: '/whatsapp/billing' },
-    { icon: Settings, label: t('app.dashboard.whatsapp_settings_37faf3', undefined, 'WhatsApp Settings'), path: '/settings/whatsapp' },
-  ]},
-  { group: t('app.dashboard.automation_d90975', undefined, 'Automation'), items: [
-    { icon: Zap, label: t('app.dashboard.workflows_automation_daecf7', undefined, 'Workflows & Automation'), path: '/automation' },
-  ]},
-  { group: t('app.dashboard.page_form_builder', undefined, 'Page & Form Builder'), items: [
-    {
-      icon: Layers,
-      label: t('app.dashboard.page_builder_title', undefined, 'Page & Form Builder'),
-      path: '/page-builder',
-      submenus: [
-        { label: 'Overview', path: '/page-builder' },
-        { label: 'Landing Pages', path: '/page-builder/pages' },
-        { label: 'Forms & Surveys', path: '/page-builder/forms' },
-        { label: 'Submissions', path: '/page-builder/submissions' },
-      ],
-    },
-  ]},
-  { group: t('app.dashboard.social_media_planner', undefined, 'Social Media Planner'), items: [
-    {
-      icon: Share2,
-      label: t('app.dashboard.social_planner_title', undefined, 'Social Media Planner'),
-      path: '/social-planner',
-      submenus: [
-        { label: 'Overview', path: '/social-planner' },
-        { label: 'Content Calendar', path: '/social-planner/calendar' },
-        { label: 'Create Post', path: '/social-planner/create' },
-        { label: 'Social Accounts', path: '/social-planner/accounts' },
-        { label: 'Inbox', path: '/social-planner/inbox' },
-        { label: 'Analytics', path: '/social-planner/analytics' },
-        { label: 'Lead Ads (FB & IG)', path: '/social-planner/lead-ads' },
-      ],
-    },
-  ]},
-  { group: 'Media & Analytics', items: [
-    {
-      icon: HardDrive,
-      label: 'Media Storage',
-      path: '/media-library',
-    },
-    {
-      icon: BarChart3,
-      label: 'Advanced Reporting',
-      path: '/reporting',
-    },
-  ]}
-];
 
 const GRADIENTS = {
   royal: "from-slate-800 to-[#12263A] shadow-[#12263A]/20 bg-gradient-to-br text-white",
@@ -146,17 +88,8 @@ export function Sidebar({
   const { logout, user, updateProfile } = useAuthStore();
   const { websiteName, websiteLogo, websiteFavicon } = useBrandingStore();
   const { t, isRtl } = useI18n();
-  const menuItems = getMenuItems(t);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({ '/social-planner': true, '/page-builder': true });
-
-  const isItemActive = (isActive: boolean, itemPath: string) => {
-    if (!isActive) return false;
-    if (itemPath === '/email-campaigns' && location.pathname.startsWith('/email-campaigns/ai-agent')) {
-      return false;
-    }
-    return true;
-  };
+  const [isWorkspaceMenuOpen, setIsWorkspaceMenuOpen] = useState(false);
 
   // Profile modal state
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -327,8 +260,16 @@ export function Sidebar({
     <>
       {/* Mobile Toggle */}
       <button
-        className="lg:hidden fixed top-6 right-6 z-[120] w-11 h-11 bg-white text-slate-700 rounded-xl shadow-lg flex items-center justify-center transition-all active:scale-95 border border-slate-200"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        aria-label={isMobileMenuOpen ? 'Close navigation' : 'Open navigation'}
+        className={cn(
+          "lg:hidden fixed top-5 z-[120] w-11 h-11 bg-white text-slate-700 rounded-xl shadow-lg flex items-center justify-center transition-all active:scale-95 border border-slate-200",
+          isRtl ? "left-4" : "right-4"
+        )}
+        onClick={() => {
+          if (!isMobileMenuOpen) setIsCollapsed(false);
+          if (isMobileMenuOpen) setIsWorkspaceMenuOpen(false);
+          setIsMobileMenuOpen(!isMobileMenuOpen);
+        }}
       >
         <AnimatePresence mode="wait">
           <motion.div
@@ -346,10 +287,12 @@ export function Sidebar({
         "fixed inset-y-0 z-[110] bg-white transform transition-all duration-300 ease-in-out lg:translate-x-0 flex flex-col overflow-visible",
         isRtl ? "right-0 border-l border-slate-200" : "left-0 border-r border-slate-200",
         isMobileMenuOpen ? "translate-x-0" : (isRtl ? "translate-x-full" : "-translate-x-full"),
-        isCollapsed ? "w-20" : "w-72"
+        isCollapsed ? "w-[72px]" : "w-[272px]"
       )}>
         {/* Collapsible Trigger for Desktop */}
         <button
+          type="button"
+          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           onClick={() => setIsCollapsed(!isCollapsed)}
           className={cn(
             "hidden lg:flex absolute top-9 z-[120] w-6 h-6 bg-white hover:bg-slate-50 border border-slate-200 rounded-full text-slate-400 hover:text-slate-700 items-center justify-center cursor-pointer transition-all hover:scale-110 active:scale-95 shadow-sm",
@@ -365,7 +308,12 @@ export function Sidebar({
 
         {/* 1. Logo Section */}
         <div className={cn("transition-all duration-300", isCollapsed ? "p-4 flex justify-center" : "px-6 pt-5 pb-3")}>
-          <div className={cn("flex items-center cursor-pointer", isCollapsed ? "justify-center" : "")} onClick={() => navigate('/dashboard')}>
+          <button
+            type="button"
+            aria-label="Go to dashboard"
+            className={cn("flex items-center outline-none focus-visible:ring-2 focus-visible:ring-emerald-500", isCollapsed ? "justify-center" : "")}
+            onClick={() => navigate('/dashboard')}
+          >
             {isCollapsed ? (
               <img
                 src={favIconImg}
@@ -379,274 +327,202 @@ export function Sidebar({
                 className="h-8 md:h-9 w-auto max-w-[190px] object-contain shrink-0 hover:opacity-90 transition-opacity"
               />
             )}
-          </div>
+          </button>
         </div>
 
-        {/* 2. User / workspace card */}
-        <div className={cn("px-4 mb-2 select-none", isCollapsed ? "flex justify-center" : "")}>
-          <div
-            onClick={() => setIsProfileModalOpen(true)}
+        {/* 2. Workspace selector */}
+        <div className={cn("relative mb-2 px-3", isCollapsed ? "flex justify-center" : "")}>
+          {isWorkspaceMenuOpen && (
+            <button
+              type="button"
+              aria-label="Close workspace menu"
+              onClick={() => setIsWorkspaceMenuOpen(false)}
+              className="fixed inset-0 z-40 cursor-default bg-transparent"
+            />
+          )}
+          <button
+            type="button"
+            aria-haspopup="menu"
+            aria-expanded={isWorkspaceMenuOpen}
+            title={isCollapsed ? (businessName || 'Workspace') : undefined}
+            onClick={() => setIsWorkspaceMenuOpen((open) => !open)}
             className={cn(
-              "bg-slate-50 hover:bg-[#F0FDF4] border border-slate-200 hover:border-[#bbf7d0] flex items-center cursor-pointer group transition-all duration-200 rounded-xl",
-              isCollapsed ? "p-2 justify-center w-11 h-11" : "p-2 gap-2.5 w-full"
+              "relative z-50 flex border border-slate-200 bg-slate-50 text-left outline-none transition-colors hover:border-emerald-200 hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-500",
+              isCollapsed
+                ? "h-11 w-11 items-center justify-center rounded-xl p-2"
+                : "min-h-[58px] w-full items-center gap-2.5 rounded-2xl p-2.5"
             )}
           >
             <div className={cn(
-              "rounded-lg flex items-center justify-center font-bold transition-all duration-200 shrink-0 relative overflow-hidden",
-              isCollapsed ? "w-7 h-7 text-xs" : "w-8 h-8 text-xs",
+              "relative flex shrink-0 items-center justify-center overflow-hidden rounded-xl font-bold",
+              isCollapsed ? "h-8 w-8 text-xs" : "h-9 w-9 text-sm",
               isImageAvatar(user?.avatar) ? "bg-slate-100" : GRADIENTS[(user?.avatar as keyof typeof GRADIENTS) || 'royal']
             )}>
               {isImageAvatar(user?.avatar) ? (
-                <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                <img src={user.avatar} alt="" className="h-full w-full object-cover" />
               ) : (
                 user?.name ? user.name.substring(0, 1).toUpperCase() : 'A'
               )}
-              <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full border-2 border-white" />
+              <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500" />
             </div>
             {!isCollapsed && (
-              <div className="flex-1 min-w-0 text-left">
-                <p className="text-xs font-bold text-slate-900 truncate leading-tight group-hover:text-[#166534] transition-colors">{businessName || 'Workspace'}</p>
-                <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">{name || 'View profile'}</p>
-              </div>
-            )}
-            {!isCollapsed && <ChevronDown size={13} className="text-slate-400 group-hover:text-[#166534] transition-colors shrink-0" />}
-          </div>
-        </div>
-
-        {/* 3. Navigation */}
-        <div className="flex-1 px-3 overflow-y-auto custom-scrollbar flex flex-col justify-between">
-          <div className="space-y-3.5 py-1">
-            {menuItems.map((group) => (
-              <div key={group.group} className="space-y-0.5">
-                {!isCollapsed ? (
-                  <p className="px-3 mb-1 text-[11px] font-bold uppercase tracking-wider text-[#57534E]/70 select-none">{group.group}</p>
-                ) : (
-                  <div className="w-full h-px bg-[#e7e5e4] my-2" />
-                )}
-                <nav className="space-y-0.5">
-                  {group.items.map((item) => {
-                    const submenus = (item as any).submenus as Array<{ label: string; path: string }> | undefined;
-                    const isItemOpen = openSubmenus[item.path] ?? location.pathname.startsWith(item.path);
-
-                    if (submenus && submenus.length > 0) {
-                      const isAnySubActive = location.pathname.startsWith(item.path);
-                      return (
-                        <div key={item.label} className="space-y-0.5">
-                          <div
-                            onClick={() => {
-                              if (!isCollapsed) {
-                                setOpenSubmenus((prev) => ({ ...prev, [item.path]: !isItemOpen }));
-                              }
-                            }}
-                            className={cn(
-                              "flex items-center rounded-xl text-xs sm:text-[13px] font-semibold transition-all duration-200 group relative cursor-pointer",
-                              isCollapsed ? "p-2 justify-center" : "px-3 py-2 gap-2.5",
-                              isAnySubActive
-                                ? "bg-[#166534] text-white shadow-sm shadow-[#166534]/25"
-                                : "text-[#57534E] hover:text-[#12263A] hover:bg-[#F0FDF4]"
-                            )}
-                          >
-                            <item.icon
-                              size={17}
-                              strokeWidth={2}
-                              className={cn("shrink-0 transition-colors", isAnySubActive ? "text-white" : "text-[#57534E]/75 group-hover:text-[#12263A]")}
-                            />
-                            {!isCollapsed && (
-                              <>
-                                <NavLink
-                                  to={item.path}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setIsMobileMenuOpen(false);
-                                  }}
-                                  className="flex-1 text-left"
-                                >
-                                  {item.label}
-                                </NavLink>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setOpenSubmenus((prev) => ({ ...prev, [item.path]: !isItemOpen }));
-                                  }}
-                                  className="p-1 hover:bg-black/10 rounded-md transition-transform"
-                                >
-                                  <ChevronDown size={14} className={cn("transition-transform duration-200", isItemOpen ? "rotate-180" : "")} />
-                                </button>
-                              </>
-                            )}
-                            {isCollapsed && (
-                              <div
-                                className={cn(
-                                  "absolute top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-[#12263A] text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]",
-                                  isRtl ? "right-[64px]" : "left-[64px]"
-                                )}
-                              >
-                                {item.label}
-                              </div>
-                            )}
-                          </div>
-
-                          {!isCollapsed && isItemOpen && (
-                            <div className="pl-6 pr-1 py-0.5 space-y-0.5">
-                              {submenus.map((sub) => {
-                                const isSubActive =
-                                  sub.path === '/social-planner' || sub.path === '/page-builder'
-                                    ? location.pathname === sub.path
-                                    : location.pathname.startsWith(sub.path);
-
-                                return (
-                                  <NavLink
-                                    key={sub.path}
-                                    to={sub.path}
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className={cn(
-                                      "flex items-center px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors",
-                                      isSubActive
-                                        ? "bg-[#166534]/15 text-[#166534] font-bold"
-                                        : "text-[#57534E] hover:text-[#12263A] hover:bg-[#F0FDF4]"
-                                    )}
-                                  >
-                                    <span className="w-1.5 h-1.5 rounded-full mr-2 bg-current opacity-60" />
-                                    {sub.label}
-                                  </NavLink>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    }
-
-                    return (
-                    <NavLink
-                      key={item.label}
-                      to={item.path}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={({ isActive }) => {
-                        const active = isItemActive(isActive, item.path);
-                        return cn(
-                          "flex items-center rounded-xl text-xs sm:text-[13px] font-semibold transition-all duration-200 group relative cursor-pointer",
-                          isCollapsed ? "p-2 justify-center" : "px-3 py-2 gap-2.5",
-                          active
-                            ? "bg-[#166534] text-white shadow-sm shadow-[#166534]/25"
-                            : "text-[#57534E] hover:text-[#12263A] hover:bg-[#F0FDF4]"
-                        );
-                      }}
-                    >
-                      {({ isActive }) => {
-                        const active = isItemActive(isActive, item.path);
-                        return (
-                          <>
-                            <item.icon size={17} strokeWidth={2} className={cn("shrink-0 transition-colors", active ? "text-white" : "text-[#57534E]/75 group-hover:text-[#12263A]")} />
-
-                            {!isCollapsed && (
-                              <span className="flex-1">{item.label}</span>
-                            )}
-
-                            {/* Hover Tooltips for Collapsed state */}
-                            {isCollapsed && (
-                              <div className={cn(
-                                "absolute top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-[#12263A] text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]",
-                                isRtl ? "right-[64px]" : "left-[64px]"
-                              )}>
-                                {item.label}
-                              </div>
-                            )}
-                          </>
-                        );
-                      }}
-                    </NavLink>
-                    );
-                  })}
-                </nav>
-              </div>
-            ))}
-            {user?.role === 'superadmin' && (
-              <div className="space-y-0.5 pt-1">
-                {!isCollapsed ? (
-                  <p className="px-3 mb-1 text-[11px] font-bold uppercase tracking-wider text-[#166534] select-none">
-                    {isRtl ? 'Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©' : 'Administration'}
+              <>
+                <div className="min-w-0 flex-1">
+                  <p className="line-clamp-2 text-xs font-extrabold leading-4 text-slate-900">
+                    {businessName || 'Workspace'}
                   </p>
-                ) : (
-                  <div className="w-full h-px bg-[#e7e5e4] my-2" />
-                )}
-                <nav className="space-y-0.5">
-                  <NavLink
-                    to="/admin"
-                    className={({ isActive }) => cn(
-                      "flex items-center rounded-xl text-xs sm:text-[13px] font-semibold transition-all duration-200 group relative cursor-pointer",
-                      isCollapsed ? "p-2 justify-center" : "px-3 py-2 gap-2.5",
-                      isActive
-                        ? "bg-[#166534] text-white shadow-sm shadow-[#166534]/25"
-                        : "text-[#12263A] hover:text-[#166534] hover:bg-[#F0FDF4]"
-                    )}
-                  >
-                    <Cpu size={17} strokeWidth={2} className="shrink-0 text-[#166534] group-hover:text-[#14532d]" />
-                    {!isCollapsed && <span className="flex-1">{isRtl ? 'Ù„ÙˆØ­Ø© Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©' : 'Admin Panel'}</span>}
-                    {isCollapsed && (
-                      <div className={cn(
-                        "absolute top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-[#12263A] text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]",
-                        isRtl ? "right-[64px]" : "left-[64px]"
-                      )}>
-                        {isRtl ? 'Ù„ÙˆØ­Ø© Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©' : 'Admin Panel'}
-                      </div>
-                    )}
-                  </NavLink>
-                </nav>
-              </div>
-            )}
-          </div>
-
-          {/* Support & Resource Card inside scroll stream */}
-          {!isCollapsed && (
-            <div className="pt-4 pb-2">
-              <div className="bg-[#FAFAF9] border border-[#e7e5e4] rounded-xl p-3 flex items-center justify-between gap-2.5">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-7 h-7 rounded-lg bg-[#F0FDF4] text-[#166534] flex items-center justify-center shrink-0 border border-[#bbf7d0]">
-                    <FileText size={14} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-[#12263A] truncate">{isRtl ? 'Ø§Ù„Ù…Ø³Ø§Ø¹Ø¯Ø© ÙˆØ§Ù„ÙˆØ«Ø§Ø¦Ù‚' : 'Help & Docs'}</p>
-                    <p className="text-[10px] text-[#57534E] truncate">{isRtl ? 'Ø£Ø¯Ù„Ø© ÙˆÙ…Ø±Ø§Ø¬Ø¹ Ø´Ø§Ù…Ù„Ø©' : 'Guides & resources'}</p>
-                  </div>
+                  <p className="mt-0.5 truncate text-[10px] font-medium text-slate-400">
+                    {name || 'Current workspace'}
+                  </p>
                 </div>
+                <ChevronDown
+                  size={14}
+                  className={cn("shrink-0 text-slate-400 transition-transform", isWorkspaceMenuOpen && "rotate-180")}
+                />
+              </>
+            )}
+          </button>
+
+          {isWorkspaceMenuOpen && (
+            <div
+              role="menu"
+              className={cn(
+                "absolute top-[calc(100%+8px)] z-[60] w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl",
+                isRtl ? "right-3" : "left-3",
+                isCollapsed && (isRtl ? "right-[64px]" : "left-[64px]")
+              )}
+            >
+              <div className="rounded-xl bg-slate-50 p-3">
+                <div className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-600">
+                  Current workspace
+                </div>
+                <div className="mt-1 break-words text-sm font-extrabold leading-5 text-slate-950">
+                  {businessName || 'Workspace'}
+                </div>
+                <div className="mt-1 truncate text-[10px] text-slate-500">{user?.email}</div>
+              </div>
+              <div className="mt-2 space-y-1">
                 <button
                   type="button"
-                  onClick={() => navigate('/resources')}
-                  className="h-7 px-3 text-[11px] font-bold text-[#166534] hover:text-[#14532d] bg-white hover:bg-[#F0FDF4] border border-slate-200 hover:border-[#bbf7d0] rounded-lg transition-all shadow-xs active:scale-95 cursor-pointer shrink-0"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsWorkspaceMenuOpen(false);
+                    setIsProfileModalOpen(true);
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-xs font-bold text-slate-600 hover:bg-slate-100 hover:text-slate-950"
                 >
-                  {isRtl ? 'Ø¹Ø±Ø¶' : 'View'}
+                  <UserIcon size={16} /> Profile settings
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsWorkspaceMenuOpen(false);
+                    setIsMobileMenuOpen(false);
+                    navigate('/settings/business-profile');
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-xs font-bold text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+                >
+                  <Briefcase size={16} /> Business profile
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsWorkspaceMenuOpen(false);
+                    setIsMobileMenuOpen(false);
+                    navigate('/settings/governance');
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-xs font-bold text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+                >
+                  <ShieldCheck size={16} /> Team, roles & audit
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* 4. Bottom sign out area */}
-        <div className="border-t border-slate-200 p-2.5">
-          {!isCollapsed ? (
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50/80 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer active:scale-98"
-            >
-              <LogOut size={16} strokeWidth={2} className="shrink-0" />
-              {t('app.dashboard.sign_out_0b184b', undefined, 'Sign Out')}
-            </button>
-          ) : (
-            <button
-              onClick={handleLogout}
-              className="w-9 h-9 mx-auto flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all cursor-pointer group relative active:scale-90"
-            >
-              <LogOut size={16} strokeWidth={2} />
-              <div className={cn(
-                "absolute top-1/2 -translate-y-1/2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-1 translate-x-[-6px] transition-all duration-200 bg-slate-900 text-white rounded-md px-2.5 py-1.5 whitespace-nowrap text-xs font-medium shadow-lg z-[70]",
-                isRtl ? "right-[52px]" : "left-[52px]"
-              )}>
-                {t('app.dashboard.sign_out_0b184b', undefined, 'Sign Out')}
-              </div>
-            </button>
-          )}
+        {/* 3. Navigation */}
+        <div className="flex-1 px-3 overflow-y-auto custom-scrollbar flex flex-col justify-between">
+          <SidebarNavigation
+            t={t}
+            pathname={location.pathname}
+            isCollapsed={isCollapsed}
+            isRtl={isRtl}
+            role={user?.role}
+            permissions={(user as any)?.permissions || []}
+            features={(user as any)?.features || []}
+            onNavigate={() => {
+              setIsMobileMenuOpen(false);
+              setIsWorkspaceMenuOpen(false);
+            }}
+            onExpand={() => setIsCollapsed(false)}
+          />
+          </div>
+
+        {/* Fixed sidebar utilities */}
+        <div className="shrink-0 space-y-1 border-t border-slate-200 bg-white p-2.5">
+          <NavLink
+            to="/settings/business-profile"
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              setIsWorkspaceMenuOpen(false);
+            }}
+            title={isCollapsed ? 'Settings' : undefined}
+            className={cn(
+              "group relative flex min-h-9 items-center rounded-xl text-xs font-bold text-slate-500 outline-none transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-emerald-500",
+              isCollapsed ? "justify-center px-2" : "gap-2.5 px-3"
+            )}
+          >
+            <Settings size={16} strokeWidth={2} className="shrink-0" />
+            {!isCollapsed && <span>Settings</span>}
+            {isCollapsed && (
+              <span className={cn(
+                "pointer-events-none absolute top-1/2 z-[130] -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-950 px-2.5 py-1.5 text-xs font-semibold text-white opacity-0 shadow-xl transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100",
+                isRtl ? "right-[50px]" : "left-[50px]"
+              )}>Settings</span>
+            )}
+          </NavLink>
+          <button
+            type="button"
+            onClick={() => {
+              navigate('/resources');
+              setIsMobileMenuOpen(false);
+              setIsWorkspaceMenuOpen(false);
+            }}
+            title={isCollapsed ? 'Help & Docs' : undefined}
+            className={cn(
+              "group relative flex min-h-9 w-full items-center rounded-xl text-xs font-bold text-slate-500 outline-none transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-emerald-500",
+              isCollapsed ? "justify-center px-2" : "gap-2.5 px-3"
+            )}
+          >
+            <FileText size={16} strokeWidth={2} className="shrink-0" />
+            {!isCollapsed && <span>Help & Docs</span>}
+            {isCollapsed && (
+              <span className={cn(
+                "pointer-events-none absolute top-1/2 z-[130] -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-950 px-2.5 py-1.5 text-xs font-semibold text-white opacity-0 shadow-xl transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100",
+                isRtl ? "right-[50px]" : "left-[50px]"
+              )}>Help & Docs</span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={handleLogout}
+            title={isCollapsed ? t('app.dashboard.sign_out_0b184b', undefined, 'Sign Out') : undefined}
+            className={cn(
+              "group relative flex min-h-9 w-full items-center rounded-xl text-xs font-bold text-slate-500 outline-none transition-colors hover:bg-rose-50 hover:text-rose-600 focus-visible:ring-2 focus-visible:ring-rose-400",
+              isCollapsed ? "justify-center px-2" : "gap-2.5 px-3"
+            )}
+          >
+            <LogOut size={16} strokeWidth={2} className="shrink-0" />
+            {!isCollapsed && <span>{t('app.dashboard.sign_out_0b184b', undefined, 'Sign Out')}</span>}
+            {isCollapsed && (
+              <span className={cn(
+                "pointer-events-none absolute top-1/2 z-[130] -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-950 px-2.5 py-1.5 text-xs font-semibold text-white opacity-0 shadow-xl transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100",
+                isRtl ? "right-[50px]" : "left-[50px]"
+              )}>{t('app.dashboard.sign_out_0b184b', undefined, 'Sign Out')}</span>
+            )}
+          </button>
         </div>
       </aside>
 
@@ -657,7 +533,10 @@ export function Sidebar({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              setIsWorkspaceMenuOpen(false);
+            }}
             className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 lg:hidden"
           />
         )}
@@ -1650,8 +1529,8 @@ export function Layout({ children }: { children?: ReactNode }) {
       <div className={cn(
         "flex flex-col min-h-screen transition-all duration-300 ease-in-out",
         isRtl
-          ? (isCollapsed ? "lg:pr-20 lg:pl-0" : "lg:pr-72 lg:pl-0")
-          : (isCollapsed ? "lg:pl-20 lg:pr-0" : "lg:pl-72 lg:pr-0")
+          ? (isCollapsed ? "lg:pr-[72px] lg:pl-0" : "lg:pr-[272px] lg:pl-0")
+          : (isCollapsed ? "lg:pl-[72px] lg:pr-0" : "lg:pl-[272px] lg:pr-0")
       )}>
         <Header />
         <main className="p-5 md:p-6 xl:p-8 max-w-[1600px] w-full mx-auto">

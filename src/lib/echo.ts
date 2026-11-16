@@ -27,6 +27,17 @@ export const getEcho = (): any => {
   const port = isLocalDev ? 8080 : parseInt(String(import.meta.env.VITE_REVERB_PORT || '443'), 10);
   const scheme = isLocalDev ? 'http' : (import.meta.env.VITE_REVERB_SCHEME || 'https');
   const isTls = scheme === 'https';
+  const apiBaseUrl = import.meta.env.DEV
+    ? '/api'
+    : `${import.meta.env.VITE_CRM_API_URL ?? 'https://crm.throbtech.com'}/api`;
+  const authHeaders: Record<string, string> = {
+    Accept: 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
+  };
+
+  if (token) {
+    authHeaders.Authorization = `Bearer ${token}`;
+  }
 
   try {
     echoInstance = new Echo({
@@ -37,13 +48,9 @@ export const getEcho = (): any => {
       wssPort: port,
       forceTLS: isTls,
       enabledTransports: ['ws', 'wss'],
-      authEndpoint: '/api/broadcasting/auth',
+      authEndpoint: `${apiBaseUrl}/broadcasting/auth`,
       auth: {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
+        headers: authHeaders,
       },
     });
   } catch (err) {

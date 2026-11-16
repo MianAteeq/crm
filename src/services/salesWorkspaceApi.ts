@@ -1,0 +1,20 @@
+import { apiClient } from './apiClient';
+export const salesWorkspaceApi = {
+ bootstrap:()=>apiClient.get('/sales/bootstrap').then(r=>r.data),
+ overview:(params={})=>apiClient.get('/sales/overview',{params}).then(r=>r.data), opportunities:(params={})=>apiClient.get('/sales/opportunities',{params}).then(r=>r.data), opportunity:(id:number)=>apiClient.get(`/sales/opportunities/${id}`).then(r=>r.data),
+ savePipeline:(d:any)=>apiClient.post('/sales/pipelines',d).then(r=>r.data), deletePipeline:(id:number)=>apiClient.delete(`/sales/pipelines/${id}`).then(r=>r.data),
+ saveStage:(d:any)=>apiClient.post('/sales/stages',d).then(r=>r.data), deleteStage:(id:number,replacement_stage_id?:number)=>apiClient.delete(`/sales/stages/${id}`,{data:{replacement_stage_id}}).then(r=>r.data),
+ saveOpportunity:(d:any)=>apiClient.post('/sales/opportunities',d).then(r=>r.data), moveOpportunity:(id:number,stage_id:number)=>apiClient.patch(`/sales/opportunities/${id}/stage`,{stage_id}).then(r=>r.data), deleteOpportunity:(id:number)=>apiClient.delete(`/sales/opportunities/${id}`).then(r=>r.data),
+ tasks:(params={})=>apiClient.get('/sales/tasks',{params}).then(r=>r.data), saveTask:(d:any)=>apiClient.post('/sales/tasks',d).then(r=>r.data), deleteTask:(id:number)=>apiClient.delete(`/sales/tasks/${id}`).then(r=>r.data),
+ completeTask:(id:number)=>apiClient.post(`/sales/tasks/${id}/complete`).then(r=>r.data),
+ companies:(params={})=>apiClient.get('/sales/companies',{params}).then(r=>r.data), company:(id:number)=>apiClient.get(`/sales/companies/${id}`).then(r=>r.data), saveCompany:(d:any)=>apiClient.post('/sales/companies',d).then(r=>r.data), deleteCompany:(id:number)=>apiClient.delete(`/sales/companies/${id}`).then(r=>r.data),
+ appointments:(params={})=>apiClient.get('/sales/appointments',{params}).then(r=>r.data), saveAppointment:(d:any)=>apiClient.post('/sales/appointments',d).then(r=>r.data), reschedule:(id:number,d:any)=>apiClient.post(`/sales/appointments/${id}/reschedule`,d).then(r=>r.data), deleteAppointment:(id:number)=>apiClient.delete(`/sales/appointments/${id}`).then(r=>r.data),
+ configuration:()=>apiClient.get('/sales/configuration').then(r=>r.data),
+ saveCustomField:(d:any)=>apiClient.post('/sales/custom-fields',d).then(r=>r.data), deleteCustomField:(id:number)=>apiClient.delete(`/sales/custom-fields/${id}`).then(r=>r.data),
+ customFieldValues:(type:string,id:string|number)=>apiClient.get(`/sales/custom-fields/${type}/${id}/values`).then(r=>r.data), saveCustomFieldValues:(type:string,id:string|number,values:any)=>apiClient.put(`/sales/custom-fields/${type}/${id}/values`,{values}).then(r=>r.data),
+ saveList:(d:any)=>apiClient.post('/sales/lists',d).then(r=>r.data), listMembers:(id:number)=>apiClient.get(`/sales/lists/${id}/members`).then(r=>r.data), deleteList:(id:number)=>apiClient.delete(`/sales/lists/${id}`).then(r=>r.data),
+ saveView:(d:any)=>apiClient.post('/sales/list-views',d).then(r=>r.data), deleteView:(id:number)=>apiClient.delete(`/sales/list-views/${id}`).then(r=>r.data),
+ saveTagCategory:(d:any)=>apiClient.post('/sales/tag-categories',d).then(r=>r.data), deleteTagCategory:(id:number)=>apiClient.delete(`/sales/tag-categories/${id}`).then(r=>r.data),
+ saveTag:(d:any)=>d.id?apiClient.patch(`/tags/${d.id}`,d).then(r=>r.data):apiClient.post('/tags',d).then(r=>r.data), deleteTag:(id:number)=>apiClient.delete(`/tags/${id}`).then(r=>r.data),
+ saveFolder:(d:any)=>apiClient.post('/sales/value-folders',d).then(r=>r.data), saveReusableValue:(d:any)=>apiClient.post('/sales/reusable-values',d).then(r=>r.data), deleteReusableValue:(id:number)=>apiClient.delete(`/sales/reusable-values/${id}`).then(r=>r.data),
+};

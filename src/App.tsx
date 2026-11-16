@@ -19,6 +19,8 @@ import EmailCampaignBuilderPage from './pages/campaigns/EmailCampaignBuilderPage
 import EmailCampaignReportPage from './pages/campaigns/EmailCampaignReportPage';
 import EmailTemplatesPage from './pages/campaigns/EmailTemplatesPage';
 import EmailSettingsPage from './pages/settings/EmailSettingsPage';
+import BusinessProfilePage from './pages/settings/BusinessProfilePage';
+import WorkspaceGovernancePage from './pages/settings/WorkspaceGovernancePage';
 import AiMarketingAgentPage from './pages/campaigns/AiMarketingAgentPage';
 
 // Public Pages
@@ -89,6 +91,7 @@ import SocialAnalyticsPage from './pages/social/SocialAnalyticsPage';
 import SocialLeadAdsPage from './pages/social/SocialLeadAdsPage';
 import MediaLibraryPage from './pages/media/MediaLibraryPage';
 import AdvancedReportingPage from './pages/reporting/AdvancedReportingPage';
+import SalesWorkspacePage from './pages/sales/SalesWorkspacePage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -106,6 +109,7 @@ function PublicChatbot() {
                        !pathname.startsWith('/inbox') && 
                        !pathname.startsWith('/campaigns') && 
                        !pathname.startsWith('/contacts') && 
+                       !pathname.startsWith('/sales') &&
                        !pathname.startsWith('/templates') && 
                        !pathname.startsWith('/settings') && 
                        !pathname.startsWith('/whatsapp') && 
@@ -194,10 +198,18 @@ export default function App() {
           <Route path="email-campaigns/:id/report" element={<EmailCampaignReportPage />} />
           <Route path="email-templates" element={<EmailTemplatesPage />} />
           <Route path="settings/email" element={<EmailSettingsPage />} />
+          <Route path="settings/business-profile" element={<BusinessProfilePage />} />
+          <Route path="settings/governance" element={<WorkspaceGovernancePage />} />
 
           <Route path="contacts" element={<Contacts />} />
           <Route path="contacts/add" element={<ContactEditorPage />} />
           <Route path="contacts/edit/:id" element={<ContactEditorPage />} />
+          <Route path="sales" element={<SalesWorkspacePage section="overview" />} />
+          <Route path="sales/opportunities" element={<SalesWorkspacePage section="pipeline" />} />
+          <Route path="sales/tasks" element={<SalesWorkspacePage section="tasks" />} />
+          <Route path="sales/companies" element={<SalesWorkspacePage section="companies" />} />
+          <Route path="sales/appointments" element={<SalesWorkspacePage section="appointments" />} />
+          <Route path="sales/configuration" element={<SalesWorkspacePage section="configuration" />} />
           <Route path="scraper" element={<BusinessScraperPage />} />
           <Route path="templates" element={<TemplatesPage />} />
           <Route path="templates/builder" element={<TemplateBuilderPage />} />
