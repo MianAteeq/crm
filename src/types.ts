@@ -177,6 +177,8 @@ export interface WhatsAppSettings {
   messaging_limit_tier?: string;
   openai_key?: string;
   company_prompt?: string;
+  reply_language?: string;
+  is_auto_reply_enabled?: boolean;
 }
 
 export interface WhatsAppConfig {

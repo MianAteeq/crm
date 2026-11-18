@@ -176,6 +176,7 @@ export default function WhatsAppSettingsPage() {
     return 'ar-SA';
   });
   const [isSavingAi, setIsSavingAi] = useState(false);
+  const [isAutoReplyEnabled, setIsAutoReplyEnabled] = useState(true);
   const toastCounter = useRef(0);
 
   // ── Toast helpers ──
@@ -269,6 +270,9 @@ export default function WhatsAppSettingsPage() {
         });
         setOpenaiKey(res.openai_key || '');
         setCompanyPrompt(res.company_prompt || '');
+        if ((res as any).is_auto_reply_enabled !== undefined) {
+          setIsAutoReplyEnabled((res as any).is_auto_reply_enabled);
+        }
         if ((res as any).reply_language) {
           setReplyLanguage((res as any).reply_language === 'en' ? 'en' : 'ar-SA');
         }
@@ -333,7 +337,7 @@ export default function WhatsAppSettingsPage() {
 
     setIsSavingAi(true);
     try {
-      const res = await crmApi.saveAiSettings(openaiKey || undefined, companyPrompt, replyLanguage);
+      const res = await crmApi.saveAiSettings(openaiKey || undefined, companyPrompt, replyLanguage, isAutoReplyEnabled);
       if (res.success) {
         localStorage.setItem('throb_whatsapp_reply_language', replyLanguage);
         addToast('success', isRtl ? 'تم تحديث إعدادات الرد الآلي للذكاء الاصطناعي بنجاح!' : t('app.dashboard.aiSavedSuccess', 'AI auto-reply settings updated successfully!'));
@@ -1109,6 +1113,39 @@ export default function WhatsAppSettingsPage() {
                       </div>
 
                       <div className="p-6 space-y-5">
+                        {/* Auto-Reply Master Switch */}
+                        <div className="p-4 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs flex items-center justify-between gap-4">
+                          <div className="space-y-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-sm font-bold text-[#12263A]">
+                                {isRtl ? 'تشغيل الرد التلقائي العام (Auto-Reply)' : 'Global WhatsApp Auto-Reply'}
+                              </h3>
+                              <span className={cn(
+                                "px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider",
+                                isAutoReplyEnabled
+                                  ? "bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30"
+                                  : "bg-slate-100 text-slate-600 border border-slate-300"
+                              )}>
+                                {isAutoReplyEnabled ? (isRtl ? 'مفعل ويعمل' : 'Active & Listening') : (isRtl ? 'معطل مؤقتاً' : 'Paused / Off')}
+                              </span>
+                            </div>
+                            <p className="text-xs text-[#64748B] leading-relaxed">
+                              {isRtl 
+                                ? 'عند التفعيل، يتم الرد التلقائي الذكي على رسائل العملاء الواردة. يمكنك أيضاً تعطيل أو تفعيل الرد الآلي لكل محادثة على حدة مباشرة من شاشة الدردشة.'
+                                : 'When enabled, inbound customer messages receive automated replies based on your knowledge base. You can also toggle auto-reply individually per conversation directly inside the chat.'}
+                            </p>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input
+                              type="checkbox"
+                              checked={isAutoReplyEnabled}
+                              onChange={(e) => setIsAutoReplyEnabled(e.target.checked)}
+                              className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#166534]"></div>
+                          </label>
+                        </div>
+
                         {/* Universal DeepSeek Status Banner */}
                         <div className="p-4 rounded-2xl bg-[#F0FDF4] border border-[#22C55E]/30 flex items-start gap-3.5">
                           <div className="w-8 h-8 rounded-xl bg-[#166534] text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">

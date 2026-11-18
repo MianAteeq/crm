@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { crmApi } from '../../services/crmApi';
 import { 
@@ -7,65 +7,129 @@ import {
   GitFork, 
   MoreVertical, 
   Trash2, 
-  User, 
   Sparkles, 
   X,
   Edit2,
   AlertCircle,
   RefreshCw,
   Loader2,
-  ArrowRight,
-  ArrowLeft
+  PlayCircle,
+  PauseCircle,
+  Copy,
+  Folder,
+  FolderPlus,
+  FolderEdit,
+  History,
+  CheckCircle2,
+  ArrowUpDown,
+  Filter,
+  CheckSquare,
+  Square,
+  MessageSquare,
+  Send,
+  Zap,
+  HelpCircle,
+  ExternalLink
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from '../../components/ui/Toast';
 import { useI18n } from '../../i18n';
 
-interface Workflow {
+interface FolderItem {
   id: number;
   name: string;
+  workflows_count?: number;
+}
+
+interface WorkflowItem {
+  id: number;
+  name: string;
+  folder_id: number | null;
+  folder?: { id: number; name: string } | null;
   description: string;
-  status: 'active' | 'inactive';
+  internal_notes?: string;
+  status: 'active' | 'draft' | 'paused' | 'error' | 'inactive';
   trigger: string;
+  whatsapp_sender_number?: string;
+  activeEnrollments: number;
+  completionRate: number;
+  replyRate: number;
+  failureCount: number;
   lastRun: string;
-  nextRun: string;
-  totalExecutions: number;
-  successRate: number;
+  updatedAt: string;
   createdBy: string;
+  version: string;
+  lock_version?: number;
+  totalExecutions: number;
 }
 
 export default function WorkflowsPage() {
   const navigate = useNavigate();
   const { isRtl } = useI18n();
-  const [workflows, setWorkflows] = useState<Workflow[]>([]);
-  const [search, setSearch] = useState('');
-  const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
+
+  // Data States
+  const [workflows, setWorkflows] = useState<WorkflowItem[]>([]);
+  const [folders, setFolders] = useState<FolderItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
-  // CRUD Modal States
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedWorkflow, setSelectedWorkflow] = useState<Workflow | null>(null);
-  
-  // Form States
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<'active' | 'inactive'>('inactive');
+  // Filter States
+  const [search, setSearch] = useState('');
+  const [selectedFolderId, setSelectedFolderId] = useState<number | 'all' | 'unorganized'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'draft' | 'paused' | 'error'>('all');
+  const [triggerFilter, setTriggerFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'updatedAt' | 'name' | 'totalExecutions' | 'completionRate'>('updatedAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  const fetchWorkflows = async () => {
+  // Selection & Bulk Actions
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [isBulkMoveOpen, setIsBulkMoveOpen] = useState(false);
+  const [bulkTargetFolderId, setBulkTargetFolderId] = useState<number | null>(null);
+  const [isBulkDeleteConfirm, setIsBulkDeleteConfirm] = useState(false);
+  const [isPerformingBulk, setIsPerformingBulk] = useState(false);
+
+  // Active Dropdown Menu
+  const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
+
+  // Folder Modal States
+  const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  const [folderModalMode, setFolderModalMode] = useState<'create' | 'rename'>('create');
+  const [targetFolder, setTargetFolder] = useState<FolderItem | null>(null);
+  const [folderNameInput, setFolderNameInput] = useState('');
+  const [isFolderSaving, setIsFolderSaving] = useState(false);
+
+  // Create Workflow Modal
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [newWorkflowName, setNewWorkflowName] = useState('');
+  const [newWorkflowDescription, setNewWorkflowDescription] = useState('');
+  const [newWorkflowFolderId, setNewWorkflowFolderId] = useState<number | null>(null);
+  const [isCreatingWorkflow, setIsCreatingWorkflow] = useState(false);
+
+  // Single Action Modal
+  const [singleActionWorkflow, setSingleActionWorkflow] = useState<WorkflowItem | null>(null);
+  const [isMoveSingleOpen, setIsMoveSingleOpen] = useState(false);
+  const [singleTargetFolderId, setSingleTargetFolderId] = useState<number | null>(null);
+  const [isDeleteSingleConfirm, setIsDeleteSingleConfirm] = useState(false);
+  const [isTestingWorkflow, setIsTestingWorkflow] = useState(false);
+
+  // Fetch Workflows & Folders
+  const fetchData = async () => {
     setIsLoading(true);
     setHasError(false);
     try {
-      const data = await crmApi.getWorkflows();
-      if (data && Array.isArray(data)) {
-        setWorkflows(data);
-      } else {
-        setWorkflows([]);
-      }
+      const [workflowsRes, foldersRes] = await Promise.all([
+        crmApi.getWorkflows(),
+        crmApi.getAutomationFolders(),
+      ]);
+
+      const workflowList = Array.isArray(workflowsRes) ? workflowsRes : (workflowsRes?.data || []);
+      const folderList = Array.isArray(foldersRes) ? foldersRes : (foldersRes?.data || []);
+
+      setWorkflows(workflowList);
+      setFolders(folderList);
     } catch (err) {
-      console.error('Failed to load workflows:', err);
+      console.error('Failed to load workflows or folders:', err);
       setHasError(true);
       toast.error(isRtl ? 'خطأ' : 'Error', isRtl ? 'فشل استرجاع مسارات العمل.' : 'Failed to retrieve workflows.');
     } finally {
@@ -74,427 +138,900 @@ export default function WorkflowsPage() {
   };
 
   useEffect(() => {
-    fetchWorkflows();
+    fetchData();
   }, []);
 
-  const handleCreate = async () => {
-    if (!name.trim()) return;
-    try {
-      const result = await crmApi.createWorkflow({ name, description, status });
-      if (result) {
-        toast.success(isRtl ? 'تم الإنشاء!' : 'Created!', isRtl ? 'تم إنشاء مسار العمل بنجاح.' : 'Workflow created successfully.');
-        setIsCreateOpen(false);
-        setName('');
-        setDescription('');
-        setStatus('inactive');
-        fetchWorkflows();
+  // Filtered and Sorted Workflows
+  const filteredWorkflows = useMemo(() => {
+    return workflows
+      .filter((w) => {
+        // Search Filter
+        const term = search.toLowerCase().trim();
+        const matchesSearch = !term || 
+          w.name.toLowerCase().includes(term) || 
+          (w.description && w.description.toLowerCase().includes(term));
+
+        // Folder Filter
+        let matchesFolder = true;
+        if (selectedFolderId === 'unorganized') {
+          matchesFolder = !w.folder_id;
+        } else if (selectedFolderId !== 'all') {
+          matchesFolder = w.folder_id === selectedFolderId;
+        }
+
+        // Status Filter
+        let matchesStatus = true;
+        if (statusFilter !== 'all') {
+          const wStatus = w.status === 'inactive' ? 'draft' : w.status;
+          matchesStatus = wStatus === statusFilter;
+        }
+
+        // Trigger Filter
+        let matchesTrigger = true;
+        if (triggerFilter !== 'all') {
+          matchesTrigger = w.trigger.toLowerCase().includes(triggerFilter.toLowerCase());
+        }
+
+        return matchesSearch && matchesFolder && matchesStatus && matchesTrigger;
+      })
+      .sort((a, b) => {
+        let valA: any = a[sortBy];
+        let valB: any = b[sortBy];
+
+        if (sortBy === 'name') {
+          valA = (a.name || '').toLowerCase();
+          valB = (b.name || '').toLowerCase();
+        }
+
+        if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+        if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
+  }, [workflows, search, selectedFolderId, statusFilter, triggerFilter, sortBy, sortOrder]);
+
+  // Unique Triggers for dropdown
+  const uniqueTriggers = useMemo(() => {
+    const set = new Set<string>();
+    workflows.forEach(w => {
+      if (w.trigger) set.add(w.trigger);
+    });
+    return Array.from(set);
+  }, [workflows]);
+
+  // Folder count calculation
+  const folderCounts = useMemo(() => {
+    const counts: Record<number | string, number> = { all: workflows.length, unorganized: 0 };
+    workflows.forEach((w) => {
+      if (!w.folder_id) {
+        counts.unorganized += 1;
+      } else {
+        counts[w.folder_id] = (counts[w.folder_id] || 0) + 1;
       }
-    } catch (err) {
-      console.error(err);
-      toast.error(isRtl ? 'خطأ' : 'Error', isRtl ? 'فشل إنشاء مسار العمل.' : 'Failed to create workflow.');
+    });
+    return counts;
+  }, [workflows]);
+
+  // Select All / Deselect All
+  const handleToggleSelectAll = () => {
+    if (selectedIds.length === filteredWorkflows.length && filteredWorkflows.length > 0) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredWorkflows.map(w => w.id));
     }
   };
 
-  const handleEditOpen = (w: Workflow) => {
-    setSelectedWorkflow(w);
-    setName(w.name);
-    setDescription(w.description);
-    setStatus(w.status);
-    setIsEditOpen(true);
-    setActiveMenuId(null);
+  const handleToggleSelectOne = (id: number) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
   };
 
-  const handleUpdate = async () => {
-    if (!selectedWorkflow || !name.trim()) return;
+  // Workflow Quick Actions
+  const handlePauseResume = async (w: WorkflowItem) => {
+    const isPaused = w.status === 'paused' || w.status === 'draft' || w.status === 'inactive';
     try {
-      const result = await crmApi.updateWorkflow(selectedWorkflow.id, { name, description, status });
-      if (result) {
-        toast.success(isRtl ? 'تم التحديث!' : 'Updated!', isRtl ? 'تم تحديث مسار العمل بنجاح.' : 'Workflow updated successfully.');
-        setIsEditOpen(false);
-        setSelectedWorkflow(null);
-        setName('');
-        setDescription('');
-        setStatus('inactive');
-        fetchWorkflows();
+      if (isPaused) {
+        await crmApi.resumeWorkflow(w.id);
+        toast.success(isRtl ? 'تم التفعيل' : 'Resumed', isRtl ? 'تم تفعيل مسار العمل بنجاح.' : 'Workflow resumed successfully.');
+      } else {
+        await crmApi.pauseWorkflow(w.id);
+        toast.success(isRtl ? 'تم الإيقاف' : 'Paused', isRtl ? 'تم إيقاف مسار العمل مؤقتاً.' : 'Workflow paused successfully.');
       }
-    } catch (err) {
-      console.error(err);
-      toast.error(isRtl ? 'خطأ' : 'Error', isRtl ? 'فشل تحديث مسار العمل.' : 'Failed to update workflow.');
+      setActiveMenuId(null);
+      fetchData();
+    } catch (err: any) {
+      toast.error(isRtl ? 'فشل' : 'Failed', err?.message || 'Could not update workflow state.');
     }
   };
 
-  const toggleStatus = async (w: Workflow) => {
-    const nextStatus = w.status === 'active' ? 'inactive' : 'active';
-    setWorkflows(prev => prev.map(item => item.id === w.id ? { ...item, status: nextStatus } : item));
-    
+  const handleDuplicate = async (w: WorkflowItem) => {
     try {
-      await crmApi.updateWorkflow(w.id, { status: nextStatus });
-      toast.success(isRtl ? 'تغيرت الحالة' : 'Status Changed', isRtl ? `أصبح المسار الآن ${nextStatus === 'active' ? 'نشطاً' : 'معطلاً'}.` : `Workflow is now ${nextStatus}.`);
-    } catch (err) {
-      console.error('Failed to toggle status:', err);
-      toast.error(isRtl ? 'خطأ' : 'Error', isRtl ? 'فشل تحديث حالة المسار.' : 'Failed to update workflow status.');
-      fetchWorkflows();
+      await crmApi.duplicateWorkflow(w.id);
+      toast.success(isRtl ? 'تم النسخ' : 'Duplicated', isRtl ? 'تم تكرار مسار العمل بنجاح.' : 'Workflow duplicated as a draft.');
+      setActiveMenuId(null);
+      fetchData();
+    } catch (err: any) {
+      toast.error(isRtl ? 'فشل' : 'Failed', err?.message || 'Could not duplicate workflow.');
     }
   };
 
-  const deleteWorkflow = async (id: number) => {
-    if (!confirm(isRtl ? 'هل أنت متأكد من رغبتك في حذف مسار العمل هذا؟' : 'Are you sure you want to delete this workflow?')) return;
-    
-    setWorkflows(prev => prev.filter(w => w.id !== id));
-    setActiveMenuId(null);
-    
+  const handleTestWorkflow = async (w: WorkflowItem) => {
+    setIsTestingWorkflow(true);
     try {
-      await crmApi.deleteWorkflow(id);
+      const res = await crmApi.testWorkflow(w.id, { trigger_type: 'test_simulation' });
+      toast.success(
+        isRtl ? 'تم الاختبار بنجاح' : 'Test Complete',
+        res?.message || (isRtl ? 'تم تشغيل بيئة اختبار معزولة بنجاح.' : 'Isolated dry run finished without errors.')
+      );
+      setActiveMenuId(null);
+    } catch (err: any) {
+      toast.error(isRtl ? 'خطأ في الاختبار' : 'Test Error', err?.message || 'Dry run failed.');
+    } finally {
+      setIsTestingWorkflow(false);
+    }
+  };
+
+  const handleDeleteSingle = async () => {
+    if (!singleActionWorkflow) return;
+    try {
+      await crmApi.deleteWorkflow(singleActionWorkflow.id);
       toast.success(isRtl ? 'تم الحذف' : 'Deleted', isRtl ? 'تم حذف مسار العمل.' : 'Workflow deleted.');
-    } catch (err) {
-      console.error('Failed to delete workflow:', err);
-      toast.error(isRtl ? 'خطأ' : 'Error', isRtl ? 'فشل حذف مسار العمل.' : 'Failed to delete workflow.');
-      fetchWorkflows();
+      setIsDeleteSingleConfirm(false);
+      setSingleActionWorkflow(null);
+      setSelectedIds(prev => prev.filter(id => id !== singleActionWorkflow.id));
+      fetchData();
+    } catch (err: any) {
+      toast.error(isRtl ? 'فشل الحذف' : 'Delete Failed', err?.message || 'Could not delete workflow.');
     }
   };
 
-  const filteredWorkflows = workflows.filter(w => {
-    const query = search.toLowerCase();
-    return (w.name || '').toLowerCase().includes(query) || 
-           (w.description || '').toLowerCase().includes(query);
-  });
+  const handleMoveSingle = async () => {
+    if (!singleActionWorkflow) return;
+    try {
+      await crmApi.moveWorkflowToFolder(singleActionWorkflow.id, singleTargetFolderId);
+      toast.success(isRtl ? 'تم النقل' : 'Moved', isRtl ? 'تم نقل مسار العمل إلى المجلد.' : 'Workflow moved to folder.');
+      setIsMoveSingleOpen(false);
+      setSingleActionWorkflow(null);
+      fetchData();
+    } catch (err: any) {
+      toast.error(isRtl ? 'فشل النقل' : 'Move Failed', err?.message || 'Could not move workflow.');
+    }
+  };
+
+  // Bulk Handlers
+  const handleBulkPause = async () => {
+    if (selectedIds.length === 0) return;
+    setIsPerformingBulk(true);
+    try {
+      await crmApi.bulkPauseWorkflows(selectedIds);
+      toast.success(isRtl ? 'تم الإيقاف' : 'Paused', isRtl ? `تم إيقاف ${selectedIds.length} مسارات عمل.` : `Paused ${selectedIds.length} workflows.`);
+      setSelectedIds([]);
+      fetchData();
+    } catch (err: any) {
+      toast.error(isRtl ? 'فشل' : 'Failed', err?.message || 'Bulk pause failed.');
+    } finally {
+      setIsPerformingBulk(false);
+    }
+  };
+
+  const handleBulkMove = async () => {
+    if (selectedIds.length === 0) return;
+    setIsPerformingBulk(true);
+    try {
+      await crmApi.bulkMoveWorkflows(selectedIds, bulkTargetFolderId);
+      toast.success(isRtl ? 'تم النقل' : 'Moved', isRtl ? `تم نقل ${selectedIds.length} مسارات عمل.` : `Moved ${selectedIds.length} workflows.`);
+      setIsBulkMoveOpen(false);
+      setSelectedIds([]);
+      fetchData();
+    } catch (err: any) {
+      toast.error(isRtl ? 'فشل' : 'Failed', err?.message || 'Bulk move failed.');
+    } finally {
+      setIsPerformingBulk(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+    setIsPerformingBulk(true);
+    try {
+      await crmApi.bulkDeleteWorkflows(selectedIds);
+      toast.success(isRtl ? 'تم الحذف' : 'Deleted', isRtl ? `تم حذف ${selectedIds.length} مسارات عمل.` : `Deleted ${selectedIds.length} workflows.`);
+      setIsBulkDeleteConfirm(false);
+      setSelectedIds([]);
+      fetchData();
+    } catch (err: any) {
+      toast.error(isRtl ? 'فشل' : 'Failed', err?.message || 'Bulk delete failed.');
+    } finally {
+      setIsPerformingBulk(false);
+    }
+  };
+
+  // Folder Handlers
+  const handleSaveFolder = async () => {
+    if (!folderNameInput.trim()) return;
+    setIsFolderSaving(true);
+    try {
+      await crmApi.createAutomationFolder({ name: folderNameInput.trim() });
+      toast.success(isRtl ? 'تم الحفظ' : 'Saved', isRtl ? 'تم إنشاء المجلد بنجاح.' : 'Folder created successfully.');
+      setIsFolderModalOpen(false);
+      setFolderNameInput('');
+      fetchData();
+    } catch (err: any) {
+      toast.error(isRtl ? 'خطأ' : 'Error', err?.message || 'Could not save folder.');
+    } finally {
+      setIsFolderSaving(false);
+    }
+  };
+
+  // Create New Workflow
+  const handleCreateWorkflow = async () => {
+    if (!newWorkflowName.trim()) return;
+    setIsCreatingWorkflow(true);
+    try {
+      const res = await crmApi.createWorkflow({
+        name: newWorkflowName.trim(),
+        description: newWorkflowDescription.trim(),
+        folder_id: newWorkflowFolderId,
+        status: 'draft',
+      });
+      toast.success(isRtl ? 'تم الإنشاء' : 'Created', isRtl ? 'تم إنشاء المسار كمسودة، جاري فتح أداة البناء...' : 'Workflow draft created. Opening builder...');
+      setIsCreateOpen(false);
+      navigate(`/automation/workflows/builder/${res.id}`);
+    } catch (err: any) {
+      toast.error(isRtl ? 'خطأ' : 'Error', err?.message || 'Could not create workflow.');
+      setIsCreatingWorkflow(false);
+    }
+  };
 
   return (
-    <div className={cn("space-y-6 bg-white min-h-full font-sans", isRtl && "text-right")} dir={isRtl ? 'rtl' : 'ltr'}>
+    <div className={cn("space-y-6 bg-white font-sans", isRtl && "text-right")} dir={isRtl ? 'rtl' : 'ltr'}>
       
-      {/* Header Panel */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#E2E8F0]">
         <div>
-          <h1 className="text-xl font-bold text-[#12263A] tracking-tight">
-            {isRtl ? 'مسارات العمل المؤتمتة' : 'Workflow Automation'}
-          </h1>
-          <p className="text-[11px] text-[#12263A] font-bold mt-1 uppercase tracking-wider">
-            {isRtl ? 'تكوين مشغلات الأحداث وإجراءات اللوحة التفاعلية' : 'CONFIGURE EVENT TRIGGERS AND VISUAL CANVAS ACTIONS'}
-          </p>
-        </div>
-        
-        <button
-          onClick={() => setIsCreateOpen(true)}
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] active:scale-[0.98] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer w-full sm:w-auto"
-        >
-          <Plus size={15} strokeWidth={2.5} /> {isRtl ? 'إنشاء مسار جديد' : 'Create Workflow'}
-        </button>
-      </div>
-
-      {/* Search Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 border border-[#E2E8F0] rounded-2xl shadow-xs">
-        <div className="relative w-full sm:w-80">
-          <Search size={15} className={cn("absolute top-1/2 -translate-y-1/2 text-[#12263A]", isRtl ? "right-3.5" : "left-3.5")} />
-          <input 
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={isRtl ? "البحث في مسارات العمل..." : "Search workflows..."}
-            className={cn(
-              "w-full h-10 bg-[#FFFFFF] border border-[#E2E8F0] rounded-xl text-xs font-medium text-[#12263A] focus:outline-none focus:ring-2 focus:ring-[#22C55E]/15 focus:border-[#166534] transition-all placeholder:text-[#64748B]",
-              isRtl ? "pr-10 pl-4 text-right" : "pl-10 pr-4 text-left"
-            )}
-          />
-        </div>
-        {!isLoading && !hasError && workflows.length > 0 && (
-          <div className="text-[11px] font-semibold text-[#64748B]">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight text-[#12263A]">
+              {isRtl ? 'مسارات عمل واتساب' : 'WhatsApp Workflows'}
+            </h1>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30">
+              {workflows.length} {isRtl ? 'مسار' : 'Total'}
+            </span>
+          </div>
+          <p className="text-xs sm:text-sm text-[#64748B] mt-1 font-medium">
             {isRtl 
-              ? <>عرض <span className="font-bold text-[#12263A]">{filteredWorkflows.length}</span> من أصل <span className="font-bold text-[#12263A]">{workflows.length}</span> مسار</>
-              : <>Showing <span className="font-bold text-[#12263A]">{filteredWorkflows.length}</span> of <span className="font-bold text-[#12263A]">{workflows.length}</span> workflows</>}
-          </div>
-        )}
+              ? 'إنشاء وإدارة ومراقبة مسارات العمل المؤتمتة عبر واتساب ومزامنتها مع العملاء.' 
+              : 'Create, monitor, and organize production-grade WhatsApp customer engagement automations.'}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2.5 w-full sm:w-auto">
+          <button
+            onClick={() => navigate('/automation/templates')}
+            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] bg-white hover:bg-slate-50 text-xs font-bold text-[#12263A] transition-all cursor-pointer shadow-sm"
+          >
+            <Sparkles size={14} className="text-amber-500" />
+            {isRtl ? 'استخدام قالب' : 'Use Template'}
+          </button>
+          
+          <button
+            onClick={() => {
+              setNewWorkflowName('');
+              setNewWorkflowDescription('');
+              setNewWorkflowFolderId(typeof selectedFolderId === 'number' ? selectedFolderId : null);
+              setIsCreateOpen(true);
+            }}
+            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#166534] hover:bg-[#15803d] text-white text-xs font-bold transition-all cursor-pointer shadow-sm hover:shadow"
+          >
+            <Plus size={15} />
+            {isRtl ? 'مسار عمل جديد' : 'New Workflow'}
+          </button>
+        </div>
       </div>
 
-      {/* Main Content Area */}
-      {isLoading ? (
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-16 text-center shadow-xs">
-          <Loader2 size={28} className="animate-spin text-[#166534] mx-auto mb-3" />
-          <p className="text-xs font-bold text-[#12263A] uppercase tracking-wider">
-            {isRtl ? 'جارٍ تحميل مسارات العمل...' : 'Loading Workflows...'}
-          </p>
-          <p className="text-[11px] text-[#64748B] mt-1">
-            {isRtl ? 'استرجاع أنابيب الأتمتة من الخادم' : 'Retrieving automation pipelines from server'}
-          </p>
-        </div>
-      ) : hasError ? (
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center shadow-xs max-w-lg mx-auto">
-          <div className="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-red-200">
-            <AlertCircle size={22} />
+      {/* Main Workspace Layout (Folder Sidebar + Workflows Table) */}
+      <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6 items-start">
+        
+        {/* Left Folder Hierarchy Panel */}
+        <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-3.5 space-y-3">
+          <div className="flex items-center justify-between px-2 pt-1">
+            <span className="text-[11px] font-bold text-[#64748B] uppercase tracking-wider">
+              {isRtl ? 'المجلدات' : 'Folders'}
+            </span>
+            <button
+              onClick={() => {
+                setFolderModalMode('create');
+                setFolderNameInput('');
+                setIsFolderModalOpen(true);
+              }}
+              className="p-1 rounded-lg text-[#166534] hover:bg-[#F0FDF4] transition-colors"
+              title={isRtl ? 'مجلد جديد' : 'New Folder'}
+            >
+              <FolderPlus size={15} />
+            </button>
           </div>
-          <h3 className="text-base font-bold text-[#12263A]">
-            {isRtl ? 'فشل تحميل مسارات العمل' : 'Failed to Load Workflows'}
-          </h3>
-          <p className="text-xs text-[#64748B] mt-1.5 leading-relaxed">
-            {isRtl ? 'تعذر الاتصال بخدمة الأتمتة. يرجى التحقق من اتصالك والمحاولة مجدداً.' : 'Unable to connect to the automation service. Please check your connection and retry.'}
-          </p>
-          <button
-            onClick={fetchWorkflows}
-            className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all cursor-pointer"
-          >
-            <RefreshCw size={14} /> {isRtl ? 'إعادة المحاولة' : 'Retry'}
-          </button>
-        </div>
-      ) : workflows.length === 0 ? (
-        /* Empty State Card */
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 sm:p-16 text-center shadow-xs max-w-lg mx-auto">
-          <div className="w-14 h-14 bg-[#F0FDF4] border border-[#22C55E]/30 rounded-2xl flex items-center justify-center text-[#166534] mx-auto mb-4">
-            <GitFork size={24} />
-          </div>
-          <h3 className="text-base sm:text-lg font-bold text-[#12263A]">
-            {isRtl ? 'أنشئ أول مسار أتمتة خاص بك' : 'Create Your First Automation'}
-          </h3>
-          <p className="text-xs sm:text-sm text-[#64748B] mt-1.5 leading-relaxed font-normal max-w-sm mx-auto">
-            {isRtl ? 'قم ببناء مسارات عمل ورسائل واتساب مؤتمتة وتفاعلية بدون كتابة أكواد.' : 'Build automated WhatsApp workflows without writing code.'}
-          </p>
-          <button
-            onClick={() => setIsCreateOpen(true)}
-            className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#166534] hover:bg-[#14532d] active:scale-[0.98] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer"
-          >
-            <Plus size={15} strokeWidth={2.5} /> {isRtl ? 'إنشاء مسار عمل' : 'CREATE WORKFLOW'}
-          </button>
-        </div>
-      ) : filteredWorkflows.length === 0 ? (
-        /* No Search Match State */
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-12 text-center shadow-xs max-w-lg mx-auto">
-          <div className="w-12 h-12 bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Search size={20} />
-          </div>
-          <h3 className="text-base font-bold text-[#12263A]">
-            {isRtl ? 'لم يتم العثور على مسارات مطابقة' : 'No Workflows Found'}
-          </h3>
-          <p className="text-xs text-[#64748B] mt-1.5 leading-relaxed">
-            {isRtl ? `لم نجد نتائج مطابقة لـ "${search}". جرّب كلمة بحث أخرى.` : `No workflows matched "${search}". Try another search term or clear the filter.`}
-          </p>
-          <button
-            onClick={() => setSearch('')}
-            className="mt-5 inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#E2E8F0] text-[#12263A] rounded-xl text-xs font-bold transition-all cursor-pointer"
-          >
-            {isRtl ? 'مسح البحث' : 'Clear Search'}
-          </button>
-        </div>
-      ) : (
-        /* Grid of Workflow Cards */
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {filteredWorkflows.map((w) => (
-            <motion.div
-              layout
-              key={w.id}
+
+          <div className="space-y-1">
+            <button
+              onClick={() => setSelectedFolderId('all')}
               className={cn(
-                "bg-white border rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between relative group",
-                w.status === 'active' ? 'border-[#E2E8F0] hover:border-[#166534]/50' : 'border-[#E2E8F0] opacity-80'
+                "w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all text-left",
+                selectedFolderId === 'all' 
+                  ? "bg-white text-[#166534] shadow-sm border border-[#E2E8F0]" 
+                  : "text-[#64748B] hover:text-[#12263A] hover:bg-slate-200/50"
               )}
             >
-              <div>
-                <div className="flex items-center justify-between gap-4 mb-3">
-                  <span className="px-2.5 py-1 bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] rounded-lg text-[9px] font-bold uppercase tracking-wider">
-                    {w.trigger || (isRtl ? 'تشغيل يدوي' : 'Manual Trigger')}
-                  </span>
-                  
-                  <div className="flex items-center gap-1.5">
-                    {/* Status Toggle Switch */}
-                    <button
-                      onClick={() => toggleStatus(w)}
-                      title={w.status === 'active' 
-                        ? (isRtl ? 'نشط - انقر للتعطيل' : 'Active - click to deactivate') 
-                        : (isRtl ? 'معطل - انقر للتفعيل' : 'Inactive - click to activate')}
-                      className={cn(
-                        "w-9 h-5 rounded-full p-0.5 transition-colors relative cursor-pointer",
-                        w.status === 'active' ? 'bg-[#166534]' : 'bg-[#CBD5E1]'
-                      )}
-                    >
-                      <div className={cn(
-                        "w-4 h-4 rounded-full bg-white transition-transform shadow-xs",
-                        w.status === 'active' ? (isRtl ? '-translate-x-4' : 'translate-x-4') : 'translate-x-0'
-                      )} />
-                    </button>
+              <div className="flex items-center gap-2">
+                <GitFork size={14} />
+                <span>{isRtl ? 'كافة المسارات' : 'All Workflows'}</span>
+              </div>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-bold">
+                {folderCounts.all || 0}
+              </span>
+            </button>
 
-                    {/* Action Dropdown Menu */}
-                    <div className="relative">
-                      <button
-                        onClick={() => setActiveMenuId(activeMenuId === w.id ? null : w.id)}
-                        className="p-1.5 rounded-lg hover:bg-[#F8FAFC] text-[#64748B] hover:text-[#12263A] border border-transparent hover:border-[#E2E8F0] transition-all cursor-pointer"
-                        aria-label="Workflow options"
-                      >
-                        <MoreVertical size={16} />
-                      </button>
+            <button
+              onClick={() => setSelectedFolderId('unorganized')}
+              className={cn(
+                "w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all text-left",
+                selectedFolderId === 'unorganized' 
+                  ? "bg-white text-[#166534] shadow-sm border border-[#E2E8F0]" 
+                  : "text-[#64748B] hover:text-[#12263A] hover:bg-slate-200/50"
+              )}
+            >
+              <div className="flex items-center gap-2">
+                <Folder size={14} className="text-slate-400" />
+                <span>{isRtl ? 'بدون مجلد' : 'Unorganized'}</span>
+              </div>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-bold">
+                {folderCounts.unorganized || 0}
+              </span>
+            </button>
 
-                      <AnimatePresence>
-                        {activeMenuId === w.id && (
-                          <>
-                            <div className="fixed inset-0 z-20" onClick={() => setActiveMenuId(null)} />
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0.95, y: 5 }}
-                              animate={{ opacity: 1, scale: 1, y: 0 }}
-                              exit={{ opacity: 0, scale: 0.95, y: 5 }}
-                              className={cn("absolute mt-1 w-44 bg-white border border-[#E2E8F0] rounded-xl shadow-lg z-30 py-1.5 overflow-hidden", isRtl ? "left-0" : "right-0")}
-                            >
-                              <button
-                                onClick={() => navigate(`/automation/workflows/builder/${w.id}`)}
-                                className={cn("w-full px-3.5 py-2 text-xs font-semibold text-[#12263A] hover:bg-[#F8FAFC] flex items-center gap-2 cursor-pointer transition-colors", isRtl ? "text-right" : "text-left")}
-                              >
-                                <GitFork size={13} className="text-[#166534]" /> 
-                                {isRtl ? 'فتح المحرر' : 'Edit Builder'}
-                              </button>
-                              <button
-                                onClick={() => handleEditOpen(w)}
-                                className={cn("w-full px-3.5 py-2 text-xs font-semibold text-[#12263A] hover:bg-[#F8FAFC] flex items-center gap-2 cursor-pointer transition-colors", isRtl ? "text-right" : "text-left")}
-                              >
-                                <Edit2 size={13} className="text-[#64748B]" /> 
-                                {isRtl ? 'تعديل البيانات' : 'Edit Info'}
-                              </button>
-                              <div className="h-px bg-[#E2E8F0] my-1" />
-                              <button
-                                onClick={() => deleteWorkflow(w.id)}
-                                className={cn("w-full px-3.5 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2 cursor-pointer transition-colors", isRtl ? "text-right" : "text-left")}
-                              >
-                                <Trash2 size={13} /> 
-                                {isRtl ? 'حذف المسار' : 'Delete Workflow'}
-                              </button>
-                            </motion.div>
-                          </>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </div>
+            {folders.map(folder => (
+              <button
+                key={folder.id}
+                onClick={() => setSelectedFolderId(folder.id)}
+                className={cn(
+                  "w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all text-left group",
+                  selectedFolderId === folder.id 
+                    ? "bg-white text-[#166534] shadow-sm border border-[#E2E8F0]" 
+                    : "text-[#64748B] hover:text-[#12263A] hover:bg-slate-200/50"
+                )}
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <Folder size={14} className={selectedFolderId === folder.id ? "text-[#166534]" : "text-amber-500"} />
+                  <span className="truncate">{folder.name}</span>
                 </div>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-bold shrink-0">
+                  {folderCounts[folder.id] || 0}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
 
-                <h3 className="text-sm font-bold text-[#12263A] group-hover:text-[#166534] transition-colors leading-tight">
-                  {w.name}
-                </h3>
-                
-                <p className="text-xs text-[#64748B] mt-1 font-normal leading-relaxed line-clamp-2">
-                  {w.description || (isRtl ? 'لا يوجد وصف.' : 'No description provided.')}
-                </p>
+        {/* Right Workflow Content Area */}
+        <div className="space-y-4">
+          
+          {/* Top Filter and Search Bar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={isRtl ? 'بحث باسم المسار أو الوصف...' : 'Search workflows by name or description...'}
+                className="w-full pl-9 pr-4 py-2 bg-white border border-[#E2E8F0] rounded-xl text-xs font-medium focus:outline-none focus:border-[#166534] focus:ring-1 focus:ring-[#166534]"
+              />
+              {search && (
+                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                  <X size={13} />
+                </button>
+              )}
+            </div>
 
-                <div className="mt-4 p-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl flex items-center gap-2.5">
-                  <div className="w-6 h-6 rounded-lg bg-[#F0FDF4] border border-[#22C55E]/30 flex items-center justify-center shrink-0">
-                    <Sparkles size={12} className="text-[#166534]" />
-                  </div>
-                  <div className="min-w-0">
-                    <span className="text-[9px] font-bold text-[#64748B] uppercase tracking-widest block leading-none">
-                      {isRtl ? 'آخر تشغيل' : 'Last Run'}
-                    </span>
-                    <span className="text-[11px] font-bold text-[#12263A] truncate block mt-0.5">{w.lastRun || (isRtl ? 'أبداً' : 'Never')}</span>
-                  </div>
-                </div>
+            {/* Status Pills */}
+            <div className="flex items-center gap-1 bg-[#F8FAFC] border border-[#E2E8F0] p-1 rounded-xl overflow-x-auto text-xs">
+              {(['all', 'active', 'draft', 'paused', 'error'] as const).map((st) => (
+                <button
+                  key={st}
+                  onClick={() => setStatusFilter(st)}
+                  className={cn(
+                    "px-2.5 py-1 rounded-lg font-bold capitalize transition-all whitespace-nowrap",
+                    statusFilter === st 
+                      ? "bg-white text-[#166534] shadow-sm border border-[#E2E8F0]" 
+                      : "text-slate-500 hover:text-[#12263A]"
+                  )}
+                >
+                  {st === 'all' ? (isRtl ? 'الكل' : 'All') : st}
+                </button>
+              ))}
+            </div>
+
+            {/* Trigger Filter Dropdown */}
+            <select
+              value={triggerFilter}
+              onChange={(e) => setTriggerFilter(e.target.value)}
+              className="px-3 py-2 bg-white border border-[#E2E8F0] rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:border-[#166534]"
+            >
+              <option value="all">{isRtl ? 'كافة المشغلات' : 'All Triggers'}</option>
+              {uniqueTriggers.map(t => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+
+            {/* Sorting Dropdown */}
+            <div className="flex items-center gap-1.5">
+              <select
+                value={sortBy}
+                onChange={(e: any) => setSortBy(e.target.value)}
+                className="px-3 py-2 bg-white border border-[#E2E8F0] rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:border-[#166534]"
+              >
+                <option value="updatedAt">{isRtl ? 'آخر تحديث' : 'Last Updated'}</option>
+                <option value="name">{isRtl ? 'الاسم' : 'Name'}</option>
+                <option value="totalExecutions">{isRtl ? 'التشغيل الكلي' : 'Executions'}</option>
+                <option value="completionRate">{isRtl ? 'نسبة الإكمال' : 'Completion Rate'}</option>
+              </select>
+
+              <button
+                onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                className="p-2 border border-[#E2E8F0] bg-white rounded-xl text-slate-600 hover:bg-slate-50 transition-colors"
+                title="Toggle sort direction"
+              >
+                <ArrowUpDown size={14} />
+              </button>
+            </div>
+          </div>
+
+          {/* Bulk Action Banner when multiple items selected */}
+          {selectedIds.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between p-3 bg-[#F0FDF4] border border-[#22C55E]/40 rounded-xl"
+            >
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={16} className="text-[#166534]" />
+                <span className="text-xs font-bold text-[#166534]">
+                  {selectedIds.length} {isRtl ? 'مسارات محددة' : 'workflows selected'}
+                </span>
               </div>
 
-              {/* Stats Footer */}
-              <div className="mt-5 pt-3.5 border-t border-[#E2E8F0] flex items-center justify-between text-[10px] text-[#64748B]">
-                <div className="flex gap-4">
-                  <div className="leading-tight">
-                    <span className="block text-[8.5px] font-bold uppercase tracking-wider text-[#64748B]">
-                      {isRtl ? 'مرات التشغيل' : 'Runs'}
-                    </span>
-                    <span className="text-[#12263A] font-bold mt-0.5 block">{w.totalExecutions ?? 0}</span>
-                  </div>
-                  <div className="leading-tight">
-                    <span className="block text-[8.5px] font-bold uppercase tracking-wider text-[#64748B]">
-                      {isRtl ? 'تم الإنشاء بواسطة' : 'Created By'}
-                    </span>
-                    <span className="text-[#12263A] font-bold mt-0.5 block flex items-center gap-1">
-                      <User size={10} className="text-[#64748B]" /> {w.createdBy || (isRtl ? 'النظام' : 'System')}
-                    </span>
-                  </div>
-                </div>
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => navigate(`/automation/workflows/builder/${w.id}`)}
-                  className="text-xs font-bold text-[#166534] hover:text-[#14532d] flex items-center gap-1 cursor-pointer transition-colors"
+                  disabled={isPerformingBulk}
+                  onClick={handleBulkPause}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-white border border-[#E2E8F0] hover:bg-slate-50 text-xs font-bold text-slate-700 rounded-lg shadow-sm"
                 >
-                  {isRtl ? 'فتح المحرر' : 'Open Builder'} {isRtl ? '←' : '→'}
+                  <PauseCircle size={14} className="text-amber-500" />
+                  {isRtl ? 'إيقاف مؤقت' : 'Pause'}
+                </button>
+
+                <button
+                  disabled={isPerformingBulk}
+                  onClick={() => setIsBulkMoveOpen(true)}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-white border border-[#E2E8F0] hover:bg-slate-50 text-xs font-bold text-slate-700 rounded-lg shadow-sm"
+                >
+                  <Folder size={14} className="text-[#166534]" />
+                  {isRtl ? 'نقل لمجلد' : 'Move to Folder'}
+                </button>
+
+                <button
+                  disabled={isPerformingBulk}
+                  onClick={() => setIsBulkDeleteConfirm(true)}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-white border border-red-200 hover:bg-red-50 text-xs font-bold text-red-600 rounded-lg shadow-sm"
+                >
+                  <Trash2 size={14} />
+                  {isRtl ? 'حذف' : 'Delete'}
+                </button>
+
+                <button
+                  onClick={() => setSelectedIds([])}
+                  className="p-1.5 text-slate-400 hover:text-slate-600"
+                  title="Clear selection"
+                >
+                  <X size={14} />
                 </button>
               </div>
             </motion.div>
-          ))}
-        </div>
-      )}
+          )}
 
-      {/* CREATE MODAL */}
+          {/* Workflows Table */}
+          <div className="border border-[#E2E8F0] rounded-2xl overflow-hidden bg-white shadow-sm">
+            {isLoading ? (
+              <div className="p-16 flex flex-col items-center justify-center gap-3 text-slate-500">
+                <Loader2 size={24} className="animate-spin text-[#166534]" />
+                <span className="text-xs font-bold">{isRtl ? 'جاري تحميل مسارات العمل...' : 'Loading WhatsApp workflows...'}</span>
+              </div>
+            ) : hasError ? (
+              <div className="p-12 text-center space-y-3">
+                <AlertCircle size={28} className="text-red-500 mx-auto" />
+                <p className="text-xs font-bold text-slate-700">{isRtl ? 'تعذر جلب مسارات العمل من الخادم.' : 'Unable to load workflows.'}</p>
+                <button
+                  onClick={fetchData}
+                  className="px-4 py-2 bg-[#166534] text-white rounded-xl text-xs font-bold inline-flex items-center gap-1.5"
+                >
+                  <RefreshCw size={14} /> {isRtl ? 'إعادة المحاولة' : 'Retry'}
+                </button>
+              </div>
+            ) : filteredWorkflows.length === 0 ? (
+              <div className="p-16 text-center space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                  <GitFork size={24} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#12263A]">{isRtl ? 'لا توجد مسارات مطابقة' : 'No workflows found'}</h3>
+                  <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                    {search || statusFilter !== 'all' || triggerFilter !== 'all' 
+                      ? (isRtl ? 'جرب ضبط معايير البحث أو التصفية.' : 'Try adjusting your search criteria or active filters.') 
+                      : (isRtl ? 'ابدأ بإنشاء مسار واتساب مخصص أو استخدم أحد القوالب الجاهزة.' : 'Start by building a tailored WhatsApp flow or launch one from our template library.')}
+                  </p>
+                </div>
+                <div className="flex items-center justify-center gap-2 pt-2">
+                  <button
+                    onClick={() => navigate('/automation/templates')}
+                    className="px-4 py-2 border border-[#E2E8F0] rounded-xl text-xs font-bold text-[#12263A] hover:bg-slate-50"
+                  >
+                    {isRtl ? 'استعراض القوالب' : 'Browse Templates'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setNewWorkflowName('');
+                      setNewWorkflowDescription('');
+                      setIsCreateOpen(true);
+                    }}
+                    className="px-4 py-2 bg-[#166534] text-white rounded-xl text-xs font-bold"
+                  >
+                    {isRtl ? 'إنشاء مسار جديد' : 'New Workflow'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[#64748B] font-bold uppercase tracking-wider text-[10px]">
+                    <tr>
+                      <th className="p-3 w-8 text-center">
+                        <button
+                          onClick={handleToggleSelectAll}
+                          className="text-slate-400 hover:text-slate-700"
+                        >
+                          {selectedIds.length === filteredWorkflows.length && filteredWorkflows.length > 0 ? (
+                            <CheckSquare size={15} className="text-[#166534]" />
+                          ) : (
+                            <Square size={15} />
+                          )}
+                        </button>
+                      </th>
+                      <th className="p-3">{isRtl ? 'اسم المسار' : 'Workflow Name'}</th>
+                      <th className="p-3">{isRtl ? 'المجلد' : 'Folder'}</th>
+                      <th className="p-3">{isRtl ? 'الحالة' : 'Status'}</th>
+                      <th className="p-3">{isRtl ? 'المشغّل' : 'Trigger'}</th>
+                      <th className="p-3">{isRtl ? 'رقم المرسل' : 'WhatsApp Sender'}</th>
+                      <th className="p-3 text-center">{isRtl ? 'النشط' : 'Active'}</th>
+                      <th className="p-3 text-center">{isRtl ? 'نسبة الإكمال' : 'Completion'}</th>
+                      <th className="p-3 text-center">{isRtl ? 'الردود' : 'Reply %'}</th>
+                      <th className="p-3 text-center">{isRtl ? 'الأخطاء' : 'Failures'}</th>
+                      <th className="p-3">{isRtl ? 'آخر تشغيل' : 'Last Run'}</th>
+                      <th className="p-3 w-12 text-center">{isRtl ? 'إجراءات' : 'Actions'}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E2E8F0]">
+                    {filteredWorkflows.map((w) => {
+                      const isSelected = selectedIds.includes(w.id);
+                      const isPaused = w.status === 'paused' || w.status === 'draft' || w.status === 'inactive';
+
+                      return (
+                        <tr 
+                          key={w.id} 
+                          className={cn(
+                            "hover:bg-[#F8FAFC] transition-colors",
+                            isSelected && "bg-[#F0FDF4]/50"
+                          )}
+                        >
+                          {/* Multi-select check */}
+                          <td className="p-3 text-center">
+                            <button
+                              onClick={() => handleToggleSelectOne(w.id)}
+                              className="text-slate-400 hover:text-slate-700"
+                            >
+                              {isSelected ? (
+                                <CheckSquare size={15} className="text-[#166534]" />
+                              ) : (
+                                <Square size={15} />
+                              )}
+                            </button>
+                          </td>
+
+                          {/* Workflow Name & Version */}
+                          <td className="p-3">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => navigate(`/automation/workflows/builder/${w.id}`)}
+                                className="font-bold text-[#12263A] hover:text-[#166534] transition-colors text-left"
+                              >
+                                {w.name}
+                              </button>
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-600">
+                                v{w.version || '1.0'}
+                              </span>
+                            </div>
+                            {w.description && (
+                              <p className="text-[11px] text-slate-500 truncate max-w-xs mt-0.5">
+                                {w.description}
+                              </p>
+                            )}
+                          </td>
+
+                          {/* Folder */}
+                          <td className="p-3 text-slate-600">
+                            {w.folder ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold">
+                                <Folder size={11} className="text-amber-500" />
+                                {w.folder.name}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400 text-[11px]">—</span>
+                            )}
+                          </td>
+
+                          {/* Status */}
+                          <td className="p-3">
+                            <span className={cn(
+                              "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                              w.status === 'active' && "bg-[#F0FDF4] text-[#166534] border border-[#22C55E]/30",
+                              w.status === 'paused' && "bg-amber-50 text-amber-700 border border-amber-200",
+                              (w.status === 'draft' || w.status === 'inactive') && "bg-slate-100 text-slate-600 border border-slate-200",
+                              w.status === 'error' && "bg-red-50 text-red-700 border border-red-200"
+                            )}>
+                              <span className={cn(
+                                "w-1.5 h-1.5 rounded-full",
+                                w.status === 'active' && "bg-[#166534] animate-pulse",
+                                w.status === 'paused' && "bg-amber-500",
+                                (w.status === 'draft' || w.status === 'inactive') && "bg-slate-400",
+                                w.status === 'error' && "bg-red-500"
+                              )} />
+                              {w.status === 'inactive' ? 'Draft' : w.status}
+                            </span>
+                          </td>
+
+                          {/* Trigger */}
+                          <td className="p-3">
+                            <span className="inline-flex items-center gap-1.5 text-slate-700 font-semibold text-[11px]">
+                              <Zap size={12} className="text-amber-500" />
+                              <span className="truncate max-w-[140px]">{w.trigger}</span>
+                            </span>
+                          </td>
+
+                          {/* WhatsApp Sender */}
+                          <td className="p-3 text-slate-600 font-mono text-[11px]">
+                            {w.whatsapp_sender_number || 'Default Number'}
+                          </td>
+
+                          {/* Active Enrollments */}
+                          <td className="p-3 text-center font-bold text-slate-700">
+                            {w.activeEnrollments || 0}
+                          </td>
+
+                          {/* Completion Rate */}
+                          <td className="p-3 text-center">
+                            <span className="font-bold text-slate-700">{w.completionRate || 0}%</span>
+                          </td>
+
+                          {/* Reply Rate */}
+                          <td className="p-3 text-center font-bold text-[#166534]">
+                            {w.replyRate || 0}%
+                          </td>
+
+                          {/* Failure Count */}
+                          <td className="p-3 text-center">
+                            {w.failureCount > 0 ? (
+                              <span className="px-1.5 py-0.5 rounded bg-red-50 text-red-700 font-bold border border-red-200">
+                                {w.failureCount}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400">0</span>
+                            )}
+                          </td>
+
+                          {/* Last Execution */}
+                          <td className="p-3 text-slate-500 text-[11px]">
+                            {w.lastRun || 'Never'}
+                          </td>
+
+                          {/* Row Actions Dropdown */}
+                          <td className="p-3 text-center relative">
+                            <button
+                              onClick={() => setActiveMenuId(activeMenuId === w.id ? null : w.id)}
+                              className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                            >
+                              <MoreVertical size={15} />
+                            </button>
+
+                            {activeMenuId === w.id && (
+                              <div 
+                                className="absolute right-3 top-8 w-48 bg-white border border-[#E2E8F0] rounded-xl shadow-xl py-1.5 z-40 text-left"
+                                onMouseLeave={() => setActiveMenuId(null)}
+                              >
+                                <button
+                                  onClick={() => navigate(`/automation/workflows/builder/${w.id}`)}
+                                  className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-[#12263A] hover:bg-slate-50 font-bold"
+                                >
+                                  <Edit2 size={13} className="text-[#166534]" />
+                                  {isRtl ? 'فتح في المحرر' : 'Edit in Builder'}
+                                </button>
+
+                                <button
+                                  onClick={() => handleTestWorkflow(w)}
+                                  className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-[#12263A] hover:bg-slate-50 font-bold"
+                                >
+                                  <PlayCircle size={13} className="text-amber-500" />
+                                  {isRtl ? 'اختبار المسار' : 'Test Run'}
+                                </button>
+
+                                <button
+                                  onClick={() => handlePauseResume(w)}
+                                  className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-[#12263A] hover:bg-slate-50 font-bold"
+                                >
+                                  {isPaused ? (
+                                    <>
+                                      <PlayCircle size={13} className="text-[#166534]" />
+                                      {isRtl ? 'تفعيل المسار' : 'Resume Workflow'}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <PauseCircle size={13} className="text-amber-500" />
+                                      {isRtl ? 'إيقاف مؤقت' : 'Pause Workflow'}
+                                    </>
+                                  )}
+                                </button>
+
+                                <button
+                                  onClick={() => handleDuplicate(w)}
+                                  className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-[#12263A] hover:bg-slate-50 font-bold"
+                                >
+                                  <Copy size={13} className="text-slate-500" />
+                                  {isRtl ? 'تكرار المسار' : 'Duplicate'}
+                                </button>
+
+                                <button
+                                  onClick={() => {
+                                    setSingleActionWorkflow(w);
+                                    setSingleTargetFolderId(w.folder_id);
+                                    setIsMoveSingleOpen(true);
+                                    setActiveMenuId(null);
+                                  }}
+                                  className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-[#12263A] hover:bg-slate-50 font-bold"
+                                >
+                                  <Folder size={13} className="text-[#166534]" />
+                                  {isRtl ? 'نقل إلى مجلد' : 'Move to Folder'}
+                                </button>
+
+                                <button
+                                  onClick={() => navigate(`/automation/executions?workflow_id=${w.id}`)}
+                                  className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-[#12263A] hover:bg-slate-50 font-bold"
+                                >
+                                  <History size={13} className="text-slate-500" />
+                                  {isRtl ? 'سجلات التنفيذ' : 'View Executions'}
+                                </button>
+
+                                <div className="border-t border-slate-100 my-1" />
+
+                                <button
+                                  onClick={() => {
+                                    setSingleActionWorkflow(w);
+                                    setIsDeleteSingleConfirm(true);
+                                    setActiveMenuId(null);
+                                  }}
+                                  className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 font-bold"
+                                >
+                                  <Trash2 size={13} />
+                                  {isRtl ? 'حذف المسار' : 'Delete'}
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* MODAL: Create New Workflow */}
       <AnimatePresence>
         {isCreateOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" dir={isRtl ? 'rtl' : 'ltr'}>
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsCreateOpen(false)}
-              className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs"
-            />
-            
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 15 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 15 }}
-              className="relative w-full max-w-md bg-white border border-[#E2E8F0] rounded-2xl shadow-xl overflow-hidden z-[110] p-6 space-y-4"
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl border border-slate-200 space-y-5"
             >
-              <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
-                <span className="text-xs font-black text-[#12263A] uppercase tracking-widest">
-                  {isRtl ? 'إنشاء مسار عمل جديد' : 'Create Workflow'}
-                </span>
-                <button 
-                  onClick={() => setIsCreateOpen(false)} 
-                  className="text-[#64748B] hover:text-[#12263A] p-1 rounded-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-                >
-                  <X size={16} />
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#F0FDF4] text-[#166534] flex items-center justify-center">
+                    <Plus size={16} />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-[#12263A]">
+                      {isRtl ? 'إنشاء مسار واتساب جديد' : 'Create New WhatsApp Workflow'}
+                    </h2>
+                    <p className="text-[11px] text-slate-500">
+                      {isRtl ? 'ابدأ بمسودة فارغة وسيتم توجيهك إلى أداة البناء.' : 'Initialize a blank workflow draft.'}
+                    </p>
+                  </div>
+                </div>
+                <button onClick={() => setIsCreateOpen(false)} className="text-slate-400 hover:text-slate-600">
+                  <X size={18} />
                 </button>
               </div>
 
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-[#64748B] uppercase tracking-widest block">
-                    {isRtl ? 'اسم مسار العمل' : 'Workflow Name'}
+              <div className="space-y-4 text-xs">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    {isRtl ? 'اسم مسار العمل *' : 'Workflow Name *'}
                   </label>
                   <input
                     type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder={isRtl ? "مثال: رسالة ترحيبية بالعملاء الجدد" : "e.g. Welcome Message Automation"}
-                    className="w-full h-10 px-3.5 bg-[#FFFFFF] border border-[#E2E8F0] rounded-xl text-xs font-medium text-[#12263A] placeholder:text-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#22C55E]/15 focus:border-[#166534] transition-all"
+                    value={newWorkflowName}
+                    onChange={(e) => setNewWorkflowName(e.target.value)}
+                    placeholder={isRtl ? 'مثال: الترحيب بالعملاء الجدد' : 'e.g. VIP Inbound Lead Onboarding'}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-[#166534]"
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-[#64748B] uppercase tracking-widest block">
-                    {isRtl ? 'الوصف' : 'Description'}
-                  </label>
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder={isRtl ? "اكتب نبذة عن أهداف هذا المسار الآلي..." : "Describe what this automation does..."}
-                    className="w-full h-20 p-3 bg-[#FFFFFF] border border-[#E2E8F0] rounded-xl text-xs font-medium text-[#12263A] placeholder:text-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#22C55E]/15 focus:border-[#166534] transition-all resize-none"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-[#64748B] uppercase tracking-widest block">
-                    {isRtl ? 'الحالة المبدئية' : 'Initial Status'}
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    {isRtl ? 'المجلد (اختياري)' : 'Folder (Optional)'}
                   </label>
                   <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value as any)}
-                    className="w-full h-10 px-3 bg-[#FFFFFF] border border-[#E2E8F0] rounded-xl text-xs font-medium text-[#12263A] focus:outline-none focus:ring-2 focus:ring-[#22C55E]/15 focus:border-[#166534] transition-all cursor-pointer"
+                    value={newWorkflowFolderId || ''}
+                    onChange={(e) => setNewWorkflowFolderId(e.target.value ? Number(e.target.value) : null)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-[#166534] bg-white"
                   >
-                    <option value="inactive">{isRtl ? 'معطل (مسودة)' : 'Inactive'}</option>
-                    <option value="active">{isRtl ? 'نشط' : 'Active'}</option>
+                    <option value="">{isRtl ? 'بدون مجلد (غير منظم)' : 'No Folder (Unorganized)'}</option>
+                    {folders.map(f => (
+                      <option key={f.id} value={f.id}>{f.name}</option>
+                    ))}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    {isRtl ? 'الوصف الداخلي' : 'Internal Description'}
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={newWorkflowDescription}
+                    onChange={(e) => setNewWorkflowDescription(e.target.value)}
+                    placeholder={isRtl ? 'تفاصيل حول هدف هذا المسار...' : 'Notes on target audience and purpose...'}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-[#166534]"
+                  />
                 </div>
               </div>
 
-              <div className="flex gap-2.5 pt-2">
-                <button 
-                  type="button"
-                  onClick={() => setIsCreateOpen(false)} 
-                  className="w-1/2 py-2.5 bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#E2E8F0] text-[#64748B] hover:text-[#12263A] rounded-xl text-xs font-bold transition-all cursor-pointer"
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  onClick={() => setIsCreateOpen(false)}
+                  className="px-4 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50"
                 >
                   {isRtl ? 'إلغاء' : 'Cancel'}
                 </button>
-                <button 
-                  type="button"
-                  onClick={handleCreate} 
-                  disabled={!name.trim()}
-                  className="w-1/2 py-2.5 bg-[#166534] hover:bg-[#14532d] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                <button
+                  disabled={!newWorkflowName.trim() || isCreatingWorkflow}
+                  onClick={handleCreateWorkflow}
+                  className="px-4 py-2 bg-[#166534] hover:bg-[#15803d] text-white rounded-xl text-xs font-bold disabled:opacity-50 flex items-center gap-1.5"
                 >
-                  {isRtl ? 'إنشاء' : 'Create'}
+                  {isCreatingWorkflow && <Loader2 size={13} className="animate-spin" />}
+                  {isRtl ? 'إنشاء وفتح المحرر' : 'Create & Open Builder'}
                 </button>
               </div>
             </motion.div>
@@ -502,93 +1039,212 @@ export default function WorkflowsPage() {
         )}
       </AnimatePresence>
 
-      {/* EDIT MODAL */}
+      {/* MODAL: Create/Rename Folder */}
       <AnimatePresence>
-        {isEditOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" dir={isRtl ? 'rtl' : 'ltr'}>
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsEditOpen(false)}
-              className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs"
-            />
-            
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 15 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 15 }}
-              className="relative w-full max-w-md bg-white border border-[#E2E8F0] rounded-2xl shadow-xl overflow-hidden z-[110] p-6 space-y-4"
+        {isFolderModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-sm bg-white rounded-2xl p-5 shadow-2xl border border-slate-200 space-y-4"
             >
-              <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
-                <span className="text-xs font-black text-[#12263A] uppercase tracking-widest">
-                  {isRtl ? 'تعديل بيانات المسار' : 'Edit Workflow Info'}
-                </span>
-                <button 
-                  onClick={() => setIsEditOpen(false)} 
-                  className="text-[#64748B] hover:text-[#12263A] p-1 rounded-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-                >
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-[#12263A]">
+                  {folderModalMode === 'create' ? (isRtl ? 'إنشاء مجلد مسارات جديد' : 'New Workflow Folder') : (isRtl ? 'إعادة تسمية المجلد' : 'Rename Folder')}
+                </h3>
+                <button onClick={() => setIsFolderModalOpen(false)} className="text-slate-400 hover:text-slate-600">
                   <X size={16} />
                 </button>
               </div>
 
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-[#64748B] uppercase tracking-widest block">
-                    {isRtl ? 'اسم مسار العمل' : 'Workflow Name'}
-                  </label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full h-10 px-3.5 bg-[#FFFFFF] border border-[#E2E8F0] rounded-xl text-xs font-medium text-[#12263A] focus:outline-none focus:ring-2 focus:ring-[#22C55E]/15 focus:border-[#166534] transition-all"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-[#64748B] uppercase tracking-widest block">
-                    {isRtl ? 'الوصف' : 'Description'}
-                  </label>
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="w-full h-20 p-3 bg-[#FFFFFF] border border-[#E2E8F0] rounded-xl text-xs font-medium text-[#12263A] focus:outline-none focus:ring-2 focus:ring-[#22C55E]/15 focus:border-[#166534] transition-all resize-none"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-[#64748B] uppercase tracking-widest block">
-                    {isRtl ? 'الحالة' : 'Status'}
-                  </label>
-                  <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value as any)}
-                    className="w-full h-10 px-3 bg-[#FFFFFF] border border-[#E2E8F0] rounded-xl text-xs font-medium text-[#12263A] focus:outline-none focus:ring-2 focus:ring-[#22C55E]/15 focus:border-[#166534] transition-all cursor-pointer"
-                  >
-                    <option value="inactive">{isRtl ? 'معطل' : 'Inactive'}</option>
-                    <option value="active">{isRtl ? 'نشط' : 'Active'}</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  {isRtl ? 'اسم المجلد' : 'Folder Name'}
+                </label>
+                <input
+                  type="text"
+                  value={folderNameInput}
+                  onChange={(e) => setFolderNameInput(e.target.value)}
+                  placeholder={isRtl ? 'مثال: حملات الترحيب' : 'e.g. Sales Sequences'}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#166534]"
+                />
               </div>
 
-              <div className="flex gap-2.5 pt-2">
-                <button 
-                  type="button"
-                  onClick={() => setIsEditOpen(false)} 
-                  className="w-1/2 py-2.5 bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#E2E8F0] text-[#64748B] hover:text-[#12263A] rounded-xl text-xs font-bold transition-all cursor-pointer"
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  onClick={() => setIsFolderModalOpen(false)}
+                  className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50"
                 >
                   {isRtl ? 'إلغاء' : 'Cancel'}
                 </button>
-                <button 
-                  type="button"
-                  onClick={handleUpdate} 
-                  disabled={!name.trim()}
-                  className="w-1/2 py-2.5 bg-[#166534] hover:bg-[#14532d] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                <button
+                  disabled={!folderNameInput.trim() || isFolderSaving}
+                  onClick={handleSaveFolder}
+                  className="px-4 py-1.5 bg-[#166534] text-white rounded-lg text-xs font-bold disabled:opacity-50"
                 >
-                  {isRtl ? 'حفظ التغييرات' : 'Save Changes'}
+                  {isFolderSaving ? (isRtl ? 'جاري الحفظ...' : 'Saving...') : (isRtl ? 'حفظ المجلد' : 'Save Folder')}
                 </button>
               </div>
             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL: Single Move to Folder */}
+      <AnimatePresence>
+        {isMoveSingleOpen && singleActionWorkflow && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+            <div className="w-full max-w-sm bg-white rounded-2xl p-5 shadow-2xl border border-slate-200 space-y-4">
+              <h3 className="text-sm font-bold text-[#12263A]">
+                {isRtl ? 'نقل المسار إلى مجلد' : 'Move Workflow to Folder'}
+              </h3>
+              <p className="text-xs text-slate-500">
+                {singleActionWorkflow.name}
+              </p>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  {isRtl ? 'اختر المجلد الوجهة' : 'Select Destination Folder'}
+                </label>
+                <select
+                  value={singleTargetFolderId || ''}
+                  onChange={(e) => setSingleTargetFolderId(e.target.value ? Number(e.target.value) : null)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-[#166534]"
+                >
+                  <option value="">{isRtl ? 'بدون مجلد (غير منظم)' : 'No Folder (Unorganized)'}</option>
+                  {folders.map(f => (
+                    <option key={f.id} value={f.id}>{f.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  onClick={() => setIsMoveSingleOpen(false)}
+                  className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50"
+                >
+                  {isRtl ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button
+                  onClick={handleMoveSingle}
+                  className="px-4 py-1.5 bg-[#166534] text-white rounded-lg text-xs font-bold"
+                >
+                  {isRtl ? 'تأكيد النقل' : 'Move'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL: Bulk Move to Folder */}
+      <AnimatePresence>
+        {isBulkMoveOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+            <div className="w-full max-w-sm bg-white rounded-2xl p-5 shadow-2xl border border-slate-200 space-y-4">
+              <h3 className="text-sm font-bold text-[#12263A]">
+                {isRtl ? 'نقل المسارات المحددة' : 'Move Selected Workflows'}
+              </h3>
+              <p className="text-xs text-slate-500">
+                {isRtl ? `سيتم نقل ${selectedIds.length} مسارات عمل.` : `Moving ${selectedIds.length} workflows.`}
+              </p>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  {isRtl ? 'المجلد الوجهة' : 'Target Folder'}
+                </label>
+                <select
+                  value={bulkTargetFolderId || ''}
+                  onChange={(e) => setBulkTargetFolderId(e.target.value ? Number(e.target.value) : null)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-[#166534]"
+                >
+                  <option value="">{isRtl ? 'بدون مجلد (إلغاء التصنيف)' : 'No Folder (Unorganized)'}</option>
+                  {folders.map(f => (
+                    <option key={f.id} value={f.id}>{f.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  onClick={() => setIsBulkMoveOpen(false)}
+                  className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50"
+                >
+                  {isRtl ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button
+                  disabled={isPerformingBulk}
+                  onClick={handleBulkMove}
+                  className="px-4 py-1.5 bg-[#166534] text-white rounded-lg text-xs font-bold disabled:opacity-50"
+                >
+                  {isPerformingBulk ? (isRtl ? 'جاري النقل...' : 'Moving...') : (isRtl ? 'تأكيد النقل' : 'Move')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* CONFIRM MODAL: Single Delete */}
+      <AnimatePresence>
+        {isDeleteSingleConfirm && singleActionWorkflow && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+            <div className="w-full max-w-sm bg-white rounded-2xl p-5 shadow-2xl border border-red-200 space-y-4">
+              <div className="flex items-center gap-2 text-red-600">
+                <AlertCircle size={20} />
+                <h3 className="text-sm font-bold">{isRtl ? 'تأكيد حذف المسار' : 'Confirm Workflow Deletion'}</h3>
+              </div>
+              <p className="text-xs text-slate-600">
+                {isRtl ? `هل أنت متأكد من حذف "${singleActionWorkflow.name}"؟ سيتم إيقاف كافة جهات الاتصال المسجلة حالياً.` : `Are you sure you want to delete "${singleActionWorkflow.name}"? Active enrollments will be halted.`}
+              </p>
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  onClick={() => setIsDeleteSingleConfirm(false)}
+                  className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50"
+                >
+                  {isRtl ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button
+                  onClick={handleDeleteSingle}
+                  className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold"
+                >
+                  {isRtl ? 'تأكيد الحذف' : 'Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* CONFIRM MODAL: Bulk Delete */}
+      <AnimatePresence>
+        {isBulkDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+            <div className="w-full max-w-sm bg-white rounded-2xl p-5 shadow-2xl border border-red-200 space-y-4">
+              <div className="flex items-center gap-2 text-red-600">
+                <AlertCircle size={20} />
+                <h3 className="text-sm font-bold">{isRtl ? 'حذف مسارات متعددة' : 'Bulk Delete Workflows'}</h3>
+              </div>
+              <p className="text-xs text-slate-600">
+                {isRtl ? `سيتم حذف ${selectedIds.length} مسارات عمل نهائياً. لا يمكن التراجع عن هذا الإجراء.` : `Permanently delete ${selectedIds.length} selected workflows? This action cannot be undone.`}
+              </p>
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  onClick={() => setIsBulkDeleteConfirm(false)}
+                  className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50"
+                >
+                  {isRtl ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button
+                  disabled={isPerformingBulk}
+                  onClick={handleBulkDelete}
+                  className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold disabled:opacity-50"
+                >
+                  {isPerformingBulk ? (isRtl ? 'جاري الحذف...' : 'Deleting...') : (isRtl ? 'حذف نهائي' : 'Delete All')}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </AnimatePresence>

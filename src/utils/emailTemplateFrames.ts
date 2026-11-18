@@ -167,6 +167,63 @@ export const PROFESSIONAL_FRAMES: EmailFrame[] = [
 <div style="padding: 16px 24px; border-top: 1px solid #f1f5f9; font-size: 11px; color: #94a3b8; border-radius: 0 0 12px 12px; text-align: center;">
   <a href="{{unsubscribe_url}}" style="color: #94a3b8; text-decoration: underline;">Unsubscribe</a>
 </div>`
+  },
+  {
+    id: 'corporate_cyber_lime',
+    name: 'Corporate Cyber Lime',
+    nameAr: 'الشركات والتقنية الحديثة (لايم وأسود)',
+    badge: 'Black & Lime',
+    badgeAr: 'أسود ولايم',
+    accentBg: 'bg-black',
+    accentBorder: 'border-[#ccff00]',
+    category: 'General',
+    description: 'High-contrast corporate letterhead with dark navigation, lime green accent bar, and sleek social footer.',
+    descriptionAr: 'قالب رسمي أنيق بشريط تنقل داكن، خط تحديد بلون الليموني، وتذييل احترافي لشبكات التواصل الاجتماعي.',
+    defaultSubject: 'Project Updates & Case Studies',
+    defaultSubjectAr: 'تحديثات المشاريع ودراسات الحالة',
+    defaultBody: `<p style="margin: 0 0 16px 0; font-weight: 700; color: #111827;">Hi {{first_name | default: "there"}},</p>
+<p style="margin: 0 0 20px 0; color: #374151; line-height: 1.65;">Thank you for the updates. We checked the latest progress and need the following points addressed:</p>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin: 0 0 14px 0;">
+  <tr>
+    <td width="3.5" bgcolor="#ccff00" style="background-color: #ccff00; width: 3.5px; font-size: 0; line-height: 0;">&nbsp;</td>
+    <td style="padding-left: 10px;">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 800; color: #111827;">1. Case studies & Updates</h2>
+    </td>
+  </tr>
+</table>
+<ul style="margin: 0 0 22px 0; padding-left: 20px; color: #374151; line-height: 1.65;">
+  <li style="margin-bottom: 7px;">Please replace the current case study text on each project page with the updated content.</li>
+  <li style="margin-bottom: 7px;">Keep all existing image boards and verified metrics intact.</li>
+</ul>
+<p style="margin: 0 0 16px 0; color: #374151;">Please reply with a completion date for each item.</p>
+<p style="margin: 0; line-height: 1.5; color: #374151;">Thanks,<br><strong style="color: #111827;">{{from_name}}</strong></p>`,
+    renderHeader: (fromName) => `
+<div style="background-color: #ffffff; padding: 22px 28px; border-radius: 12px 12px 0 0;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td>
+        <span style="font-size: 22px; font-weight: 800; color: #111827; letter-spacing: -0.5px;">${fromName || 'Andlyl'}</span>
+      </td>
+      <td align="right">
+        <span style="font-size: 10px; font-weight: 700; color: #6b7280; letter-spacing: 0.8px; text-transform: uppercase;">TALK TO US</span>
+        <span style="display: block; font-size: 13px; font-weight: 800; color: #111827; margin-top: 2px;">+1 718 395 3598</span>
+      </td>
+    </tr>
+  </table>
+</div>
+<div style="background-color: #000000; border-bottom: 3px solid #ccff00; padding: 10px 16px; text-align: center;">
+  <span style="color: #ffffff; font-size: 11px; font-weight: 800; letter-spacing: 1px; padding: 0 10px;">COMPANY</span>
+  <span style="color: #ffffff; font-size: 11px; font-weight: 800; letter-spacing: 1px; padding: 0 10px;">SERVICES</span>
+  <span style="color: #ffffff; font-size: 11px; font-weight: 800; letter-spacing: 1px; padding: 0 10px;">PROJECTS</span>
+  <span style="color: #ccff00; font-size: 11px; font-weight: 800; letter-spacing: 1px; padding: 0 10px;">CONTACT</span>
+</div>`,
+    renderFooter: (fromName) => `
+<div style="background-color: #000000; padding: 26px 28px; border-radius: 0 0 12px 12px; color: #ffffff;">
+  <p style="margin: 0 0 12px 0; font-size: 11px; font-weight: 800; color: #ccff00; letter-spacing: 1px; text-transform: uppercase;">FOLLOW ${fromName ? fromName.toUpperCase() : 'ANDLYL'}</p>
+  <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #ccff00;">${fromName || 'Andlyl Corp'}</p>
+  <p style="margin: 0 0 6px 0; font-size: 11px; color: #9ca3af;">18904 Hillside Ave, Hollis, NY 11423, USA</p>
+  <p style="margin: 0; font-size: 11px;"><a href="{{unsubscribe_url}}" style="color: #6b7280; text-decoration: underline;">Unsubscribe</a></p>
+</div>`
   }
 ];
 
@@ -269,6 +326,63 @@ export const EMAIL_TEMPLATE_THEMES: EmailTemplateTheme[] = [
     buttonBg: '#059669',
     buttonTextColor: '#ffffff',
     description: 'Trust-building growth layout with deep emerald accents and credibility badges.'
+  },
+  {
+    id: 'corporate_cyber_lime',
+    name: 'Corporate Cyber Lime',
+    nameAr: 'الشركات والتقنية الحديثة (لايم وأسود)',
+    badge: 'Black & Lime',
+    badgeAr: 'أسود ولايم',
+    accentBg: 'bg-black',
+    accentBorder: 'border-[#ccff00]',
+    category: 'General',
+    description: 'High-contrast corporate letterhead with dark navigation, lime green accent bar, and sleek social footer.',
+    descriptionAr: 'قالب رسمي أنيق بشريط تنقل داكن، خط تحديد بلون الليموني، وتذييل احترافي لشبكات التواصل الاجتماعي.',
+    defaultSubject: 'Project Updates & Case Studies',
+    defaultSubjectAr: 'تحديثات المشاريع ودراسات الحالة',
+    defaultBody: `<p style="margin: 0 0 16px 0; font-weight: 700; color: #111827;">Hi {{first_name | default: "there"}},</p>
+<p style="margin: 0 0 20px 0; color: #374151; line-height: 1.65;">Thank you for the updates. We checked the latest progress and need the following points addressed:</p>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin: 0 0 14px 0;">
+  <tr>
+    <td width="3.5" bgcolor="#ccff00" style="background-color: #ccff00; width: 3.5px; font-size: 0; line-height: 0;">&nbsp;</td>
+    <td style="padding-left: 10px;">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 800; color: #111827;">1. Case studies & Updates</h2>
+    </td>
+  </tr>
+</table>
+<ul style="margin: 0 0 22px 0; padding-left: 20px; color: #374151; line-height: 1.65;">
+  <li style="margin-bottom: 7px;">Please replace the current case study text on each project page with the updated content.</li>
+  <li style="margin-bottom: 7px;">Keep all existing image boards and verified metrics intact.</li>
+</ul>
+<p style="margin: 0 0 16px 0; color: #374151;">Please reply with a completion date for each item.</p>
+<p style="margin: 0; line-height: 1.5; color: #374151;">Thanks,<br><strong style="color: #111827;">{{from_name}}</strong></p>`,
+    renderHeader: (fromName) => `
+<div style="background-color: #ffffff; padding: 22px 28px; border-radius: 12px 12px 0 0;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td>
+        <span style="font-size: 22px; font-weight: 800; color: #111827; letter-spacing: -0.5px;">${fromName || 'Andlyl'}</span>
+      </td>
+      <td align="right">
+        <span style="font-size: 10px; font-weight: 700; color: #6b7280; letter-spacing: 0.8px; text-transform: uppercase;">TALK TO US</span>
+        <span style="display: block; font-size: 13px; font-weight: 800; color: #111827; margin-top: 2px;">+1 718 395 3598</span>
+      </td>
+    </tr>
+  </table>
+</div>
+<div style="background-color: #000000; border-bottom: 3px solid #ccff00; padding: 10px 16px; text-align: center;">
+  <span style="color: #ffffff; font-size: 11px; font-weight: 800; letter-spacing: 1px; padding: 0 10px;">COMPANY</span>
+  <span style="color: #ffffff; font-size: 11px; font-weight: 800; letter-spacing: 1px; padding: 0 10px;">SERVICES</span>
+  <span style="color: #ffffff; font-size: 11px; font-weight: 800; letter-spacing: 1px; padding: 0 10px;">PROJECTS</span>
+  <span style="color: #ccff00; font-size: 11px; font-weight: 800; letter-spacing: 1px; padding: 0 10px;">CONTACT</span>
+</div>`,
+    renderFooter: (fromName) => `
+<div style="background-color: #000000; padding: 26px 28px; border-radius: 0 0 12px 12px; color: #ffffff;">
+  <p style="margin: 0 0 12px 0; font-size: 11px; font-weight: 800; color: #ccff00; letter-spacing: 1px; text-transform: uppercase;">FOLLOW ${fromName ? fromName.toUpperCase() : 'ANDLYL'}</p>
+  <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #ccff00;">${fromName || 'Andlyl Corp'}</p>
+  <p style="margin: 0 0 6px 0; font-size: 11px; color: #9ca3af;">18904 Hillside Ave, Hollis, NY 11423, USA</p>
+  <p style="margin: 0; font-size: 11px;"><a href="{{unsubscribe_url}}" style="color: #6b7280; text-decoration: underline;">Unsubscribe</a></p>
+</div>`
   }
 ];
 

@@ -70,6 +70,8 @@ import AutomationDashboard from './pages/automation/AutomationDashboard';
 import WorkflowsPage from './pages/automation/WorkflowsPage';
 import ExecutionsPage from './pages/automation/ExecutionsPage';
 import WorkflowBuilderPage from './pages/automation/WorkflowBuilderPage';
+import AutomationTemplatesPage from './pages/automation/AutomationTemplatesPage';
+import AutomationSettingsPage from './pages/automation/AutomationSettingsPage';
 
 // Page & Form Builder Pages
 import PageBuilderDashboard from './pages/pageBuilder/PageBuilderDashboard';
@@ -221,7 +223,10 @@ export default function App() {
           <Route path="automation" element={<AutomationLayout />}>
             <Route index element={<AutomationDashboard />} />
             <Route path="workflows" element={<WorkflowsPage />} />
+            <Route path="templates" element={<AutomationTemplatesPage />} />
             <Route path="executions" element={<ExecutionsPage />} />
+            <Route path="settings" element={<AutomationSettingsPage />} />
+            <Route path="controls" element={<Navigate to="/automation/settings" replace />} />
           </Route>
           <Route path="automation/workflows/builder/:id" element={<WorkflowBuilderPage />} />
           <Route path="automation/workflows/builder" element={<WorkflowBuilderPage />} />

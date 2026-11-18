@@ -8,7 +8,7 @@ export interface InboxConversation {
   last_message?:string; last_message_at?:string; unread_count:number; is_unread:boolean; status:'open'|'pending'|'resolved'; priority:'low'|'normal'|'high'|'urgent';
   assigned_to_user_id?:number|null; assigned_to_name?:string|null; is_starred:boolean; is_following:boolean; identity_status:'linked'|'unresolved';
   sla_status?:'running'|'warning'|'overdue'|'met'|'paused'|'inactive'|null; sla_due_at?:string|null; sla_started_at?:string|null;
-  can_send_freeform?:boolean; send_restriction?:string|null;
+  can_send_freeform?:boolean; send_restriction?:string|null; is_auto_reply_active?:boolean;
 }
 
 export interface InboxMessage { id:number; provider_id?:string; direction:'inbound'|'outbound'; body?:string; type:string; status?:string; timestamp:string; attachment?:{url:string;mime_type?:string;file_name?:string}|null }

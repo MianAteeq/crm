@@ -284,7 +284,7 @@ class CrmApiService {
     }
   }
 
-  async saveAiSettings(openaiKey: string | undefined, companyPrompt: string, replyLanguage: string = 'ar-SA'): Promise<{ success: boolean; message: string; data?: any }> {
+  async saveAiSettings(openaiKey: string | undefined, companyPrompt: string, replyLanguage: string = 'ar-SA', isAutoReplyEnabled: boolean = true): Promise<{ success: boolean; message: string; data?: any }> {
     try {
       return await this.request('/whatsapp/settings/ai', {
         method: 'POST',
@@ -292,6 +292,7 @@ class CrmApiService {
           openai_key: openaiKey || undefined,
           company_prompt: companyPrompt,
           reply_language: replyLanguage,
+          is_auto_reply_enabled: isAutoReplyEnabled,
         })
       });
     } catch (error: any) {
@@ -966,19 +967,107 @@ class CrmApiService {
     });
   }
 
-  async saveWorkflowCanvas(id: number | string, nodes: any[], connections: any[]): Promise<any> {
+  async saveWorkflowCanvas(id: number | string, nodes: any[], connections: any[], lockVersion?: number): Promise<any> {
     return this.request<any>(`/automation/workflows/${id}/canvas`, {
       method: 'POST',
-      body: JSON.stringify({ nodes, connections })
+      body: JSON.stringify({ nodes, connections, lock_version: lockVersion })
     });
   }
 
-  async getAutomationLogs(): Promise<any> {
-    return this.request<any>('/automation/executions');
+  async publishWorkflow(id: number | string, changeSummary?: string): Promise<any> {
+    return this.request<any>(`/automation/workflows/${id}/publish`, { method: 'POST', body: JSON.stringify({ change_summary: changeSummary }) });
+  }
+
+  async validateWorkflow(id: number | string): Promise<any> {
+    return this.request<any>(`/automation/workflows/${id}/validate`, { method: 'POST' });
+  }
+
+  async testWorkflow(id: number | string, testData: Record<string, unknown> = {}): Promise<any> {
+    return this.request<any>(`/automation/workflows/${id}/test`, { method: 'POST', body: JSON.stringify({ test_data: testData }) });
+  }
+
+  async getWorkflowVersions(id: number | string): Promise<any> {
+    return this.request<any>(`/automation/workflows/${id}/versions`);
+  }
+
+  async restoreWorkflowVersion(id: number | string, versionId: number | string, lockVersion: number): Promise<any> {
+    return this.request<any>(`/automation/workflows/${id}/versions/${versionId}/restore`, { method: 'POST', body: JSON.stringify({ lock_version: lockVersion }) });
+  }
+
+  async getAutomationLogs(params: Record<string, string | number | undefined> = {}): Promise<any> {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== '') query.set(key, String(value));
+    });
+    const suffix = query.toString() ? `?${query.toString()}` : '';
+    return this.request<any>(`/automation/executions${suffix}`);
+  }
+
+  async getAutomationExecution(id: number | string): Promise<any> {
+    return this.request<any>(`/automation/executions/${id}`);
+  }
+
+  async retryExecution(id: number | string): Promise<any> {
+    return this.request<any>(`/automation/executions/${id}/retry`, { method: 'POST' });
+  }
+
+  async cancelExecution(id: number | string): Promise<any> {
+    return this.request<any>(`/automation/executions/${id}/cancel`, { method: 'POST' });
+  }
+
+  async getAutomationFolders(): Promise<any> { return this.request<any>('/automation/folders'); }
+  async getAutomationTemplates(): Promise<any> { return this.request<any>('/automation/templates'); }
+  async createWorkflowFromTemplate(key: string, data: any): Promise<any> { return this.request<any>(`/automation/templates/${key}/create-workflow`, { method: 'POST', body: JSON.stringify(data) }); }
+  async getEmailSequences(): Promise<any> { return this.request<any>('/automation/email-sequences'); }
+  async getTrackedLinks(): Promise<any> { return this.request<any>('/automation/tracked-links'); }
+  async getAutomationBotRules(): Promise<any> { return this.request<any>('/automation/bot-rules'); }
+  async createTrackedLink(data: any): Promise<any> { return this.request<any>('/automation/tracked-links', { method: 'POST', body: JSON.stringify(data) }); }
+  async createEmailSequence(data: any): Promise<any> { return this.request<any>('/automation/email-sequences', { method: 'POST', body: JSON.stringify(data) }); }
+  async createAutomationFolder(data: any): Promise<any> { return this.request<any>('/automation/folders', { method: 'POST', body: JSON.stringify(data) }); }
+  async createAutomationBotRule(data: any): Promise<any> { return this.request<any>('/automation/bot-rules', { method: 'POST', body: JSON.stringify(data) }); }
+
+  async duplicateWorkflow(id: number | string): Promise<any> {
+    return this.request<any>(`/automation/workflows/${id}/duplicate`, { method: 'POST' });
+  }
+
+  async pauseWorkflow(id: number | string): Promise<any> {
+    return this.request<any>(`/automation/workflows/${id}/pause`, { method: 'POST' });
+  }
+
+  async resumeWorkflow(id: number | string): Promise<any> {
+    return this.request<any>(`/automation/workflows/${id}/resume`, { method: 'POST' });
+  }
+
+  async moveWorkflowToFolder(id: number | string, folderId: number | null): Promise<any> {
+    return this.request<any>(`/automation/workflows/${id}/move`, { method: 'POST', body: JSON.stringify({ folder_id: folderId }) });
+  }
+
+  async bulkPauseWorkflows(ids: (number | string)[]): Promise<any> {
+    return this.request<any>('/automation/workflows/bulk-pause', { method: 'POST', body: JSON.stringify({ ids }) });
+  }
+
+  async bulkMoveWorkflows(ids: (number | string)[], folderId: number | null): Promise<any> {
+    return this.request<any>('/automation/workflows/bulk-move', { method: 'POST', body: JSON.stringify({ ids, folder_id: folderId }) });
+  }
+
+  async bulkDeleteWorkflows(ids: (number | string)[]): Promise<any> {
+    return this.request<any>('/automation/workflows/bulk-delete', { method: 'POST', body: JSON.stringify({ ids }) });
   }
 
   async getAutomationDashboardStats(): Promise<any> {
     return this.request<any>('/automation/dashboard-stats');
+  }
+
+  async getExecutionTroubleshoot(executionId: number | string): Promise<any> {
+    return this.request<any>(`/automation/executions/${executionId}/troubleshoot`);
+  }
+
+  async getAlertSettings(): Promise<any> {
+    return this.request<any>('/automation/alert-settings');
+  }
+
+  async saveAlertSettings(data: any): Promise<any> {
+    return this.request<any>('/automation/alert-settings', { method: 'PUT', body: JSON.stringify(data) });
   }
 }
 

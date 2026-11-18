@@ -5,7 +5,9 @@ import {
   GitFork, 
   History, 
   Menu, 
-  X 
+  X,
+  Sparkles,
+  Settings
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useI18n } from '../../i18n';
@@ -21,7 +23,7 @@ export default function AutomationLayout() {
       label: isRtl ? 'نظرة عامة' : 'Overview', 
       path: '/automation', 
       icon: LayoutDashboard, 
-      desc: isRtl ? 'الرؤى والملخص العام' : 'Insights and summary' 
+      desc: isRtl ? 'الرؤى والملخص العام' : 'Insights and performance' 
     },
     { 
       label: isRtl ? 'مسارات العمل' : 'Workflows', 
@@ -30,10 +32,22 @@ export default function AutomationLayout() {
       desc: isRtl ? 'مسارات وأنابيب الأتمتة' : 'Automation pipelines' 
     },
     { 
+      label: isRtl ? 'مكتبة القوالب' : 'Templates', 
+      path: '/automation/templates', 
+      icon: Sparkles, 
+      desc: isRtl ? 'قوالب واتساب الجاهزة' : 'WhatsApp template library' 
+    },
+    { 
       label: isRtl ? 'سجلات التنفيذ' : 'Executions', 
       path: '/automation/executions', 
       icon: History, 
-      desc: isRtl ? 'سجلات تشغيل العمليات' : 'Workflow execution records' 
+      desc: isRtl ? 'سجلات وسجل التشغيل' : 'Execution history & logs' 
+    },
+    { 
+      label: isRtl ? 'الإعدادات' : 'Settings', 
+      path: '/automation/settings', 
+      icon: Settings, 
+      desc: isRtl ? 'إعدادات وقواعد الأتمتة' : 'Policies, pause & bot rules' 
     },
   ];
 

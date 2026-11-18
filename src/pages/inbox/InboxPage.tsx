@@ -4,6 +4,7 @@ import {
   AlertCircle,
   AtSign,
   BellRing,
+  Bot,
   Building2,
   CalendarDays,
   Check,
@@ -62,6 +63,7 @@ export default function InboxPage() {
         open={contextOpen}
         close={() => setContextOpen(false)}
         refresh={inbox.refresh}
+        mutateState={inbox.mutateState}
       />
       {settingsOpen && (
         <InboxSettingsModal
@@ -474,6 +476,27 @@ function ConversationWorkspace({
           </select>
         </div>
 
+        {/* Chat Auto-Reply Option Toggle */}
+        {conversation.channel === 'whatsapp' && (
+          <button
+            type="button"
+            onClick={() => mutateState({ is_auto_reply_active: conversation.is_auto_reply_active === false ? true : false })}
+            aria-label="Toggle Auto-Reply"
+            title={conversation.is_auto_reply_active !== false ? 'Auto-Reply is ACTIVE for this conversation. Click to pause.' : 'Auto-Reply is PAUSED for this conversation. Click to enable.'}
+            className={`hidden sm:inline-flex items-center gap-1.5 h-10 px-3 rounded-xl text-xs font-bold transition-all border shadow-xs cursor-pointer active:scale-95 ${
+              conversation.is_auto_reply_active !== false
+                ? 'bg-[#F0FDF4] border-[#22C55E]/40 text-[#166534] hover:bg-[#DCFCE7]'
+                : 'bg-slate-100 border-slate-300 text-slate-500 hover:text-slate-800 hover:bg-slate-200'
+            }`}
+          >
+            <Bot size={15} className={conversation.is_auto_reply_active !== false ? 'text-[#166534]' : 'text-slate-400'} />
+            <span>Auto-Reply:</span>
+            <span className={conversation.is_auto_reply_active !== false ? 'text-[#166534]' : 'text-slate-600'}>
+              {conversation.is_auto_reply_active !== false ? 'ON' : 'OFF'}
+            </span>
+          </button>
+        )}
+
         <button
           onClick={() => mutateState({ is_starred: !conversation.is_starred })}
           aria-label={conversation.is_starred ? 'Remove star' : 'Star conversation'}
@@ -520,6 +543,20 @@ function ConversationWorkspace({
           <option value="pending">Pending</option>
           <option value="resolved">Resolved</option>
         </select>
+        {conversation.channel === 'whatsapp' && (
+          <button
+            type="button"
+            onClick={() => mutateState({ is_auto_reply_active: conversation.is_auto_reply_active === false ? true : false })}
+            className={`inline-flex items-center gap-1 h-10 px-2.5 rounded-xl text-xs font-bold border shrink-0 ${
+              conversation.is_auto_reply_active !== false
+                ? 'bg-[#F0FDF4] border-[#22C55E]/40 text-[#166534]'
+                : 'bg-slate-100 border-slate-300 text-slate-500'
+            }`}
+          >
+            <Bot size={13} />
+            <span>{conversation.is_auto_reply_active !== false ? 'Bot: ON' : 'Bot: OFF'}</span>
+          </button>
+        )}
       </div>
 
       <MessageTimeline messages={detail.messages || []} notes={detail.notes || []} />
@@ -781,7 +818,7 @@ function Composer({
   );
 }
 
-function CustomerContext({ detail, boot, selected, open, close, refresh }: any) {
+function CustomerContext({ detail, boot, selected, open, close, refresh, mutateState }: any) {
   const context = detail?.context;
   const conversation = detail?.conversation;
   const [taskOpen, setTaskOpen] = useState(false);
@@ -849,6 +886,41 @@ function CustomerContext({ detail, boot, selected, open, close, refresh }: any) 
           </div>
         ) : (
           <div className="space-y-3">
+            {/* Auto-Reply Status & Option */}
+            {conversation?.channel === 'whatsapp' && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${conversation.is_auto_reply_active !== false ? 'bg-[#F0FDF4] text-[#166534]' : 'bg-slate-100 text-slate-500'}`}>
+                      <Bot size={15} />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-slate-900 block leading-tight">Chat Auto-Reply</span>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        {conversation.is_auto_reply_active !== false ? 'Bot active' : 'Bot paused'}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => mutateState?.({ is_auto_reply_active: conversation.is_auto_reply_active === false ? true : false })}
+                    className={`px-3 py-1 rounded-xl text-xs font-bold border transition cursor-pointer active:scale-95 ${
+                      conversation.is_auto_reply_active !== false 
+                        ? 'bg-[#F0FDF4] text-[#166534] border-[#22C55E]/40 hover:bg-[#DCFCE7]' 
+                        : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+                    }`}
+                  >
+                    {conversation.is_auto_reply_active !== false ? 'Active (ON)' : 'Paused (OFF)'}
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-500 leading-normal">
+                  {conversation.is_auto_reply_active !== false 
+                    ? 'Automated responses and bot workflows are active for this contact.' 
+                    : 'Auto-reply is paused. Incoming messages will only be handled manually by your team.'}
+                </p>
+              </div>
+            )}
+
             <ContextCard title="Contact" icon={UserCheck}>
               <div className="text-base font-extrabold text-slate-950">{context.contact.name}</div>
               <div className="mt-2 space-y-1.5 text-xs text-slate-500">
@@ -1014,7 +1086,7 @@ function InboxSettingsModal({
   close: () => void;
   reload: () => Promise<void>;
 }) {
-  const [tab, setTab] = useState<'snippets' | 'sla' | 'report'>('snippets');
+  const [tab, setTab] = useState<'snippets' | 'sla' | 'autoreply' | 'report'>('snippets');
   const [snippets, setSnippets] = useState<any[]>([]);
   const [snippet, setSnippet] = useState({
     title: '',
@@ -1087,7 +1159,7 @@ function InboxSettingsModal({
         </header>
 
         <div className="flex border-b border-slate-200 px-5">
-          {(['snippets', 'sla', 'report'] as const).map((item) => (
+          {(['snippets', 'sla', 'autoreply', 'report'] as const).map((item) => (
             <button
               key={item}
               onClick={() => setTab(item)}
@@ -1097,7 +1169,7 @@ function InboxSettingsModal({
                   : 'border-transparent text-slate-500 hover:text-slate-800'
               }`}
             >
-              {item === 'sla' ? 'SLA policy' : item}
+              {item === 'sla' ? 'SLA policy' : item === 'autoreply' ? 'Auto-Reply' : item}
             </button>
           ))}
         </div>
